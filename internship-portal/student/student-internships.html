@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Browse Internships - First Step Into The Business World</title>
+
+	<!-- Global stylesheets -->
+	<link href="../../bs5/template/assets/fonts/inter/inter.css" rel="stylesheet" type="text/css">
+	<link href="../../bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
+	<link href="../../bs5/template/html/layout_1/full/assets/css/ltr/all.min.css?v=1" id="stylesheet" rel="stylesheet" type="text/css">
+	<!-- /global stylesheets -->
+
+	<!-- Core JS files -->
+	<script src="../../bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+	<!-- /core JS files -->
+
+	<!-- Theme JS files -->
+	<script src="../../bs5/template/assets/js/vendor/tables/datatables/datatables.min.js"></script>
+	<script src="../../bs5/template/html/layout_1/full/assets/js/app.js"></script>
+	<script src="../../bs5/template/assets/demo/pages/datatables_basic.js"></script>
+	<!-- /theme JS files -->
+	
+	<!-- Custom style for proper scrolling -->
+	<style>
+		.content-wrapper {
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+		}
+		.content {
+			flex: 1;
+			overflow-y: auto;
+			padding-bottom: 1rem;
+		}
+		.page-content {
+			height: 100vh;
+			display: flex;
+			overflow: hidden;
+		}
+	</style>
+</head>
+
+<body>
+
+	<!-- Main navbar -->
+	<div class="navbar navbar-dark navbar-expand-lg navbar-static border-bottom border-bottom-white border-opacity-10">
+		<div class="container-fluid">
+			<div class="d-flex d-lg-none me-2">
+				<button type="button" class="navbar-toggler sidebar-mobile-main-toggle rounded-pill">
+					<i class="ph-list"></i>
+				</button>
+			</div>
+
+			<div class="navbar-brand flex-1 flex-lg-0">
+				<a href="student-dashboard.html" class="d-inline-flex align-items-center">
+					<img src="../../bs5/template/assets/images/demo/logos/1.svg" alt="First Step Logo" class="h-32px">
+					<span class="d-none d-sm-inline-block h6 mb-0 ms-2">First Step Into The Business World</span>
+				</a>
+			</div>
+
+			<div class="navbar-collapse justify-content-center flex-lg-1 order-2 order-lg-1 collapse" id="navbar_search">
+				<div class="navbar-search flex-fill position-relative mt-2 mt-lg-0 mx-lg-3">
+					<div class="form-control-feedback form-control-feedback-start flex-grow-1">
+						<input type="text" class="form-control bg-transparent rounded-pill" placeholder="Search internships...">
+						<div class="form-control-feedback-icon">
+							<i class="ph-magnifying-glass"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<ul class="nav flex-row justify-content-end order-1 order-lg-2">
+				<li class="nav-item nav-item-dropdown-lg dropdown">
+					<a href="#" class="navbar-nav-link navbar-nav-link-icon rounded-pill" data-bs-toggle="dropdown">
+						<i class="ph-bell"></i>
+						<span class="badge bg-yellow text-black position-absolute top-0 end-0 translate-middle-top zindex-1 rounded-pill mt-1 me-1">2</span>
+					</a>
+					
+					<div class="dropdown-menu dropdown-menu-end dropdown-menu-scrollable-sm wmin-lg-350">
+						<div class="d-flex align-items-center border-bottom py-2 px-3">
+							<h6 class="mb-0">Notifications</h6>
+							<a href="#" class="ms-auto text-body">
+								<i class="ph-check-square me-1"></i>
+								Mark all as read
+							</a>
+						</div>
+
+						<div class="dropdown-item d-flex py-2">
+							<div class="flex-shrink-0 me-3">
+								<div class="bg-success bg-opacity-10 text-success rounded-pill p-2">
+									<i class="ph-check"></i>
+								</div>
+							</div>
+
+							<div class="flex-grow-1">
+								<a href="#" class="d-block fw-semibold">Your application has been accepted</a>
+								<span class="text-muted">Marketing Intern at XYZ Corp</span>
+							</div>
+							<div class="flex-shrink-0 align-self-center">
+								<span class="text-muted fs-sm">2 hours ago</span>
+							</div>
+						</div>
+
+						<div class="dropdown-item d-flex py-2">
+							<div class="flex-shrink-0 me-3">
+								<div class="bg-primary bg-opacity-10 text-primary rounded-pill p-2">
+									<i class="ph-user-plus"></i>
+								</div>
+							</div>
+
+							<div class="flex-grow-1">
+								<a href="#" class="d-block fw-semibold">New internship posted</a>
+								<span class="text-muted">Software Developer at ABC Tech</span>
+							</div>
+							<div class="flex-shrink-0 align-self-center">
+								<span class="text-muted fs-sm">1 day ago</span>
+							</div>
+						</div>
+
+						<div class="text-center border-top p-2">
+							<a href="#" class="text-body">View all</a>
+						</div>
+					</div>
+				</li>
+
+				<li class="nav-item nav-item-dropdown-lg dropdown ms-lg-2">
+					<a href="#" class="navbar-nav-link align-items-center rounded-pill p-1" data-bs-toggle="dropdown">
+						<div class="status-indicator-container">
+							<img src="../../bs5/template/assets/images/demo/users/face11.jpg" class="w-32px h-32px rounded-pill" alt="">
+							<span class="status-indicator bg-success"></span>
+						</div>
+						<span class="d-none d-lg-inline-block mx-lg-2">John Doe</span>
+					</a>
+
+					<div class="dropdown-menu dropdown-menu-end">
+						<a href="student-profile.html" class="dropdown-item">
+							<i class="ph-user-circle me-2"></i>
+							My profile
+						</a>
+						<a href="student-applications.html" class="dropdown-item">
+							<i class="ph-briefcase me-2"></i>
+							My applications
+						</a>
+						<a href="student-documents.html" class="dropdown-item">
+							<i class="ph-file-text me-2"></i>
+							My documents
+						</a>
+						<a href="student-settings.html" class="dropdown-item">
+							<i class="ph-gear me-2"></i>
+							Account settings
+						</a>
+						<div class="dropdown-divider"></div>
+						<a href="index.html" class="dropdown-item">
+							<i class="ph-sign-out me-2"></i>
+							Logout
+						</a>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<!-- /main navbar -->
+
+	<!-- Page content -->
+	<div class="page-content">
+
+		<!-- Main sidebar -->
+		<div class="sidebar sidebar-dark sidebar-main sidebar-expand-lg">
+
+			<!-- Sidebar content -->
+			<div class="sidebar-content">
+
+				<!-- Sidebar header -->
+				<div class="sidebar-section">
+					<div class="sidebar-section-body d-flex justify-content-center">
+						<h5 class="sidebar-resize-hide flex-grow-1 my-auto">Navigation</h5>
+
+						<div>
+							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-control sidebar-main-resize d-none d-lg-inline-flex">
+								<i class="ph-arrows-left-right"></i>
+							</button>
+
+							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-mobile-main-toggle d-lg-none">
+								<i class="ph-x"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+				<!-- /sidebar header -->
+
+
+				<!-- Main navigation -->
+				<div class="sidebar-section">
+					<ul class="nav nav-sidebar" data-nav-type="accordion">
+
+						<!-- Main -->
+						<li class="nav-item-header">
+							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Main</div>
+							<i class="ph-dots-three sidebar-resize-show"></i>
+						</li>
+						<li class="nav-item">
+							<a href="student-dashboard.html" class="nav-link">
+								<i class="ph-house"></i>
+								<span>Dashboard</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-internships.html" class="nav-link active">
+								<i class="ph-briefcase"></i>
+								<span>Browse Internships</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-applications.html" class="nav-link">
+								<i class="ph-file-text"></i>
+								<span>My Applications</span>
+								<span class="badge bg-primary rounded-pill ms-auto">3</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-documents.html" class="nav-link">
+								<i class="ph-file-doc"></i>
+								<span>Documents</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-evaluations.html" class="nav-link">
+								<i class="ph-star"></i>
+								<span>Evaluations</span>
+							</a>
+						</li>
+
+						<!-- Profile -->
+						<li class="nav-item-header">
+							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Profile</div>
+							<i class="ph-dots-three sidebar-resize-show"></i>
+						</li>
+						<li class="nav-item">
+							<a href="student-profile.html" class="nav-link">
+								<i class="ph-user-circle"></i>
+								<span>My Profile</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-settings.html" class="nav-link">
+								<i class="ph-gear"></i>
+								<span>Account Settings</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="index.html" class="nav-link">
+								<i class="ph-sign-out"></i>
+								<span>Logout</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<!-- /main navigation -->
+
+			</div>
+			<!-- /sidebar content -->
+			
+		</div>
+		<!-- /main sidebar -->
+
+
+		<!-- Main content -->
+		<div class="content-wrapper">
+
+			<!-- Page header -->
+			<div class="page-header page-header-light shadow">
+				<div class="page-header-content d-flex justify-content-between align-items-center">
+					<div class="d-flex">
+						<h4 class="page-title mb-0">Browse Internships</h4>
+						<span class="text-muted fs-sm ms-3">65 available opportunities</span>
+					</div>
+					
+					<div>
+						<button type="button" class="btn btn-light">
+							<i class="ph-funnel me-2"></i>
+							Filter Results
+						</button>
+					</div>
+				</div>
+
+				<div class="page-header-content border-top">
+					<div class="row">
+						<div class="col-xl-3 col-lg-6">
+							<div class="mb-3 mb-xl-0">
+								<label class="form-label">Keywords</label>
+								<div class="form-control-feedback form-control-feedback-start">
+									<input type="text" class="form-control" placeholder="Job title, skills, etc">
+									<div class="form-control-feedback-icon">
+										<i class="ph-magnifying-glass"></i>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-xl-3 col-lg-6">
+							<div class="mb-3 mb-xl-0">
+								<label class="form-label">Location</label>
+								<div class="form-control-feedback form-control-feedback-start">
+									<input type="text" class="form-control" placeholder="City, country, region">
+									<div class="form-control-feedback-icon">
+										<i class="ph-map-pin"></i>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-xl-3 col-lg-6">
+							<div class="mb-3 mb-lg-0">
+								<label class="form-label">Category</label>
+								<select class="form-select">
+									<option value="">All Categories</option>
+									<option value="technology">Technology</option>
+									<option value="marketing">Marketing</option>
+									<option value="finance">Finance</option>
+									<option value="hr">Human Resources</option>
+									<option value="engineering">Engineering</option>
+									<option value="research">Research</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="col-xl-3 col-lg-6">
+							<div>
+								<label class="form-label">Duration</label>
+								<select class="form-select">
+									<option value="">Any duration</option>
+									<option value="1-2">1-2 months</option>
+									<option value="3-4">3-4 months</option>
+									<option value="5-6">5-6 months</option>
+									<option value="6+">6+ months</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /page header -->
+
+			<!-- Content area -->
+			<div class="content">
+
+				<!-- Internship cards -->
+				<div class="row">
+					<div class="col-xl-4 col-md-6">
+						<div class="card">
+							<div class="card-body">
+								<div class="d-flex align-items-start mb-3">
+									<div class="me-3">
+										<img src="../../bs5/template/assets/images/demo/logos/2.svg" class="rounded" width="44" height="44" alt="">
+									</div>
+									<div>
+										<h5 class="mb-1">Marketing Intern</h5>
+										<div class="text-muted">XYZ Corporation</div>
+									</div>
+								</div>
+
+								<div class="mb-3">
+									<p>Join our dynamic marketing team to gain hands-on experience in digital marketing, social media management, and campaign development.</p>
+								</div>
+
+								<ul class="list-unstyled mb-3">
+									<li class="mb-1">
+										<i class="ph-map-pin me-1"></i>
+										New York, USA
+									</li>
+									<li class="mb-1">
+										<i class="ph-calendar me-1"></i>
+										3 months
+									</li>
+									<li>
+										<i class="ph-currency-dollar me-1"></i>
+										Paid
+									</li>
+								</ul>
+
+								<div class="mb-3">
+									<span class="badge bg-primary rounded-pill">Graphic Design</span>
+									<span class="badge bg-primary rounded-pill">Social Media</span>
+									<span class="badge bg-primary rounded-pill">Analytics</span>
+								</div>
+
+								<div class="d-flex mt-auto">
+									<div>
+										<span class="text-muted">Posted 2 days ago</span>
+									</div>
+									<button type="button" class="btn btn-primary ms-auto">Apply Now</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-xl-4 col-md-6">
+						<div class="card">
+							<div class="card-body">
+								<div class="d-flex align-items-start mb-3">
+									<div class="me-3">
+										<img src="../../bs5/template/assets/images/demo/logos/3.svg" class="rounded" width="44" height="44" alt="">
+									</div>
+									<div>
+										<h5 class="mb-1">Software Developer Intern</h5>
+										<div class="text-muted">ABC Technologies</div>
+									</div>
+								</div>
+
+								<div class="mb-3">
+									<p>Develop and test software in a collaborative team environment. Opportunity to work on real projects and gain practical programming experience.</p>
+								</div>
+
+								<ul class="list-unstyled mb-3">
+									<li class="mb-1">
+										<i class="ph-map-pin me-1"></i>
+										Remote
+									</li>
+									<li class="mb-1">
+										<i class="ph-calendar me-1"></i>
+										6 months
+									</li>
+									<li>
+										<i class="ph-currency-dollar me-1"></i>
+										Paid
+									</li>
+								</ul>
+
+								<div class="mb-3">
+									<span class="badge bg-primary rounded-pill">Java</span>
+									<span class="badge bg-primary rounded-pill">Python</span>
+									<span class="badge bg-primary rounded-pill">React</span>
+								</div>
+
+								<div class="d-flex mt-auto">
+									<div>
+										<span class="text-muted">Posted 1 week ago</span>
+									</div>
+									<button type="button" class="btn btn-primary ms-auto">Apply Now</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-xl-4 col-md-6">
+						<div class="card">
+							<div class="card-body">
+								<div class="d-flex align-items-start mb-3">
+									<div class="me-3">
+										<img src="../../bs5/template/assets/images/demo/logos/4.svg" class="rounded" width="44" height="44" alt="">
+									</div>
+									<div>
+										<h5 class="mb-1">Data Analyst Intern</h5>
+										<div class="text-muted">Global Enterprises</div>
+									</div>
+								</div>
+
+								<div class="mb-3">
+									<p>Analyze large datasets and create meaningful insights for business decisions. An ideal opportunity for students interested in data science and analytics.</p>
+								</div>
+
+								<ul class="list-unstyled mb-3">
+									<li class="mb-1">
+										<i class="ph-map-pin me-1"></i>
+										London, UK
+									</li>
+									<li class="mb-1">
+										<i class="ph-calendar me-1"></i>
+										4 months
+									</li>
+									<li>
+										<i class="ph-currency-dollar me-1"></i>
+										Paid
+									</li>
+								</ul>
+
+								<div class="mb-3">
+									<span class="badge bg-primary rounded-pill">SQL</span>
+									<span class="badge bg-primary rounded-pill">Excel</span>
+									<span class="badge bg-primary rounded-pill">Tableau</span>
+								</div>
+
+								<div class="d-flex mt-auto">
+									<div>
+										<span class="text-muted">Posted 3 days ago</span>
+									</div>
+									<button type="button" class="btn btn-primary ms-auto">Apply Now</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-xl-4 col-md-6">
+						<div class="card">
+							<div class="card-body">
+								<div class="d-flex align-items-start mb-3">
+									<div class="me-3">
+										<img src="../../bs5/template/assets/images/demo/logos/1.svg" class="rounded" width="44" height="44" alt="">
+									</div>
+									<div>
+										<h5 class="mb-1">UI/UX Designer Intern</h5>
+										<div class="text-muted">Innovation Tech</div>
+									</div>
+								</div>
+
+								<div class="mb-3">
+									<p>Design user interfaces for web and mobile applications. Gain hands-on experience in user research, wireframing, prototyping, and usability testing.</p>
+								</div>
+
+								<ul class="list-unstyled mb-3">
+									<li class="mb-1">
+										<i class="ph-map-pin me-1"></i>
+										San Francisco, USA
+									</li>
+									<li class="mb-1">
+										<i class="ph-calendar me-1"></i>
+										3 months
+									</li>
+									<li>
+										<i class="ph-currency-dollar me-1"></i>
+										Paid
+									</li>
+								</ul>
+
+								<div class="mb-3">
+									<span class="badge bg-primary rounded-pill">Figma</span>
+									<span class="badge bg-primary rounded-pill">Adobe XD</span>
+									<span class="badge bg-primary rounded-pill">Prototyping</span>
+								</div>
+
+								<div class="d-flex mt-auto">
+									<div>
+										<span class="text-muted">Posted 1 day ago</span>
+									</div>
+									<button type="button" class="btn btn-primary ms-auto">Apply Now</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-xl-4 col-md-6">
+						<div class="card">
+							<div class="card-body">
+								<div class="d-flex align-items-start mb-3">
+									<div class="me-3">
+										<img src="../../bs5/template/assets/images/demo/logos/5.svg" class="rounded" width="44" height="44" alt="">
+									</div>
+									<div>
+										<h5 class="mb-1">Digital Marketing Intern</h5>
+										<div class="text-muted">Digital Solutions</div>
+									</div>
+								</div>
+
+								<div class="mb-3">
+									<p>Work with experienced marketers on SEO, SEM, social media and content marketing strategies. Perfect for students looking to build a marketing portfolio.</p>
+								</div>
+
+								<ul class="list-unstyled mb-3">
+									<li class="mb-1">
+										<i class="ph-map-pin me-1"></i>
+										Chicago, USA
+									</li>
+									<li class="mb-1">
+										<i class="ph-calendar me-1"></i>
+										4 months
+									</li>
+									<li>
+										<i class="ph-currency-dollar me-1"></i>
+										Paid
+									</li>
+								</ul>
+
+								<div class="mb-3">
+									<span class="badge bg-primary rounded-pill">SEO</span>
+									<span class="badge bg-primary rounded-pill">Content</span>
+									<span class="badge bg-primary rounded-pill">PPC</span>
+								</div>
+
+								<div class="d-flex mt-auto">
+									<div>
+										<span class="text-muted">Posted 5 days ago</span>
+									</div>
+									<button type="button" class="btn btn-primary ms-auto">Apply Now</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-xl-4 col-md-6">
+						<div class="card">
+							<div class="card-body">
+								<div class="d-flex align-items-start mb-3">
+									<div class="me-3">
+										<img src="../../bs5/template/assets/images/demo/logos/6.svg" class="rounded" width="44" height="44" alt="">
+									</div>
+									<div>
+										<h5 class="mb-1">Financial Analyst Intern</h5>
+										<div class="text-muted">Finance Pro</div>
+									</div>
+								</div>
+
+								<div class="mb-3">
+									<p>Assist in financial analysis, budgeting, and forecasting. Learn about financial modeling, valuation, and investment analysis in a professional environment.</p>
+								</div>
+
+								<ul class="list-unstyled mb-3">
+									<li class="mb-1">
+										<i class="ph-map-pin me-1"></i>
+										New York, USA
+									</li>
+									<li class="mb-1">
+										<i class="ph-calendar me-1"></i>
+										6 months
+									</li>
+									<li>
+										<i class="ph-currency-dollar me-1"></i>
+										Paid
+									</li>
+								</ul>
+
+								<div class="mb-3">
+									<span class="badge bg-primary rounded-pill">Excel</span>
+									<span class="badge bg-primary rounded-pill">Financial Modeling</span>
+									<span class="badge bg-primary rounded-pill">Bloomberg</span>
+								</div>
+
+								<div class="d-flex mt-auto">
+									<div>
+										<span class="text-muted">Posted 1 week ago</span>
+									</div>
+									<button type="button" class="btn btn-primary ms-auto">Apply Now</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /internship cards -->
+
+				<!-- Pagination -->
+				<div class="d-flex align-items-center mt-3">
+					<div class="ms-auto">
+						<ul class="pagination">
+							<li class="page-item disabled">
+								<a href="#" class="page-link">
+									<i class="ph-arrow-left"></i>
+								</a>
+							</li>
+							<li class="page-item active">
+								<a href="#" class="page-link">1</a>
+							</li>
+							<li class="page-item">
+								<a href="#" class="page-link">2</a>
+							</li>
+							<li class="page-item">
+								<a href="#" class="page-link">3</a>
+							</li>
+							<li class="page-item">
+								<a href="#" class="page-link">
+									<i class="ph-arrow-right"></i>
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<!-- /pagination -->
+
+			</div>
+			<!-- /content area -->
+
+			<!-- Footer -->
+			<div class="navbar navbar-sm navbar-footer border-top">
+				<div class="container-fluid">
+					<span>&copy; 2023 <a href="#">First Step Into The Business World</a></span>
+
+					<ul class="nav">
+						<li class="nav-item">
+							<a href="#" class="navbar-nav-link">
+								Support
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="#" class="navbar-nav-link">
+								Help
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="#" class="navbar-nav-link">
+								Contact
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<!-- /footer -->
+
+		</div>
+		<!-- /main content -->
+
+	</div>
+	<!-- /page content -->
+
+</body>
+</html> 

@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Student Dashboard - First Step Into The Business World</title>
+
+	<!-- Global stylesheets -->
+	<link href="../../bs5/template/assets/fonts/inter/inter.css" rel="stylesheet" type="text/css">
+	<link href="../../bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
+	<link href="../../bs5/template/html/layout_1/full/assets/css/ltr/all.min.css?v=1" id="stylesheet" rel="stylesheet" type="text/css">
+	<!-- /global stylesheets -->
+
+	<!-- Core JS files -->
+	<script src="../../bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+	<!-- /core JS files -->
+
+	<!-- Theme JS files -->
+	<script src="../../bs5/template/assets/js/vendor/visualization/d3/d3.min.js"></script>
+	<script src="../../bs5/template/assets/js/vendor/visualization/d3/d3_tooltip.js"></script>
+	<script src="../../bs5/template/assets/js/vendor/tables/datatables/datatables.min.js"></script>
+	<script src="../../bs5/template/html/layout_1/full/assets/js/app.js"></script>
+	<script src="../../bs5/template/assets/demo/charts/pages/dashboard/streamgraph.js"></script>
+	<script src="../../bs5/template/assets/demo/charts/pages/dashboard/sparklines.js"></script>
+	<script src="../../bs5/template/assets/demo/charts/pages/dashboard/lines.js"></script>	
+	<script src="../../bs5/template/assets/demo/charts/pages/dashboard/areas.js"></script>
+	<script src="../../bs5/template/assets/demo/charts/pages/dashboard/donuts.js"></script>
+	<script src="../../bs5/template/assets/demo/pages/datatables_basic.js"></script>
+	<!-- /theme JS files -->
+	
+	<!-- Custom style for proper scrolling -->
+	<style>
+		.content-wrapper {
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+		}
+		.content {
+			flex: 1;
+			overflow-y: auto;
+			padding-bottom: 1rem;
+		}
+		.page-content {
+			height: 100vh;
+			display: flex;
+			overflow: hidden;
+		}
+	</style>
+</head>
+
+<body>
+
+	<!-- Main navbar -->
+	<div class="navbar navbar-dark navbar-expand-lg navbar-static border-bottom border-bottom-white border-opacity-10">
+		<div class="container-fluid">
+			<div class="d-flex d-lg-none me-2">
+				<button type="button" class="navbar-toggler sidebar-mobile-main-toggle rounded-pill">
+					<i class="ph-list"></i>
+				</button>
+			</div>
+
+			<div class="navbar-brand flex-1 flex-lg-0">
+				<a href="student-dashboard.html" class="d-inline-flex align-items-center">
+					<img src="../../bs5/template/assets/images/demo/logos/1.svg" alt="First Step Logo" class="h-32px">
+					<span class="d-none d-sm-inline-block h6 mb-0 ms-2">First Step Into The Business World</span>
+				</a>
+			</div>
+
+			<div class="navbar-collapse justify-content-center flex-lg-1 order-2 order-lg-1 collapse" id="navbar_search">
+				<div class="navbar-search flex-fill position-relative mt-2 mt-lg-0 mx-lg-3">
+					<div class="form-control-feedback form-control-feedback-start flex-grow-1">
+						<input type="text" class="form-control bg-transparent rounded-pill" placeholder="Search internships...">
+						<div class="form-control-feedback-icon">
+							<i class="ph-magnifying-glass"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<ul class="nav flex-row justify-content-end order-1 order-lg-2">
+				<li class="nav-item nav-item-dropdown-lg dropdown">
+					<a href="#" class="navbar-nav-link navbar-nav-link-icon rounded-pill" data-bs-toggle="dropdown">
+						<i class="ph-bell"></i>
+						<span class="badge bg-yellow text-black position-absolute top-0 end-0 translate-middle-top zindex-1 rounded-pill mt-1 me-1">2</span>
+					</a>
+					
+					<div class="dropdown-menu dropdown-menu-end dropdown-menu-scrollable-sm wmin-lg-350">
+						<div class="d-flex align-items-center border-bottom py-2 px-3">
+							<h6 class="mb-0">Notifications</h6>
+							<a href="#" class="ms-auto text-body">
+								<i class="ph-check-square me-1"></i>
+								Mark all as read
+							</a>
+						</div>
+
+						<div class="dropdown-item d-flex py-2">
+							<div class="flex-shrink-0 me-3">
+								<div class="bg-success bg-opacity-10 text-success rounded-pill p-2">
+									<i class="ph-check"></i>
+								</div>
+							</div>
+
+							<div class="flex-grow-1">
+								<a href="#" class="d-block fw-semibold">Your application has been accepted</a>
+								<span class="text-muted">Marketing Intern at XYZ Corp</span>
+							</div>
+							<div class="flex-shrink-0 align-self-center">
+								<span class="text-muted fs-sm">2 hours ago</span>
+							</div>
+						</div>
+
+						<div class="dropdown-item d-flex py-2">
+							<div class="flex-shrink-0 me-3">
+								<div class="bg-primary bg-opacity-10 text-primary rounded-pill p-2">
+									<i class="ph-user-plus"></i>
+								</div>
+							</div>
+
+							<div class="flex-grow-1">
+								<a href="#" class="d-block fw-semibold">New internship posted</a>
+								<span class="text-muted">Software Developer at ABC Tech</span>
+							</div>
+							<div class="flex-shrink-0 align-self-center">
+								<span class="text-muted fs-sm">1 day ago</span>
+							</div>
+						</div>
+
+						<div class="text-center border-top p-2">
+							<a href="#" class="text-body">View all</a>
+						</div>
+					</div>
+				</li>
+
+				<li class="nav-item nav-item-dropdown-lg dropdown ms-lg-2">
+					<a href="#" class="navbar-nav-link align-items-center rounded-pill p-1" data-bs-toggle="dropdown">
+						<div class="status-indicator-container">
+							<img src="../../bs5/template/assets/images/demo/users/face11.jpg" class="w-32px h-32px rounded-pill" alt="">
+							<span class="status-indicator bg-success"></span>
+						</div>
+						<span class="d-none d-lg-inline-block mx-lg-2">John Doe</span>
+					</a>
+
+					<div class="dropdown-menu dropdown-menu-end">
+						<a href="student-profile.html" class="dropdown-item">
+							<i class="ph-user-circle me-2"></i>
+							My profile
+						</a>
+						<a href="student-applications.html" class="dropdown-item">
+							<i class="ph-briefcase me-2"></i>
+							My applications
+						</a>
+						<a href="student-documents.html" class="dropdown-item">
+							<i class="ph-file-text me-2"></i>
+							My documents
+						</a>
+						<a href="student-settings.html" class="dropdown-item">
+							<i class="ph-gear me-2"></i>
+							Account settings
+						</a>
+						<div class="dropdown-divider"></div>
+						<a href="index.html" class="dropdown-item">
+							<i class="ph-sign-out me-2"></i>
+							Logout
+						</a>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<!-- /main navbar -->
+
+	<!-- Page content -->
+	<div class="page-content">
+
+		<!-- Main sidebar -->
+		<div class="sidebar sidebar-dark sidebar-main sidebar-expand-lg">
+
+			<!-- Sidebar content -->
+			<div class="sidebar-content">
+
+				<!-- Sidebar header -->
+				<div class="sidebar-section">
+					<div class="sidebar-section-body d-flex justify-content-center">
+						<h5 class="sidebar-resize-hide flex-grow-1 my-auto">Navigation</h5>
+
+						<div>
+							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-control sidebar-main-resize d-none d-lg-inline-flex">
+								<i class="ph-arrows-left-right"></i>
+							</button>
+
+							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-mobile-main-toggle d-lg-none">
+								<i class="ph-x"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+				<!-- /sidebar header -->
+
+
+				<!-- Main navigation -->
+				<div class="sidebar-section">
+					<ul class="nav nav-sidebar" data-nav-type="accordion">
+
+						<!-- Main -->
+						<li class="nav-item-header">
+							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Main</div>
+							<i class="ph-dots-three sidebar-resize-show"></i>
+						</li>
+						<li class="nav-item">
+							<a href="student-dashboard.html" class="nav-link active">
+								<i class="ph-house"></i>
+								<span>Dashboard</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-internships.html" class="nav-link">
+								<i class="ph-briefcase"></i>
+								<span>Browse Internships</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-applications.html" class="nav-link">
+								<i class="ph-file-text"></i>
+								<span>My Applications</span>
+								<span class="badge bg-primary rounded-pill ms-auto">3</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-documents.html" class="nav-link">
+								<i class="ph-file-doc"></i>
+								<span>Documents</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-evaluations.html" class="nav-link">
+								<i class="ph-star"></i>
+								<span>Evaluations</span>
+							</a>
+						</li>
+
+						<!-- Profile -->
+						<li class="nav-item-header">
+							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Profile</div>
+							<i class="ph-dots-three sidebar-resize-show"></i>
+						</li>
+						<li class="nav-item">
+							<a href="student-profile.html" class="nav-link">
+								<i class="ph-user-circle"></i>
+								<span>My Profile</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-settings.html" class="nav-link">
+								<i class="ph-gear"></i>
+								<span>Account Settings</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="index.html" class="nav-link">
+								<i class="ph-sign-out"></i>
+								<span>Logout</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<!-- /main navigation -->
+
+			</div>
+			<!-- /sidebar content -->
+			
+		</div>
+		<!-- /main sidebar -->
+
+
+		<!-- Main content -->
+		<div class="content-wrapper">
+
+			<!-- Content area -->
+			<div class="content">
+
+				<!-- Welcome widget -->
+				<div class="card bg-primary text-white">
+					<div class="card-body">
+						<div class="d-sm-flex align-items-center">
+							<div class="me-sm-auto mb-3 mb-sm-0">
+								<h5 class="mb-1">Welcome back, John Doe!</h5>
+								<div class="opacity-75">Your internship journey overview</div>
+							</div>
+							<div class="d-inline-flex">
+								<a href="student-internships.html" class="btn btn-light text-primary">
+									<i class="ph-briefcase me-2"></i>
+									Browse Internships
+								</a>
+							</div>
+						</div>
+					</div>
+
+					<div class="card-body border-top border-light bg-opacity-10 border-opacity-25">
+						<div class="row text-center">
+							<div class="col-4">
+								<div class="mb-1">
+									<i class="ph-briefcase fs-3"></i>
+								</div>
+								<h5 class="mb-0">3</h5>
+								<div class="opacity-75">Applications</div>
+							</div>
+
+							<div class="col-4">
+								<div class="mb-1">
+									<i class="ph-check-circle fs-3"></i>
+								</div>
+								<h5 class="mb-0">1</h5>
+								<div class="opacity-75">Accepted</div>
+							</div>
+
+							<div class="col-4">
+								<div class="mb-1">
+									<i class="ph-clock fs-3"></i>
+								</div>
+								<h5 class="mb-0">2</h5>
+								<div class="opacity-75">Pending</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /welcome widget -->
+
+				<!-- My applications -->
+				<div class="card">
+					<div class="card-header d-flex align-items-center">
+						<h5 class="mb-0">My Applications</h5>
+						<div class="ms-auto">
+							<a href="student-applications.html" class="text-body">View all</a>
+						</div>
+					</div>
+
+					<div class="table-responsive">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th>Company</th>
+									<th>Position</th>
+									<th>Location</th>
+									<th>Duration</th>
+									<th>Status</th>
+									<th class="text-center">Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										<div class="d-flex align-items-center">
+											<img src="assets/images/company-logo1.png" class="rounded-circle me-2" width="32" height="32" alt="">
+											<div>XYZ Corporation</div>
+										</div>
+									</td>
+									<td>Marketing Intern</td>
+									<td>New York, USA</td>
+									<td>3 months</td>
+									<td><span class="badge bg-success">Accepted</span></td>
+									<td class="text-center">
+										<div class="d-inline-flex">
+											<a href="#" class="text-body" data-bs-popup="tooltip" title="View Details">
+												<i class="ph-eye"></i>
+											</a>
+											<a href="#" class="text-body ms-2" data-bs-popup="tooltip" title="Confirm">
+												<i class="ph-check-circle"></i>
+											</a>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div class="d-flex align-items-center">
+											<img src="assets/images/company-logo2.png" class="rounded-circle me-2" width="32" height="32" alt="">
+											<div>ABC Technologies</div>
+										</div>
+									</td>
+									<td>Software Developer Intern</td>
+									<td>Remote</td>
+									<td>6 months</td>
+									<td><span class="badge bg-secondary">Pending</span></td>
+									<td class="text-center">
+										<div class="d-inline-flex">
+											<a href="#" class="text-body" data-bs-popup="tooltip" title="View Details">
+												<i class="ph-eye"></i>
+											</a>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div class="d-flex align-items-center">
+											<img src="assets/images/company-logo3.png" class="rounded-circle me-2" width="32" height="32" alt="">
+											<div>Global Enterprises</div>
+										</div>
+									</td>
+									<td>Data Analyst Intern</td>
+									<td>London, UK</td>
+									<td>4 months</td>
+									<td><span class="badge bg-secondary">Pending</span></td>
+									<td class="text-center">
+										<div class="d-inline-flex">
+											<a href="#" class="text-body" data-bs-popup="tooltip" title="View Details">
+												<i class="ph-eye"></i>
+											</a>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<!-- /my applications -->
+
+				<!-- Recommended internships -->
+				<div class="card">
+					<div class="card-header">
+						<h5 class="mb-0">Recommended Internships</h5>
+					</div>
+
+					<div class="card-body">
+						<div class="row">
+							<div class="col-lg-4">
+								<div class="card card-body">
+									<div class="d-flex align-items-center mb-3">
+										<img src="assets/images/company-logo4.png" class="rounded-circle me-2" width="40" height="40" alt="">
+										<div>
+											<h6 class="mb-0">Innovation Tech</h6>
+											<span class="text-muted">Technology</span>
+										</div>
+									</div>
+
+									<h6>UI/UX Designer Intern</h6>
+									<ul class="list-unstyled mb-3">
+										<li><i class="ph-map-pin me-1"></i> San Francisco, USA</li>
+										<li><i class="ph-clock me-1"></i> 3 months</li>
+										<li><i class="ph-currency-dollar me-1"></i> Paid</li>
+									</ul>
+
+									<div class="d-flex mt-auto">
+										<a href="#" class="btn btn-light">Details</a>
+										<a href="#" class="btn btn-primary ms-auto">Apply Now</a>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-lg-4">
+								<div class="card card-body">
+									<div class="d-flex align-items-center mb-3">
+										<img src="assets/images/company-logo5.png" class="rounded-circle me-2" width="40" height="40" alt="">
+										<div>
+											<h6 class="mb-0">Digital Solutions</h6>
+											<span class="text-muted">Marketing</span>
+										</div>
+									</div>
+
+									<h6>Digital Marketing Intern</h6>
+									<ul class="list-unstyled mb-3">
+										<li><i class="ph-map-pin me-1"></i> Chicago, USA</li>
+										<li><i class="ph-clock me-1"></i> 4 months</li>
+										<li><i class="ph-currency-dollar me-1"></i> Paid</li>
+									</ul>
+
+									<div class="d-flex mt-auto">
+										<a href="#" class="btn btn-light">Details</a>
+										<a href="#" class="btn btn-primary ms-auto">Apply Now</a>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-lg-4">
+								<div class="card card-body">
+									<div class="d-flex align-items-center mb-3">
+										<img src="assets/images/company-logo6.png" class="rounded-circle me-2" width="40" height="40" alt="">
+										<div>
+											<h6 class="mb-0">Finance Pro</h6>
+											<span class="text-muted">Finance</span>
+										</div>
+									</div>
+
+									<h6>Financial Analyst Intern</h6>
+									<ul class="list-unstyled mb-3">
+										<li><i class="ph-map-pin me-1"></i> New York, USA</li>
+										<li><i class="ph-clock me-1"></i> 6 months</li>
+										<li><i class="ph-currency-dollar me-1"></i> Paid</li>
+									</ul>
+
+									<div class="d-flex mt-auto">
+										<a href="#" class="btn btn-light">Details</a>
+										<a href="#" class="btn btn-primary ms-auto">Apply Now</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /recommended internships -->
+
+				<!-- Upcoming deadlines -->
+				<div class="card">
+					<div class="card-header">
+						<h5 class="mb-0">Upcoming Deadlines</h5>
+					</div>
+
+					<div class="card-body">
+						<ul class="list-group list-group-flush">
+							<li class="list-group-item d-flex flex-wrap align-items-center py-2">
+								<a href="#" class="d-flex align-items-center me-3">
+									<i class="ph-file-doc ph-lg me-2"></i>
+									<span>Upload insurance document</span>
+								</a>
+
+								<div class="d-flex align-items-center text-muted ms-auto">
+									<i class="ph-calendar ph-sm me-1"></i>
+									<span>Due in 2 days</span>
+								</div>
+							</li>
+
+							<li class="list-group-item d-flex flex-wrap align-items-center py-2">
+								<a href="#" class="d-flex align-items-center me-3">
+									<i class="ph-certificate ph-lg me-2"></i>
+									<span>Complete eligibility certificate</span>
+								</a>
+
+								<div class="d-flex align-items-center text-muted ms-auto">
+									<i class="ph-calendar ph-sm me-1"></i>
+									<span>Due in 5 days</span>
+								</div>
+							</li>
+
+							<li class="list-group-item d-flex flex-wrap align-items-center py-2">
+								<a href="#" class="d-flex align-items-center me-3">
+									<i class="ph-check-square ph-lg me-2"></i>
+									<span>Confirm XYZ Corporation internship</span>
+								</a>
+
+								<div class="d-flex align-items-center text-muted ms-auto">
+									<i class="ph-calendar ph-sm me-1"></i>
+									<span>Due in 1 week</span>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<!-- /upcoming deadlines -->
+
+			</div>
+			<!-- /content area -->
+
+			<!-- Footer -->
+			<div class="navbar navbar-sm navbar-footer border-top">
+				<div class="container-fluid">
+					<span>&copy; 2023 <a href="#">First Step Into The Business World</a></span>
+
+					<ul class="nav">
+						<li class="nav-item">
+							<a href="#" class="navbar-nav-link">
+								Support
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="#" class="navbar-nav-link">
+								Help
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="#" class="navbar-nav-link">
+								Contact
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<!-- /footer -->
+
+		</div>
+		<!-- /main content -->
+
+	</div>
+	<!-- /page content -->
+
+</body>
+</html> 

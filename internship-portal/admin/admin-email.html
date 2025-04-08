@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Email Tool - Admin - First Step Into The Business World</title>
+
+	<!-- Global stylesheets -->
+	<link href="../../bs5/template/assets/fonts/inter/inter.css" rel="stylesheet" type="text/css">
+	<link href="../../bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
+	<link href="../../bs5/template/html/layout_1/full/assets/css/ltr/all.min.css" id="stylesheet" rel="stylesheet" type="text/css">
+	<!-- /global stylesheets -->
+
+	<!-- Core JS files -->
+	<script src="../../bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+	<!-- /core JS files -->
+
+	<!-- Theme JS files -->
+    <script src="../../bs5/template/assets/js/vendor/editors/ckeditor/ckeditor_classic.js"></script>
+	<script src="../../bs5/template/html/layout_1/full/assets/js/app.js"></script>
+    <script src="../../bs5/template/assets/demo/pages/mail_list_write.js"></script>
+	<!-- /theme JS files -->
+
+	<!-- Custom style for proper scrolling -->
+	<style>
+		.content-wrapper {
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+		}
+		.content {
+			flex: 1;
+			overflow-y: auto;
+			padding-bottom: 1rem;
+		}
+		.page-content {
+			height: 100vh;
+			display: flex;
+			overflow: hidden;
+		}
+	</style>
+</head>
+
+<body>
+
+	<!-- Main navbar -->
+	<div class="navbar navbar-dark navbar-expand-lg navbar-static border-bottom border-bottom-white border-opacity-10">
+		<div class="container-fluid">
+			<div class="d-flex d-lg-none me-2">
+				<button type="button" class="navbar-toggler sidebar-mobile-main-toggle rounded-pill">
+					<i class="ph-list"></i>
+				</button>
+			</div>
+
+			<div class="navbar-brand flex-1 flex-lg-0">
+				<a href="admin-dashboard.html" class="d-inline-flex align-items-center">
+					<img src="../../bs5/template/assets/images/demo/logos/1.svg" alt="First Step Logo" class="h-32px">
+					<span class="d-none d-lg-inline-block h6 mb-0 ms-2">First Step Into The Business World</span>
+				</a>
+			</div>
+
+			<ul class="nav flex-row justify-content-end order-1 order-lg-2">
+				<li class="nav-item nav-item-dropdown-lg dropdown">
+					<a href="#" class="navbar-nav-link navbar-nav-link-icon rounded-pill" data-bs-toggle="dropdown">
+						<i class="ph-bell"></i>
+						<span class="badge bg-yellow text-black position-absolute top-0 end-0 translate-middle-top zindex-1 rounded-pill mt-1 me-1">7</span>
+					</a>
+					
+					<div class="dropdown-menu dropdown-menu-end dropdown-menu-scrollable-sm wmin-lg-350">
+						<div class="d-flex align-items-center border-bottom py-2 px-3">
+							<h6 class="mb-0">Notifications</h6>
+							<a href="#" class="ms-auto text-body">
+								<i class="ph-check-square me-1"></i>
+								Mark all as read
+							</a>
+						</div>
+
+						<div class="dropdown-item d-flex py-2">
+							<div class="flex-shrink-0 me-3">
+								<div class="bg-primary bg-opacity-10 text-primary rounded-pill p-2">
+									<i class="ph-user-plus"></i>
+								</div>
+							</div>
+
+							<div class="flex-grow-1">
+								<a href="#" class="d-block fw-semibold">New company registered</a>
+								<span class="text-muted">ABC Technologies joined the program</span>
+							</div>
+							<div class="flex-shrink-0 align-self-center">
+								<span class="text-muted fs-sm">1 hour ago</span>
+							</div>
+						</div>
+
+						<div class="dropdown-item d-flex py-2">
+							<div class="flex-shrink-0 me-3">
+								<div class="bg-success bg-opacity-10 text-success rounded-pill p-2">
+									<i class="ph-check-circle"></i>
+								</div>
+							</div>
+
+							<div class="flex-grow-1">
+								<a href="#" class="d-block fw-semibold">Internship confirmed</a>
+								<span class="text-muted">John Doe confirmed Software Developer position</span>
+							</div>
+							<div class="flex-shrink-0 align-self-center">
+								<span class="text-muted fs-sm">2 hours ago</span>
+							</div>
+						</div>
+
+						<div class="text-center border-top p-2">
+							<a href="#" class="text-body">View all</a>
+						</div>
+					</div>
+				</li>
+
+				<li class="nav-item nav-item-dropdown-lg dropdown ms-lg-2">
+					<a href="#" class="navbar-nav-link align-items-center rounded-pill p-1" data-bs-toggle="dropdown">
+						<div class="status-indicator-container">
+							<img src="../../bs5/template/assets/images/demo/users/face1.jpg" class="w-32px h-32px rounded-pill" alt="">
+							<span class="status-indicator bg-success"></span>
+						</div>
+						<span class="d-none d-lg-inline-block mx-lg-2">Admin User</span>
+					</a>
+
+					<div class="dropdown-menu dropdown-menu-end">
+						<a href="admin-profile.html" class="dropdown-item">
+							<i class="ph-user-circle me-2"></i>
+							My profile
+						</a>
+						<a href="admin-settings.html" class="dropdown-item">
+							<i class="ph-gear me-2"></i>
+							Account settings
+						</a>
+						<div class="dropdown-divider"></div>
+						<a href="../index.html" class="dropdown-item">
+							<i class="ph-sign-out me-2"></i>
+							Logout
+						</a>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<!-- /main navbar -->
+
+	<!-- Page content -->
+	<div class="page-content">
+
+		<!-- Main sidebar -->
+		<div class="sidebar sidebar-dark sidebar-main sidebar-expand-lg">
+
+			<!-- Sidebar content -->
+			<div class="sidebar-content">
+
+				<!-- Sidebar header -->
+				<div class="sidebar-section">
+					<div class="sidebar-section-body d-flex justify-content-center">
+						<h5 class="sidebar-resize-hide flex-grow-1 my-auto">Navigation</h5>
+
+						<div>
+							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-control sidebar-main-resize d-none d-lg-inline-flex">
+								<i class="ph-arrows-left-right"></i>
+							</button>
+
+							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-mobile-main-toggle d-lg-none">
+								<i class="ph-x"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+				<!-- /sidebar header -->
+
+
+				<!-- Main navigation -->
+				<div class="sidebar-section">
+					<ul class="nav nav-sidebar" data-nav-type="accordion">
+
+						<!-- Main -->
+						<li class="nav-item-header">
+							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Main</div>
+							<i class="ph-dots-three sidebar-resize-show"></i>
+						</li>
+						<li class="nav-item">
+							<a href="admin-dashboard.html" class="nav-link">
+								<i class="ph-house"></i>
+								<span>Dashboard</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-students.html" class="nav-link">
+								<i class="ph-student"></i>
+								<span>Students</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-companies.html" class="nav-link">
+								<i class="ph-buildings"></i>
+								<span>Companies</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-internships.html" class="nav-link">
+								<i class="ph-briefcase"></i>
+								<span>Internships</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-applications.html" class="nav-link">
+								<i class="ph-file-text"></i>
+								<span>Applications</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-reports.html" class="nav-link">
+								<i class="ph-chart-bar"></i>
+								<span>Reports</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-evaluations.html" class="nav-link">
+								<i class="ph-star"></i>
+								<span>Evaluations</span>
+							</a>
+						</li>
+						
+						<!-- Tools -->
+						<li class="nav-item-header">
+							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Tools</div>
+							<i class="ph-dots-three sidebar-resize-show"></i>
+						</li>
+						<li class="nav-item">
+							<a href="admin-email.html" class="nav-link active">
+								<i class="ph-envelope"></i>
+								<span>Email Tool</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-csv-import.html" class="nav-link">
+								<i class="ph-file-csv"></i>
+								<span>CSV Import</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-settings.html" class="nav-link">
+								<i class="ph-gear"></i>
+								<span>Settings</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../index.html" class="nav-link">
+								<i class="ph-sign-out"></i>
+								<span>Logout</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<!-- /main navigation -->
+
+			</div>
+			<!-- /sidebar content -->
+			
+		</div>
+		<!-- /main sidebar -->
+
+
+		<!-- Main content -->
+		<div class="content-wrapper">
+
+			<!-- Content area -->
+			<div class="content">
+
+                <!-- Page header -->
+                <div class="page-header">
+                    <div class="page-header-content d-lg-flex">
+                        <div class="d-flex">
+                            <h4 class="page-title mb-0">
+                                Email Tool <span class="fw-normal">Compose and send emails</span>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <!-- /page header -->
+
+				<!-- Email compose form -->
+				<div class="card">
+					<div class="card-header">
+						<h5 class="mb-0">Compose New Email</h5>
+					</div>
+
+					<div class="card-body">
+						<form action="#">
+							<div class="mb-3 row">
+								<label class="col-form-label col-lg-2">Recipients</label>
+								<div class="col-lg-10">
+                                    <select class="form-select" multiple="multiple" data-placeholder="Select recipient groups...">
+                                        <option value="all_students">All Students</option>
+                                        <option value="students_active">Students (Active Internships)</option>
+                                        <option value="students_pending">Students (Pending Applications)</option>
+                                        <option value="all_companies">All Companies</option>
+                                        <option value="companies_active">Companies (Active Listings)</option>
+                                        <option value="companies_pending">Companies (Pending Approval)</option>
+                                        <!-- Add more specific groups if needed -->
+                                    </select>
+                                    <div class="form-text">Select one or more groups, or leave blank to enter specific emails below.</div>
+                                    <div class="mt-2">
+                                        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#recipient-selector">
+                                            <i class="ph-magnifying-glass-plus me-1"></i>
+                                            Browse Recipients Database
+                                        </button>
+                                    </div>
+								</div>
+							</div>
+
+                            <div class="mb-3 row">
+								<label class="col-form-label col-lg-2">Specific Emails</label>
+								<div class="col-lg-10">
+									<input type="text" class="form-control" placeholder="Enter specific email addresses, separated by commas" id="specific-emails">
+                                    <div id="selected-recipients-display" class="mt-2 fs-sm"></div>
+								</div>
+							</div>
+
+							<div class="mb-3 row">
+								<label class="col-form-label col-lg-2">Subject</label>
+								<div class="col-lg-10">
+									<input type="text" class="form-control" placeholder="Enter email subject">
+								</div>
+							</div>
+
+							<div class="mb-3 row">
+								<label class="col-form-label col-lg-2">Message</label>
+								<div class="col-lg-10">
+									<div class="ckeditor-classic" id="editor-classic"></div>
+								</div>
+							</div>
+
+                            <div class="mb-3 row">
+                                <label class="col-form-label col-lg-2">Attachments</label>
+                                <div class="col-lg-10">
+                                    <input type="file" class="form-control" multiple>
+                                    <div class="form-text text-muted">Max file size 10 MB. Allowed formats: pdf, doc, docx, jpg, png.</div>
+                                </div>
+                            </div>
+
+							<div class="text-end">
+								<button type="submit" class="btn btn-primary">
+									<i class="ph-paper-plane-tilt me-2"></i>
+									Send Email
+								</button>
+                                <button type="button" class="btn btn-light ms-2">
+									<i class="ph-floppy-disk me-2"></i>
+									Save Draft
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+				<!-- /email compose form -->
+
+                <!-- Recipients Database Modal -->
+                <div id="recipient-selector" class="modal fade" tabindex="-1">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Select Recipients from Database</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+
+                            <div class="modal-body">
+                                <!-- Tabs for different recipient types -->
+                                <ul class="nav nav-tabs nav-tabs-highlight mb-3">
+                                    <li class="nav-item">
+                                        <a href="#students-tab" class="nav-link active" data-bs-toggle="tab">
+                                            <i class="ph-student me-2"></i>
+                                            Students
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#companies-tab" class="nav-link" data-bs-toggle="tab">
+                                            <i class="ph-buildings me-2"></i>
+                                            Companies
+                                        </a>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content">
+                                    <!-- Students Tab -->
+                                    <div class="tab-pane fade show active" id="students-tab">
+                                        <div class="mb-3">
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="ph-magnifying-glass"></i></span>
+                                                <input type="text" class="form-control" placeholder="Search students by name, email or university...">
+                                                <button class="btn btn-light" type="button">Search</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <div>Filter by:</div>
+                                                <div class="ms-2">
+                                                    <select class="form-select form-select-sm">
+                                                        <option value="">Status</option>
+                                                        <option value="active">Active</option>
+                                                        <option value="inactive">Inactive</option>
+                                                    </select>
+                                                </div>
+                                                <div class="ms-2">
+                                                    <select class="form-select form-select-sm">
+                                                        <option value="">University</option>
+                                                        <option value="state_university">State University</option>
+                                                        <option value="city_college">City College</option>
+                                                    </select>
+                                                </div>
+                                                <div class="ms-2">
+                                                    <select class="form-select form-select-sm">
+                                                        <option value="">Major</option>
+                                                        <option value="computer_science">Computer Science</option>
+                                                        <option value="marketing">Marketing</option>
+                                                        <option value="business">Business</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input select-all-students">
+                                                            </div>
+                                                        </th>
+                                                        <th>Name</th>
+                                                        <th>Email</th>
+                                                        <th>University</th>
+                                                        <th>Major</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input student-select" data-email="john.doe@university.edu" data-name="John Doe">
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="me-3">
+                                                                    <img src="../../bs5/template/assets/images/demo/users/face11.jpg" class="rounded-circle" width="36" height="36" alt="">
+                                                                </div>
+                                                                <div>John Doe</div>
+                                                            </div>
+                                                        </td>
+                                                        <td>john.doe@university.edu</td>
+                                                        <td>State University</td>
+                                                        <td>Computer Science</td>
+                                                        <td><span class="badge bg-success bg-opacity-20 text-success">Active</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input student-select" data-email="jane.smith@school.org" data-name="Jane Smith">
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="me-3">
+                                                                    <img src="../../bs5/template/assets/images/demo/users/face1.jpg" class="rounded-circle" width="36" height="36" alt="">
+                                                                </div>
+                                                                <div>Jane Smith</div>
+                                                            </div>
+                                                        </td>
+                                                        <td>jane.smith@school.org</td>
+                                                        <td>City College</td>
+                                                        <td>Marketing</td>
+                                                        <td><span class="badge bg-secondary bg-opacity-20 text-secondary">Inactive</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input student-select" data-email="michael.johnson@university.edu" data-name="Michael Johnson">
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="me-3">
+                                                                    <img src="../../bs5/template/assets/images/demo/users/face13.jpg" class="rounded-circle" width="36" height="36" alt="">
+                                                                </div>
+                                                                <div>Michael Johnson</div>
+                                                            </div>
+                                                        </td>
+                                                        <td>michael.johnson@university.edu</td>
+                                                        <td>State University</td>
+                                                        <td>Business</td>
+                                                        <td><span class="badge bg-success bg-opacity-20 text-success">Active</span></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <!-- Companies Tab -->
+                                    <div class="tab-pane fade" id="companies-tab">
+                                        <div class="mb-3">
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="ph-magnifying-glass"></i></span>
+                                                <input type="text" class="form-control" placeholder="Search companies by name, email or industry...">
+                                                <button class="btn btn-light" type="button">Search</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <div>Filter by:</div>
+                                                <div class="ms-2">
+                                                    <select class="form-select form-select-sm">
+                                                        <option value="">Status</option>
+                                                        <option value="active">Active</option>
+                                                        <option value="pending">Pending</option>
+                                                    </select>
+                                                </div>
+                                                <div class="ms-2">
+                                                    <select class="form-select form-select-sm">
+                                                        <option value="">Industry</option>
+                                                        <option value="technology">Technology</option>
+                                                        <option value="finance">Finance</option>
+                                                        <option value="healthcare">Healthcare</option>
+                                                    </select>
+                                                </div>
+                                                <div class="ms-2">
+                                                    <select class="form-select form-select-sm">
+                                                        <option value="">Size</option>
+                                                        <option value="small">Small (1-50)</option>
+                                                        <option value="medium">Medium (51-200)</option>
+                                                        <option value="large">Large (201+)</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input select-all-companies">
+                                                            </div>
+                                                        </th>
+                                                        <th>Company</th>
+                                                        <th>Contact Email</th>
+                                                        <th>Industry</th>
+                                                        <th>Size</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input company-select" data-email="contact@techsolutions.com" data-name="Tech Solutions">
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="me-3">
+                                                                    <div class="bg-primary bg-opacity-10 text-primary rounded p-1">
+                                                                        <i class="ph-buildings"></i>
+                                                                    </div>
+                                                                </div>
+                                                                <div>Tech Solutions</div>
+                                                            </div>
+                                                        </td>
+                                                        <td>contact@techsolutions.com</td>
+                                                        <td>Technology</td>
+                                                        <td>Medium (51-200)</td>
+                                                        <td><span class="badge bg-success bg-opacity-20 text-success">Active</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input company-select" data-email="hr@financepro.com" data-name="Finance Pro">
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="me-3">
+                                                                    <div class="bg-primary bg-opacity-10 text-primary rounded p-1">
+                                                                        <i class="ph-buildings"></i>
+                                                                    </div>
+                                                                </div>
+                                                                <div>Finance Pro</div>
+                                                            </div>
+                                                        </td>
+                                                        <td>hr@financepro.com</td>
+                                                        <td>Finance</td>
+                                                        <td>Large (201+)</td>
+                                                        <td><span class="badge bg-success bg-opacity-20 text-success">Active</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input company-select" data-email="info@healthcareinc.com" data-name="Healthcare Inc">
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="me-3">
+                                                                    <div class="bg-primary bg-opacity-10 text-primary rounded p-1">
+                                                                        <i class="ph-buildings"></i>
+                                                                    </div>
+                                                                </div>
+                                                                <div>Healthcare Inc</div>
+                                                            </div>
+                                                        </td>
+                                                        <td>info@healthcareinc.com</td>
+                                                        <td>Healthcare</td>
+                                                        <td>Small (1-50)</td>
+                                                        <td><span class="badge bg-warning bg-opacity-20 text-warning">Pending</span></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <div class="d-flex align-items-center me-auto">
+                                    <span id="selected-count">0</span> recipients selected
+                                </div>
+                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" id="add-selected-recipients">Add Selected Recipients</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /recipients database modal -->
+
+                <!-- Add JavaScript for the recipient selection functionality -->
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Track selected recipients
+                        let selectedRecipients = [];
+                        
+                        // Select all checkboxes functionality
+                        document.querySelector('.select-all-students').addEventListener('change', function() {
+                            const isChecked = this.checked;
+                            document.querySelectorAll('.student-select').forEach(checkbox => {
+                                checkbox.checked = isChecked;
+                                updateSelectedCount();
+                            });
+                        });
+                        
+                        document.querySelector('.select-all-companies').addEventListener('change', function() {
+                            const isChecked = this.checked;
+                            document.querySelectorAll('.company-select').forEach(checkbox => {
+                                checkbox.checked = isChecked;
+                                updateSelectedCount();
+                            });
+                        });
+                        
+                        // Individual checkbox change
+                        document.querySelectorAll('.student-select, .company-select').forEach(checkbox => {
+                            checkbox.addEventListener('change', function() {
+                                updateSelectedCount();
+                            });
+                        });
+                        
+                        // Update the selected count
+                        function updateSelectedCount() {
+                            const count = document.querySelectorAll('.student-select:checked, .company-select:checked').length;
+                            document.getElementById('selected-count').textContent = count;
+                        }
+                        
+                        // Add selected recipients to the form
+                        document.getElementById('add-selected-recipients').addEventListener('click', function() {
+                            selectedRecipients = [];
+                            
+                            // Collect selected students
+                            document.querySelectorAll('.student-select:checked').forEach(checkbox => {
+                                selectedRecipients.push({
+                                    email: checkbox.dataset.email,
+                                    name: checkbox.dataset.name,
+                                    type: 'student'
+                                });
+                            });
+                            
+                            // Collect selected companies
+                            document.querySelectorAll('.company-select:checked').forEach(checkbox => {
+                                selectedRecipients.push({
+                                    email: checkbox.dataset.email,
+                                    name: checkbox.dataset.name,
+                                    type: 'company'
+                                });
+                            });
+                            
+                            // Add to specific emails input
+                            const emailInput = document.getElementById('specific-emails');
+                            emailInput.value = selectedRecipients.map(r => r.email).join(', ');
+                            
+                            // Display selected recipients summary
+                            const displayElement = document.getElementById('selected-recipients-display');
+                            if (selectedRecipients.length > 0) {
+                                displayElement.innerHTML = `<div class="alert alert-info p-2">
+                                    Selected recipients: ${selectedRecipients.length} total (${selectedRecipients.filter(r => r.type === 'student').length} students, 
+                                    ${selectedRecipients.filter(r => r.type === 'company').length} companies)
+                                </div>`;
+                            } else {
+                                displayElement.innerHTML = '';
+                            }
+                            
+                            // Close the modal
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('recipient-selector'));
+                            modal.hide();
+                        });
+                    });
+                </script>
+
+			</div>
+			<!-- /content area -->
+
+		</div>
+		<!-- /main content -->
+
+	</div>
+	<!-- /page content -->
+
+</body>
+</html> 

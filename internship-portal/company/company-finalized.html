@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Finalized Internships - First Step Into The Business World</title>
+
+	<!-- Global stylesheets -->
+	<link href="../../bs5/template/assets/fonts/inter/inter.css" rel="stylesheet" type="text/css">
+	<link href="../../bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
+	<link href="../../bs5/template/html/layout_1/full/assets/css/ltr/all.min.css" id="stylesheet" rel="stylesheet" type="text/css">
+	<!-- /global stylesheets -->
+
+	<!-- Core JS files -->
+	<script src="../../bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+	<!-- /core JS files -->
+
+	<!-- Theme JS files -->
+	<script src="../../bs5/template/assets/js/vendor/tables/datatables/datatables.min.js"></script>
+	<script src="../../bs5/template/html/layout_1/full/assets/js/app.js"></script>
+	<script src="../../bs5/template/assets/demo/pages/datatables_basic.js"></script>
+	<!-- /theme JS files -->
+	
+	<!-- Custom style for proper scrolling -->
+	<style>
+		.content-wrapper {
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+		}
+		.content {
+			flex: 1;
+			overflow-y: auto;
+			padding-bottom: 1rem;
+		}
+		.page-content {
+			height: 100vh;
+			display: flex;
+			overflow: hidden;
+		}
+	</style>
+</head>
+
+<body>
+
+	<!-- Main navbar -->
+	<div class="navbar navbar-dark navbar-expand-lg navbar-static border-bottom border-bottom-white border-opacity-10">
+		<div class="container-fluid">
+			<div class="d-flex d-lg-none me-2">
+				<button type="button" class="navbar-toggler sidebar-mobile-main-toggle rounded-pill">
+					<i class="ph-list"></i>
+				</button>
+			</div>
+
+			<div class="navbar-brand flex-1 flex-lg-0">
+				<a href="company-dashboard.html" class="d-inline-flex align-items-center">
+					<img src="../../bs5/template/assets/images/demo/logos/1.svg" alt="First Step Logo" class="h-32px">
+					<span class="d-none d-sm-inline-block h6 mb-0 ms-2">First Step Into The Business World</span>
+				</a>
+			</div>
+
+			<ul class="nav flex-row justify-content-end order-1 order-lg-2">
+				<li class="nav-item nav-item-dropdown-lg dropdown">
+					<a href="#" class="navbar-nav-link navbar-nav-link-icon rounded-pill" data-bs-toggle="dropdown">
+						<i class="ph-bell"></i>
+						<span class="badge bg-yellow text-black position-absolute top-0 end-0 translate-middle-top zindex-1 rounded-pill mt-1 me-1">5</span>
+					</a>
+					
+					<div class="dropdown-menu dropdown-menu-end dropdown-menu-scrollable-sm wmin-lg-350">
+						<div class="d-flex align-items-center border-bottom py-2 px-3">
+							<h6 class="mb-0">Notifications</h6>
+							<a href="#" class="ms-auto text-body">
+								<i class="ph-check-square me-1"></i>
+								Mark all as read
+							</a>
+						</div>
+
+						<div class="dropdown-item d-flex py-2">
+							<div class="flex-shrink-0 me-3">
+								<div class="bg-success bg-opacity-10 text-success rounded-pill p-2">
+									<i class="ph-user-plus"></i>
+								</div>
+							</div>
+
+							<div class="flex-grow-1">
+								<a href="#" class="d-block fw-semibold">New application received</a>
+								<span class="text-muted">Marketing Intern position</span>
+							</div>
+							<div class="flex-shrink-0 align-self-center">
+								<span class="text-muted fs-sm">2 hours ago</span>
+							</div>
+						</div>
+
+						<div class="dropdown-item d-flex py-2">
+							<div class="flex-shrink-0 me-3">
+								<div class="bg-primary bg-opacity-10 text-primary rounded-pill p-2">
+									<i class="ph-check-circle"></i>
+								</div>
+							</div>
+
+							<div class="flex-grow-1">
+								<a href="#" class="d-block fw-semibold">Internship confirmed</a>
+								<span class="text-muted">John Doe confirmed Software Developer position</span>
+							</div>
+							<div class="flex-shrink-0 align-self-center">
+								<span class="text-muted fs-sm">1 day ago</span>
+							</div>
+						</div>
+
+						<div class="text-center border-top p-2">
+							<a href="#" class="text-body">View all</a>
+						</div>
+					</div>
+				</li>
+
+				<li class="nav-item nav-item-dropdown-lg dropdown ms-lg-2">
+					<a href="#" class="navbar-nav-link align-items-center rounded-pill p-1" data-bs-toggle="dropdown">
+						<div class="status-indicator-container">
+							<img src="../../bs5/template/assets/images/demo/logos/2.svg" class="w-32px h-32px rounded-pill" alt="">
+							<span class="status-indicator bg-success"></span>
+						</div>
+						<span class="d-none d-lg-inline-block mx-lg-2">XYZ Corporation</span>
+					</a>
+
+					<div class="dropdown-menu dropdown-menu-end">
+						<a href="company-profile.html" class="dropdown-item">
+							<i class="ph-building me-2"></i>
+							Company profile
+						</a>
+						<a href="company-internships.html" class="dropdown-item">
+							<i class="ph-briefcase me-2"></i>
+							Posted internships
+						</a>
+						<a href="company-applications.html" class="dropdown-item">
+							<i class="ph-users me-2"></i>
+							Applications
+						</a>
+						<a href="company-settings.html" class="dropdown-item">
+							<i class="ph-gear me-2"></i>
+							Account settings
+						</a>
+						<div class="dropdown-divider"></div>
+						<a href="../index.html" class="dropdown-item">
+							<i class="ph-sign-out me-2"></i>
+							Logout
+						</a>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<!-- /main navbar -->
+
+	<!-- Page content -->
+	<div class="page-content">
+
+		<!-- Main sidebar -->
+		<div class="sidebar sidebar-dark sidebar-main sidebar-expand-lg">
+
+			<!-- Sidebar content -->
+			<div class="sidebar-content">
+
+				<!-- Sidebar header -->
+				<div class="sidebar-section">
+					<div class="sidebar-section-body d-flex justify-content-center">
+						<h5 class="sidebar-resize-hide flex-grow-1 my-auto">Navigation</h5>
+
+						<div>
+							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-control sidebar-main-resize d-none d-lg-inline-flex">
+								<i class="ph-arrows-left-right"></i>
+							</button>
+
+							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-mobile-main-toggle d-lg-none">
+								<i class="ph-x"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+				<!-- /sidebar header -->
+
+
+				<!-- Main navigation -->
+				<div class="sidebar-section">
+					<ul class="nav nav-sidebar" data-nav-type="accordion">
+
+						<!-- Main -->
+						<li class="nav-item-header">
+							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Main</div>
+							<i class="ph-dots-three sidebar-resize-show"></i>
+						</li>
+						<li class="nav-item">
+							<a href="company-dashboard.html" class="nav-link">
+								<i class="ph-house"></i>
+								<span>Dashboard</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="company-internships.html" class="nav-link">
+								<i class="ph-briefcase"></i>
+								<span>My Internships</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="company-applications.html" class="nav-link">
+								<i class="ph-users"></i>
+								<span>Applications</span>
+								<span class="badge bg-primary rounded-pill ms-auto">8</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="company-finalized.html" class="nav-link active">
+								<i class="ph-check-circle"></i>
+								<span>Finalized Internships</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="company-evaluations.html" class="nav-link">
+								<i class="ph-star"></i>
+								<span>Evaluations</span>
+							</a>
+						</li>
+
+						<!-- Profile -->
+						<li class="nav-item-header">
+							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Profile</div>
+							<i class="ph-dots-three sidebar-resize-show"></i>
+						</li>
+						<li class="nav-item">
+							<a href="company-profile.html" class="nav-link">
+								<i class="ph-building"></i>
+								<span>Company Profile</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="company-settings.html" class="nav-link">
+								<i class="ph-gear"></i>
+								<span>Account Settings</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../index.html" class="nav-link">
+								<i class="ph-sign-out"></i>
+								<span>Logout</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<!-- /main navigation -->
+
+			</div>
+			<!-- /sidebar content -->
+			
+		</div>
+		<!-- /main sidebar -->
+
+
+		<!-- Main content -->
+		<div class="content-wrapper">
+
+			<!-- Content area -->
+			<div class="content">
+
+                <!-- Page header -->
+                <div class="page-header">
+                    <div class="page-header-content d-lg-flex">
+                        <div class="d-flex">
+                            <h4 class="page-title mb-0">
+                                Finalized Internships <span class="fw-normal">View finalized internship details</span>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <!-- /page header -->
+
+                <!-- Finalized internships table -->
+				<div class="card">
+					<div class="card-header">
+						<h5 class="mb-0">Finalized Internships</h5>
+					</div>
+
+					<div class="table-responsive">
+						<table class="table table-striped table-hover">
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Student Name</th>
+									<th>Internship Position</th>
+									<th>Start Date</th>
+									<th>End Date</th>
+									<th>Status</th>
+									<th class="text-center">Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>1</td>
+									<td>
+										<div class="d-flex align-items-center">
+											<div class="me-3">
+												<img src="../../bs5/template/assets/images/demo/users/face11.jpg" class="rounded-circle" width="36" height="36" alt="">
+											</div>
+											<div>
+												<a href="#" class="text-body fw-semibold">John Doe</a>
+												<div class="text-muted fs-sm">Computer Science</div>
+											</div>
+										</div>
+									</td>
+									<td>Software Developer Intern</td>
+									<td>2025/06/01</td>
+									<td>2025/08/31</td>
+									<td><span class="badge bg-primary bg-opacity-20 text-primary">Ongoing</span></td>
+									<td class="text-center">
+										<div class="dropdown">
+											<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
+												<i class="ph-dots-three-vertical"></i>
+											</button>
+											<div class="dropdown-menu dropdown-menu-end">
+												<a href="#" class="dropdown-item"><i class="ph-eye me-2"></i>View Details</a>
+												<a href="company-evaluations.html" class="dropdown-item"><i class="ph-star me-2"></i>Submit Evaluation</a>
+											</div>
+										</div>
+									</td>
+								</tr>
+                                <tr>
+									<td>2</td>
+									<td>
+										<div class="d-flex align-items-center">
+											<div class="me-3">
+												<img src="../../bs5/template/assets/images/demo/users/face1.jpg" class="rounded-circle" width="36" height="36" alt="">
+											</div>
+											<div>
+												<a href="#" class="text-body fw-semibold">Jane Smith</a>
+												<div class="text-muted fs-sm">Marketing</div>
+											</div>
+										</div>
+									</td>
+									<td>Marketing Intern</td>
+									<td>2025/05/15</td>
+									<td>2025/11/15</td>
+									<td><span class="badge bg-primary bg-opacity-20 text-primary">Ongoing</span></td>
+									<td class="text-center">
+										<div class="dropdown">
+											<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
+												<i class="ph-dots-three-vertical"></i>
+											</button>
+											<div class="dropdown-menu dropdown-menu-end">
+												<a href="#" class="dropdown-item"><i class="ph-eye me-2"></i>View Details</a>
+												<a href="company-evaluations.html" class="dropdown-item"><i class="ph-star me-2"></i>Submit Evaluation</a>
+											</div>
+										</div>
+									</td>
+								</tr>
+                                <tr>
+									<td>3</td>
+									<td>
+										<div class="d-flex align-items-center">
+											<div class="me-3">
+												<img src="../../bs5/template/assets/images/demo/users/face4.jpg" class="rounded-circle" width="36" height="36" alt="">
+											</div>
+											<div>
+												<a href="#" class="text-body fw-semibold">Robert Johnson</a>
+												<div class="text-muted fs-sm">Data Science</div>
+											</div>
+										</div>
+									</td>
+									<td>Data Analyst Intern</td>
+									<td>2025/01/10</td>
+									<td>2025/05/10</td>
+									<td><span class="badge bg-success bg-opacity-20 text-success">Completed</span></td>
+									<td class="text-center">
+										<div class="dropdown">
+											<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
+												<i class="ph-dots-three-vertical"></i>
+											</button>
+											<div class="dropdown-menu dropdown-menu-end">
+												<a href="#" class="dropdown-item"><i class="ph-eye me-2"></i>View Details</a>
+												<a href="company-evaluations.html" class="dropdown-item"><i class="ph-star-half me-2"></i>View Evaluation</a>
+											</div>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<!-- /finalized internships table -->
+
+			</div>
+			<!-- /content area -->
+
+		</div>
+		<!-- /main content -->
+
+	</div>
+	<!-- /page content -->
+
+</body>
+</html> 

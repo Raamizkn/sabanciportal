@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Admin Dashboard - First Step Into The Business World</title>
+
+	<!-- Global stylesheets -->
+	<link href="../../bs5/template/assets/fonts/inter/inter.css" rel="stylesheet" type="text/css">
+	<link href="../../bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
+	<link href="../../bs5/template/html/layout_1/full/assets/css/ltr/all.min.css" id="stylesheet" rel="stylesheet" type="text/css">
+	<!-- /global stylesheets -->
+
+	<!-- Core JS files -->
+	<script src="../../bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+	<!-- /core JS files -->
+
+	<!-- Theme JS files -->
+	<script src="../../bs5/template/assets/js/vendor/visualization/d3/d3.min.js"></script>
+	<script src="../../bs5/template/assets/js/vendor/visualization/d3/d3_tooltip.js"></script>
+	<script src="../../bs5/template/assets/js/vendor/tables/datatables/datatables.min.js"></script>
+	<script src="../../bs5/template/assets/js/vendor/tables/datatables/extensions/buttons.min.js"></script>
+	<script src="../../bs5/template/assets/js/vendor/tables/datatables/extensions/responsive.min.js"></script>
+	<script src="../../bs5/template/html/layout_1/full/assets/js/app.js"></script>
+	<script src="../../bs5/template/assets/demo/charts/pages/dashboard/streamgraph.js"></script>
+	<script src="../../bs5/template/assets/demo/charts/pages/dashboard/sparklines.js"></script>
+	<script src="../../bs5/template/assets/demo/charts/pages/dashboard/lines.js"></script>	
+	<script src="../../bs5/template/assets/demo/charts/pages/dashboard/areas.js"></script>
+	<script src="../../bs5/template/assets/demo/charts/pages/dashboard/donuts.js"></script>
+	<script src="../../bs5/template/assets/demo/pages/datatables_extension_buttons_init.js"></script>
+	<!-- /theme JS files -->
+</head>
+
+<body>
+
+	<!-- Main navbar -->
+	<div class="navbar navbar-dark navbar-expand-lg navbar-static border-bottom border-bottom-white border-opacity-10">
+		<div class="container-fluid">
+			<div class="d-flex d-lg-none me-2">
+				<button type="button" class="navbar-toggler sidebar-mobile-main-toggle rounded-pill">
+					<i class="ph-list"></i>
+				</button>
+			</div>
+
+			<div class="navbar-brand flex-1 flex-lg-0">
+				<a href="admin-dashboard.html" class="d-inline-flex align-items-center">
+					<img src="../../bs5/template/assets/images/demo/logos/1.svg" alt="First Step Logo" class="h-32px">
+					<span class="d-none d-lg-inline-block h6 mb-0 ms-2">First Step Into The Business World</span>
+				</a>
+			</div>
+
+			<ul class="nav flex-row justify-content-end order-1 order-lg-2">
+				<li class="nav-item nav-item-dropdown-lg dropdown">
+					<a href="#" class="navbar-nav-link navbar-nav-link-icon rounded-pill" data-bs-toggle="dropdown">
+						<i class="ph-bell"></i>
+						<span class="badge bg-yellow text-black position-absolute top-0 end-0 translate-middle-top zindex-1 rounded-pill mt-1 me-1">7</span>
+					</a>
+					
+					<div class="dropdown-menu dropdown-menu-end dropdown-menu-scrollable-sm wmin-lg-350">
+						<div class="d-flex align-items-center border-bottom py-2 px-3">
+							<h6 class="mb-0">Notifications</h6>
+							<a href="#" class="ms-auto text-body">
+								<i class="ph-check-square me-1"></i>
+								Mark all as read
+							</a>
+						</div>
+
+						<div class="dropdown-item d-flex py-2">
+							<div class="flex-shrink-0 me-3">
+								<div class="bg-primary bg-opacity-10 text-primary rounded-pill p-2">
+									<i class="ph-user-plus"></i>
+								</div>
+							</div>
+
+							<div class="flex-grow-1">
+								<a href="#" class="d-block fw-semibold">New company registered</a>
+								<span class="text-muted">ABC Technologies joined the program</span>
+							</div>
+							<div class="flex-shrink-0 align-self-center">
+								<span class="text-muted fs-sm">1 hour ago</span>
+							</div>
+						</div>
+
+						<div class="dropdown-item d-flex py-2">
+							<div class="flex-shrink-0 me-3">
+								<div class="bg-success bg-opacity-10 text-success rounded-pill p-2">
+									<i class="ph-check-circle"></i>
+								</div>
+							</div>
+
+							<div class="flex-grow-1">
+								<a href="#" class="d-block fw-semibold">Internship confirmed</a>
+								<span class="text-muted">John Doe confirmed Software Developer position</span>
+							</div>
+							<div class="flex-shrink-0 align-self-center">
+								<span class="text-muted fs-sm">2 hours ago</span>
+							</div>
+						</div>
+
+						<div class="text-center border-top p-2">
+							<a href="#" class="text-body">View all</a>
+						</div>
+					</div>
+				</li>
+
+				<li class="nav-item nav-item-dropdown-lg dropdown ms-lg-2">
+					<a href="#" class="navbar-nav-link align-items-center rounded-pill p-1" data-bs-toggle="dropdown">
+						<div class="status-indicator-container">
+							<img src="../../bs5/template/assets/images/demo/users/face1.jpg" class="w-32px h-32px rounded-pill" alt="">
+							<span class="status-indicator bg-success"></span>
+						</div>
+						<span class="d-none d-lg-inline-block mx-lg-2">Admin User</span>
+					</a>
+
+					<div class="dropdown-menu dropdown-menu-end">
+						<a href="admin-profile.html" class="dropdown-item">
+							<i class="ph-user-circle me-2"></i>
+							My profile
+						</a>
+						<a href="admin-settings.html" class="dropdown-item">
+							<i class="ph-gear me-2"></i>
+							Account settings
+						</a>
+						<div class="dropdown-divider"></div>
+						<a href="index.html" class="dropdown-item">
+							<i class="ph-sign-out me-2"></i>
+							Logout
+						</a>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<!-- /main navbar -->
+
+	<!-- Page content -->
+	<div class="page-content">
+
+		<!-- Main sidebar -->
+		<div class="sidebar sidebar-dark sidebar-main sidebar-expand-lg">
+
+			<!-- Sidebar content -->
+			<div class="sidebar-content">
+
+				<!-- Sidebar header -->
+				<div class="sidebar-section">
+					<div class="sidebar-section-body d-flex justify-content-center">
+						<h5 class="sidebar-resize-hide flex-grow-1 my-auto">Navigation</h5>
+
+						<div>
+							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-control sidebar-main-resize d-none d-lg-inline-flex">
+								<i class="ph-arrows-left-right"></i>
+							</button>
+
+							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-mobile-main-toggle d-lg-none">
+								<i class="ph-x"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+				<!-- /sidebar header -->
+
+
+				<!-- Main navigation -->
+				<div class="sidebar-section">
+					<ul class="nav nav-sidebar" data-nav-type="accordion">
+
+						<!-- Main -->
+						<li class="nav-item-header">
+							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Main</div>
+							<i class="ph-dots-three sidebar-resize-show"></i>
+						</li>
+						<li class="nav-item">
+							<a href="admin-dashboard.html" class="nav-link active">
+								<i class="ph-house"></i>
+								<span>Dashboard</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-students.html" class="nav-link">
+								<i class="ph-student"></i>
+								<span>Students</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-companies.html" class="nav-link">
+								<i class="ph-buildings"></i>
+								<span>Companies</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-internships.html" class="nav-link">
+								<i class="ph-briefcase"></i>
+								<span>Internships</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-applications.html" class="nav-link">
+								<i class="ph-file-text"></i>
+								<span>Applications</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-reports.html" class="nav-link">
+								<i class="ph-chart-bar"></i>
+								<span>Reports</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-evaluations.html" class="nav-link">
+								<i class="ph-star"></i>
+								<span>Evaluations</span>
+							</a>
+						</li>
+						
+						<!-- Tools -->
+						<li class="nav-item-header">
+							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Tools</div>
+							<i class="ph-dots-three sidebar-resize-show"></i>
+						</li>
+						<li class="nav-item">
+							<a href="admin-email.html" class="nav-link">
+								<i class="ph-envelope"></i>
+								<span>Email Tool</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-csv-import.html" class="nav-link">
+								<i class="ph-file-csv"></i>
+								<span>CSV Import</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-settings.html" class="nav-link">
+								<i class="ph-gear"></i>
+								<span>Settings</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="index.html" class="nav-link">
+								<i class="ph-sign-out"></i>
+								<span>Logout</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<!-- /main navigation -->
+
+			</div>
+			<!-- /sidebar content -->
+			
+		</div>
+		<!-- /main sidebar -->
+
+
+		<!-- Main content -->
+		<div class="content-wrapper">
+
+			<!-- Content area -->
+			<div class="content">
+
+				<!-- Quick stats boxes -->
+				<div class="row">
+					<div class="col-lg-3">
+						<div class="card card-body bg-primary text-white">
+							<div class="d-flex">
+								<h3 class="mb-0">458</h3>
+								<i class="ph-student ph-2x ms-auto"></i>
+							</div>
+							
+							<div>
+								Total Students
+								<div class="fs-sm opacity-75">125 new this month</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-lg-3">
+						<div class="card card-body bg-success text-white">
+							<div class="d-flex">
+								<h3 class="mb-0">62</h3>
+								<i class="ph-buildings ph-2x ms-auto"></i>
+							</div>
+							
+							<div>
+								Participating Companies
+								<div class="fs-sm opacity-75">8 new this month</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-lg-3">
+						<div class="card card-body bg-indigo text-white">
+							<div class="d-flex">
+								<h3 class="mb-0">175</h3>
+								<i class="ph-briefcase ph-2x ms-auto"></i>
+							</div>
+							
+							<div>
+								Active Internships
+								<div class="fs-sm opacity-75">32 new this month</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-lg-3">
+						<div class="card card-body bg-warning text-white">
+							<div class="d-flex">
+								<h3 class="mb-0">294</h3>
+								<i class="ph-check-circle ph-2x ms-auto"></i>
+							</div>
+							
+							<div>
+								Finalized Internships
+								<div class="fs-sm opacity-75">48 completed this month</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /quick stats boxes -->
+
+				<!-- Platform activity chart -->
+				<div class="card">
+					<div class="card-header d-flex align-items-center">
+						<h5 class="mb-0">Platform Activity</h5>
+						<div class="ms-auto">
+							<div class="d-flex align-items-center">
+								<span class="me-2">Filter by:</span>
+								<select class="form-select">
+									<option value="1">Last 7 days</option>
+									<option value="2" selected>Last 30 days</option>
+									<option value="3">Last 3 months</option>
+									<option value="4">Last 6 months</option>
+								</select>
+							</div>
+						</div>
+					</div>
+
+					<div class="card-body">
+						<div class="chart-container">
+							<div class="chart" id="area_basic_chart" style="height: 350px;"></div>
+						</div>
+					</div>
+				</div>
+				<!-- /platform activity chart -->
+
+				<!-- Latest activity -->
+				<div class="card">
+					<div class="card-header">
+						<h5 class="mb-0">Latest Activity</h5>
+					</div>
+
+					<div class="card-body pb-0">
+						<div class="timeline timeline-start timeline-left">
+							<div class="timeline-container">
+
+								<div class="timeline-item">
+									<div class="timeline-item-date">1 hour ago</div>
+									<div class="timeline-item-indicator bg-success">
+										<i class="ph-user-plus"></i>
+									</div>
+									<div class="timeline-item-content">
+										<div class="d-flex align-items-start">
+											<div class="me-3">
+												<img src="assets/images/company-logo1.png" class="rounded-circle" width="40" height="40" alt="">
+											</div>
+
+											<div class="flex-fill">
+												<div class="fw-semibold">New Company Registered</div>
+												ABC Technologies has joined the internship program.
+												<div class="fs-sm text-muted mt-1">Registered by: Admin User</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="timeline-item">
+									<div class="timeline-item-date">2 hours ago</div>
+									<div class="timeline-item-indicator bg-primary">
+										<i class="ph-check-circle"></i>
+									</div>
+									<div class="timeline-item-content">
+										<div class="d-flex align-items-start">
+											<div class="me-3">
+												<img src="assets/images/student-avatar.png" class="rounded-circle" width="40" height="40" alt="">
+											</div>
+
+											<div class="flex-fill">
+												<div class="fw-semibold">Internship Confirmed</div>
+												John Doe confirmed Software Developer position at XYZ Corporation.
+												<div class="fs-sm text-muted mt-1">Start Date: Sept 15, 2023</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="timeline-item">
+									<div class="timeline-item-date">3 hours ago</div>
+									<div class="timeline-item-indicator bg-warning">
+										<i class="ph-file-text"></i>
+									</div>
+									<div class="timeline-item-content">
+										<div class="d-flex align-items-start">
+											<div class="me-3">
+												<img src="assets/images/company-logo2.png" class="rounded-circle" width="40" height="40" alt="">
+											</div>
+
+											<div class="flex-fill">
+												<div class="fw-semibold">New Internship Posted</div>
+												Global Enterprises posted a new Data Analyst internship position.
+												<div class="fs-sm text-muted mt-1">4 month position - London, UK</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="timeline-item">
+									<div class="timeline-item-date">5 hours ago</div>
+									<div class="timeline-item-indicator bg-info">
+										<i class="ph-user-focus"></i>
+									</div>
+									<div class="timeline-item-content">
+										<div class="d-flex align-items-start">
+											<div class="me-3">
+												<img src="assets/images/company-logo3.png" class="rounded-circle" width="40" height="40" alt="">
+											</div>
+
+											<div class="flex-fill">
+												<div class="fw-semibold">Internship Application Accepted</div>
+												Jane Smith's application for Marketing Intern at Digital Solutions was accepted.
+												<div class="fs-sm text-muted mt-1">Start Date: Sept 10, 2023</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+
+					<div class="card-footer bg-transparent text-center">
+						<a href="#" class="text-body">View all activity</a>
+					</div>
+				</div>
+				<!-- /latest activity -->
+
+				<!-- Data tables -->
+				<div class="card">
+					<div class="card-header d-flex">
+						<h5 class="mb-0">Recent Applications</h5>
+						<div class="ms-auto">
+							<button type="button" class="btn btn-light">
+								<i class="ph-file-csv me-2"></i>
+								Export
+							</button>
+						</div>
+					</div>
+
+					<table class="table datatable-responsive">
+						<thead>
+							<tr>
+								<th>Student</th>
+								<th>Company</th>
+								<th>Position</th>
+								<th>Status</th>
+								<th>Applied On</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<div class="d-flex align-items-center">
+										<img src="assets/images/student-avatar.png" class="rounded-circle me-2" width="32" height="32" alt="">
+										<div>John Doe</div>
+									</div>
+								</td>
+								<td>XYZ Corporation</td>
+								<td>Marketing Intern</td>
+								<td><span class="badge bg-success">Accepted</span></td>
+								<td>Aug 15, 2023</td>
+								<td class="text-center">
+									<div class="d-inline-flex">
+										<a href="#" class="text-body" data-bs-popup="tooltip" title="View Details">
+											<i class="ph-eye"></i>
+										</a>
+										<a href="#" class="text-body ms-2" data-bs-popup="tooltip" title="Documents">
+											<i class="ph-file-doc"></i>
+										</a>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div class="d-flex align-items-center">
+										<img src="assets/images/student-avatar2.png" class="rounded-circle me-2" width="32" height="32" alt="">
+										<div>Jane Smith</div>
+									</div>
+								</td>
+								<td>ABC Technologies</td>
+								<td>Software Developer Intern</td>
+								<td><span class="badge bg-secondary">Pending</span></td>
+								<td>Aug 17, 2023</td>
+								<td class="text-center">
+									<div class="d-inline-flex">
+										<a href="#" class="text-body" data-bs-popup="tooltip" title="View Details">
+											<i class="ph-eye"></i>
+										</a>
+										<a href="#" class="text-body ms-2" data-bs-popup="tooltip" title="Documents">
+											<i class="ph-file-doc"></i>
+										</a>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div class="d-flex align-items-center">
+										<img src="assets/images/student-avatar3.png" class="rounded-circle me-2" width="32" height="32" alt="">
+										<div>Michael Johnson</div>
+									</div>
+								</td>
+								<td>Global Enterprises</td>
+								<td>Data Analyst Intern</td>
+								<td><span class="badge bg-secondary">Pending</span></td>
+								<td>Aug 18, 2023</td>
+								<td class="text-center">
+									<div class="d-inline-flex">
+										<a href="#" class="text-body" data-bs-popup="tooltip" title="View Details">
+											<i class="ph-eye"></i>
+										</a>
+										<a href="#" class="text-body ms-2" data-bs-popup="tooltip" title="Documents">
+											<i class="ph-file-doc"></i>
+										</a>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div class="d-flex align-items-center">
+										<img src="assets/images/student-avatar4.png" class="rounded-circle me-2" width="32" height="32" alt="">
+										<div>Sarah Williams</div>
+									</div>
+								</td>
+								<td>Digital Solutions</td>
+								<td>UI/UX Designer Intern</td>
+								<td><span class="badge bg-success">Accepted</span></td>
+								<td>Aug 19, 2023</td>
+								<td class="text-center">
+									<div class="d-inline-flex">
+										<a href="#" class="text-body" data-bs-popup="tooltip" title="View Details">
+											<i class="ph-eye"></i>
+										</a>
+										<a href="#" class="text-body ms-2" data-bs-popup="tooltip" title="Documents">
+											<i class="ph-file-doc"></i>
+										</a>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div class="d-flex align-items-center">
+										<img src="assets/images/student-avatar5.png" class="rounded-circle me-2" width="32" height="32" alt="">
+										<div>Robert Brown</div>
+									</div>
+								</td>
+								<td>Finance Pro</td>
+								<td>Financial Analyst Intern</td>
+								<td><span class="badge bg-danger">Rejected</span></td>
+								<td>Aug 20, 2023</td>
+								<td class="text-center">
+									<div class="d-inline-flex">
+										<a href="#" class="text-body" data-bs-popup="tooltip" title="View Details">
+											<i class="ph-eye"></i>
+										</a>
+										<a href="#" class="text-body ms-2" data-bs-popup="tooltip" title="Documents">
+											<i class="ph-file-doc"></i>
+										</a>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<!-- /data tables -->
+
+				<!-- Email tool card -->
+				<div class="card">
+					<div class="card-header d-flex">
+						<h5 class="mb-0">Quick Email</h5>
+						<div class="ms-auto">
+							<a href="admin-email.html" class="text-body">Advanced options</a>
+						</div>
+					</div>
+
+					<div class="card-body">
+						<form action="#">
+							<div class="row mb-3">
+								<label class="col-lg-2 col-form-label">Recipient type:</label>
+								<div class="col-lg-10">
+									<select class="form-select">
+										<option value="1">All Students</option>
+										<option value="2">All Companies</option>
+										<option value="3">Selected Students</option>
+										<option value="4">Selected Companies</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="row mb-3">
+								<label class="col-lg-2 col-form-label">Subject:</label>
+								<div class="col-lg-10">
+									<input type="text" class="form-control" placeholder="Email subject">
+								</div>
+							</div>
+
+							<div class="row mb-3">
+								<label class="col-lg-2 col-form-label">Message:</label>
+								<div class="col-lg-10">
+									<textarea rows="4" cols="3" class="form-control" placeholder="Enter your message here"></textarea>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-lg-10 offset-lg-2">
+									<button type="submit" class="btn btn-primary">
+										Send message
+										<i class="ph-paper-plane-right ms-2"></i>
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+				<!-- /email tool card -->
+
+			</div>
+			<!-- /content area -->
+
+			<!-- Footer -->
+			<div class="navbar navbar-sm navbar-footer border-top">
+				<div class="container-fluid">
+					<span>&copy; 2023 <a href="#">First Step Into The Business World</a></span>
+
+					<ul class="nav">
+						<li class="nav-item">
+							<a href="#" class="navbar-nav-link">
+								Support
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="#" class="navbar-nav-link">
+								Help
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="#" class="navbar-nav-link">
+								Contact
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<!-- /footer -->
+
+		</div>
+		<!-- /main content -->
+
+	</div>
+	<!-- /page content -->
+
+</body>
+</html> 
