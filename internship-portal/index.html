@@ -4,20 +4,21 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>First Step Into The Business World - Internship Portal</title>
+	<title>Sabancı University - Internship Portal</title>
 
 	<!-- Global stylesheets -->
-	<link href="../bs5/template/assets/fonts/inter/inter.css" rel="stylesheet" type="text/css">
-	<link href="../bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
-	<link href="../bs5/template/html/layout_1/full/assets/css/ltr/all.min.css" id="stylesheet" rel="stylesheet" type="text/css">
+	<link href="/bs5/template/assets/fonts/inter/inter.css" rel="stylesheet" type="text/css">
+	<link href="/bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
+	<link href="/bs5/template/html/layout_1/full/assets/css/ltr/all.min.css" id="stylesheet" rel="stylesheet" type="text/css">
+	<link href="/internship-portal/assets/css/sabanci-theme.css" rel="stylesheet" type="text/css">
 	<!-- /global stylesheets -->
 
 	<!-- Core JS files -->
-	<script src="../bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+	<script src="/bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
 	<!-- /core JS files -->
 
 	<!-- Theme JS files -->
-	<script src="../bs5/template/html/layout_1/full/assets/js/app.js"></script>
+	<script src="/bs5/template/html/layout_1/full/assets/js/app.js"></script>
 	<!-- /theme JS files -->
 
 </head>
@@ -34,9 +35,9 @@
 			</div>
 
 			<div class="navbar-brand flex-1 flex-lg-0">
-				<a href="index.html" class="d-inline-flex align-items-center">
-					<img src="../bs5/template/assets/images/demo/logos/1.svg" alt="First Step Logo" class="h-48px">
-					<span class="d-none d-sm-inline-block h5 mb-0 ms-2">First Step Into The Business World</span>
+				<a href="/internship-portal/index.html" class="d-inline-flex align-items-center">
+					<img src="/assets/images/logo.svg" alt="Sabancı University Logo" class="h-48px">
+					<span class="d-none d-sm-inline-block h5 mb-0 ms-2">Sabancı University Internship Portal</span>
 				</a>
 			</div>
 
@@ -110,7 +111,7 @@
 						<div class="card-body">
 							<div class="text-center mb-3">
 								<div class="d-inline-flex align-items-center justify-content-center mb-4 mt-2">
-									<img src="../bs5/template/assets/images/demo/logos/1.svg" class="h-48px" alt="">
+									<img src="/assets/images/logo.svg" class="h-48px" alt="Sabancı University Logo">
 								</div>
 								<h5 class="mb-0">Login to your account</h5>
 								<span class="d-block text-muted">Enter your credentials below</span>
@@ -197,7 +198,7 @@
 				<!-- Footer -->
 				<div class="navbar navbar-sm navbar-footer border-top">
 					<div class="container-fluid">
-						<span>&copy; 2023 <a href="#">First Step Into The Business World</a></span>
+						<span>&copy; 2023 <a href="#">Sabancı University Internship Portal</a></span>
 
 						<ul class="nav">
 							<li class="nav-item">
@@ -379,6 +380,65 @@
 		</div>
 	</div>
 	<!-- /sign up modal -->
+
+	<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		console.log('Login page script loaded.');
+		// Select the container of the main login form elements
+		const loginContainer = document.querySelector('.content .card .card-body'); 
+
+		if (!loginContainer) {
+			console.error('Login form container (.content .card .card-body) not found!');
+			return;
+		}
+		// Find elements within the container
+		const loginButton = loginContainer.querySelector('button[type="submit"]');
+		const emailInput = loginContainer.querySelector('input[type="text"]'); 
+		const passwordInput = loginContainer.querySelector('input[type="password"]');
+
+		if (loginButton && emailInput && passwordInput) {
+			console.log('Login form elements found within container.');
+			loginButton.addEventListener('click', (event) => {
+				// No need for preventDefault() as there is no form submission to prevent
+				console.log('Login button clicked.');
+
+				const email = emailInput.value.trim().toLowerCase();
+				console.log('Email entered:', email);
+
+				let userRole = null;
+				let redirectUrl = null;
+
+				// Role assignment based on email
+				if (email === 'admin@example.com') {
+					userRole = 'admin';
+					redirectUrl = 'admin/admin-dashboard.html';
+				} else if (email === 'company@example.com') {
+					userRole = 'company';
+					redirectUrl = 'company/company-dashboard.html';
+				} else if (email === 'student@example.com') {
+					userRole = 'student';
+					redirectUrl = 'student/student-dashboard.html';
+				} else {
+					console.log('Invalid credentials entered.');
+					alert('Invalid login credentials for simulation. Use admin@example.com, company@example.com, or student@example.com');
+					return;
+				}
+
+				if (userRole && redirectUrl) {
+					console.log('Role identified:', userRole, 'Redirecting to:', redirectUrl);
+					// Store role in localStorage
+					localStorage.setItem('userRole', userRole);
+					// Redirect to the dashboard
+					window.location.href = redirectUrl;
+				} else {
+					console.error('Login successful but role or redirect URL missing?'); // Should not happen
+				}
+			});
+		} else {
+			console.error('Could not find required login elements (button, email, password) within .card-body.');
+		}
+	});
+	</script>
 
 </body>
 </html> 

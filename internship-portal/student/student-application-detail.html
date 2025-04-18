@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Application Details - Sabancı University Internship Portal</title>
+
+	<!-- Global stylesheets -->
+	<link href="/bs5/template/assets/fonts/inter/inter.css" rel="stylesheet" type="text/css">
+	<link href="/bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
+	<link href="/bs5/template/html/layout_1/full/assets/css/ltr/all.min.css?v=1" id="stylesheet" rel="stylesheet" type="text/css">
+	<link href="/internship-portal/assets/css/sabanci-theme.css" rel="stylesheet" type="text/css">
+	<!-- /global stylesheets -->
+
+	<!-- Core JS files -->
+	<script src="/bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+	<!-- /core JS files -->
+
+	<!-- Theme JS files -->
+	<script src="/bs5/template/html/layout_1/full/assets/js/app.js"></script>
+	<!-- /theme JS files -->
+	
+	<!-- Custom style for proper scrolling -->
+	<style>
+		.content-wrapper {
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+		}
+		.content {
+			flex: 1;
+			overflow-y: auto;
+			padding-bottom: 1rem;
+		}
+		.page-content {
+			height: 100vh;
+			display: flex;
+			overflow: hidden;
+		}
+	</style>
+</head>
+
+<body>
+
+	<!-- Main navbar -->
+	<div class="navbar navbar-dark navbar-expand-lg navbar-static border-bottom border-bottom-white border-opacity-10">
+		<div class="container-fluid">
+			<div class="d-flex d-lg-none me-2">
+				<button type="button" class="navbar-toggler sidebar-mobile-main-toggle rounded-pill">
+					<i class="ph-list"></i>
+				</button>
+			</div>
+
+			<div class="navbar-brand flex-1 flex-lg-0">
+				<a href="/internship-portal/student/student-dashboard.html" class="d-inline-flex align-items-center">
+					<img src="/internship-portal/assets/images/logo.svg" alt="Sabancı University Logo" class="h-32px">
+					<span class="d-none d-sm-inline-block h6 mb-0 ms-2">Sabancı University Internship Portal</span>
+				</a>
+			</div>
+
+			<ul class="nav flex-row justify-content-end order-1 order-lg-2">
+                <!-- Notifications dropdown (optional, can be simplified or removed for detail page) -->
+				<li class="nav-item nav-item-dropdown-lg dropdown">
+					<a href="#" class="navbar-nav-link navbar-nav-link-icon rounded-pill" data-bs-toggle="dropdown">
+						<i class="ph-bell"></i>
+					</a>					
+					<div class="dropdown-menu dropdown-menu-end dropdown-menu-scrollable-sm wmin-lg-350">
+						<div class="p-2">No new notifications</div>
+					</div>
+				</li>
+
+				<li class="nav-item nav-item-dropdown-lg dropdown ms-lg-2">
+					<a href="#" class="navbar-nav-link align-items-center rounded-pill p-1" data-bs-toggle="dropdown">
+						<div class="status-indicator-container">
+							<img src="/bs5/template/assets/images/demo/users/face11.jpg" class="w-32px h-32px rounded-pill" alt="">
+							<span class="status-indicator bg-success"></span>
+						</div>
+						<span class="d-none d-lg-inline-block mx-lg-2">John Doe</span>
+					</a>
+
+					<div class="dropdown-menu dropdown-menu-end">
+						<a href="student-profile.html" class="dropdown-item">
+							<i class="ph-user-circle me-2"></i>
+							My profile
+						</a>
+						<a href="student-applications.html" class="dropdown-item">
+							<i class="ph-briefcase me-2"></i>
+							My applications
+						</a>
+						<a href="student-documents.html" class="dropdown-item">
+							<i class="ph-file-text me-2"></i>
+							My documents
+						</a>
+						<a href="student-settings.html" class="dropdown-item">
+							<i class="ph-gear me-2"></i>
+							Account settings
+						</a>
+						<div class="dropdown-divider"></div>
+						<a href="../index.html" class="dropdown-item logout-link">
+							<i class="ph-sign-out me-2"></i>
+							Logout
+						</a>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<!-- /main navbar -->
+
+	<!-- Page content -->
+	<div class="page-content">
+
+		<!-- Main sidebar -->
+		<div class="sidebar sidebar-dark sidebar-main sidebar-expand-lg">
+			<div class="sidebar-content">
+				<!-- Sidebar header -->
+				<div class="sidebar-section">
+					<div class="sidebar-section-body d-flex justify-content-center">
+						<h5 class="sidebar-resize-hide flex-grow-1 my-auto">Navigation</h5>
+						<div>
+							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-control sidebar-main-resize d-none d-lg-inline-flex">
+								<i class="ph-arrows-left-right"></i>
+							</button>
+							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-mobile-main-toggle d-lg-none">
+								<i class="ph-x"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+				<!-- /sidebar header -->
+
+				<!-- Main navigation -->
+				<div class="sidebar-section">
+					<ul class="nav nav-sidebar" data-nav-type="accordion">
+						<!-- Main -->
+						<li class="nav-item-header">
+							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Main</div>
+							<i class="ph-dots-three sidebar-resize-show"></i>
+						</li>
+						<li class="nav-item">
+							<a href="student-dashboard.html" class="nav-link">
+								<i class="ph-house"></i>
+								<span>Dashboard</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-internships.html" class="nav-link">
+								<i class="ph-briefcase"></i>
+								<span>Browse Internships</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-applications.html" class="nav-link active">
+								<i class="ph-file-text"></i>
+								<span>My Applications</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-documents.html" class="nav-link">
+								<i class="ph-file-doc"></i>
+								<span>Documents</span>
+							</a>
+						</li>
+
+						<!-- Profile -->
+						<li class="nav-item-header">
+							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Profile</div>
+							<i class="ph-dots-three sidebar-resize-show"></i>
+						</li>
+						<li class="nav-item">
+							<a href="student-profile.html" class="nav-link">
+								<i class="ph-user-circle"></i>
+								<span>My Profile</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-settings.html" class="nav-link">
+								<i class="ph-gear"></i>
+								<span>Account Settings</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../index.html" class="nav-link logout-link">
+								<i class="ph-sign-out"></i>
+								<span>Logout</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<!-- /main navigation -->
+			</div>
+		</div>
+		<!-- /main sidebar -->
+
+		<!-- Main content -->
+		<div class="content-wrapper">
+
+			<!-- Content area -->
+			<div class="content">
+
+				<!-- Page header -->
+				<div class="page-header page-header-light shadow">
+					<div class="page-header-content d-lg-flex">
+						<div class="d-flex">
+							<h4 class="page-title mb-0">
+								Application Details - <span class="fw-normal">Marketing Intern at XYZ Corporation</span>
+							</h4>
+						</div>
+					</div>
+					<div class="page-header-content d-lg-flex border-top">
+						<div class="d-flex">
+							<div class="breadcrumb py-2">
+								<a href="student-dashboard.html" class="breadcrumb-item"><i class="ph-house"></i></a>
+								<a href="student-applications.html" class="breadcrumb-item">My Applications</a>
+								<span class="breadcrumb-item active">Application Details</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /page header -->
+
+
+				<!-- Application Details Content -->
+				<div class="row">
+					<div class="col-lg-8">
+						<div class="card">
+							<div class="card-header d-flex align-items-center">
+								<div>
+									<h5 class="mb-0">Marketing Intern</h5>
+									<span class="text-muted">XYZ Corporation</span>
+								</div>
+							</div>
+
+							<div class="card-body">
+								<h6>Internship Description</h6>
+								<p>This is a placeholder for the internship description. As a Marketing Intern at XYZ Corporation, you will support the marketing team in various tasks including market research, campaign analysis, content creation, and social media management. You will gain hands-on experience in a fast-paced corporate environment.</p>
+								
+								<h6>Responsibilities</h6>
+								<ul class="list-unstyled">
+									<li><i class="ph-check text-success me-2"></i>Assist with market research and competitor analysis.</li>
+									<li><i class="ph-check text-success me-2"></i>Support the creation of marketing materials and presentations.</li>
+									<li><i class="ph-check text-success me-2"></i>Help manage social media accounts and track engagement.</li>
+									<li><i class="ph-check text-success me-2"></i>Analyze campaign performance data.</li>
+								</ul>
+
+								<h6>Qualifications</h6>
+								<ul class="list-unstyled">
+									<li><i class="ph-caret-right text-primary me-2"></i>Currently pursuing a Bachelor's degree in Marketing, Business, or related field.</li>
+									<li><i class="ph-caret-right text-primary me-2"></i>Strong written and verbal communication skills.</li>
+									<li><i class="ph-caret-right text-primary me-2"></i>Familiarity with social media platforms.</li>
+									<li><i class="ph-caret-right text-primary me-2"></i>Proficient in Microsoft Office Suite.</li>
+								</ul>
+							</div>
+						</div>
+
+						<div class="card">
+							<div class="card-header">
+								<h6 class="mb-0">Submitted Documents</h6>
+							</div>
+							<div class="card-body">
+								<ul class="list-unstyled mb-0">
+									<li class="mb-2"><i class="ph-file-pdf me-2"></i> <a href="#">Resume_JohnDoe.pdf</a></li>
+									<li class="mb-2"><i class="ph-file-doc me-2"></i> <a href="#">CoverLetter_XYZ.docx</a></li>
+									<li><i class="ph-file-image me-2"></i> <a href="#">Transcript_JDoe.pdf</a></li>
+								</ul>
+							</div>
+						</div>
+
+						<div class="card">
+							<div class="card-header">
+								<h6 class="mb-0">Communication Log</h6>
+							</div>
+							<div class="card-body">
+								<p class="text-muted">No communication history recorded yet.</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-lg-4">
+						<div class="card">
+							<div class="card-header">
+								<h6 class="mb-0">Application Status</h6>
+							</div>
+							<div class="card-body">
+								<div class="d-flex align-items-center mb-3">
+									<span class="badge bg-success fs-lg me-2">Accepted</span>
+								</div>
+								<dl class="row">
+									<dt class="col-sm-5">Application ID:</dt>
+									<dd class="col-sm-7">APP-2023-001</dd>
+
+									<dt class="col-sm-5">Applied On:</dt>
+									<dd class="col-sm-7">August 15, 2023</dd>
+
+									<dt class="col-sm-5">Status Updated:</dt>
+									<dd class="col-sm-7">August 20, 2023</dd>
+
+									<dt class="col-sm-5">Location:</dt>
+									<dd class="col-sm-7">New York, USA</dd>
+
+									<dt class="col-sm-5">Duration:</dt>
+									<dd class="col-sm-7">3 Months</dd>
+
+									<dt class="col-sm-5">Type:</dt>
+									<dd class="col-sm-7">Paid ($1,200/month)</dd>
+								</dl>
+								
+								<hr>
+
+								<h6 class="mb-3">Actions</h6>
+								<div class="d-grid gap-2">
+									<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirm_internship_modal">
+										<i class="ph-check-circle me-2"></i>Confirm Acceptance
+									</button>
+									<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#withdraw_application_modal">
+										<i class="ph-x-circle me-2"></i>Withdraw Application
+									</button>
+									<a href="student-applications.html" class="btn btn-light">
+										<i class="ph-arrow-left me-2"></i>Back to Applications
+									</a>
+								</div>
+							</div>
+						</div>
+
+						<div class="card">
+							<div class="card-header">
+								<h6 class="mb-0">Required Documents for Confirmation</h6>
+							</div>
+							<div class="card-body">
+								<ul class="list-unstyled mb-0">
+									<li class="d-flex justify-content-between align-items-center mb-2">
+										<span><i class="ph-file-doc me-2"></i>Insurance Form</span>
+										<span class="badge bg-warning">Pending</span>
+									</li>
+									<li class="d-flex justify-content-between align-items-center mb-2">
+										<span><i class="ph-file-doc me-2"></i>Agreement Form</span>
+										<span class="badge bg-warning">Pending</span>
+									</li>
+								</ul>
+								<a href="student-documents.html" class="btn btn-light btn-sm mt-3">Upload Documents</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /Application Details Content -->
+
+			</div>
+			<!-- /content area -->
+
+			<!-- Footer -->
+			<div class="navbar navbar-sm navbar-footer border-top">
+				<div class="container-fluid">
+					<span>&copy; 2023 <a href="#">Sabancı University Internship Portal</a></span>
+					<ul class="nav">
+					</ul>
+				</div>
+			</div>
+			<!-- /footer -->
+
+		</div>
+		<!-- /main content -->
+
+	</div>
+	<!-- /page content -->
+
+	<!-- Confirm Internship Modal (Example) -->
+	<div id="confirm_internship_modal" class="modal fade" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header bg-success text-white">
+					<h5 class="modal-title">Confirm Internship Acceptance</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<p>Are you sure you want to confirm your acceptance for the <strong>Marketing Intern</strong> position at <strong>XYZ Corporation</strong>?</p>
+					<p>Remember to upload the required documents (Insurance Form, Agreement Form) via the Documents page.</p>
+					<div class="form-check mt-3">
+						<input type="checkbox" class="form-check-input" id="confirm_check">
+						<label class="form-check-label" for="confirm_check">I understand and agree to the terms.</label>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-link" data-bs-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-success" id="confirm_acceptance_button" disabled>Confirm Acceptance</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /confirm internship modal -->
+
+	<!-- Withdraw Application Modal (Example) -->
+	<div id="withdraw_application_modal" class="modal fade" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header bg-danger text-white">
+					<h5 class="modal-title">Withdraw Application</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<p>Are you sure you want to withdraw your application for the <strong>Marketing Intern</strong> position at <strong>XYZ Corporation</strong>?</p>
+					<p class="text-danger">This action cannot be undone.</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-link" data-bs-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-danger">Withdraw Application</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /withdraw application modal -->
+
+
+	<script>
+		// Basic logout functionality & auth check
+		document.addEventListener('DOMContentLoaded', () => {
+			const logoutLinks = document.querySelectorAll('.logout-link');
+			logoutLinks.forEach(link => {
+				link.addEventListener('click', (event) => {
+					localStorage.removeItem('userRole');
+				});
+			});
+			const userRole = localStorage.getItem('userRole');
+			if (userRole !== 'student') {
+				alert('Access denied. Redirecting to login page.');
+				window.location.href = '../index.html';
+			}
+
+			// Enable confirm button only when checkbox is checked
+			const confirmCheckbox = document.getElementById('confirm_check');
+			const confirmButton = document.getElementById('confirm_acceptance_button');
+			if (confirmCheckbox && confirmButton) {
+				confirmCheckbox.addEventListener('change', () => {
+					confirmButton.disabled = !confirmCheckbox.checked;
+				});
+			}
+		});
+	</script>
+
+</body>
+</html> 

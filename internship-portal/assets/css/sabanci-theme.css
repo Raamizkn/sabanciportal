@@ -1,0 +1,100 @@
+/* Sabanci University Theme Overrides */
+
+/* Define Sabanci Blue */
+:root {
+  --sabanci-blue: #003366; /* Adjust if you have the exact hex code */
+  --sabanci-link-hover: #e0e0e0; /* Lighter gray/white for hover */
+}
+
+/* --- General --- */
+body {
+  /* You might want to set a specific font here if needed */
+}
+
+/* --- Navbar --- */
+.navbar-static { /* Targeting the top navbar in index.html */
+  background-color: var(--sabanci-blue);
+  border-bottom: none; /* Remove default border */
+}
+.navbar-dark { /* Targeting navbars in dashboard pages */
+  background-color: var(--sabanci-blue);
+  border-bottom-color: rgba(255, 255, 255, 0.2); /* Lighter border for dark bg */
+}
+
+.navbar-static .navbar-brand a,
+.navbar-dark .navbar-brand a,
+.navbar-static .navbar-nav .nav-link,
+.navbar-dark .navbar-nav .nav-link {
+  color: #ffffff;
+}
+
+.navbar-static .navbar-brand span,
+.navbar-dark .navbar-brand span {
+    color: #ffffff; /* Ensure text next to logo is white */
+}
+
+
+.navbar-static .navbar-nav .nav-link:hover, .navbar-static .navbar-nav .nav-link:focus,
+.navbar-dark .navbar-nav .nav-link:hover, .navbar-dark .navbar-nav .nav-link:focus {
+  color: var(--sabanci-link-hover);
+}
+
+/* Ensure dropdown items in dark navbar are styled for light-on-dark */
+.navbar-dark .dropdown-menu {
+   /* Limitless might handle this, but add overrides if needed */
+}
+.navbar-dark .dropdown-item {
+    /* color: #333; Default might be okay */
+}
+.navbar-dark .dropdown-item:hover, .navbar-dark .dropdown-item:focus {
+    /* background-color: #f5f5f5; */
+}
+
+/* --- Sidebar (Dashboards) --- */
+.sidebar-dark {
+  background-color: var(--sabanci-blue);
+}
+.sidebar-dark .nav-sidebar .nav-link {
+  color: rgba(255, 255, 255, 0.8); /* Slightly muted white */
+}
+.sidebar-dark .nav-sidebar .nav-link:hover,
+.sidebar-dark .nav-sidebar .nav-link:focus {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.sidebar-dark .nav-sidebar .nav-link.active {
+  color: #ffffff;
+  background-color: rgba(0, 0, 0, 0.2); /* Darker shade for active */
+}
+.sidebar-dark .nav-item-header {
+    color: rgba(255, 255, 255, 0.5); /* Muted headers */
+}
+
+/* --- Buttons --- */
+.btn-primary {
+  background-color: var(--sabanci-blue);
+  border-color: var(--sabanci-blue);
+  color: #ffffff;
+}
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+  background-color: #002244; /* Darker blue on hover */
+  border-color: #002244;
+  color: #ffffff;
+}
+
+/* --- Specific Page Elements (Example: Login Page) --- */
+/* Adjust login card or other elements if needed */
+.card {
+  /* Example: border-top: 3px solid var(--sabanci-blue); */
+}
+
+/* --- Footer --- */
+.navbar-footer {
+    /* Style footer if needed */
+}
+
+/* Adjust logo height if necessary */
+.navbar-brand img {
+    max-height: 40px; /* Adjust as needed */
+    width: auto;
+} 

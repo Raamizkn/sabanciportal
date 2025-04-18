@@ -4,20 +4,21 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>My Profile - First Step Into The Business World</title>
+	<title>My Profile - Sabancı University Internship Portal</title>
 
 	<!-- Global stylesheets -->
-	<link href="../../bs5/template/assets/fonts/inter/inter.css" rel="stylesheet" type="text/css">
-	<link href="../../bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
-	<link href="../../bs5/template/html/layout_1/full/assets/css/ltr/all.min.css?v=1" id="stylesheet" rel="stylesheet" type="text/css">
+	<link href="/bs5/template/assets/fonts/inter/inter.css" rel="stylesheet" type="text/css">
+	<link href="/bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
+	<link href="/bs5/template/html/layout_1/full/assets/css/ltr/all.min.css?v=1" id="stylesheet" rel="stylesheet" type="text/css">
+	<link href="/internship-portal/assets/css/sabanci-theme.css" rel="stylesheet" type="text/css">
 	<!-- /global stylesheets -->
 
 	<!-- Core JS files -->
-	<script src="../../bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+	<script src="/bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
 	<!-- /core JS files -->
 
 	<!-- Theme JS files -->
-	<script src="../../bs5/template/html/layout_1/full/assets/js/app.js"></script>
+	<script src="/bs5/template/html/layout_1/full/assets/js/app.js"></script>
 	<!-- /theme JS files -->
 	
 	<!-- Custom style for proper scrolling -->
@@ -52,8 +53,8 @@
 
 			<div class="navbar-brand flex-1 flex-lg-0">
 				<a href="student-dashboard.html" class="d-inline-flex align-items-center">
-					<img src="../../bs5/template/assets/images/demo/logos/1.svg" alt="First Step Logo" class="h-32px">
-					<span class="d-none d-sm-inline-block h6 mb-0 ms-2">First Step Into The Business World</span>
+					<img src="/internship-portal/assets/images/logo.svg" alt="Sabancı University Logo" class="h-32px">
+					<span class="d-none d-sm-inline-block h6 mb-0 ms-2">Sabancı University Internship Portal</span>
 				</a>
 			</div>
 
@@ -114,7 +115,7 @@
 				<li class="nav-item nav-item-dropdown-lg dropdown ms-lg-2">
 					<a href="#" class="navbar-nav-link align-items-center rounded-pill p-1" data-bs-toggle="dropdown">
 						<div class="status-indicator-container">
-							<img src="../../bs5/template/assets/images/demo/users/face11.jpg" class="w-32px h-32px rounded-pill" alt="">
+							<img src="/bs5/template/assets/images/demo/users/face11.jpg" class="w-32px h-32px rounded-pill" alt="">
 							<span class="status-indicator bg-success"></span>
 						</div>
 						<span class="d-none d-lg-inline-block mx-lg-2">John Doe</span>
@@ -138,7 +139,7 @@
 							Account settings
 						</a>
 						<div class="dropdown-divider"></div>
-						<a href="index.html" class="dropdown-item">
+						<a href="../index.html" class="dropdown-item logout-link">
 							<i class="ph-sign-out me-2"></i>
 							Logout
 						</a>
@@ -211,12 +212,6 @@
 								<span>Documents</span>
 							</a>
 						</li>
-						<li class="nav-item">
-							<a href="student-evaluations.html" class="nav-link">
-								<i class="ph-star"></i>
-								<span>Evaluations</span>
-							</a>
-						</li>
 
 						<!-- Profile -->
 						<li class="nav-item-header">
@@ -236,7 +231,7 @@
 							</a>
 						</li>
 						<li class="nav-item">
-							<a href="index.html" class="nav-link">
+							<a href="../index.html" class="nav-link logout-link">
 								<i class="ph-sign-out"></i>
 								<span>Logout</span>
 							</a>
@@ -296,7 +291,7 @@
 								<div class="d-sm-flex align-items-center mb-3">
 									<div class="me-sm-3 mb-3 mb-sm-0">
 										<div class="card-img-actions">
-											<img src="../../bs5/template/assets/images/demo/users/face11.jpg" class="rounded-circle" width="150" height="150" alt="">
+											<img src="/bs5/template/assets/images/demo/users/face11.jpg" class="rounded-circle" width="150" height="150" alt="">
 											<div class="card-img-actions-overlay rounded-circle">
 												<a href="#" class="btn btn-outline-white btn-icon rounded-pill" data-bs-toggle="modal" data-bs-target="#edit_profile">
 													<i class="ph-pencil"></i>
@@ -470,6 +465,30 @@
 						</div>
 						<!-- /status & activity -->
 
+                        <!-- Key Documents -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Key Documents</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2">
+                                        <i class="ph-file-pdf me-2 text-danger"></i>
+                                        <a href="#" data-doc-id="resume1">Resume_JohnDoe.pdf</a> 
+                                        <a href="student-documents.html" class="text-muted fs-sm ms-1">(Manage)</a>
+                                    </li>
+                                    <li>
+                                        <i class="ph-file-pdf me-2 text-danger"></i>
+                                        <a href="#" data-doc-id="transcript1">Transcript_JDoe.pdf</a>
+                                        <a href="student-documents.html" class="text-muted fs-sm ms-1">(Manage)</a>
+                                    </li>
+                                    <!-- Add more key documents like cover letters if needed -->
+                                </ul>
+                                <a href="student-documents.html" class="btn btn-light btn-sm mt-3">View All Documents</a>
+                            </div>
+                        </div>
+                        <!-- /key documents -->
+
 						<!-- Contact details -->
 						<div class="card">
 							<div class="card-header">
@@ -506,7 +525,7 @@
 			<!-- Footer -->
 			<div class="navbar navbar-sm navbar-footer border-top">
 				<div class="container-fluid">
-					<span>&copy; 2023 <a href="#">First Step Into The Business World</a></span>
+					<span>&copy; 2023 <a href="#">Sabancı University Internship Portal</a></span>
 
 					<ul class="nav">
 						<li class="nav-item">
@@ -549,7 +568,7 @@
 						<div class="fw-semibold mb-2">Profile Picture</div>
 						<div class="d-flex align-items-center">
 							<div class="me-3">
-								<img src="../../bs5/template/assets/images/demo/users/face11.jpg" class="rounded-circle" width="80" height="80" alt="">
+								<img src="/bs5/template/assets/images/demo/users/face11.jpg" class="rounded-circle" width="80" height="80" alt="">
 							</div>
 							<div>
 								<input type="file" class="form-control">
@@ -660,5 +679,35 @@
 		</div>
 	</div>
 	<!-- /edit profile modal -->
+
+	<!-- Add logout script -->
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			console.log('Student profile script loaded.');
+			const logoutLinks = document.querySelectorAll('.logout-link');
+			console.log('Found', logoutLinks.length, 'logout links.');
+			logoutLinks.forEach(link => {
+				link.addEventListener('click', (event) => {
+					console.log('Logout link clicked:', event.target.href);
+					// Clear user role from localStorage
+					localStorage.removeItem('userRole');
+					console.log('userRole removed from localStorage.');
+					// Allow the link's default behavior (navigation) to proceed
+					console.log('Proceeding with navigation...');
+				});
+			});
+
+			// Optional: Add protection - redirect if not logged in as student
+			const userRole = localStorage.getItem('userRole');
+			console.log('Current userRole from localStorage:', userRole);
+			if (userRole !== 'student') {
+				console.warn('Access denied. User role is not \'student\'. Redirecting...');
+				alert('Access denied. Redirecting to login page.');
+				window.location.href = '../index.html';
+			} else {
+				console.log('Access granted for student.');
+			}
+		});
+	</script>
 </body>
 </html> 
