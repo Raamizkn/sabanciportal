@@ -269,7 +269,7 @@
 
 
 		<!-- Main content -->
-		<div class="content-wrapper">
+		<div class="content-wrapper" style="overflow-y: auto;">
 
 			<!-- Content area -->
 			<div class="content">
@@ -663,60 +663,158 @@
 			currentApplicationStatus = getApplicationStatus(); 
 		}
 
+		// --- Helper functions (Copied from student-applications.html) ---
+		// Helper to create a button if it doesn't exist
+		function ensureButtonExists(actionCell, buttonClass, iconClass, title, onClickFunction, internshipId) {
+			let button = actionCell.querySelector(`button.${buttonClass}`); // Look specifically for a button with the class
+			if (!button) {
+				button = document.createElement('button');
+				button.className = `btn btn-sm btn-icon btn-light ms-1 ${buttonClass}`;
+				button.dataset.bsPopup = 'tooltip';
+				button.title = title; // Initial title
+				if (onClickFunction) {
+					button.onclick = () => onClickFunction(button, internshipId);
+				}
+				
+				const icon = document.createElement('i');
+				icon.className = iconClass;
+				button.appendChild(icon);
+
+				// Find the view button to insert after, or append if only view exists or it's empty
+				const viewButton = actionCell.querySelector('.view-button');
+				if (viewButton && viewButton.nextSibling) {
+					actionCell.insertBefore(button, viewButton.nextSibling); // Try inserting after view
+				} else if (viewButton) {
+				 	actionCell.appendChild(button); // Append if view is last
+				} else {
+					actionCell.insertBefore(button, actionCell.firstChild); // Insert at beginning if no view (shouldn't happen)
+				}
+
+				new bootstrap.Tooltip(button); // Initialize tooltip for new button
+			}
+			// Ensure icon class is correct (needed if button existed but was modified)
+			if (button.querySelector('i')) { // Check if icon exists before setting class
+				button.querySelector('i').className = iconClass;
+			}
+			return button;
+		}
+
+		// Helper to enable/disable button and update tooltip
+		function setButtonState(button, enabled, title, iconClass = null) {
+			if (!button) return;
+
+			button.disabled = !enabled;
+			button.setAttribute('data-bs-original-title', title); // Use data-bs-original-title for Bootstrap 5 tooltips
+			
+			const icon = button.querySelector('i');
+			if (icon) {
+				if (iconClass) { // Update icon class if provided
+					icon.className = iconClass;
+				}
+				// Apply/remove muted class based on state
+				if (enabled) {
+					icon.classList.remove('text-muted');
+					// Optional: Restore specific text color if needed (e.g., text-success for confirm)
+					if (button.classList.contains('confirm-button')) icon.classList.add('text-success');
+					// Withdraw button on dashboard is always disabled, so no need for text-danger restoration
+				} else {
+					icon.classList.add('text-muted');
+					// Optional: Remove specific color classes when muted
+					icon.classList.remove('text-success', 'text-danger');
+				}
+			}
+
+			// Update the tooltip instance
+			const tooltipInstance = bootstrap.Tooltip.getInstance(button);
+			if (tooltipInstance) {
+				tooltipInstance.update();
+				tooltipInstance.setContent({ '.tooltip-inner': title }); // Ensure tooltip content updates
+			} else {
+				// Reinitialize if instance somehow got lost
+				new bootstrap.Tooltip(button);
+			}
+		}
+		// --- End Helper Functions ---
+
+
 		// Update UI based on current status (for dashboard)
 		function updateDashboardUIToReflectStatus() {
-			const status = getApplicationStatus();
-			const applicationRows = document.querySelectorAll('.card table tbody tr');
+			const overallStatus = getApplicationStatus();
+			const applicationRows = document.querySelectorAll('.card table tbody tr'); // Target dashboard table
 
 			applicationRows.forEach(row => {
-				const rowId = row.dataset.internshipId; 
+				const rowId = row.dataset.internshipId;
 				const statusBadge = row.querySelector('.badge');
-				const actionCell = row.querySelector('td:last-child');
-				const confirmBtn = actionCell.querySelector('button[onclick^="confirmInternship"]');
+				const actionCell = row.querySelector('td:last-child .d-inline-flex'); // Target the button container
 
 				if (!rowId || !statusBadge || !actionCell) return; // Skip if elements not found
 
-				// Restore original action cell content if needed (very basic)
-				if (actionCell.dataset.originalHtml) {
-					actionCell.innerHTML = actionCell.dataset.originalHtml;
-					// Reinitialize tooltip if necessary
-					const newTooltips = actionCell.querySelectorAll('[data-bs-popup="tooltip"]');
-					newTooltips.forEach(tooltip => new bootstrap.Tooltip(tooltip));
-				}
-
-				// Update status based on localStorage
-				if (status.approvedInternshipId === rowId) {
-					statusBadge.className = 'badge bg-info text-white';
-					statusBadge.textContent = APPLICATION_STATUS.APPROVED;
-					// Keep only view button
-					const viewButton = actionCell.querySelector('a[data-bs-popup="tooltip"][title="View Details"]');
-					actionCell.innerHTML = ''; // Clear actions
-					if(viewButton) actionCell.appendChild(viewButton.closest('.d-inline-flex') || viewButton); // Add back only view
-				} else if (status.confirmedInternshipId === rowId) {
-					statusBadge.className = 'badge bg-warning text-dark';
-					statusBadge.textContent = APPLICATION_STATUS.AWAITING_CONFIRMATION;
-					// Remove confirm button
-					if(confirmBtn) confirmBtn.remove();
-				} else if (status.withdrawnIds.includes(rowId)) {
-					statusBadge.className = 'badge bg-secondary';
-					statusBadge.textContent = APPLICATION_STATUS.WITHDRAWN;
-					actionCell.innerHTML = '-'; // No actions for withdrawn
-				}
-
-				// Disable buttons based on overall status
-				if (status.hasConfirmedInternship || status.hasApprovedInternship) {
-					const confirmButton = actionCell.querySelector('button[onclick^="confirmInternship"]');
-					if (confirmButton && status.confirmedInternshipId !== rowId && status.approvedInternshipId !== rowId) {
-						confirmButton.disabled = true;
-						confirmButton.classList.add('btn-light'); // Ensure style consistency
-						confirmButton.querySelector('i')?.classList.add('text-muted');
-						confirmButton.setAttribute('data-bs-original-title', 'Cannot confirm: another application is confirmed or approved');
-						bootstrap.Tooltip.getInstance(confirmButton)?.update();
+				let rowStatusText = statusBadge.textContent.trim();
+				
+				// If the row is marked as withdrawn via overallStatus, update badge
+				if (overallStatus.withdrawnIds.includes(rowId)) {
+					rowStatusText = APPLICATION_STATUS.WITHDRAWN;
+					if (statusBadge.textContent !== APPLICATION_STATUS.WITHDRAWN) {
+						statusBadge.className = 'badge bg-secondary';
+						statusBadge.textContent = APPLICATION_STATUS.WITHDRAWN;
 					}
 				}
-				
-				if (status.hasApprovedInternship) {
-					// In dashboard, we only show confirm/view, no withdraw needed
+				// Update other statuses visually based on overall status if needed
+				else if (overallStatus.approvedInternshipId === rowId && rowStatusText !== APPLICATION_STATUS.APPROVED) {
+					rowStatusText = APPLICATION_STATUS.APPROVED;
+					statusBadge.className = 'badge bg-info text-white';
+					statusBadge.textContent = APPLICATION_STATUS.APPROVED;
+				} else if (overallStatus.confirmedInternshipId === rowId && rowStatusText !== APPLICATION_STATUS.AWAITING_CONFIRMATION) {
+					rowStatusText = APPLICATION_STATUS.AWAITING_CONFIRMATION;
+					statusBadge.className = 'badge bg-warning text-dark';
+					statusBadge.textContent = APPLICATION_STATUS.AWAITING_CONFIRMATION;
+				} // Add more else-if for other statuses if their initial HTML might not match localStorage
+
+
+				// --- Ensure buttons exist (or find existing ones) ---
+				const viewButton = actionCell.querySelector('a.view-button'); 
+				const confirmButton = ensureButtonExists(actionCell, 'confirm-button', 'ph-check-circle', 'Confirm Acceptance', confirmInternship, rowId);
+				// Pass null for onClick function for withdraw button on dashboard as it's always disabled
+				const withdrawButton = ensureButtonExists(actionCell, 'withdraw-button', 'ph-x-circle', 'Withdraw Application', null, rowId);
+
+
+				// --- Determine button states for Dashboard ---
+				let confirmEnabled = false;
+				let confirmTitle = 'Confirm Acceptance';
+				const withdrawEnabled = false; // Always disabled on dashboard
+				const withdrawTitle = 'Withdraw from My Applications page';
+
+				// Base eligibility for confirm based on row status
+				if (rowStatusText === APPLICATION_STATUS.ACCEPTED) {
+					confirmEnabled = true;
+				}
+
+				// Override based on overall status
+				if (overallStatus.hasApprovedInternship) {
+					if (confirmEnabled) confirmTitle = 'Cannot confirm: An application is already approved.';
+					confirmEnabled = false;
+				} else if (overallStatus.hasConfirmedInternship && overallStatus.confirmedInternshipId !== rowId) {
+					if (confirmEnabled) confirmTitle = 'Cannot confirm: Another application is awaiting confirmation.';
+					confirmEnabled = false;
+				}
+
+				// Final overrides for specific row statuses that make confirm impossible
+				if (rowStatusText !== APPLICATION_STATUS.ACCEPTED) {
+				    if (confirmEnabled) confirmTitle = 'Cannot confirm this application status';
+					confirmEnabled = false;
+				}
+				if (rowStatusText === APPLICATION_STATUS.AWAITING_CONFIRMATION) {
+					if (confirmEnabled) confirmTitle = 'Already confirmed, awaiting company response'; // Specific message
+					confirmEnabled = false;
+				}
+
+				// --- Apply states --- 
+				setButtonState(confirmButton, confirmEnabled, confirmTitle, confirmEnabled ? 'ph-check-circle text-success' : 'ph-check-circle');
+				setButtonState(withdrawButton, withdrawEnabled, withdrawTitle, 'ph-x-circle'); // Use default icon class as it's always disabled
+
+				// Ensure view button always looks enabled
+				if(viewButton) {
+					viewButton.querySelector('i')?.classList.remove('text-muted');
 				}
 			});
 		}
