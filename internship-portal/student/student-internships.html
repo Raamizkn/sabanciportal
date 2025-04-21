@@ -273,64 +273,79 @@
 					</div>
 					
 					<div>
-						<button type="button" class="btn btn-light">
+						<button type="button" class="btn btn-light" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
 							<i class="ph-funnel me-2"></i>
 							Filter Results
 						</button>
 					</div>
 				</div>
 
-				<div class="page-header-content border-top">
-					<div class="row">
-						<div class="col-xl-3 col-lg-6">
-							<div class="mb-3 mb-xl-0">
-								<label class="form-label">Keywords</label>
-								<div class="form-control-feedback form-control-feedback-start">
-									<input type="text" class="form-control" placeholder="Job title, skills, etc">
-									<div class="form-control-feedback-icon">
-										<i class="ph-magnifying-glass"></i>
+				<div class="collapse" id="filterCollapse">
+					<div class="page-header-content border-top p-3">
+						<div class="row">
+							<div class="col-xl-3 col-lg-6">
+								<div class="mb-3 mb-xl-0">
+									<label class="form-label">Keywords</label>
+									<div class="form-control-feedback form-control-feedback-start">
+										<input type="text" class="form-control" placeholder="Job title, skills, etc">
+										<div class="form-control-feedback-icon">
+											<i class="ph-magnifying-glass"></i>
+										</div>
 									</div>
 								</div>
 							</div>
-						</div>
 
-						<div class="col-xl-3 col-lg-6">
-							<div class="mb-3 mb-xl-0">
-								<label class="form-label">Location</label>
-								<div class="form-control-feedback form-control-feedback-start">
-									<input type="text" class="form-control" placeholder="City, country, region">
-									<div class="form-control-feedback-icon">
-										<i class="ph-map-pin"></i>
+							<div class="col-xl-3 col-lg-6">
+								<div class="mb-3 mb-xl-0">
+									<label class="form-label">Location</label>
+									<div class="form-control-feedback form-control-feedback-start">
+										<input type="text" class="form-control" placeholder="City, country, region">
+										<div class="form-control-feedback-icon">
+											<i class="ph-map-pin"></i>
+										</div>
 									</div>
 								</div>
 							</div>
-						</div>
 
-						<div class="col-xl-3 col-lg-6">
-							<div class="mb-3 mb-lg-0">
-								<label class="form-label">Category</label>
-								<select class="form-select">
-									<option value="">All Categories</option>
-									<option value="technology">Technology</option>
-									<option value="marketing">Marketing</option>
-									<option value="finance">Finance</option>
-									<option value="hr">Human Resources</option>
-									<option value="engineering">Engineering</option>
-									<option value="research">Research</option>
-								</select>
+							<div class="col-xl-3 col-lg-6">
+								<div class="mb-3 mb-lg-0">
+									<label class="form-label">Category</label>
+									<select class="form-select filter-select" data-filter-type="category">
+										<option value="all">All Categories</option>
+										<option value="technology">Technology</option>
+										<option value="marketing">Marketing</option>
+										<option value="finance">Finance</option>
+										<option value="hr">Human Resources</option>
+										<option value="engineering">Engineering</option>
+										<option value="research">Research</option>
+										<option value="other">Other</option>
+									</select>
+								</div>
 							</div>
-						</div>
 
-						<div class="col-xl-3 col-lg-6">
-							<div>
-								<label class="form-label">Duration</label>
-								<select class="form-select">
-									<option value="">Any duration</option>
-									<option value="1-2">1-2 months</option>
-									<option value="3-4">3-4 months</option>
-									<option value="5-6">5-6 months</option>
-									<option value="6+">6+ months</option>
-								</select>
+							<div class="col-xl-3 col-lg-6">
+								<div>
+									<label class="form-label">Duration</label>
+									<select class="form-select filter-select" data-filter-type="duration">
+										<option value="all">Any duration</option>
+										<option value="1-2">1-2 months</option>
+										<option value="3-4">3-4 months</option>
+										<option value="5-6">5-6 months</option>
+										<option value="6+">6+ months</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="col-xl-3 col-lg-6">
+								<div>
+									<label class="form-label">Internship Mode</label>
+									<select class="form-select filter-select" data-filter-type="mode">
+										<option value="all">All Modes</option>
+										<option value="remote">Remote</option>
+										<option value="in-person">In-Person</option>
+										<option value="hybrid">Hybrid</option>
+									</select>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -344,7 +359,7 @@
 				<!-- Internship cards -->
 				<div class="row">
 					<div class="col-xl-4 col-md-6">
-						<div class="card">
+						<div class="card" data-category="marketing" data-duration="3-4" data-mode="in-person">
 							<div class="card-body">
 								<div class="d-flex align-items-start mb-3">
 									<div class="me-3">
@@ -365,13 +380,9 @@
 										<i class="ph-map-pin me-1"></i>
 										New York, USA
 									</li>
-									<li class="mb-1">
+									<li>
 										<i class="ph-calendar me-1"></i>
 										3 months
-									</li>
-									<li>
-										<i class="ph-currency-dollar me-1"></i>
-										Paid
 									</li>
 								</ul>
 
@@ -385,14 +396,14 @@
 									<div>
 										<span class="text-muted">Posted 2 days ago</span>
 									</div>
-									<a href="student-internship-detail.html" class="btn btn-primary ms-auto">Apply Now</a>
+									<a href="student-internship-detail.html" class="btn btn-primary ms-auto">See Details</a>
 								</div>
 							</div>
 						</div>
 					</div>
 
 					<div class="col-xl-4 col-md-6">
-						<div class="card">
+						<div class="card" data-category="technology" data-duration="5-6" data-mode="remote">
 							<div class="card-body">
 								<div class="d-flex align-items-start mb-3">
 									<div class="me-3">
@@ -413,13 +424,9 @@
 										<i class="ph-map-pin me-1"></i>
 										Remote
 									</li>
-									<li class="mb-1">
+									<li>
 										<i class="ph-calendar me-1"></i>
 										6 months
-									</li>
-									<li>
-										<i class="ph-currency-dollar me-1"></i>
-										Paid
 									</li>
 								</ul>
 
@@ -433,14 +440,14 @@
 									<div>
 										<span class="text-muted">Posted 1 week ago</span>
 									</div>
-									<a href="student-internship-detail.html" class="btn btn-primary ms-auto">Apply Now</a>
+									<a href="student-internship-detail.html" class="btn btn-primary ms-auto">See Details</a>
 								</div>
 							</div>
 						</div>
 					</div>
 
 					<div class="col-xl-4 col-md-6">
-						<div class="card">
+						<div class="card" data-category="finance" data-duration="3-4" data-mode="in-person">
 							<div class="card-body">
 								<div class="d-flex align-items-start mb-3">
 									<div class="me-3">
@@ -461,13 +468,9 @@
 										<i class="ph-map-pin me-1"></i>
 										London, UK
 									</li>
-									<li class="mb-1">
+									<li>
 										<i class="ph-calendar me-1"></i>
 										4 months
-									</li>
-									<li>
-										<i class="ph-currency-dollar me-1"></i>
-										Paid
 									</li>
 								</ul>
 
@@ -481,14 +484,14 @@
 									<div>
 										<span class="text-muted">Posted 3 days ago</span>
 									</div>
-									<a href="student-internship-detail.html" class="btn btn-primary ms-auto">Apply Now</a>
+									<a href="student-internship-detail.html" class="btn btn-primary ms-auto">See Details</a>
 								</div>
 							</div>
 						</div>
 					</div>
 
 					<div class="col-xl-4 col-md-6">
-						<div class="card">
+						<div class="card" data-category="technology" data-duration="3-4" data-mode="hybrid">
 							<div class="card-body">
 								<div class="d-flex align-items-start mb-3">
 									<div class="me-3">
@@ -509,13 +512,9 @@
 										<i class="ph-map-pin me-1"></i>
 										San Francisco, USA
 									</li>
-									<li class="mb-1">
+									<li>
 										<i class="ph-calendar me-1"></i>
 										3 months
-									</li>
-									<li>
-										<i class="ph-currency-dollar me-1"></i>
-										Paid
 									</li>
 								</ul>
 
@@ -529,14 +528,14 @@
 									<div>
 										<span class="text-muted">Posted 1 day ago</span>
 									</div>
-									<a href="student-internship-detail.html" class="btn btn-primary ms-auto">Apply Now</a>
+									<a href="student-internship-detail.html" class="btn btn-primary ms-auto">See Details</a>
 								</div>
 							</div>
 						</div>
 					</div>
 
 					<div class="col-xl-4 col-md-6">
-						<div class="card">
+						<div class="card" data-category="marketing" data-duration="3-4" data-mode="in-person">
 							<div class="card-body">
 								<div class="d-flex align-items-start mb-3">
 									<div class="me-3">
@@ -557,13 +556,9 @@
 										<i class="ph-map-pin me-1"></i>
 										Chicago, USA
 									</li>
-									<li class="mb-1">
+									<li>
 										<i class="ph-calendar me-1"></i>
 										4 months
-									</li>
-									<li>
-										<i class="ph-currency-dollar me-1"></i>
-										Paid
 									</li>
 								</ul>
 
@@ -577,14 +572,14 @@
 									<div>
 										<span class="text-muted">Posted 5 days ago</span>
 									</div>
-									<a href="student-internship-detail.html" class="btn btn-primary ms-auto">Apply Now</a>
+									<a href="student-internship-detail.html" class="btn btn-primary ms-auto">See Details</a>
 								</div>
 							</div>
 						</div>
 					</div>
 
 					<div class="col-xl-4 col-md-6">
-						<div class="card">
+						<div class="card" data-category="finance" data-duration="6+" data-mode="in-person">
 							<div class="card-body">
 								<div class="d-flex align-items-start mb-3">
 									<div class="me-3">
@@ -605,13 +600,9 @@
 										<i class="ph-map-pin me-1"></i>
 										New York, USA
 									</li>
-									<li class="mb-1">
+									<li>
 										<i class="ph-calendar me-1"></i>
 										6 months
-									</li>
-									<li>
-										<i class="ph-currency-dollar me-1"></i>
-										Paid
 									</li>
 								</ul>
 
@@ -625,7 +616,7 @@
 									<div>
 										<span class="text-muted">Posted 1 week ago</span>
 									</div>
-									<a href="student-internship-detail.html" class="btn btn-primary ms-auto">Apply Now</a>
+									<a href="student-internship-detail.html" class="btn btn-primary ms-auto">See Details</a>
 								</div>
 							</div>
 						</div>
@@ -700,28 +691,101 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Student internships script loaded.');
+            
+            // Logout functionality
             const logoutLinks = document.querySelectorAll('.logout-link');
-            console.log('Found', logoutLinks.length, 'logout links.');
             logoutLinks.forEach(link => {
                 link.addEventListener('click', (event) => {
-                    console.log('Logout link clicked:', event.target.href);
-                    // Clear user role from localStorage
                     localStorage.removeItem('userRole');
-                    console.log('userRole removed from localStorage.');
-                    // Allow the link's default behavior (navigation) to proceed
-                    console.log('Proceeding with navigation...');
                 });
             });
 
-            // Optional: Add protection - redirect if not logged in as student
+            // Auth check
             const userRole = localStorage.getItem('userRole');
-            console.log('Current userRole from localStorage:', userRole);
             if (userRole !== 'student') {
-                console.warn('Access denied. User role is not \'student\'. Redirecting...');
                 alert('Access denied. Redirecting to login page.');
                 window.location.href = '../index.html';
-            } else {
-                console.log('Access granted for student.');
+            }
+
+            // Filtering functionality
+            const filterSelects = document.querySelectorAll('.filter-select');
+            const internshipCards = document.querySelectorAll('.card[data-category]');
+            const keywordsInput = document.querySelector('input[placeholder="Job title, skills, etc"]');
+            const locationInput = document.querySelector('input[placeholder="City, country, region"]');
+
+            // Store current filter values
+            let currentFilters = {
+                category: 'all',
+                mode: 'all',
+                keywords: '',
+                location: ''
+            };
+
+            // Function to check if a card matches all current filters
+            function cardMatchesFilters(card) {
+                // Check category
+                if (currentFilters.category !== 'all' && card.dataset.category !== currentFilters.category) {
+                    return false;
+                }
+
+                // Check mode
+                if (currentFilters.mode !== 'all' && card.dataset.mode !== currentFilters.mode) {
+                    return false;
+                }
+
+                // Check keywords
+                if (currentFilters.keywords) {
+                    const cardText = card.textContent.toLowerCase();
+                    const keywords = currentFilters.keywords.toLowerCase().split(' ');
+                    if (!keywords.every(keyword => cardText.includes(keyword))) {
+                        return false;
+                    }
+                }
+
+                // Check location
+                if (currentFilters.location) {
+                    const locationText = card.querySelector('.ph-map-pin')?.parentElement?.textContent.toLowerCase() || '';
+                    if (!locationText.includes(currentFilters.location.toLowerCase())) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            // Function to apply all filters
+            function applyFilters() {
+                internshipCards.forEach(card => {
+                    if (cardMatchesFilters(card)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+
+            // Add event listeners to select elements
+            filterSelects.forEach(select => {
+                select.addEventListener('change', () => {
+                    const filterType = select.dataset.filterType;
+                    currentFilters[filterType] = select.value;
+                    applyFilters();
+                });
+            });
+
+            // Add event listeners to text inputs
+            if (keywordsInput) {
+                keywordsInput.addEventListener('input', () => {
+                    currentFilters.keywords = keywordsInput.value;
+                    applyFilters();
+                });
+            }
+
+            if (locationInput) {
+                locationInput.addEventListener('input', () => {
+                    currentFilters.location = locationInput.value;
+                    applyFilters();
+                });
             }
         });
     </script>

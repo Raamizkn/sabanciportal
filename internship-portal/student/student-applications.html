@@ -295,9 +295,11 @@
 
 							<div class="dropdown-menu dropdown-menu-end">
 								<a href="#" class="dropdown-item" data-filter="all">All applications</a>
-								<a href="#" class="dropdown-item" data-filter="accepted">Accepted applications</a>
-								<a href="#" class="dropdown-item" data-filter="pending">Pending applications</a>
-								<a href="#" class="dropdown-item" data-filter="rejected">Rejected applications</a>
+								<a href="#" class="dropdown-item" data-filter="Accepted">Accepted applications</a>
+								<a href="#" class="dropdown-item" data-filter="Pending">Pending applications</a>
+								<a href="#" class="dropdown-item" data-filter="Rejected">Rejected applications</a>
+								<a href="#" class="dropdown-item" data-filter="Awaiting Confirmation">Awaiting confirmation</a>
+								<a href="#" class="dropdown-item" data-filter="Approved">Approved applications</a>
 							</div>
 						</div>
 					</div>
@@ -310,19 +312,19 @@
 
 				<!-- Application status boxes -->
 				<div class="row">
-					<div class="col-sm-6 col-xl-3">
+					<div class="col-sm-6 col-xl">
 						<div class="card card-body bg-primary text-white">
 							<div class="d-flex align-items-center">
 								<i class="ph-briefcase ph-2x opacity-75 me-3"></i>
 								<div class="flex-fill text-end">
-									<h4 class="mb-0">3</h4>
+									<h4 class="mb-0">5</h4>
 									<span class="opacity-75">Total Applications</span>
 								</div>
 							</div>
 						</div>
 					</div>
 
-					<div class="col-sm-6 col-xl-3">
+					<div class="col-sm-6 col-xl">
 						<div class="card card-body bg-success text-white">
 							<div class="d-flex align-items-center">
 								<i class="ph-check-circle ph-2x opacity-75 me-3"></i>
@@ -334,25 +336,49 @@
 						</div>
 					</div>
 
-					<div class="col-sm-6 col-xl-3">
-						<div class="card card-body bg-warning text-white">
+					<div class="col-sm-6 col-xl">
+						<div class="card card-body bg-secondary text-white">
 							<div class="d-flex align-items-center">
 								<i class="ph-clock ph-2x opacity-75 me-3"></i>
 								<div class="flex-fill text-end">
-									<h4 class="mb-0">2</h4>
+									<h4 class="mb-0">1</h4>
 									<span class="opacity-75">Pending</span>
 								</div>
 							</div>
 						</div>
 					</div>
 
-					<div class="col-sm-6 col-xl-3">
+					<div class="col-sm-6 col-xl">
 						<div class="card card-body bg-danger text-white">
 							<div class="d-flex align-items-center">
 								<i class="ph-x-circle ph-2x opacity-75 me-3"></i>
 								<div class="flex-fill text-end">
-									<h4 class="mb-0">0</h4>
+									<h4 class="mb-0">1</h4>
 									<span class="opacity-75">Rejected</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-sm-6 col-xl">
+						<div class="card card-body bg-warning text-dark">
+							<div class="d-flex align-items-center">
+								<i class="ph-hourglass ph-2x opacity-75 me-3"></i>
+								<div class="flex-fill text-end">
+									<h4 class="mb-0">1</h4>
+									<span class="opacity-75">Awaiting Confirmation</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-sm-6 col-xl">
+						<div class="card card-body bg-info text-white">
+							<div class="d-flex align-items-center">
+								<i class="ph-seal-check ph-2x opacity-75 me-3"></i>
+								<div class="flex-fill text-end">
+									<h4 class="mb-0">1</h4>
+									<span class="opacity-75">Approved</span>
 								</div>
 							</div>
 						</div>
@@ -380,7 +406,7 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr>
+								<tr data-internship-id="xyz-corp-1">
 									<td>
 										<div class="d-flex align-items-center">
 											<img src="/assets/images/company-logo1.png" class="rounded-circle me-2" width="32" height="32" alt="">
@@ -393,19 +419,15 @@
 									<td>3 months</td>
 									<td><span class="badge bg-success">Accepted</span></td>
 									<td class="text-center">
-										<div class="d-inline-flex">
-											<a href="student-application-detail.html" class="text-body">
-												<i class="ph-eye me-1"></i>
-												Details
+										<div class="d-inline-flex bg-light rounded p-1">
+											<a href="student-application-detail.html" class="btn btn-sm btn-icon btn-light view-button" data-bs-popup="tooltip" title="View Details">
+												<i class="ph-eye"></i>
 											</a>
-											<a href="student-application-detail.html" class="text-body ms-2">
-												<i class="ph-check-circle me-1"></i>
-												Confirm
-											</a>
+											<!-- Confirm and Withdraw buttons will be added/managed by JS -->
 										</div>
 									</td>
 								</tr>
-								<tr>
+								<tr data-internship-id="abc-tech-1">
 									<td>
 										<div class="d-flex align-items-center">
 											<img src="/assets/images/company-logo2.png" class="rounded-circle me-2" width="32" height="32" alt="">
@@ -418,19 +440,15 @@
 									<td>6 months</td>
 									<td><span class="badge bg-secondary">Pending</span></td>
 									<td class="text-center">
-										<div class="d-inline-flex">
-											<a href="student-application-detail.html" class="text-body">
-												<i class="ph-eye me-1"></i>
-												Details
+										<div class="d-inline-flex bg-light rounded p-1">
+											<a href="student-application-detail.html" class="btn btn-sm btn-icon btn-light view-button" data-bs-popup="tooltip" title="View Details">
+												<i class="ph-eye"></i>
 											</a>
-											<a href="student-application-detail.html" class="text-body ms-2">
-												<i class="ph-x-circle me-1"></i>
-												Withdraw
-											</a>
+											<!-- Confirm and Withdraw buttons will be added/managed by JS -->
 										</div>
 									</td>
 								</tr>
-								<tr>
+								<tr data-internship-id="global-ent-1">
 									<td>
 										<div class="d-flex align-items-center">
 											<img src="/assets/images/company-logo3.png" class="rounded-circle me-2" width="32" height="32" alt="">
@@ -441,17 +459,55 @@
 									<td>London, UK</td>
 									<td>Aug 18, 2023</td>
 									<td>4 months</td>
-									<td><span class="badge bg-secondary">Pending</span></td>
+									<td><span class="badge bg-danger">Rejected</span></td>
 									<td class="text-center">
-										<div class="d-inline-flex">
-											<a href="student-application-detail.html" class="text-body">
-												<i class="ph-eye me-1"></i>
-												Details
+										<div class="d-inline-flex bg-light rounded p-1">
+											<a href="student-application-detail.html" class="btn btn-sm btn-icon btn-light view-button" data-bs-popup="tooltip" title="View Details">
+												<i class="ph-eye"></i>
 											</a>
-											<a href="student-application-detail.html" class="text-body ms-2">
-												<i class="ph-x-circle me-1"></i>
-												Withdraw
+											<!-- Confirm and Withdraw buttons will be added/managed by JS -->
+										</div>
+									</td>
+								</tr>
+								<tr data-internship-id="tech-solutions-1">
+									<td>
+										<div class="d-flex align-items-center">
+											<img src="/assets/images/company-logo4.png" class="rounded-circle me-2" width="32" height="32" alt="">
+											<div>Tech Solutions</div>
+										</div>
+									</td>
+									<td>UI/UX Designer Intern</td>
+									<td>San Francisco, USA</td>
+									<td>Aug 20, 2023</td>
+									<td>3 months</td>
+									<td><span class="badge bg-warning text-dark">Awaiting Confirmation</span></td>
+									<td class="text-center">
+										<div class="d-inline-flex bg-light rounded p-1">
+											<a href="student-application-detail.html" class="btn btn-sm btn-icon btn-light view-button" data-bs-popup="tooltip" title="View Details">
+												<i class="ph-eye"></i>
 											</a>
+											<!-- Confirm and Withdraw buttons will be added/managed by JS -->
+										</div>
+									</td>
+								</tr>
+								<tr data-internship-id="innotech-1">
+									<td>
+										<div class="d-flex align-items-center">
+											<img src="/assets/images/company-logo5.png" class="rounded-circle me-2" width="32" height="32" alt="">
+											<div>InnoTech</div>
+										</div>
+									</td>
+									<td>Product Management Intern</td>
+									<td>Boston, USA</td>
+									<td>Aug 10, 2023</td>
+									<td>4 months</td>
+									<td><span class="badge bg-info text-white">Approved</span></td>
+									<td class="text-center">
+										<div class="d-inline-flex bg-light rounded p-1">
+											<a href="student-application-detail.html" class="btn btn-sm btn-icon btn-light view-button" data-bs-popup="tooltip" title="View Details">
+												<i class="ph-eye"></i>
+											</a>
+											<!-- Confirm and Withdraw buttons will be added/managed by JS -->
 										</div>
 									</td>
 								</tr>
@@ -467,72 +523,105 @@
 						<h5 class="mb-0">Application History</h5>
 					</div>
 
-					<div class="card-body">
-						<ul class="timeline timeline-solid mb-0">
-							<li class="timeline-item">
-								<div class="timeline-item-date">Aug 15 <span>2023</span></div>
-								<div class="timeline-item-indicator bg-success">
-									<i class="ph-check"></i>
+					<div class="list-group list-group-flush">
+						<div class="list-group-item py-3">
+							<div class="d-flex align-items-center">
+								<i class="ph-seal-check ph-2x text-info me-3"></i>
+								<div class="flex-fill">
+									<div class="fw-semibold">Product Management Intern at InnoTech</div>
+									<span class="text-muted fs-sm">Status changed to <span class="badge bg-info">Approved</span></span>
 								</div>
-								<div class="timeline-item-content">
-									<div class="timeline-item-header">
-										<span class="badge bg-success">Accepted</span>
-										<h6 class="mb-0">Marketing Intern at XYZ Corporation</h6>
-										<span class="text-muted">Aug 15, 2023 - 10:24 am</span>
-									</div>
+								<div class="ms-3 text-muted text-nowrap fs-sm">Aug 22, 2023 - 9:15 am</div>
+								<a href="student-application-detail.html" class="btn btn-light btn-sm ms-3">View</a>
+							</div>
+							<p class="fs-sm text-muted mt-1 mb-0 ms-5 ps-1">Your internship confirmation has been approved by the company. Congratulations!</p>
+							<div class="d-flex align-items-center mt-2 ms-5 ps-1">
+								<div class="progress flex-grow-1 rounded-pill" style="height: 10px;" title="Application Progress: Approved">
+									<div class="progress-bar bg-secondary" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" title="Pending"></div>
+									<div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" title="Accepted"></div>
+									<div class="progress-bar bg-warning" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" title="Awaiting Confirmation"></div>
+									<div class="progress-bar bg-info" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" title="Approved"></div>
+								</div>
+								<span class="ms-2 text-muted fs-sm fw-semibold">100%</span>
+							</div>
+						</div>
 
-									<div class="mt-2">
-										<p>Your application has been accepted. The next steps include submitting required documents and confirming your acceptance.</p>
-										<div class="mt-2">
-											<a href="student-application-detail.html" class="btn btn-light btn-sm">View Details</a>
-											<a href="student-application-detail.html" class="btn btn-primary btn-sm">Confirm Acceptance</a>
-										</div>
-									</div>
+						<div class="list-group-item py-3">
+							<div class="d-flex align-items-center">
+								<i class="ph-hourglass ph-2x text-warning me-3"></i>
+								<div class="flex-fill">
+									<div class="fw-semibold">UI/UX Designer Intern at Tech Solutions</div>
+									<span class="text-muted fs-sm">Status changed to <span class="badge bg-warning text-dark">Awaiting Confirmation</span></span>
 								</div>
-							</li>
+								<div class="ms-3 text-muted text-nowrap fs-sm">Aug 20, 2023 - 3:45 pm</div>
+								<a href="student-application-detail.html" class="btn btn-light btn-sm ms-3">View</a>
+								<a href="#" class="btn btn-outline-danger btn-sm ms-2" onclick="withdrawApplication(this, 'tech-solutions-1')">Withdraw</a>
+							</div>
+							<p class="fs-sm text-muted mt-1 mb-0 ms-5 ps-1">You confirmed your interest in this internship. Waiting for company response.</p>
+							<div class="d-flex align-items-center mt-2 ms-5 ps-1">
+								<div class="progress flex-grow-1 rounded-pill" style="height: 10px;" title="Application Progress: Awaiting Confirmation">
+									<div class="progress-bar bg-secondary" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" title="Pending"></div>
+									<div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" title="Accepted"></div>
+									<div class="progress-bar bg-warning" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" title="Awaiting Confirmation"></div>
+								</div>
+								<span class="ms-2 text-muted fs-sm fw-semibold">75%</span>
+							</div>
+						</div>
 
-							<li class="timeline-item">
-								<div class="timeline-item-date">Aug 13 <span>2023</span></div>
-								<div class="timeline-item-indicator bg-primary">
-									<i class="ph-file-text"></i>
+						<div class="list-group-item py-3">
+							<div class="d-flex align-items-center">
+								<i class="ph-x-circle ph-2x text-danger me-3"></i>
+								<div class="flex-fill">
+									<div class="fw-semibold">Data Analyst Intern at Global Enterprises</div>
+									<span class="text-muted fs-sm">Status changed to <span class="badge bg-danger">Rejected</span></span>
 								</div>
-								<div class="timeline-item-content">
-									<div class="timeline-item-header">
-										<span class="badge bg-primary">Applied</span>
-										<h6 class="mb-0">Software Developer Intern at ABC Technologies</h6>
-										<span class="text-muted">Aug 13, 2023 - 3:45 pm</span>
-									</div>
+								<div class="ms-3 text-muted text-nowrap fs-sm">Aug 18, 2023 - 11:30 am</div>
+								<a href="student-application-detail.html" class="btn btn-light btn-sm ms-3">View</a>
+							</div>
+							<p class="fs-sm text-muted mt-1 mb-0 ms-5 ps-1">Application was not selected for this position.</p>
+							<!-- No progress bar for rejected status -->
+						</div>
 
-									<div class="mt-2">
-										<p>You've successfully applied for the Software Developer Intern position. Your application is currently under review.</p>
-										<div class="mt-2">
-											<a href="student-application-detail.html" class="btn btn-light btn-sm">View Details</a>
-										</div>
-									</div>
+						<div class="list-group-item py-3">
+							<div class="d-flex align-items-center">
+								<i class="ph-check-circle ph-2x text-success me-3"></i>
+								<div class="flex-fill">
+									<div class="fw-semibold">Marketing Intern at XYZ Corporation</div>
+									<span class="text-muted fs-sm">Status changed to <span class="badge bg-success">Accepted</span></span>
 								</div>
-							</li>
+								<div class="ms-3 text-muted text-nowrap fs-sm">Aug 15, 2023 - 10:24 am</div>
+								<a href="student-application-detail.html" class="btn btn-light btn-sm ms-3">View</a>
+								<a href="#" class="btn btn-outline-danger btn-sm ms-2" onclick="withdrawApplication(this, 'xyz-corp-1')">Withdraw</a>
+							</div>
+							<p class="fs-sm text-muted mt-1 mb-0 ms-5 ps-1">Application accepted. You can now confirm your interest.</p>
+							<div class="d-flex align-items-center mt-2 ms-5 ps-1">
+								<div class="progress flex-grow-1 rounded-pill" style="height: 10px;" title="Application Progress: Accepted">
+									<div class="progress-bar bg-secondary" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" title="Pending"></div>
+									<div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" title="Accepted"></div>
+								</div>
+								<span class="ms-2 text-muted fs-sm fw-semibold">50%</span>
+							</div>
+						</div>
 
-							<li class="timeline-item">
-								<div class="timeline-item-date">Aug 10 <span>2023</span></div>
-								<div class="timeline-item-indicator bg-primary">
-									<i class="ph-file-text"></i>
+						<div class="list-group-item py-3">
+							<div class="d-flex align-items-center">
+								<i class="ph-file-text ph-2x text-secondary me-3"></i>
+								<div class="flex-fill">
+									<div class="fw-semibold">Software Developer Intern at ABC Technologies</div>
+									<span class="text-muted fs-sm">Status: <span class="badge bg-secondary">Pending</span></span>
 								</div>
-								<div class="timeline-item-content">
-									<div class="timeline-item-header">
-										<span class="badge bg-primary">Applied</span>
-										<h6 class="mb-0">Data Analyst Intern at Global Enterprises</h6>
-										<span class="text-muted">Aug 10, 2023 - 11:30 am</span>
-									</div>
-
-									<div class="mt-2">
-										<p>You've successfully applied for the Data Analyst Intern position. Your application is currently under review.</p>
-										<div class="mt-2">
-											<a href="student-application-detail.html" class="btn btn-light btn-sm">View Details</a>
-										</div>
-									</div>
+								<div class="ms-3 text-muted text-nowrap fs-sm">Aug 10, 2023 - 11:30 am</div>
+								<a href="student-application-detail.html" class="btn btn-light btn-sm ms-3">View</a>
+								<a href="#" class="btn btn-outline-danger btn-sm ms-2" onclick="withdrawApplication(this, 'abc-tech-1')">Withdraw</a>
+							</div>
+							<p class="fs-sm text-muted mt-1 mb-0 ms-5 ps-1">Application submitted and currently under review.</p>
+							<div class="d-flex align-items-center mt-2 ms-5 ps-1">
+								<div class="progress flex-grow-1 rounded-pill" style="height: 10px;" title="Application Progress: Pending">
+									<div class="progress-bar bg-secondary" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" title="Pending"></div>
 								</div>
-							</li>
-						</ul>
+								<span class="ms-2 text-muted fs-sm fw-semibold">25%</span>
+							</div>
+						</div>
 					</div>
 				</div>
 				<!-- /application timeline -->
@@ -724,27 +813,27 @@
 	<script>
 		document.addEventListener('DOMContentLoaded', () => {
 			console.log('Student applications script loaded.');
+			
+			// Logout functionality
 			const logoutLinks = document.querySelectorAll('.logout-link');
-			console.log('Found', logoutLinks.length, 'logout links.');
 			logoutLinks.forEach(link => {
-				link.addEventListener('click', (event) => {
-					console.log('Logout link clicked:', event.target.href);
+				link.addEventListener('click', () => {
 					localStorage.removeItem('userRole');
-					console.log('userRole removed from localStorage.');
-					console.log('Proceeding with navigation...');
 				});
 			});
 
 			// Auth check
 			const userRole = localStorage.getItem('userRole');
-			console.log('Current userRole from localStorage:', userRole);
 			if (userRole !== 'student') {
-				console.warn('Access denied. User role is not \'student\'. Redirecting...');
 				alert('Access denied. Redirecting to login page.');
 				window.location.href = '../index.html';
-			} else {
-				console.log('Access granted for student.');
 			}
+
+			// Initialize tooltips
+			const tooltips = document.querySelectorAll('[data-bs-popup="tooltip"]');
+			tooltips.forEach(tooltip => {
+				new bootstrap.Tooltip(tooltip);
+			});
 
 			// --- Filtering Logic ---
 			const filterLinks = document.querySelectorAll('.dropdown-menu a[data-filter]');
@@ -768,7 +857,6 @@
 
 						rows.forEach(row => {
 							// Find the status badge within the row
-							// Adjust the selector if the table structure changes
 							const statusBadge = row.querySelector('td:nth-child(6) span.badge'); 
 							let status = '';
 							if (statusBadge) {
@@ -776,7 +864,7 @@
 							}
 
 							// Show/hide logic
-							if (filterValue === 'all' || status.toLowerCase() === filterValue.toLowerCase()) {
+							if (filterValue === 'all' || status === filterValue) {
 								row.style.display = ''; // Show row
 							} else {
 								row.style.display = 'none'; // Hide row
@@ -784,11 +872,314 @@
 						});
 					});
 				});
-			} else {
-				 console.error('Could not find necessary elements for filtering (table body, filter links, or filter button).');
 			}
 
+			// Check for confirmed or approved internships and disable confirm buttons if needed
+			checkApplicationStatus();
 		});
+
+		// Application status management
+		const APPLICATION_STATUS = {
+			PENDING: 'Pending',
+			ACCEPTED: 'Accepted',
+			REJECTED: 'Rejected',
+			AWAITING_CONFIRMATION: 'Awaiting Confirmation',
+			APPROVED: 'Approved',
+			WITHDRAWN: 'Withdrawn'
+		};
+
+		// Store current application status in localStorage to persist across pages
+		function getApplicationStatus() {
+			const status = localStorage.getItem('applicationStatus');
+			const parsedStatus = status ? JSON.parse(status) : {};
+			return {
+				hasConfirmedInternship: parsedStatus.confirmedInternshipId != null,
+				confirmedInternshipId: parsedStatus.confirmedInternshipId,
+				hasApprovedInternship: parsedStatus.approvedInternshipId != null,
+				approvedInternshipId: parsedStatus.approvedInternshipId,
+				withdrawnIds: parsedStatus.withdrawnIds || []
+			};
+		}
+
+		function saveApplicationStatus(status) {
+			// Ensure withdrawnIds is saved correctly
+			const minimalStatus = {
+				confirmedInternshipId: status.confirmedInternshipId,
+				approvedInternshipId: status.approvedInternshipId,
+				withdrawnIds: status.withdrawnIds || []
+			};
+			localStorage.setItem('applicationStatus', JSON.stringify(minimalStatus));
+		}
+
+		// Helper to create a button if it doesn't exist
+		function ensureButtonExists(actionCell, buttonClass, iconClass, title, onClickFunction, internshipId) {
+			let button = actionCell.querySelector(`button.${buttonClass}`); // Look specifically for a button with the class
+			if (!button) {
+				button = document.createElement('button');
+				button.className = `btn btn-sm btn-icon btn-light ms-1 ${buttonClass}`;
+				button.dataset.bsPopup = 'tooltip';
+				button.title = title; // Initial title
+				if (onClickFunction) {
+					button.onclick = () => onClickFunction(button, internshipId);
+				}
+				
+				const icon = document.createElement('i');
+				icon.className = iconClass;
+				button.appendChild(icon);
+
+				// Find the view button to insert after, or append if only view exists or it's empty
+				const viewButton = actionCell.querySelector('.view-button');
+				if (viewButton && viewButton.nextSibling) {
+					actionCell.insertBefore(button, viewButton.nextSibling); // Try inserting after view
+				} else if (viewButton) {
+				 	actionCell.appendChild(button); // Append if view is last
+				} else {
+					actionCell.insertBefore(button, actionCell.firstChild); // Insert at beginning if no view (shouldn't happen)
+				}
+
+				new bootstrap.Tooltip(button); // Initialize tooltip for new button
+			}
+			// Ensure icon class is correct (needed if button existed but was modified)
+			button.querySelector('i').className = iconClass; 
+			return button;
+		}
+		
+		// Helper to enable/disable button and update tooltip
+		function setButtonState(button, enabled, title, iconClass = null) {
+			if (!button) return;
+
+			button.disabled = !enabled;
+			button.setAttribute('data-bs-original-title', title); // Use data-bs-original-title for Bootstrap 5 tooltips
+			
+			const icon = button.querySelector('i');
+			if (icon) {
+				if (iconClass) { // Update icon class if provided
+					icon.className = iconClass;
+				}
+				// Apply/remove muted class based on state
+				if (enabled) {
+					icon.classList.remove('text-muted');
+					// Optional: Restore specific text color if needed (e.g., text-success for confirm)
+					if (button.classList.contains('confirm-button')) icon.classList.add('text-success');
+					if (button.classList.contains('withdraw-button')) icon.classList.add('text-danger');
+				} else {
+					icon.classList.add('text-muted');
+					// Optional: Remove specific color classes when muted
+					icon.classList.remove('text-success', 'text-danger');
+				}
+			}
+
+			// Update the tooltip instance
+			const tooltipInstance = bootstrap.Tooltip.getInstance(button);
+			if (tooltipInstance) {
+				tooltipInstance.update();
+				tooltipInstance.setContent({ '.tooltip-inner': title }); // Ensure tooltip content updates
+			} else {
+				// Reinitialize if instance somehow got lost
+				new bootstrap.Tooltip(button); 
+			}
+		}
+
+		// Main function to update all action buttons based on status
+		function checkApplicationStatus() {
+			const overallStatus = getApplicationStatus();
+			const applicationRows = document.querySelectorAll('.datatable-basic tbody tr');
+
+			applicationRows.forEach(row => {
+				const rowId = row.dataset.internshipId;
+				const statusBadge = row.querySelector('.badge');
+				const actionCell = row.querySelector('td:last-child .d-inline-flex'); // Target the button container
+
+				if (!rowId || !statusBadge || !actionCell) return;
+
+				let rowStatusText = statusBadge.textContent.trim();
+				
+				// If the row is marked as withdrawn via overallStatus, override badge text and appearance
+				if (overallStatus.withdrawnIds.includes(rowId)) {
+					rowStatusText = APPLICATION_STATUS.WITHDRAWN;
+					if (statusBadge.textContent !== APPLICATION_STATUS.WITHDRAWN) {
+						statusBadge.className = 'badge bg-secondary';
+						statusBadge.textContent = APPLICATION_STATUS.WITHDRAWN;
+					}
+				}
+				
+				// --- Ensure buttons exist (or find existing ones) ---
+				const viewButton = actionCell.querySelector('a.view-button'); // Use class to find view button
+				const confirmButton = ensureButtonExists(actionCell, 'confirm-button', 'ph-check-circle', 'Confirm Acceptance', confirmInternship, rowId);
+				const withdrawButton = ensureButtonExists(actionCell, 'withdraw-button', 'ph-x-circle', 'Withdraw Application', withdrawApplication, rowId);
+
+				// --- Determine button states ---
+				let confirmEnabled = false;
+				let confirmTitle = 'Confirm Acceptance';
+				let withdrawEnabled = false;
+				let withdrawTitle = 'Withdraw Application';
+
+				// Base eligibility based on row status
+				if (rowStatusText === APPLICATION_STATUS.ACCEPTED) {
+					confirmEnabled = true;
+					withdrawEnabled = true;
+				} else if (rowStatusText === APPLICATION_STATUS.PENDING || rowStatusText === APPLICATION_STATUS.AWAITING_CONFIRMATION) {
+					withdrawEnabled = true;
+				}
+				
+				// Override based on overall status
+				if (overallStatus.hasApprovedInternship) {
+					confirmEnabled = false;
+					confirmTitle = 'Cannot confirm: An application is already approved.';
+					withdrawEnabled = false; // Cannot withdraw anything once one is approved
+					withdrawTitle = 'Cannot withdraw: An application is already approved.';
+				} else if (overallStatus.hasConfirmedInternship && overallStatus.confirmedInternshipId !== rowId) {
+					confirmEnabled = false;
+					confirmTitle = 'Cannot confirm: Another application is awaiting confirmation.';
+					// Withdraw should still be possible for pending/accepted ones even if another is confirmed
+				}
+				
+				// Final overrides for specific row statuses
+				if (rowStatusText === APPLICATION_STATUS.REJECTED || rowStatusText === APPLICATION_STATUS.WITHDRAWN || rowStatusText === APPLICATION_STATUS.APPROVED || rowStatusText === APPLICATION_STATUS.AWAITING_CONFIRMATION) {
+					confirmEnabled = false; // Cannot confirm these states
+					if (rowStatusText !== APPLICATION_STATUS.AWAITING_CONFIRMATION || overallStatus.hasApprovedInternship) { // Can withdraw Awaiting Confirmation unless something is approved
+                         confirmTitle = 'Cannot confirm this application status';
+                    }
+				}
+				if (rowStatusText === APPLICATION_STATUS.REJECTED || rowStatusText === APPLICATION_STATUS.WITHDRAWN || rowStatusText === APPLICATION_STATUS.APPROVED) {
+					withdrawEnabled = false; // Cannot withdraw these states
+                    withdrawTitle = 'Cannot withdraw this application status';
+				}
+
+
+				// --- Apply states ---
+				setButtonState(confirmButton, confirmEnabled, confirmTitle, confirmEnabled ? 'ph-check-circle text-success' : 'ph-check-circle');
+				setButtonState(withdrawButton, withdrawEnabled, withdrawTitle, withdrawEnabled ? 'ph-x-circle text-danger' : 'ph-x-circle');
+				
+				// Ensure view button always looks enabled (it's an anchor tag, doesn't get disabled attribute)
+				if(viewButton) {
+					viewButton.querySelector('i')?.classList.remove('text-muted');
+				}
+			});
+		}
+
+
+		// Function to confirm internship
+		function confirmInternship(button, internshipId) {
+			const status = getApplicationStatus();
+			
+			// Re-check conditions before showing modal
+			if (status.hasConfirmedInternship && status.confirmedInternshipId !== internshipId) {
+				alert('You have already confirmed another internship. You must withdraw from it before confirming a new one.');
+				return;
+			}
+			if (status.hasApprovedInternship) {
+				alert('You already have an approved internship. You cannot confirm another one.');
+				return;
+			}
+
+			// --- Modal Logic (mostly unchanged) ---
+			const confirmModal = new bootstrap.Modal(document.getElementById('confirm_internship'));
+			const confirmButtonModal = document.querySelector('#confirm_internship .btn-success');
+			const confirmCheckbox = document.getElementById('confirm_terms');
+			confirmCheckbox.checked = false; // Reset checkbox
+
+			// Dynamic content for modal (example - adapt if needed)
+			const row = button.closest('tr');
+			const company = row.querySelector('td:first-child div div')?.textContent || 'N/A';
+			const position = row.querySelector('td:nth-child(2)')?.textContent || 'N/A';
+			const modalBody = document.querySelector('#confirm_internship .modal-body .card-body');
+			if (modalBody) {
+				modalBody.innerHTML = `<h6>${position}</h6><p>${company}</p>`; // Update modal content
+			}
+
+			// Clone and replace button to remove old listeners
+			const newConfirmButtonModal = confirmButtonModal.cloneNode(true);
+			confirmButtonModal.parentNode.replaceChild(newConfirmButtonModal, confirmButtonModal);
+			
+			// Add new event listener
+			newConfirmButtonModal.addEventListener('click', () => {
+				if (!confirmCheckbox.checked) {
+					alert('Please accept the terms and conditions to proceed.');
+					return;
+				}
+
+				// Update application status in localStorage
+				status.hasConfirmedInternship = true;
+				status.confirmedInternshipId = internshipId;
+				saveApplicationStatus(status);
+
+				// Close modal
+				confirmModal.hide();
+
+				// Show success message
+				alert('Your confirmation has been sent to the company. Please wait for their response.');
+
+				// Update UI for all rows
+				checkApplicationStatus(); 
+			});
+
+			confirmModal.show();
+		}
+
+		// Function to withdraw application
+		function withdrawApplication(button, internshipId) {
+			const status = getApplicationStatus();
+			
+			// Cannot withdraw if already approved
+			if (status.hasApprovedInternship) {
+				alert('Cannot withdraw application as another internship has been approved.');
+				return;
+			}
+
+			if (confirm('Are you sure you want to withdraw this application?')) {
+				
+				// If withdrawing the currently confirmed internship, clear the confirmation status
+				if (status.hasConfirmedInternship && status.confirmedInternshipId === internshipId) {
+					status.hasConfirmedInternship = false;
+					status.confirmedInternshipId = null;
+				}
+				
+				// Add to withdrawn list if not already there
+				if (!status.withdrawnIds.includes(internshipId)) {
+					status.withdrawnIds.push(internshipId);
+				}
+
+				saveApplicationStatus(status);
+				
+				// Update UI for all rows
+				checkApplicationStatus(); 
+				
+				alert('Application successfully withdrawn.');
+			}
+		}
+
+		// Function to handle company approval (Simulation/Example)
+		function markAsApproved(internshipId) {
+			const status = getApplicationStatus();
+			status.hasConfirmedInternship = false; // Clear confirmation if any
+			status.confirmedInternshipId = null;
+			status.hasApprovedInternship = true;
+			status.approvedInternshipId = internshipId;
+			
+			// Remove from withdrawn list if it was previously withdrawn (unlikely scenario, but for completeness)
+			status.withdrawnIds = status.withdrawnIds.filter(id => id !== internshipId); 
+
+			saveApplicationStatus(status);
+			
+			// Update UI for all rows
+			checkApplicationStatus();
+			
+			alert('Congratulations! Your internship has been approved by the company.');
+		}
+		
+		// --- Add Class to View Buttons for easier selection ---
+		document.addEventListener('DOMContentLoaded', () => {
+			// Add a specific class to existing view buttons for easier selection in JS
+			document.querySelectorAll('.datatable-basic td:last-child .d-inline-flex a[data-bs-popup="tooltip"]').forEach(a => {
+				if (a.title === 'View Details') { // Be more specific if needed
+					a.classList.add('view-button');
+				}
+			});
+			// Initial status check and button setup
+			checkApplicationStatus();
+		});
+		
 	</script>
 
 </body>
