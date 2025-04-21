@@ -149,21 +149,6 @@
 					</div>
 				</li>
 			</ul>
-
-			<div class="navbar navbar-sm navbar-footer border-top">
-				<div class="container-fluid">
-					<span>&copy; 2023 <a href="#">Sabancı University Internship Portal</a></span>
-
-					<ul class="nav">
-						<li class="nav-item">
-							<a href="#" class="nav-link">Privacy Policy</a>
-						</li>
-						<li class="nav-item">
-							<a href="#" class="nav-link">Terms of Service</a>
-						</li>
-					</ul>
-				</div>
-			</div>
 		</div>
 	</div>
 	<!-- /main navbar -->
@@ -295,6 +280,27 @@
 						<h5 class="mb-0">All Applications</h5>
 					</div>
 
+					<!-- Filter row -->
+					<div class="card-body border-bottom">
+						<div class="row align-items-center">
+							<div class="col-lg-auto">
+								<label class="col-form-label">Filter by Internship:</label>
+							</div>
+							<div class="col-lg-4">
+								<select class="form-select">
+									<option value="all">All Internships</option>
+									<option value="swe">Software Developer Intern</option>
+									<option value="marketing">Marketing Intern</option>
+									<!-- Add more options dynamically via JS -->
+								</select>
+							</div>
+							<div class="col-lg-auto mt-2 mt-lg-0">
+								<button type="button" class="btn btn-primary">Filter</button> <!-- Needs JS to apply filter -->
+							</div>
+						</div>
+					</div>
+					<!-- /filter row -->
+
 					<div class="table-responsive">
 						<table class="table table-striped table-hover">
 							<thead>
@@ -316,7 +322,7 @@
 												<img src="../../bs5/template/assets/images/demo/users/face11.jpg" class="rounded-circle" width="36" height="36" alt="">
 											</div>
 											<div>
-												<a href="#" class="text-body fw-semibold">John Doe</a>
+												<a href="#" class="text-body fw-semibold" data-bs-toggle="modal" data-bs-target="#view_student_profile_modal">John Doe</a>
 												<div class="text-muted fs-sm">Computer Science</div>
 											</div>
 										</div>
@@ -330,11 +336,11 @@
 												<i class="ph-dots-three-vertical"></i>
 											</button>
 											<div class="dropdown-menu dropdown-menu-end">
-												<a href="#" class="dropdown-item"><i class="ph-eye me-2"></i>View Application</a>
-												<a href="#" class="dropdown-item"><i class="ph-check-circle me-2"></i>Accept</a>
-												<a href="#" class="dropdown-item"><i class="ph-x-circle me-2"></i>Reject</a>
+												<a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#view_application_modal"><i class="ph-eye me-2"></i>View Application</a>
+												<a href="javascript:void(0);" class="dropdown-item"><i class="ph-check-circle me-2"></i>Accept</a>
+												<a href="javascript:void(0);" class="dropdown-item"><i class="ph-x-circle me-2"></i>Reject</a>
 												<div class="dropdown-divider"></div>
-												<a href="#" class="dropdown-item"><i class="ph-download-simple me-2"></i>Download Resume</a>
+												<a href="javascript:void(0);" class="dropdown-item"><i class="ph-download-simple me-2"></i>Download Resume</a>
 											</div>
 										</div>
 									</td>
@@ -347,7 +353,7 @@
 												<img src="../../bs5/template/assets/images/demo/users/face1.jpg" class="rounded-circle" width="36" height="36" alt="">
 											</div>
 											<div>
-												<a href="#" class="text-body fw-semibold">Jane Smith</a>
+												<a href="#" class="text-body fw-semibold" data-bs-toggle="modal" data-bs-target="#view_student_profile_modal">Jane Smith</a>
 												<div class="text-muted fs-sm">Marketing</div>
 											</div>
 										</div>
@@ -361,10 +367,10 @@
 												<i class="ph-dots-three-vertical"></i>
 											</button>
 											<div class="dropdown-menu dropdown-menu-end">
-												<a href="#" class="dropdown-item"><i class="ph-eye me-2"></i>View Application</a>
-												<a href="#" class="dropdown-item"><i class="ph-x-circle me-2"></i>Withdraw Offer</a>
+												<a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#view_application_modal"><i class="ph-eye me-2"></i>View Application</a>
+												<a href="javascript:void(0);" class="dropdown-item"><i class="ph-x-circle me-2"></i>Withdraw Offer</a>
 												<div class="dropdown-divider"></div>
-												<a href="#" class="dropdown-item"><i class="ph-download-simple me-2"></i>Download Resume</a>
+												<a href="javascript:void(0);" class="dropdown-item"><i class="ph-download-simple me-2"></i>Download Resume</a>
 											</div>
 										</div>
 									</td>
@@ -377,7 +383,7 @@
 												<img src="../../bs5/template/assets/images/demo/users/face3.jpg" class="rounded-circle" width="36" height="36" alt="">
 											</div>
 											<div>
-												<a href="#" class="text-body fw-semibold">Michael Brown</a>
+												<a href="#" class="text-body fw-semibold" data-bs-toggle="modal" data-bs-target="#view_student_profile_modal">Michael Brown</a>
 												<div class="text-muted fs-sm">Software Engineering</div>
 											</div>
 										</div>
@@ -391,9 +397,9 @@
 												<i class="ph-dots-three-vertical"></i>
 											</button>
 											<div class="dropdown-menu dropdown-menu-end">
-												<a href="#" class="dropdown-item"><i class="ph-eye me-2"></i>View Application</a>
+												<a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#view_application_modal"><i class="ph-eye me-2"></i>View Application</a>
 												<div class="dropdown-divider"></div>
-												<a href="#" class="dropdown-item"><i class="ph-download-simple me-2"></i>Download Resume</a>
+												<a href="javascript:void(0);" class="dropdown-item"><i class="ph-download-simple me-2"></i>Download Resume</a>
 											</div>
 										</div>
 									</td>
@@ -404,8 +410,114 @@
 				</div>
 				<!-- /applications table -->
 
+				<!-- View Application Modal -->
+				<div id="view_application_modal" class="modal fade" tabindex="-1">
+					<div class="modal-dialog modal-lg">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">Application Details</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+							</div>
+							<div class="modal-body">
+								<!-- Placeholder content - Needs JS to populate dynamically -->
+								<h6 class="fw-semibold">Student: John Doe (Computer Science)</h6>
+								<p><strong>Applied for:</strong> Software Developer Intern</p>
+								<p><strong>Applied on:</strong> 2025/04/06</p>
+								<p><strong>Status:</strong> Pending Review</p>
+								<hr>
+								<h6>Resume/CV</h6>
+								<p><a href="javascript:void(0);">Download Resume (Placeholder)</a></p> 
+								<h6>Cover Letter</h6>
+								<p>Placeholder for cover letter content...</p>
+								<h6>Additional Documents</h6>
+								<p>None provided (Placeholder)</p>
+								<!-- Add application questions/answers if applicable -->
+							</div>
+							<div class="modal-footer justify-content-between">
+								<div>
+									<button type="button" class="btn btn-outline-success"><i class="ph-check-circle me-2"></i>Accept</button>
+									<button type="button" class="btn btn-outline-danger ms-1"><i class="ph-x-circle me-2"></i>Reject</button>
+								</div>
+								<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /view application modal -->
+
+				<!-- View Student Profile Modal -->
+				<div id="view_student_profile_modal" class="modal fade" tabindex="-1">
+					<div class="modal-dialog modal-lg modal-dialog-scrollable">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">Student Profile Preview</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+							</div>
+							<div class="modal-body">
+								<!-- Placeholder content - Needs JS to populate dynamically -->
+								<div class="card card-body">
+									<div class="d-flex align-items-center">
+										<div class="me-3">
+											<img src="../../bs5/template/assets/images/demo/users/face11.jpg" class="rounded-circle" width="80" height="80" alt="">
+										</div>
+										<div>
+											<h5 class="mb-0">John Doe</h5>
+											<p class="mb-0 text-muted">Computer Science, Class of 2026</p>
+											<p class="mb-0"><i class="ph-envelope me-1"></i> j**n.d*e@sabanciuniv.edu (Placeholder)</p>
+										</div>
+									</div>
+								</div>
+
+								<div class="card card-body mt-3">
+									<h6 class="fw-semibold">Skills</h6>
+									<p>Java, Python, C++, SQL, Web Development (HTML, CSS, JavaScript), Teamwork, Problem Solving (Placeholder)</p>
+								</div>
+
+								<div class="card card-body mt-3">
+									<h6 class="fw-semibold">Experience</h6>
+									<ul class="list-unstyled">
+										<li><strong>Teaching Assistant</strong> - Sabancı University (Sep 2024 - Present)</li>
+										<li><strong>Summer Intern</strong> - Local Tech Company (Jun 2024 - Aug 2024)</li>
+										<!-- Placeholder -->
+									</ul>
+								</div>
+
+								<div class="card card-body mt-3">
+									<h6 class="fw-semibold">Education</h6>
+									<p><strong>Sabancı University</strong><br>B.Sc. in Computer Science<br>Expected Graduation: 2026<br>GPA: 3.8/4.0 (Placeholder)</p>
+								</div>
+
+								<div class="card card-body mt-3 text-center">
+									<a href="javascript:void(0);" class="btn btn-outline-primary"><i class="ph-download-simple me-2"></i>Download Resume (Placeholder)</a>
+								</div>
+
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /view student profile modal -->
+
 			</div>
 			<!-- /content area -->
+
+			<!-- Footer -->
+			<div class="navbar navbar-sm navbar-footer border-top">
+				<div class="container-fluid">
+					<span>&copy; 2023 <a href="#">Sabancı University Internship Portal</a></span>
+
+					<ul class="nav">
+						<li class="nav-item">
+							<a href="#" class="navbar-nav-link">Privacy Policy</a>
+						</li>
+						<li class="nav-item ms-md-1">
+							<a href="#" class="navbar-nav-link">Terms of Service</a>
+						</li>
+					</ul>
+				</div>
+			</div>
 
 		</div>
 		<!-- /main content -->

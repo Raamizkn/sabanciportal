@@ -149,21 +149,6 @@
 					</div>
 				</li>
 			</ul>
-
-			<div class="navbar navbar-sm navbar-footer border-top">
-				<div class="container-fluid">
-					<span>&copy; 2023 <a href="#">Sabancı University Internship Portal</a></span>
-
-					<ul class="nav">
-						<li class="nav-item">
-							<a href="#" class="nav-link">
-								<i class="ph-sign-out"></i>
-								<span>Logout</span>
-							</a>
-						</li>
-					</ul>
-				</div>
-			</div>
 		</div>
 	</div>
 	<!-- /main navbar -->
@@ -317,7 +302,7 @@
 												<img src="../../bs5/template/assets/images/demo/users/face11.jpg" class="rounded-circle" width="36" height="36" alt="">
 											</div>
 											<div>
-												<a href="#" class="text-body fw-semibold">John Doe</a>
+												<a href="javascript:void(0);" class="text-body fw-semibold">John Doe</a>
 												<div class="text-muted fs-sm">Computer Science</div>
 											</div>
 										</div>
@@ -332,7 +317,7 @@
 												<i class="ph-dots-three-vertical"></i>
 											</button>
 											<div class="dropdown-menu dropdown-menu-end">
-												<a href="#" class="dropdown-item"><i class="ph-eye me-2"></i>View Details</a>
+												<a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#view_finalized_details_modal"><i class="ph-eye me-2"></i>View Details</a>
 												<a href="company-evaluations.html" class="dropdown-item"><i class="ph-star me-2"></i>Submit Evaluation</a>
 											</div>
 										</div>
@@ -346,7 +331,7 @@
 												<img src="../../bs5/template/assets/images/demo/users/face1.jpg" class="rounded-circle" width="36" height="36" alt="">
 											</div>
 											<div>
-												<a href="#" class="text-body fw-semibold">Jane Smith</a>
+												<a href="javascript:void(0);" class="text-body fw-semibold">Jane Smith</a>
 												<div class="text-muted fs-sm">Marketing</div>
 											</div>
 										</div>
@@ -361,7 +346,7 @@
 												<i class="ph-dots-three-vertical"></i>
 											</button>
 											<div class="dropdown-menu dropdown-menu-end">
-												<a href="#" class="dropdown-item"><i class="ph-eye me-2"></i>View Details</a>
+												<a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#view_finalized_details_modal"><i class="ph-eye me-2"></i>View Details</a>
 												<a href="company-evaluations.html" class="dropdown-item"><i class="ph-star me-2"></i>Submit Evaluation</a>
 											</div>
 										</div>
@@ -375,7 +360,7 @@
 												<img src="../../bs5/template/assets/images/demo/users/face4.jpg" class="rounded-circle" width="36" height="36" alt="">
 											</div>
 											<div>
-												<a href="#" class="text-body fw-semibold">Robert Johnson</a>
+												<a href="javascript:void(0);" class="text-body fw-semibold">Robert Johnson</a>
 												<div class="text-muted fs-sm">Data Science</div>
 											</div>
 										</div>
@@ -390,7 +375,7 @@
 												<i class="ph-dots-three-vertical"></i>
 											</button>
 											<div class="dropdown-menu dropdown-menu-end">
-												<a href="#" class="dropdown-item"><i class="ph-eye me-2"></i>View Details</a>
+												<a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#view_finalized_details_modal"><i class="ph-eye me-2"></i>View Details</a>
 												<a href="company-evaluations.html" class="dropdown-item"><i class="ph-star-half me-2"></i>View Evaluation</a>
 											</div>
 										</div>
@@ -402,8 +387,54 @@
 				</div>
 				<!-- /finalized internships table -->
 
+				<!-- View Finalized Details Modal -->
+				<div id="view_finalized_details_modal" class="modal fade" tabindex="-1">
+					<div class="modal-dialog modal-lg">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">Finalized Internship Details</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+							</div>
+							<div class="modal-body">
+								<!-- Placeholder content - Needs JS to populate dynamically -->
+								<h6 class="fw-semibold">Student: John Doe (Computer Science)</h6>
+								<p><strong>Internship:</strong> Software Developer Intern</p>
+								<p><strong>Period:</strong> 2025/06/01 - 2025/08/31</p>
+								<p><strong>Status:</strong> Ongoing</p>
+								<hr>
+								<h6>Evaluation Status</h6>
+								<p>Evaluation not submitted yet. <a href="company-evaluations.html">Submit Evaluation</a></p>
+								<!-- Or if evaluation exists: -->
+								<!-- <p>Evaluation submitted. <a href="company-evaluations.html">View Evaluation</a></p> -->
+								<!-- Add other relevant details: supervisor, project info, etc. -->
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /view finalized details modal -->
+
 			</div>
 			<!-- /content area -->
+
+			<!-- Footer -->
+			<div class="navbar navbar-sm navbar-footer border-top">
+				<div class="container-fluid">
+					<span>&copy; 2023 <a href="#">Sabancı University Internship Portal</a></span>
+
+					<ul class="nav">
+						<li class="nav-item">
+							<a href="#" class="navbar-nav-link">Privacy Policy</a>
+						</li>
+						<li class="nav-item ms-md-1">
+							<a href="#" class="navbar-nav-link">Terms of Service</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<!-- /footer -->
 
 		</div>
 		<!-- /main content -->

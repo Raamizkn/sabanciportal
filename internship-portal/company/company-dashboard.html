@@ -294,6 +294,101 @@
 				</div>
 				<!-- /company info -->
 
+				<!-- Application Process Overview -->
+				<div class="card">
+					<div class="card-header">
+						<h5 class="mb-0">Application Process Overview</h5>
+					</div>
+					<div class="card-body">
+						<ul class="list-group list-group-flush">
+							<li class="list-group-item d-flex align-items-center py-2">
+								<i class="ph-note-pencil ph-lg me-3 text-primary"></i>
+								<div>
+									<div class="fw-semibold">1. Post Internship</div>
+									<span class="text-muted fs-sm">Create and publish your internship listing.</span>
+								</div>
+							</li>
+							<li class="list-group-item d-flex align-items-center py-2">
+								<i class="ph-users ph-lg me-3 text-info"></i>
+								<div>
+									<div class="fw-semibold">2. Review Applications</div>
+									<span class="text-muted fs-sm">Screen candidates based on profiles and documents.</span>
+								</div>
+							</li>
+							<li class="list-group-item d-flex align-items-center py-2">
+								<i class="ph-paper-plane-tilt ph-lg me-3 text-success"></i>
+								<div>
+									<div class="fw-semibold">3. Send Acceptance</div>
+									<span class="text-muted fs-sm">Send acceptance offers to chosen candidates.</span>
+								</div>
+							</li>
+							<li class="list-group-item d-flex align-items-center py-2">
+								<i class="ph-bell ph-lg me-3 text-warning"></i>
+								<div>
+									<div class="fw-semibold">4. Receive Student Confirmation</div>
+									<span class="text-muted fs-sm">Await confirmation request from accepted students.</span>
+								</div>
+							</li>
+							<li class="list-group-item d-flex align-items-center py-2">
+								<i class="ph-check-circle ph-lg me-3 text-indigo"></i>
+								<div>
+									<div class="fw-semibold">5. Approve & Finalize</div>
+									<span class="text-muted fs-sm">Approve the student's confirmation to finalize the internship placement.</span>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<!-- /application Process Overview -->
+
+				<!-- Pending tasks -->
+				<div class="card">
+					<div class="card-header">
+						<h5 class="mb-0">Pending Tasks</h5>
+					</div>
+
+					<div class="card-body">
+						<ul class="list-group list-group-flush">
+							<li class="list-group-item d-flex flex-wrap align-items-center py-2">
+								<a href="company-applications.html" class="d-flex align-items-center me-3">
+									<i class="ph-users ph-lg me-2"></i>
+									<span>Review 3 pending applications</span>
+								</a>
+
+								<div class="d-flex align-items-center text-muted ms-auto">
+									<i class="ph-calendar ph-sm me-1"></i>
+									<span>Due today</span>
+								</div>
+							</li>
+
+							<li class="list-group-item d-flex flex-wrap align-items-center py-2">
+								<a href="company-evaluations.html" class="d-flex align-items-center me-3">
+									<i class="ph-check-square ph-lg me-2"></i>
+									<span>Complete evaluation for John Doe</span>
+								</a>
+
+								<div class="d-flex align-items-center text-muted ms-auto">
+									<i class="ph-calendar ph-sm me-1"></i>
+									<span>Due in 5 days</span>
+								</div>
+							</li>
+
+							<li class="list-group-item d-flex flex-wrap align-items-center py-2">
+								<a href="company-internships.html" class="d-flex align-items-center me-3">
+									<i class="ph-file-doc ph-lg me-2"></i>
+									<span>Submit documentation for UI/UX internship</span>
+								</a>
+
+								<div class="d-flex align-items-center text-muted ms-auto">
+									<i class="ph-calendar ph-sm me-1"></i>
+									<span>Due in 1 week</span>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<!-- /pending tasks -->
+
 				<!-- Applications overview -->
 				<div class="card">
 					<div class="card-header d-flex">
@@ -328,11 +423,11 @@
 									<td>Aug 15, 2023</td>
 									<td><span class="badge bg-success">Accepted</span></td>
 									<td class="text-center">
-										<div class="d-inline-flex">
-											<a href="#" class="text-body" data-bs-popup="tooltip" title="View Profile">
+										<div class="d-inline-flex gap-1">
+											<a href="company-applications.html" class="btn btn-outline-primary btn-sm btn-icon rounded-pill" data-bs-popup="tooltip" title="View Profile">
 												<i class="ph-eye"></i>
 											</a>
-											<a href="#" class="text-body ms-2" data-bs-popup="tooltip" title="Documents">
+											<a href="company-applications.html" class="btn btn-outline-secondary btn-sm btn-icon rounded-pill" data-bs-popup="tooltip" title="Documents">
 												<i class="ph-file-doc"></i>
 											</a>
 										</div>
@@ -350,28 +445,19 @@
 									<td>Aug 17, 2023</td>
 									<td><span class="badge bg-secondary">Pending</span></td>
 									<td class="text-center">
-										<div class="d-inline-flex">
-											<a href="#" class="text-body" data-bs-popup="tooltip" title="View Profile">
+										<div class="d-inline-flex gap-1">
+											<a href="company-applications.html" class="btn btn-outline-primary btn-sm btn-icon rounded-pill" data-bs-popup="tooltip" title="View Profile">
 												<i class="ph-eye"></i>
 											</a>
-											<a href="#" class="text-body ms-2" data-bs-popup="tooltip" title="Documents">
+											<a href="company-applications.html" class="btn btn-outline-secondary btn-sm btn-icon rounded-pill" data-bs-popup="tooltip" title="Documents">
 												<i class="ph-file-doc"></i>
 											</a>
-											<div class="dropdown ms-2">
-												<a href="#" class="text-body" data-bs-toggle="dropdown">
-													<i class="ph-dots-three-vertical"></i>
-												</a>
-												<div class="dropdown-menu dropdown-menu-end">
-													<a href="#" class="dropdown-item">
-														<i class="ph-check me-2"></i>
-														Accept
-													</a>
-													<a href="#" class="dropdown-item">
-														<i class="ph-x me-2"></i>
-														Reject
-													</a>
-												</div>
-											</div>
+											<a href="javascript:void(0);" class="btn btn-outline-light text-muted btn-sm btn-icon rounded-pill disabled" data-bs-popup="tooltip" title="Accept">
+												<i class="ph-check"></i>
+											</a>
+											<a href="javascript:void(0);" class="btn btn-outline-light text-muted btn-sm btn-icon rounded-pill disabled" data-bs-popup="tooltip" title="Reject">
+												<i class="ph-x"></i>
+											</a>
 										</div>
 									</td>
 								</tr>
@@ -387,28 +473,19 @@
 									<td>Aug 18, 2023</td>
 									<td><span class="badge bg-secondary">Pending</span></td>
 									<td class="text-center">
-										<div class="d-inline-flex">
-											<a href="#" class="text-body" data-bs-popup="tooltip" title="View Profile">
+										<div class="d-inline-flex gap-1">
+											<a href="company-applications.html" class="btn btn-outline-primary btn-sm btn-icon rounded-pill" data-bs-popup="tooltip" title="View Profile">
 												<i class="ph-eye"></i>
 											</a>
-											<a href="#" class="text-body ms-2" data-bs-popup="tooltip" title="Documents">
+											<a href="company-applications.html" class="btn btn-outline-secondary btn-sm btn-icon rounded-pill" data-bs-popup="tooltip" title="Documents">
 												<i class="ph-file-doc"></i>
 											</a>
-											<div class="dropdown ms-2">
-												<a href="#" class="text-body" data-bs-toggle="dropdown">
-													<i class="ph-dots-three-vertical"></i>
-												</a>
-												<div class="dropdown-menu dropdown-menu-end">
-													<a href="#" class="dropdown-item">
-														<i class="ph-check me-2"></i>
-														Accept
-													</a>
-													<a href="#" class="dropdown-item">
-														<i class="ph-x me-2"></i>
-														Reject
-													</a>
-												</div>
-											</div>
+											<a href="javascript:void(0);" class="btn btn-outline-light text-muted btn-sm btn-icon rounded-pill disabled" data-bs-popup="tooltip" title="Accept">
+												<i class="ph-check"></i>
+											</a>
+											<a href="javascript:void(0);" class="btn btn-outline-light text-muted btn-sm btn-icon rounded-pill disabled" data-bs-popup="tooltip" title="Reject">
+												<i class="ph-x"></i>
+											</a>
 										</div>
 									</td>
 								</tr>
@@ -438,7 +515,6 @@
 											<ul class="list-inline list-inline-bullet text-muted mb-0">
 												<li class="list-inline-item">New York, USA</li>
 												<li class="list-inline-item">3 months</li>
-												<li class="list-inline-item">Paid</li>
 											</ul>
 										</div>
 
@@ -472,7 +548,6 @@
 											<ul class="list-inline list-inline-bullet text-muted mb-0">
 												<li class="list-inline-item">Remote</li>
 												<li class="list-inline-item">6 months</li>
-												<li class="list-inline-item">Paid</li>
 											</ul>
 										</div>
 
@@ -506,7 +581,6 @@
 											<ul class="list-inline list-inline-bullet text-muted mb-0">
 												<li class="list-inline-item">Chicago, USA</li>
 												<li class="list-inline-item">4 months</li>
-												<li class="list-inline-item">Paid</li>
 											</ul>
 										</div>
 
@@ -540,7 +614,6 @@
 											<ul class="list-inline list-inline-bullet text-muted mb-0">
 												<li class="list-inline-item">San Francisco, USA</li>
 												<li class="list-inline-item">3 months</li>
-												<li class="list-inline-item">Paid</li>
 											</ul>
 										</div>
 
@@ -565,54 +638,6 @@
 					</div>
 				</div>
 				<!-- /active internships -->
-
-				<!-- Pending tasks -->
-				<div class="card">
-					<div class="card-header">
-						<h5 class="mb-0">Pending Tasks</h5>
-					</div>
-
-					<div class="card-body">
-						<ul class="list-group list-group-flush">
-							<li class="list-group-item d-flex flex-wrap align-items-center py-2">
-								<a href="#" class="d-flex align-items-center me-3">
-									<i class="ph-users ph-lg me-2"></i>
-									<span>Review 3 pending applications</span>
-								</a>
-
-								<div class="d-flex align-items-center text-muted ms-auto">
-									<i class="ph-calendar ph-sm me-1"></i>
-									<span>Due today</span>
-								</div>
-							</li>
-
-							<li class="list-group-item d-flex flex-wrap align-items-center py-2">
-								<a href="#" class="d-flex align-items-center me-3">
-									<i class="ph-check-square ph-lg me-2"></i>
-									<span>Complete evaluation for John Doe</span>
-								</a>
-
-								<div class="d-flex align-items-center text-muted ms-auto">
-									<i class="ph-calendar ph-sm me-1"></i>
-									<span>Due in 5 days</span>
-								</div>
-							</li>
-
-							<li class="list-group-item d-flex flex-wrap align-items-center py-2">
-								<a href="#" class="d-flex align-items-center me-3">
-									<i class="ph-file-doc ph-lg me-2"></i>
-									<span>Submit documentation for UI/UX internship</span>
-								</a>
-
-								<div class="d-flex align-items-center text-muted ms-auto">
-									<i class="ph-calendar ph-sm me-1"></i>
-									<span>Due in 1 week</span>
-								</div>
-							</li>
-						</ul>
-					</div>
-				</div>
-				<!-- /pending tasks -->
 
 			</div>
 			<!-- /content area -->
