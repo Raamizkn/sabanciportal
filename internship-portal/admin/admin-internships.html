@@ -15,12 +15,12 @@
 
 	<!-- Core JS files -->
 	<script src="../../bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+	<script src="../../bs5/template/assets/js/jquery/jquery.min.js"></script>
 	<!-- /core JS files -->
 
 	<!-- Theme JS files -->
 	<script src="../../bs5/template/assets/js/vendor/tables/datatables/datatables.min.js"></script>
 	<script src="../../bs5/template/html/layout_1/full/assets/js/app.js"></script>
-	<script src="../../bs5/template/assets/demo/pages/datatables_basic.js"></script>
 	<!-- /theme JS files -->
 
 	<!-- Custom style for proper scrolling -->
@@ -56,7 +56,7 @@
 
 			<div class="navbar-brand flex-1 flex-lg-0">
 				<a href="admin-dashboard.html" class="d-inline-flex align-items-center">
-					<img src="/assets/images/logo.svg" alt="Sabancı University Logo" class="h-32px">
+					<img src="/internship-portal/assets/images/logo.svg" alt="Sabancı University Logo" class="h-32px">
 					<span class="d-none d-lg-inline-block h6 mb-0 ms-2">Sabancı University Internship Portal</span>
 				</a>
 			</div>
@@ -309,7 +309,7 @@
 					<div class="card-header d-flex">
 						<h5 class="mb-0">All Internship Listings</h5>
 						<div class="ms-auto">
-							<button type="button" class="btn btn-light">
+							<button type="button" class="btn btn-primary" id="filterButton">
 								<i class="ph-funnel me-2"></i>
 								Filter
 							</button>
@@ -412,5 +412,147 @@
 	</div>
 	<!-- /page content -->
 
+	<!-- Filter Modal -->
+	<div id="filterModal" class="modal fade" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Filter Internships</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+
+				<div class="modal-body">
+					<form>
+						<div class="mb-3">
+							<label class="form-label">Companies</label>
+							<select multiple class="form-select" id="companySelect">
+								<option value="xyz">XYZ Corporation</option>
+								<option value="yenigun">Yenigun Company</option>
+								<option value="niazi">Niazi Company</option>
+								<option value="korkmaz">Korkmaz Company</option>
+							</select>
+							<div class="form-text">Select one or more companies</div>
+						</div>
+
+						<div class="mb-3">
+							<label class="form-label">Internship Quota</label>
+							<div class="row">
+								<div class="col-6">
+									<div class="input-group">
+										<span class="input-group-text">Min</span>
+										<input type="number" class="form-control" id="minQuota">
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="input-group">
+										<span class="input-group-text">Max</span>
+										<input type="number" class="form-control" id="maxQuota">
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="mb-3">
+							<label class="form-label">Status</label>
+							<div class="form-check">
+								<input type="checkbox" class="form-check-input" id="statusActive" checked>
+								<label class="form-check-label" for="statusActive">Active</label>
+							</div>
+							<div class="form-check">
+								<input type="checkbox" class="form-check-input" id="statusInactive">
+								<label class="form-check-label" for="statusInactive">Inactive</label>
+							</div>
+						</div>
+					</form>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-link" data-bs-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-primary" id="applyFilter">Apply Filter</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /filter modal -->
+
 </body>
+<script>
+	// Initialize DataTable with custom options
+	document.addEventListener('DOMContentLoaded', function() {
+		// Initialize datatables
+		var dataTable = $('.datatable-basic').DataTable({
+			autoWidth: false,
+			dom: '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
+			language: {
+				search: '<span class="me-3">Filter:</span> <div class="form-control-feedback form-control-feedback-end flex-fill">_INPUT_<div class="form-control-feedback-icon"><i class="ph-magnifying-glass opacity-50"></i></div></div>',
+				searchPlaceholder: 'Type to filter...',
+				lengthMenu: '<span class="me-3">Show:</span> _MENU_',
+				paginate: { 'first': 'First', 'last': 'Last', 'next': document.dir == "rtl" ? '&larr;' : '&rarr;', 'previous': document.dir == "rtl" ? '&rarr;' : '&larr;' }
+			},
+			// Set initial order to Posted Date column (index 4) in descending order
+			order: [[4, 'desc']]
+		});
+
+		// Handle filter modal
+		document.getElementById('filterButton').addEventListener('click', function() {
+			var filterModal = new bootstrap.Modal(document.getElementById('filterModal'));
+			filterModal.show();
+		});
+
+		// Handle filter apply
+		document.getElementById('applyFilter').addEventListener('click', function() {
+			// Clear any existing filters first
+			dataTable.search('').columns().search('').draw();
+			
+			// Gather filter values
+			var companySelect = document.getElementById('companySelect');
+			var selectedCompanies = Array.from(companySelect.selectedOptions).map(option => option.text);
+			var minQuota = document.getElementById('minQuota').value;
+			var maxQuota = document.getElementById('maxQuota').value;
+			var activeStatus = document.getElementById('statusActive').checked;
+			var inactiveStatus = document.getElementById('statusInactive').checked;
+			
+			// Apply company filter
+			if (selectedCompanies.length > 0) {
+				// Filter by selected companies
+				dataTable.column(2).search(selectedCompanies.join('|'), true, false);
+			}
+			
+			// Apply status filter
+			if ((activeStatus && !inactiveStatus) || (!activeStatus && inactiveStatus)) {
+				var statusSearch = activeStatus ? 'Active' : 'Inactive';
+				dataTable.column(6).search(statusSearch);
+			}
+			
+			// Apply application count filters
+			if (minQuota || maxQuota) {
+				// Use search() for simple filtering, complex filtering would need custom function
+				// This is simplified for demo
+				if (minQuota && !maxQuota) {
+					dataTable.column(5).search('>=' + minQuota, true, false);
+				} else if (!minQuota && maxQuota) {
+					dataTable.column(5).search('<=' + maxQuota, true, false);
+				}
+			}
+			
+			// Apply all filters
+			dataTable.draw();
+
+			// Close the modal
+			bootstrap.Modal.getInstance(document.getElementById('filterModal')).hide();
+		});
+		
+		// Reset filters when modal is closed
+		document.querySelector('#filterModal .btn-close').addEventListener('click', function() {
+			// Reset the search
+			dataTable.search('').columns().search('').draw();
+		});
+		
+		// Reset filters when Cancel button is clicked
+		document.querySelector('#filterModal .btn-link').addEventListener('click', function() {
+			// Reset the search
+			dataTable.search('').columns().search('').draw();
+		});
+	});
+</script>
 </html> 

@@ -24,6 +24,15 @@
 	<script src="../../bs5/template/assets/demo/charts/pages/dashboard/lines.js"></script>	
 	<script src="../../bs5/template/assets/demo/charts/pages/dashboard/areas.js"></script>
 	<script src="../../bs5/template/assets/demo/charts/pages/dashboard/donuts.js"></script>
+	<script src="../../bs5/template/assets/js/vendor/tables/datatables/datatables.min.js"></script>
+	<script src="../../bs5/template/assets/js/vendor/uploaders/fileinput/fileinput.min.js"></script>
+	<script src="../../bs5/template/assets/js/vendor/notifications/sweet_alert.min.js"></script>
+	<script src="../../bs5/template/assets/js/vendor/pickers/daterangepicker.js"></script>
+	<script src="../../bs5/template/assets/js/vendor/forms/selects/select2.min.js"></script>
+	<script src="../../bs5/template/assets/js/vendor/export/jspdf.min.js"></script>
+	<script src="../../bs5/template/assets/js/vendor/export/jspdf.plugin.autotable.min.js"></script>
+	<script src="../../bs5/template/assets/js/vendor/export/xlsx.full.min.js"></script>
+	<script src="../../bs5/template/assets/js/vendor/export/pptxgen.min.js"></script>
 	<!-- /theme JS files -->
 
 	<!-- Custom style for proper scrolling -->
@@ -43,6 +52,38 @@
 			display: flex;
 			overflow: hidden;
 		}
+		
+		/* Report specific styles */
+		.report-card {
+			transition: all 0.2s ease;
+		}
+		.report-card:hover {
+			box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+		}
+		.export-btn {
+			transition: all 0.2s ease;
+		}
+		.export-btn:hover {
+			background-color: rgba(var(--bs-primary-rgb), 0.1);
+		}
+		.chart-container {
+			position: relative;
+			border-radius: 0.25rem;
+			background-color: var(--bs-light);
+			padding: 0.5rem;
+		}
+		.field-selector {
+			max-height: 200px;
+			overflow-y: auto;
+		}
+		.scheduled-report {
+			border-left: 4px solid var(--bs-success);
+			padding-left: 0.75rem;
+		}
+		.report-badge {
+			font-size: 0.75rem;
+			padding: 0.25rem 0.5rem;
+		}
 	</style>
 </head>
 
@@ -59,7 +100,7 @@
 
 			<div class="navbar-brand flex-1 flex-lg-0">
 				<a href="admin-dashboard.html" class="d-inline-flex align-items-center">
-					<img src="/assets/images/logo.svg" alt="Sabancı University Logo" class="h-32px">
+					<img src="/internship-portal/assets/images/logo.svg" alt="Sabancı University Logo" class="h-32px">
 					<span class="d-none d-lg-inline-block h6 mb-0 ms-2">Sabancı University Internship Portal</span>
 				</a>
 			</div>
@@ -335,11 +376,6 @@
 								<label class="col-lg-3 col-form-label">Additional Filters:</label>
 								<div class="col-lg-9">
 									<select class="form-select mb-2">
-										<option value="">Filter by University (optional)</option>
-										<option value="state_uni">State University</option>
-										<option value="city_college">City College</option>
-									</select>
-									<select class="form-select mb-2">
 										<option value="">Filter by Major (optional)</option>
 										<option value="cs">Computer Science</option>
 										<option value="mkt">Marketing</option>
@@ -359,48 +395,423 @@
 				</div>
 				<!-- /Report Generation -->
 
-				<!-- Generated Report Preview (Example) -->
-				<div class="card">
-					<div class="card-header d-flex">
-						<h5 class="mb-0">Report Preview: Placement Report (Q1 2025)</h5>
-						<div class="ms-auto">
-							<button type="button" class="btn btn-light"><i class="ph-download-simple me-2"></i>Download CSV</button>
-							<button type="button" class="btn btn-light"><i class="ph-printer me-2"></i>Print</button>
+				<!-- Report Types -->
+				<div class="row">
+					<!-- Survey Reports -->
+					<div class="col-lg-6">
+						<div class="card">
+							<div class="card-header d-flex">
+								<h5 class="mb-0">
+									<i class="ph-chart-pie me-2"></i>
+									Survey Reports
+								</h5>
+								<div class="ms-auto">
+									<div class="dropdown">
+										<button type="button" class="btn btn-light btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+											<i class="ph-download me-2"></i>Export
+										</button>
+										<div class="dropdown-menu dropdown-menu-end">
+											<a href="#" class="dropdown-item">
+												<i class="ph-file-excel me-2"></i>Excel
+											</a>
+											<a href="#" class="dropdown-item">
+												<i class="ph-file-pdf me-2"></i>PDF
+											</a>
+											<a href="#" class="dropdown-item">
+												<i class="ph-presentation me-2"></i>PowerPoint
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="card-body">
+								<p>Detailed analytics based on student and company survey responses.</p>
+								
+								<div class="mb-3">
+									<label class="form-label">Select Survey:</label>
+									<select class="form-select">
+										<option value="student_satisfaction">Student Satisfaction Survey</option>
+										<option value="company_feedback">Company Feedback Survey</option>
+										<option value="program_evaluation">Program Evaluation Survey</option>
+									</select>
+								</div>
+								
+								<div class="mb-3">
+									<label class="form-label">Faculty Filter:</label>
+									<select class="form-select" multiple>
+										<option value="fens">FENS (Faculty of Engineering and Natural Sciences)</option>
+										<option value="fass">FASS (Faculty of Arts and Social Sciences)</option>
+										<option value="som">SOM (School of Management)</option>
+									</select>
+									<div class="form-text">Hold Ctrl/Cmd to select multiple faculties</div>
+								</div>
+								
+								<button type="button" class="btn btn-primary">
+									<i class="ph-chart-line me-2"></i>Generate Survey Report
+								</button>
+							</div>
 						</div>
 					</div>
-					<div class="card-body">
-						<p>Summary statistics and charts related to internship placements for the selected period.</p>
-						<div class="row">
-							<div class="col-md-6">
-								<div class="chart-container">
-									<div class="chart" id="donut_basic_chart" style="height: 300px;"></div>
+					
+					<!-- Student Reports -->
+					<div class="col-lg-6">
+						<div class="card">
+							<div class="card-header d-flex">
+								<h5 class="mb-0">
+									<i class="ph-student me-2"></i>
+									Student Reports
+								</h5>
+								<div class="ms-auto">
+									<div class="dropdown">
+										<button type="button" class="btn btn-light btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+											<i class="ph-download me-2"></i>Export
+										</button>
+										<div class="dropdown-menu dropdown-menu-end">
+											<a href="#" class="dropdown-item">
+												<i class="ph-file-excel me-2"></i>Excel
+											</a>
+											<a href="#" class="dropdown-item">
+												<i class="ph-file-pdf me-2"></i>PDF
+											</a>
+											<a href="#" class="dropdown-item">
+												<i class="ph-presentation me-2"></i>PowerPoint
+											</a>
+										</div>
+									</div>
 								</div>
-								<p class="text-center mt-2">Placements by Industry</p>
 							</div>
-							<div class="col-md-6">
-								<ul class="list-group">
-									<li class="list-group-item d-flex justify-content-between align-items-center">
-										Total Placed Students
-										<span class="badge bg-primary rounded-pill">48</span>
-									</li>
-									<li class="list-group-item d-flex justify-content-between align-items-center">
-										Technology Sector
-										<span class="badge bg-info rounded-pill">25</span>
-									</li>
-									<li class="list-group-item d-flex justify-content-between align-items-center">
-										Marketing Sector
-										<span class="badge bg-success rounded-pill">15</span>
-									</li>
-									<li class="list-group-item d-flex justify-content-between align-items-center">
-										Finance Sector
-										<span class="badge bg-warning rounded-pill">8</span>
-									</li>
-								</ul>
+							<div class="card-body">
+								<p>Comprehensive student data including personal details, program information, and internship placements.</p>
+								
+								<div class="mb-3">
+									<label class="form-label">Data Fields:</label>
+									<div class="form-check">
+										<input type="checkbox" class="form-check-input" id="field_id" checked>
+										<label class="form-check-label" for="field_id">Student ID Number</label>
+									</div>
+									<div class="form-check">
+										<input type="checkbox" class="form-check-input" id="field_faculty" checked>
+										<label class="form-check-label" for="field_faculty">Faculty & Program</label>
+									</div>
+									<div class="form-check">
+										<input type="checkbox" class="form-check-input" id="field_personal" checked>
+										<label class="form-check-label" for="field_personal">Personal Details (Name, ID, Birth Date)</label>
+									</div>
+									<div class="form-check">
+										<input type="checkbox" class="form-check-input" id="field_internship" checked>
+										<label class="form-check-label" for="field_internship">Internship Dates</label>
+									</div>
+									<div class="form-check">
+										<input type="checkbox" class="form-check-input" id="field_company" checked>
+										<label class="form-check-label" for="field_company">Company Information</label>
+									</div>
+									<div class="form-check">
+										<input type="checkbox" class="form-check-input" id="field_supervisor" checked>
+										<label class="form-check-label" for="field_supervisor">Supervisor Details</label>
+									</div>
+									<div class="form-check">
+										<input type="checkbox" class="form-check-input" id="field_location" checked>
+										<label class="form-check-label" for="field_location">Location (Country)</label>
+									</div>
+								</div>
+								
+								<button type="button" class="btn btn-primary">
+									<i class="ph-users me-2"></i>Generate Student Report
+								</button>
 							</div>
 						</div>
 					</div>
 				</div>
-				<!-- /Generated Report Preview -->
+				
+				<div class="row">
+					<!-- Institution Reports -->
+					<div class="col-lg-6">
+						<div class="card">
+							<div class="card-header d-flex">
+								<h5 class="mb-0">
+									<i class="ph-buildings me-2"></i>
+									Institution/Company Reports
+								</h5>
+								<div class="ms-auto">
+									<div class="dropdown">
+										<button type="button" class="btn btn-light btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+											<i class="ph-download me-2"></i>Export
+										</button>
+										<div class="dropdown-menu dropdown-menu-end">
+											<a href="#" class="dropdown-item">
+												<i class="ph-file-excel me-2"></i>Excel
+											</a>
+											<a href="#" class="dropdown-item">
+												<i class="ph-file-pdf me-2"></i>PDF
+											</a>
+											<a href="#" class="dropdown-item">
+												<i class="ph-presentation me-2"></i>PowerPoint
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="card-body">
+								<p>Detailed company information including location data and sector classification.</p>
+								
+								<div class="mb-3">
+									<label class="form-label">Sector Filter:</label>
+									<select class="form-select" multiple>
+										<option value="tech">Technology</option>
+										<option value="finance">Finance</option>
+										<option value="healthcare">Healthcare</option>
+										<option value="education">Education</option>
+										<option value="manufacturing">Manufacturing</option>
+									</select>
+									<div class="form-text">Hold Ctrl/Cmd to select multiple sectors</div>
+								</div>
+								
+								<div class="mb-3">
+									<label class="form-label">Location Filter:</label>
+									<select class="form-select">
+										<option value="">All Countries</option>
+										<option value="turkey">Turkey</option>
+										<option value="germany">Germany</option>
+										<option value="usa">United States</option>
+										<option value="uk">United Kingdom</option>
+									</select>
+								</div>
+								
+								<button type="button" class="btn btn-primary">
+									<i class="ph-buildings me-2"></i>Generate Company Report
+								</button>
+							</div>
+						</div>
+					</div>
+					
+					<!-- Country Reports -->
+					<div class="col-lg-6">
+						<div class="card">
+							<div class="card-header d-flex">
+								<h5 class="mb-0">
+									<i class="ph-globe me-2"></i>
+									Country Reports
+								</h5>
+								<div class="ms-auto">
+									<div class="dropdown">
+										<button type="button" class="btn btn-light btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+											<i class="ph-download me-2"></i>Export
+										</button>
+										<div class="dropdown-menu dropdown-menu-end">
+											<a href="#" class="dropdown-item">
+												<i class="ph-file-excel me-2"></i>Excel
+											</a>
+											<a href="#" class="dropdown-item">
+												<i class="ph-file-pdf me-2"></i>PDF
+											</a>
+											<a href="#" class="dropdown-item">
+												<i class="ph-presentation me-2"></i>PowerPoint
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="card-body">
+								<p>Geographical distribution of students and companies by country and city.</p>
+								
+								<div class="mb-3">
+									<label class="form-label">Select Country:</label>
+									<select class="form-select">
+										<option value="">All Countries</option>
+										<option value="turkey">Turkey</option>
+										<option value="germany">Germany</option>
+										<option value="usa">United States</option>
+										<option value="uk">United Kingdom</option>
+									</select>
+								</div>
+								
+								<div class="mb-3">
+									<label class="form-label">Data Fields:</label>
+									<div class="form-check">
+										<input type="checkbox" class="form-check-input" id="country_field_id" checked>
+										<label class="form-check-label" for="country_field_id">Student ID Number</label>
+									</div>
+									<div class="form-check">
+										<input type="checkbox" class="form-check-input" id="country_field_name" checked>
+										<label class="form-check-label" for="country_field_name">Student Name-Surname</label>
+									</div>
+									<div class="form-check">
+										<input type="checkbox" class="form-check-input" id="country_field_company" checked>
+										<label class="form-check-label" for="country_field_company">Company</label>
+									</div>
+									<div class="form-check">
+										<input type="checkbox" class="form-check-input" id="country_field_city" checked>
+										<label class="form-check-label" for="country_field_city">City</label>
+									</div>
+									<div class="form-check">
+										<input type="checkbox" class="form-check-input" id="country_field_country" checked>
+										<label class="form-check-label" for="country_field_country">Country</label>
+									</div>
+								</div>
+								
+								<button type="button" class="btn btn-primary">
+									<i class="ph-globe me-2"></i>Generate Country Report
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Report Preview -->
+				<div class="card">
+					<div class="card-header d-flex">
+						<h5 class="mb-0">Report Preview</h5>
+						<div class="ms-auto">
+							<div class="btn-group">
+								<button type="button" class="btn btn-light"><i class="ph-file-excel me-2"></i>Excel</button>
+								<button type="button" class="btn btn-light"><i class="ph-file-pdf me-2"></i>PDF</button>
+								<button type="button" class="btn btn-light"><i class="ph-presentation me-2"></i>PowerPoint</button>
+							<button type="button" class="btn btn-light"><i class="ph-printer me-2"></i>Print</button>
+							</div>
+						</div>
+					</div>
+					<div class="card-body">
+						<div class="d-flex align-items-center mb-3">
+							<h6 class="mb-0">Student Distribution by Country</h6>
+							<span class="badge bg-primary ms-auto">25 Records</span>
+						</div>
+						
+						<!-- Preview Table -->
+						<div class="table-responsive">
+							<table class="table table-striped">
+								<thead>
+									<tr>
+										<th>Student ID</th>
+										<th>Student Name</th>
+										<th>Company</th>
+										<th>City</th>
+										<th>Country</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>S12345</td>
+										<td>John Doe</td>
+										<td>Tech Solutions</td>
+										<td>Istanbul</td>
+										<td>Turkey</td>
+									</tr>
+									<tr>
+										<td>S12346</td>
+										<td>Jane Smith</td>
+										<td>Finance Pro</td>
+										<td>Berlin</td>
+										<td>Germany</td>
+									</tr>
+									<tr>
+										<td>S12347</td>
+										<td>Michael Johnson</td>
+										<td>Healthcare Inc</td>
+										<td>New York</td>
+										<td>United States</td>
+									</tr>
+									<tr>
+										<td>S12348</td>
+										<td>Sarah Williams</td>
+										<td>Edu Systems</td>
+										<td>London</td>
+										<td>United Kingdom</td>
+									</tr>
+									<tr>
+										<td>S12349</td>
+										<td>David Lee</td>
+										<td>Manufacturing Co</td>
+										<td>Paris</td>
+										<td>France</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						
+						<!-- Sample Chart -->
+						<div class="chart-container mt-4">
+							<div class="chart" id="d3-bar-horizontal" style="height: 400px;"></div>
+						</div>
+					</div>
+				</div>
+				<!-- /Report Preview -->
+
+				<!-- Saved Reports -->
+				<div class="card">
+					<div class="card-header">
+						<h5 class="mb-0">Saved Reports</h5>
+					</div>
+					<div class="card-body">
+						<div class="table-responsive">
+							<table class="table table-hover">
+								<thead>
+									<tr>
+										<th>Report Name</th>
+										<th>Type</th>
+										<th>Generated On</th>
+										<th>Records</th>
+										<th class="text-center">Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>Student Survey Q1 2025</td>
+										<td><span class="badge bg-primary">Survey</span></td>
+										<td>Apr 15, 2025</td>
+										<td>128</td>
+										<td class="text-center">
+											<div class="d-inline-flex">
+												<a href="#" class="text-body me-2" data-bs-popup="tooltip" title="View"><i class="ph-eye"></i></a>
+												<a href="#" class="text-body me-2" data-bs-popup="tooltip" title="Download"><i class="ph-download-simple"></i></a>
+												<a href="#" class="text-danger" data-bs-popup="tooltip" title="Delete"><i class="ph-trash"></i></a>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>Companies by Sector</td>
+										<td><span class="badge bg-info">Institution</span></td>
+										<td>Apr 10, 2025</td>
+										<td>45</td>
+										<td class="text-center">
+											<div class="d-inline-flex">
+												<a href="#" class="text-body me-2" data-bs-popup="tooltip" title="View"><i class="ph-eye"></i></a>
+												<a href="#" class="text-body me-2" data-bs-popup="tooltip" title="Download"><i class="ph-download-simple"></i></a>
+												<a href="#" class="text-danger" data-bs-popup="tooltip" title="Delete"><i class="ph-trash"></i></a>
+								</div>
+										</td>
+									</tr>
+									<tr>
+										<td>International Placements</td>
+										<td><span class="badge bg-success">Country</span></td>
+										<td>Apr 5, 2025</td>
+										<td>37</td>
+										<td class="text-center">
+											<div class="d-inline-flex">
+												<a href="#" class="text-body me-2" data-bs-popup="tooltip" title="View"><i class="ph-eye"></i></a>
+												<a href="#" class="text-body me-2" data-bs-popup="tooltip" title="Download"><i class="ph-download-simple"></i></a>
+												<a href="#" class="text-danger" data-bs-popup="tooltip" title="Delete"><i class="ph-trash"></i></a>
+							</div>
+										</td>
+									</tr>
+									<tr>
+										<td>Computer Science Students</td>
+										<td><span class="badge bg-warning">Student</span></td>
+										<td>Mar 28, 2025</td>
+										<td>84</td>
+										<td class="text-center">
+											<div class="d-inline-flex">
+												<a href="#" class="text-body me-2" data-bs-popup="tooltip" title="View"><i class="ph-eye"></i></a>
+												<a href="#" class="text-body me-2" data-bs-popup="tooltip" title="Download"><i class="ph-download-simple"></i></a>
+												<a href="#" class="text-danger" data-bs-popup="tooltip" title="Delete"><i class="ph-trash"></i></a>
+							</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				<!-- /Saved Reports -->
 
 			</div>
 			<!-- /content area -->
@@ -410,6 +821,268 @@
 
 	</div>
 	<!-- /page content -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize select2 for advanced dropdowns
+    const selects = document.querySelectorAll('select[multiple]');
+    for (const select of selects) {
+        new TomSelect(select, {
+            plugins: ['remove_button'],
+            placeholder: 'Select options...'
+        });
+    }
+
+    // Initialize date range picker
+    $('.input-daterange').daterangepicker({
+        locale: {
+            format: 'YYYY-MM-DD'
+        }
+    });
+
+    // Initialize tooltips
+    const tooltips = document.querySelectorAll('[data-bs-popup="tooltip"]');
+    for (const tooltip of tooltips) {
+        new bootstrap.Tooltip(tooltip);
+    }
+
+    // Sample horizontal bar chart for country distribution
+    const horizontalBarElem = document.getElementById('d3-bar-horizontal');
+    
+    if (horizontalBarElem) {
+        const horizontalBarData = [
+            {
+                name: 'Turkey',
+                value: 45
+            }, {
+                name: 'Germany',
+                value: 15
+            }, {
+                name: 'United States',
+                value: 12
+            }, {
+                name: 'United Kingdom',
+                value: 8
+            }, {
+                name: 'France',
+                value: 5
+            }
+        ];
+
+        // Basic setup
+        const margin = {top: 20, right: 20, bottom: 20, left: 100};
+        const width = horizontalBarElem.clientWidth - margin.left - margin.right;
+        const height = horizontalBarElem.clientHeight - margin.top - margin.bottom;
+
+        // Horizontal bar setup
+        const svg = d3.select(horizontalBarElem).append('svg')
+            .attr('width', width + margin.left + margin.right)
+            .attr('height', height + margin.top + margin.bottom)
+            .append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+        // Tooltip
+        const tip = d3.tip()
+            .attr('class', 'd3-tip')
+            .offset([-5, 0])
+            .html(d => 
+                `<div class="py-1">
+                    <div class="fs-base mb-1">${d.name} <span class="fw-semibold float-end">${d.value}</span></div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-primary" style="width: ${d.value / Math.max(...horizontalBarData.map(d => d.value)) * 100}%"></div>
+                    </div>
+                </div>`
+            );
+
+        svg.call(tip);
+
+        // Scales
+        const x = d3.scaleLinear()
+            .range([0, width])
+            .domain([0, d3.max(horizontalBarData, d => d.value)]);
+
+        const y = d3.scaleBand()
+            .range([0, height])
+            .padding(0.3)
+            .domain(horizontalBarData.map(d => d.name));
+
+        // Append axes
+        svg.append('g')
+            .attr('class', 'd3-axis d3-axis-horizontal d3-axis-strong')
+            .attr('transform', `translate(0,${height})`)
+            .call(d3.axisBottom(x));
+
+        svg.append('g')
+            .attr('class', 'd3-axis d3-axis-vertical d3-axis-strong')
+            .call(d3.axisLeft(y));
+
+        // Add grid lines
+        svg.append('g')
+            .attr('class', 'd3-grid d3-grid-dashed')
+            .call(d3.axisBottom(x)
+                .tickSize(-height, 0, 0)
+                .tickFormat('')
+            );
+
+        // Add bars
+        const bars = svg.selectAll('.d3-bar')
+            .data(horizontalBarData)
+            .enter()
+            .append('rect')
+                .attr('class', 'd3-bar')
+                .attr('y', d => y(d.name))
+                .attr('height', y.bandwidth())
+                .attr('x', 0)
+                .attr('width', 0)
+                .style('fill', 'var(--bs-primary)')
+                .on('mouseover', function(event, d) {
+                    d3.select(this).transition()
+                        .duration(100)
+                        .style('fill', 'var(--bs-primary-darker)');
+                    tip.show(d, this);
+                })
+                .on('mouseout', function() {
+                    d3.select(this).transition()
+                        .duration(100)
+                        .style('fill', 'var(--bs-primary)');
+                    tip.hide();
+                });
+
+        // Add values on bars
+        svg.selectAll('.d3-value')
+            .data(horizontalBarData)
+            .enter()
+            .append('text')
+                .attr('class', 'd3-value')
+                .attr('y', d => y(d.name) + y.bandwidth() / 2)
+                .attr('x', d => x(d.value) + 10)
+                .attr('dy', '.35em')
+                .style('text-anchor', 'start')
+                .style('font-size', 12)
+                .style('font-weight', 500)
+                .style('fill', 'var(--bs-body-color)')
+                .text(d => d.value);
+
+        // Animation
+        bars.transition()
+            .duration(500)
+            .delay((d, i) => i * 100)
+            .attr('width', d => x(d.value));
+    }
+
+    // Handle report generation button clicks
+    const reportButtons = document.querySelectorAll('button[type="button"].btn-primary');
+    reportButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const cardTitle = this.closest('.card').querySelector('.card-header h5').textContent.trim();
+            
+            // Create loader
+            const card = this.closest('.card');
+            const loader = document.createElement('div');
+            loader.className = 'position-absolute w-100 h-100 bg-white bg-opacity-75 d-flex align-items-center justify-content-center';
+            loader.style.top = '0';
+            loader.style.left = '0';
+            loader.style.zIndex = '10';
+            loader.innerHTML = `
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <div class="mt-2">Generating report...</div>
+                </div>
+            `;
+            card.style.position = 'relative';
+            card.appendChild(loader);
+            
+            // Simulate report generation (would be replaced with actual API call)
+            setTimeout(() => {
+                // Remove loader
+                card.removeChild(loader);
+                
+                // Scroll to preview section
+                document.querySelector('.card:nth-of-type(5)').scrollIntoView({ behavior: 'smooth' });
+                
+                // Show success notification
+                Swal.fire({
+                    title: 'Report Generated',
+                    text: `${cardTitle} has been generated successfully.`,
+                    icon: 'success',
+                    confirmButtonClass: 'btn btn-primary',
+                    buttonsStyling: false
+                });
+            }, 2000);
+        });
+    });
+
+    // Export functionality
+    document.querySelectorAll('.btn-group .btn, .dropdown-menu .dropdown-item').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const format = this.textContent.trim();
+            let message = `Exporting report in ${format} format...`;
+            
+            // Create and show toast notification
+            const toast = document.createElement('div');
+            toast.className = 'toast position-fixed top-0 end-0 m-3';
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            toast.innerHTML = `
+                <div class="toast-header">
+                    <i class="ph-download me-2"></i>
+                    <span class="me-auto">Export ${format}</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            // Simulate export process
+            setTimeout(() => {
+                toast.querySelector('.toast-body').innerHTML = `Report exported successfully in ${format} format.`;
+                
+                // Create fake download
+                if (format.includes('Excel')) {
+                    const link = document.createElement('a');
+                    link.href = '#';
+                    link.download = `report_${Date.now()}.xlsx`;
+                    link.click();
+                }
+                else if (format.includes('PDF')) {
+                    const link = document.createElement('a');
+                    link.href = '#';
+                    link.download = `report_${Date.now()}.pdf`;
+                    link.click();
+                }
+                else if (format.includes('PowerPoint')) {
+                    const link = document.createElement('a');
+                    link.href = '#';
+                    link.download = `report_${Date.now()}.pptx`;
+                    link.click();
+                }
+            }, 1500);
+        });
+    });
+
+    // Initialize a sample DataTable on the saved reports
+    if ($.fn.DataTable) {
+        $('.table').DataTable({
+            autoWidth: false,
+            dom: '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
+            language: {
+                search: '<span>Filter:</span> _INPUT_',
+                searchPlaceholder: 'Type to filter...',
+                lengthMenu: '<span>Show:</span> _MENU_',
+                paginate: { 'first': 'First', 'last': 'Last', 'next': document.dir == "rtl" ? '&larr;' : '&rarr;', 'previous': document.dir == "rtl" ? '&rarr;' : '&larr;' }
+            }
+        });
+    }
+});
+</script>
 
 </body>
 </html> 

@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Settings - Sabancı University Internship Portal</title>
+	<title>Add Company - Sabancı University Internship Portal</title>
 
 	<!-- Global stylesheets -->
 	<link href="/bs5/template/assets/fonts/inter/inter.css" rel="stylesheet" type="text/css">
@@ -18,27 +18,10 @@
 	<!-- /core JS files -->
 
 	<!-- Theme JS files -->
+	<script src="../../bs5/template/assets/js/vendor/tables/datatables/datatables.min.js"></script>
 	<script src="../../bs5/template/html/layout_1/full/assets/js/app.js"></script>
 	<!-- /theme JS files -->
 
-	<!-- Custom style for proper scrolling -->
-	<style>
-		.content-wrapper {
-			display: flex;
-			flex-direction: column;
-			height: 100%;
-		}
-		.content {
-			flex: 1;
-			overflow-y: auto;
-			padding-bottom: 1rem;
-		}
-		.page-content {
-			height: 100vh;
-			display: flex;
-			overflow: hidden;
-		}
-	</style>
 </head>
 
 <body>
@@ -139,27 +122,6 @@
 					</div>
 				</li>
 			</ul>
-
-			<div class="navbar navbar-sm navbar-footer border-top">
-				<div class="container-fluid">
-					<span>&copy; 2023 <a href="#">Sabancı University Internship Portal</a></span>
-
-					<ul class="nav">
-						<li class="nav-item">
-							<a href="#" class="nav-link">
-								<i class="ph-question"></i>
-								Help
-							</a>
-						</li>
-						<li class="nav-item">
-							<a href="#" class="nav-link">
-								<i class="ph-cog"></i>
-								Settings
-							</a>
-						</li>
-					</ul>
-				</div>
-			</div>
 		</div>
 	</div>
 	<!-- /main navbar -->
@@ -191,11 +153,9 @@
 				</div>
 				<!-- /sidebar header -->
 
-
 				<!-- Main navigation -->
 				<div class="sidebar-section">
 					<ul class="nav nav-sidebar" data-nav-type="accordion">
-
 						<!-- Main -->
 						<li class="nav-item-header">
 							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Main</div>
@@ -214,7 +174,7 @@
 							</a>
 						</li>
 						<li class="nav-item">
-							<a href="admin-companies.html" class="nav-link">
+							<a href="admin-companies.html" class="nav-link active">
 								<i class="ph-buildings"></i>
 								<span>Companies</span>
 							</a>
@@ -243,7 +203,7 @@
 								<span>Evaluations</span>
 							</a>
 						</li>
-						
+
 						<!-- Tools -->
 						<li class="nav-item-header">
 							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Tools</div>
@@ -262,7 +222,7 @@
 							</a>
 						</li>
 						<li class="nav-item">
-							<a href="admin-settings.html" class="nav-link active">
+							<a href="admin-settings.html" class="nav-link">
 								<i class="ph-gear"></i>
 								<span>Settings</span>
 							</a>
@@ -279,10 +239,8 @@
 
 			</div>
 			<!-- /sidebar content -->
-			
 		</div>
 		<!-- /main sidebar -->
-
 
 		<!-- Main content -->
 		<div class="content-wrapper">
@@ -290,143 +248,89 @@
 			<!-- Content area -->
 			<div class="content">
 
-                <!-- Page header -->
-                <div class="page-header">
-                    <div class="page-header-content d-lg-flex">
-                        <div class="d-flex">
-                            <h4 class="page-title mb-0">
-                                Admin Settings <span class="fw-normal">Manage platform settings and admin account</span>
-                            </h4>
-                        </div>
-                    </div>
-                </div>
-                <!-- /page header -->
-
-                <!-- Settings -->
-				<div class="row">
-					<div class="col-lg-9">
-
-						<!-- General settings -->
-						<div class="card">
-							<div class="card-header">
-								<h5 class="mb-0">General Settings</h5>
-							</div>
-
-							<div class="card-body">
-								<form>
-									<div class="row mb-3">
-										<label class="col-lg-3 col-form-label">Platform Name:</label>
-										<div class="col-lg-9">
-											<input type="text" class="form-control" value="First Step Into The Business World">
-										</div>
-									</div>
-
-									<div class="row mb-3">
-										<label class="col-lg-3 col-form-label">Platform Logo:</label>
-										<div class="col-lg-9">
-											<input type="file" class="form-control">
-											<div class="form-text text-muted">Accepted formats: png, jpg. Max file size 2Mb</div>
-										</div>
-									</div>
-
-									<div class="row mb-3">
-										<label class="col-lg-3 col-form-label">Admin Email:</label>
-										<div class="col-lg-9">
-											<input type="email" class="form-control" value="admin@firststep.com">
-											<span class="form-text">Primary contact email for administrative notifications.</span>
-										</div>
-									</div>
-
-									<div class="row mb-3">
-										<label class="col-lg-3 col-form-label">Default Timezone:</label>
-										<div class="col-lg-9">
-											<select class="form-select">
-												<option value="gmt-8" selected>(GMT-08:00) Pacific Time (US & Canada)</option>
-												<option value="gmt-5">(GMT-05:00) Eastern Time (US & Canada)</option>
-												<option value="gmt"> (GMT+00:00) Greenwich Mean Time</option>
-												<option value="gmt+1">(GMT+01:00) Central European Time</option>
-											</select>
-										</div>
-									</div>
-
-									<div class="row mb-3">
-										<label class="col-lg-3 col-form-label">Enable Maintenance Mode:</label>
-										<div class="col-lg-9">
-											<div class="form-check form-switch form-check-inline">
-												<input type="checkbox" class="form-check-input" id="maintenance_mode">
-												<label class="form-check-label" for="maintenance_mode">Active</label>
-											</div>
-										</div>
-									</div>
-
-									<div class="text-end">
-										<button type="submit" class="btn btn-primary">Save General Settings</button>
-									</div>
-								</form>
-							</div>
+				<!-- Page header -->
+				<div class="page-header">
+					<div class="page-header-content d-lg-flex">
+						<div class="d-flex">
+							<h4 class="page-title mb-0">
+								Add New Company
+							</h4>
 						</div>
-						<!-- /general settings -->
-
-						<!-- Account settings -->
-						<div class="card">
-							<div class="card-header">
-								<h5 class="mb-0">Admin Account Settings</h5>
-							</div>
-
-							<div class="card-body">
-								<form>
-									<div class="row mb-3">
-										<label class="col-lg-3 col-form-label">Username:</label>
-										<div class="col-lg-9">
-											<input type="text" class="form-control" value="admin_user" readonly>
-										</div>
-									</div>
-
-									<div class="row mb-3">
-										<label class="col-lg-3 col-form-label">Email:</label>
-										<div class="col-lg-9">
-											<input type="email" class="form-control" value="admin@firststep.com">
-										</div>
-									</div>
-
-									<div class="row mb-3">
-										<label class="col-lg-3 col-form-label">Current password:</label>
-										<div class="col-lg-9">
-											<input type="password" class="form-control">
-										</div>
-									</div>
-
-									<div class="row mb-3">
-										<label class="col-lg-3 col-form-label">New password:</label>
-										<div class="col-lg-9">
-											<input type="password" class="form-control">
-										</div>
-									</div>
-
-									<div class="row mb-3">
-										<label class="col-lg-3 col-form-label">Confirm new password:</label>
-										<div class="col-lg-9">
-											<input type="password" class="form-control">
-										</div>
-									</div>
-
-									<div class="text-end">
-										<button type="submit" class="btn btn-primary">Save Account Settings</button>
-									</div>
-								</form>
-							</div>
-						</div>
-						<!-- /account settings -->
-
 					</div>
 				</div>
-                <!-- /settings -->
+				<!-- /page header -->
+
+				<!-- Form -->
+				<div class="card">
+					<div class="card-header">
+						<h5 class="mb-0">Company Information</h5>
+					</div>
+
+					<div class="card-body">
+						<form action="#">
+							<div class="row">
+								<div class="col-lg-6">
+									<div class="mb-3">
+										<label class="form-label">Company Name</label>
+										<input type="text" class="form-control" placeholder="Enter company name">
+									</div>
+								</div>
+
+								<div class="col-lg-6">
+									<div class="mb-3">
+										<label class="form-label">Contact Person</label>
+										<input type="text" class="form-control" placeholder="Enter contact person name">
+									</div>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-lg-6">
+									<div class="mb-3">
+										<label class="form-label">Email Address</label>
+										<input type="email" class="form-control" placeholder="Enter email address">
+									</div>
+								</div>
+
+								<div class="col-lg-6">
+									<div class="mb-3">
+										<label class="form-label">Role</label>
+										<select class="form-select">
+											<option value="">Select role</option>
+											<option value="supervisor">Supervisor</option>
+											<option value="hr">Human Resources</option>
+										</select>
+									</div>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-lg-6">
+									<div class="mb-3">
+										<label class="form-label">Company Logo</label>
+										<input type="file" class="form-control" accept=".jpg,.jpeg,.png" id="company-logo">
+										<div class="form-text">Upload company logo (JPEG, JPG, or PNG format)</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="text-end">
+								<button type="button" class="btn btn-light" onclick="window.location.href='admin-companies.html'">Cancel</button>
+								<button type="submit" class="btn btn-primary">Add Company</button>
+							</div>
+						</form>
+					</div>
+				</div>
+				<!-- /form -->
 
 			</div>
 			<!-- /content area -->
+
 		</div>
 		<!-- /main content -->
+
 	</div>
 	<!-- /page content -->
+
 </body>
 </html> 

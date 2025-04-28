@@ -11,20 +11,9 @@
 	<link href="/bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
 	<link href="/bs5/template/html/layout_1/full/assets/css/ltr/all.min.css" id="stylesheet" rel="stylesheet" type="text/css">
 	<link href="/internship-portal/assets/css/sabanci-theme.css" rel="stylesheet" type="text/css">
-	<!-- /global stylesheets -->
-
-	<!-- Core JS files -->
-	<script src="../../bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
-	<!-- /core JS files -->
-
-	<!-- Theme JS files -->
-    <script src="../../bs5/template/assets/js/vendor/editors/ckeditor/ckeditor_classic.js"></script>
-	<script src="../../bs5/template/html/layout_1/full/assets/js/app.js"></script>
-    <script src="../../bs5/template/assets/demo/pages/mail_list_write.js"></script>
-	<!-- /theme JS files -->
-
-	<!-- Custom style for proper scrolling -->
+	<!-- Custom styles for email tool -->
 	<style>
+		/* Custom style for proper scrolling */
 		.content-wrapper {
 			display: flex;
 			flex-direction: column;
@@ -40,7 +29,155 @@
 			display: flex;
 			overflow: hidden;
 		}
+
+		/* New styles for email tool */
+		.recipient-tags {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-top: 0.5rem;
+		}
+
+		.recipient-tag {
+			background-color: var(--bs-primary-bg-subtle);
+			padding: 0.25rem 0.5rem;
+			border-radius: 0.25rem;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			animation: fadeIn 0.3s ease-in-out;
+		}
+
+		.recipient-tag button {
+			padding: 0;
+			background: none;
+			border: none;
+			color: inherit;
+			cursor: pointer;
+		}
+
+		.attachment-area {
+			border: 2px dashed var(--bs-border-color);
+			padding: 2rem;
+			text-align: center;
+			border-radius: 0.5rem;
+			margin-bottom: 1rem;
+			transition: all 0.3s ease;
+		}
+
+		.attachment-area.dragover {
+			background-color: var(--bs-primary-bg-subtle);
+			border-color: var(--bs-primary);
+		}
+
+		.attachment-previews {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+			gap: 1rem;
+			margin-top: 1rem;
+		}
+
+		.attachment-preview {
+			position: relative;
+			border: 1px solid var(--bs-border-color);
+			border-radius: 0.25rem;
+			padding: 0.5rem;
+			text-align: center;
+		}
+
+		.attachment-preview img {
+			max-width: 100%;
+			height: auto;
+		}
+
+		.attachment-preview button {
+			position: absolute;
+			top: 0.25rem;
+			right: 0.25rem;
+			padding: 0.25rem;
+			background: rgba(0,0,0,0.5);
+			border: none;
+			border-radius: 50%;
+			color: white;
+			cursor: pointer;
+		}
+
+		.sending-progress {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			background: white;
+			padding: 1rem;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+			z-index: 1050;
+		}
+
+		.notifications {
+			position: fixed;
+			top: 1rem;
+			right: 1rem;
+			z-index: 1050;
+		}
+
+		.loading {
+			opacity: 0.5;
+			pointer-events: none;
+		}
+
+		@keyframes fadeIn {
+			from { opacity: 0; }
+			to { opacity: 1; }
+		}
+
+		/* Responsive styles */
+		@media (max-width: 768px) {
+			.email-form {
+				padding: 1rem;
+			}
+			
+			.recipient-selector {
+				flex-direction: column;
+			}
+			
+			.attachment-previews {
+				grid-template-columns: repeat(2, 1fr);
+			}
+		}
+
+		/* Template selector styles */
+		.template-selector {
+			margin-bottom: 1rem;
+		}
+
+		/* Validation styles */
+		.is-invalid {
+			border-color: var(--bs-danger) !important;
+		}
+
+		.invalid-feedback {
+			display: none;
+			color: var(--bs-danger);
+			font-size: 0.875rem;
+			margin-top: 0.25rem;
+		}
+
+		.is-invalid ~ .invalid-feedback {
+			display: block;
+		}
 	</style>
+	<!-- /global stylesheets -->
+
+	<!-- Core JS files -->
+	<script src="../../bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+	<!-- /core JS files -->
+
+	<!-- Theme JS files -->
+    <script src="../../bs5/template/assets/js/vendor/editors/ckeditor/ckeditor_classic.js"></script>
+	<script src="../../bs5/template/html/layout_1/full/assets/js/app.js"></script>
+    <script src="../../bs5/template/assets/demo/pages/mail_list_write.js"></script>
+	<!-- /theme JS files -->
+
 </head>
 
 <body>
@@ -305,18 +442,29 @@
 					</div>
 
 					<div class="card-body">
-						<form action="#">
+						<form action="#" class="email-form" role="form" aria-label="Email composition form">
+							<!-- Template Selector -->
+							<div class="mb-3 template-selector">
+								<label class="form-label">Email Template</label>
+								<select class="form-select" id="templateSelect">
+									<option value="">Select a template...</option>
+									<option value="welcome">Welcome Email</option>
+									<option value="interview">Interview Invitation</option>
+									<option value="rejection">Rejection Letter</option>
+								</select>
+							</div>
+
+							<!-- Recipients Section -->
 							<div class="mb-3 row">
 								<label class="col-form-label col-lg-2">Recipients</label>
 								<div class="col-lg-10">
-                                    <select class="form-select" multiple="multiple" data-placeholder="Select recipient groups...">
+                                    <select class="form-select" multiple="multiple" id="groupSelect" data-placeholder="Select recipient groups...">
                                         <option value="all_students">All Students</option>
                                         <option value="students_active">Students (Active Internships)</option>
                                         <option value="students_pending">Students (Pending Applications)</option>
                                         <option value="all_companies">All Companies</option>
                                         <option value="companies_active">Companies (Active Listings)</option>
                                         <option value="companies_pending">Companies (Pending Approval)</option>
-                                        <!-- Add more specific groups if needed -->
                                     </select>
                                     <div class="form-text">Select one or more groups, or leave blank to enter specific emails below.</div>
                                     <div class="mt-2">
@@ -328,21 +476,28 @@
 								</div>
 							</div>
 
+                            <!-- Specific Emails with Tags -->
                             <div class="mb-3 row">
 								<label class="col-form-label col-lg-2">Specific Emails</label>
 								<div class="col-lg-10">
-									<input type="text" class="form-control" placeholder="Enter specific email addresses, separated by commas" id="specific-emails">
+									<input type="text" class="form-control" id="specific-emails" 
+                                           placeholder="Enter specific email addresses, separated by commas">
+                                    <div class="invalid-feedback">Please enter valid email addresses</div>
+                                    <div class="recipient-tags mt-2"></div>
                                     <div id="selected-recipients-display" class="mt-2 fs-sm"></div>
 								</div>
 							</div>
 
+							<!-- Subject -->
 							<div class="mb-3 row">
 								<label class="col-form-label col-lg-2">Subject</label>
 								<div class="col-lg-10">
-									<input type="text" class="form-control" placeholder="Enter email subject">
+									<input type="text" class="form-control" id="email-subject" 
+                                           placeholder="Enter email subject">
 								</div>
 							</div>
 
+							<!-- Message Editor -->
 							<div class="mb-3 row">
 								<label class="col-form-label col-lg-2">Message</label>
 								<div class="col-lg-10">
@@ -350,20 +505,27 @@
 								</div>
 							</div>
 
+                            <!-- Attachments -->
                             <div class="mb-3 row">
                                 <label class="col-form-label col-lg-2">Attachments</label>
                                 <div class="col-lg-10">
-                                    <input type="file" class="form-control" multiple>
+                                    <div class="attachment-area">
+                                        <i class="ph-cloud-arrow-up mb-2" style="font-size: 2rem;"></i>
+                                        <p class="mb-0">Drag and drop files here or click to browse</p>
+                                        <input type="file" class="d-none" id="file-input" multiple>
+                                    </div>
+                                    <div class="attachment-previews"></div>
                                     <div class="form-text text-muted">Max file size 10 MB. Allowed formats: pdf, doc, docx, jpg, png.</div>
                                 </div>
                             </div>
 
+							<!-- Form Actions -->
 							<div class="text-end">
-								<button type="submit" class="btn btn-primary">
+								<button type="submit" class="btn btn-primary" accesskey="s">
 									<i class="ph-paper-plane-tilt me-2"></i>
 									Send Email
 								</button>
-                                <button type="button" class="btn btn-light ms-2">
+                                <button type="button" class="btn btn-light ms-2" id="save-draft">
 									<i class="ph-floppy-disk me-2"></i>
 									Save Draft
 								</button>
@@ -372,6 +534,9 @@
 					</div>
 				</div>
 				<!-- /email compose form -->
+
+                <!-- Notifications Area -->
+                <div class="notifications"></div>
 
                 <!-- Recipients Database Modal -->
                 <div id="recipient-selector" class="modal fade" tabindex="-1">
@@ -745,4 +910,259 @@
 	<!-- /page content -->
 
 </body>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize CKEditor
+        let editor;
+        ClassicEditor
+            .create(document.querySelector('#editor-classic'))
+            .then(newEditor => {
+                editor = newEditor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
+        // Email templates
+        const templates = {
+            'welcome': `
+                <h1>Welcome to Sabancı University Internship Program!</h1>
+                <p>Dear [Name],</p>
+                <p>We are excited to welcome you to our internship program. Your application has been received and is currently being reviewed.</p>
+                <p>Best regards,<br>Internship Office</p>
+            `,
+            'interview': `
+                <h1>Interview Invitation</h1>
+                <p>Dear [Name],</p>
+                <p>We are pleased to invite you for an interview regarding your internship application. Please find the details below:</p>
+                <ul>
+                    <li>Date: [Date]</li>
+                    <li>Time: [Time]</li>
+                    <li>Location: [Location]</li>
+                </ul>
+                <p>Best regards,<br>Internship Office</p>
+            `,
+            'rejection': `
+                <h1>Application Update</h1>
+                <p>Dear [Name],</p>
+                <p>Thank you for your interest in our internship program. After careful consideration, we regret to inform you that we cannot proceed with your application at this time.</p>
+                <p>Best regards,<br>Internship Office</p>
+            `
+        };
+
+        // Template selection
+        document.getElementById('templateSelect').addEventListener('change', function() {
+            if (this.value && editor) {
+                editor.setData(templates[this.value]);
+            }
+        });
+
+        // Email validation
+        const emailInput = document.getElementById('specific-emails');
+        emailInput.addEventListener('input', debounce(function() {
+            const emails = this.value.split(',').map(email => email.trim());
+            const invalidEmails = emails.filter(email => email && !isValidEmail(email));
+            
+            if (invalidEmails.length > 0) {
+                this.classList.add('is-invalid');
+                showNotification(`Invalid email addresses: ${invalidEmails.join(', ')}`, 'danger');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        }, 300));
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        // Recipient tags
+        function addRecipientTag(email, name) {
+            const tag = document.createElement('span');
+            tag.className = 'recipient-tag';
+            tag.innerHTML = `
+                ${name} <${email}>
+                <button type="button" class="btn-close" aria-label="Remove"></button>
+            `;
+            
+            tag.querySelector('button').addEventListener('click', () => {
+                tag.remove();
+                updateRecipientCount();
+            });
+            
+            document.querySelector('.recipient-tags').appendChild(tag);
+            updateRecipientCount();
+        }
+
+        // Attachment handling
+        const dropZone = document.querySelector('.attachment-area');
+        const fileInput = document.getElementById('file-input');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            const previewContainer = document.querySelector('.attachment-previews');
+            
+            Array.from(files).forEach(file => {
+                if (file.size > 10 * 1024 * 1024) {
+                    showNotification(`File ${file.name} is too large. Maximum size is 10MB.`, 'warning');
+                    return;
+                }
+
+                const preview = document.createElement('div');
+                preview.className = 'attachment-preview';
+                
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    preview.appendChild(img);
+                } else {
+                    preview.innerHTML = `<i class="ph-file"></i> ${file.name}`;
+                }
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.innerHTML = '<i class="ph-x"></i>';
+                removeBtn.onclick = () => preview.remove();
+                
+                preview.appendChild(removeBtn);
+                previewContainer.appendChild(preview);
+            });
+        }
+
+        // Auto-save drafts
+        let draftTimer;
+        function startAutoSave() {
+            draftTimer = setInterval(() => {
+                const draft = {
+                    recipients: document.getElementById('groupSelect').value,
+                    specificEmails: document.getElementById('specific-emails').value,
+                    subject: document.getElementById('email-subject').value,
+                    message: editor ? editor.getData() : '',
+                    timestamp: new Date().toISOString()
+                };
+                
+                localStorage.setItem('emailDraft', JSON.stringify(draft));
+                showNotification('Draft saved', 'info');
+            }, 30000);
+        }
+
+        // Load draft on page load
+        function loadDraft() {
+            const draft = JSON.parse(localStorage.getItem('emailDraft'));
+            if (draft) {
+                if (confirm('Load saved draft?')) {
+                    document.getElementById('groupSelect').value = draft.recipients;
+                    document.getElementById('specific-emails').value = draft.specificEmails;
+                    document.getElementById('email-subject').value = draft.subject;
+                    if (editor) {
+                        editor.setData(draft.message);
+                    }
+                }
+            }
+        }
+
+        // Form submission
+        document.querySelector('.email-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Show sending progress
+            const progress = document.createElement('div');
+            progress.className = 'sending-progress';
+            progress.innerHTML = `
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                         role="progressbar" style="width: 100%"></div>
+                </div>
+                <p>Sending email...</p>
+            `;
+            document.body.appendChild(progress);
+
+            // Disable form
+            this.classList.add('loading');
+
+            try {
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                showNotification('Email sent successfully!', 'success');
+                // Clear form
+                this.reset();
+                if (editor) {
+                    editor.setData('');
+                }
+                document.querySelector('.recipient-tags').innerHTML = '';
+                document.querySelector('.attachment-previews').innerHTML = '';
+                localStorage.removeItem('emailDraft');
+            } catch (error) {
+                showNotification('Failed to send email: ' + error.message, 'danger');
+            } finally {
+                // Remove progress and enable form
+                progress.remove();
+                this.classList.remove('loading');
+            }
+        });
+
+        // Save draft button
+        document.getElementById('save-draft').addEventListener('click', () => {
+            const draft = {
+                recipients: document.getElementById('groupSelect').value,
+                specificEmails: document.getElementById('specific-emails').value,
+                subject: document.getElementById('email-subject').value,
+                message: editor ? editor.getData() : '',
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem('emailDraft', JSON.stringify(draft));
+            showNotification('Draft saved successfully!', 'success');
+        });
+
+        // Notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show`;
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.notifications').appendChild(notification);
+            
+            setTimeout(() => notification.remove(), 5000);
+        }
+
+        // Utility functions
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Initialize
+        loadDraft();
+        startAutoSave();
+    });
+</script>
 </html> 
