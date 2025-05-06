@@ -626,6 +626,21 @@
 								</div>
 								
 								<div class="mb-3">
+									<label class="form-label">Select City:</label>
+									<select class="form-select">
+										<option value="">All Cities</option>
+										<option value="istanbul">Istanbul</option>
+										<option value="ankara">Ankara</option>
+										<option value="berlin">Berlin</option>
+										<option value="munich">Munich</option>
+										<option value="new_york">New York</option>
+										<option value="chicago">Chicago</option>
+										<option value="london">London</option>
+										<option value="manchester">Manchester</option>
+									</select>
+								</div>
+								
+								<div class="mb-3">
 									<label class="form-label">Data Fields:</label>
 									<div class="form-check">
 										<input type="checkbox" class="form-check-input" id="country_field_id" checked>
@@ -1079,6 +1094,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 lengthMenu: '<span>Show:</span> _MENU_',
                 paginate: { 'first': 'First', 'last': 'Last', 'next': document.dir == "rtl" ? '&larr;' : '&rarr;', 'previous': document.dir == "rtl" ? '&rarr;' : '&larr;' }
             }
+        });
+    }
+    
+    // City-Country dependent dropdown functionality
+    const cityCountryMap = {
+        "": ["All Cities"],
+        "turkey": ["All Cities", "Istanbul", "Ankara", "Izmir", "Antalya"],
+        "germany": ["All Cities", "Berlin", "Munich", "Hamburg", "Frankfurt"],
+        "usa": ["All Cities", "New York", "Chicago", "San Francisco", "Boston"],
+        "uk": ["All Cities", "London", "Manchester", "Birmingham", "Liverpool"]
+    };
+    
+    // Get the country and city select elements in the Country Reports section
+    const countrySelect = document.querySelector('.card:nth-of-type(7) .card-body select:nth-of-type(1)');
+    const citySelect = document.querySelector('.card:nth-of-type(7) .card-body select:nth-of-type(2)');
+    
+    if (countrySelect && citySelect) {
+        // Update city options when country changes
+        countrySelect.addEventListener('change', function() {
+            const selectedCountry = this.value;
+            const cities = cityCountryMap[selectedCountry] || cityCountryMap[""];
+            
+            // Clear existing options
+            citySelect.innerHTML = '';
+            
+            // Add new options based on selected country
+            cities.forEach(city => {
+                const option = document.createElement('option');
+                option.value = city === "All Cities" ? "" : city.toLowerCase().replace(' ', '_');
+                option.textContent = city;
+                citySelect.appendChild(option);
+            });
         });
     }
 });
