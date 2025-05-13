@@ -123,6 +123,11 @@
 							<i class="ph-gear me-2"></i>
 							Account settings
 						</a>
+						<div id="impersonation-status" class="dropdown-item d-none">
+							<i class="ph-user-switch me-2"></i>
+							<span class="text-warning">Impersonating: <span id="impersonated-user">User</span></span>
+							<button id="end-impersonation" class="btn btn-sm btn-warning ms-2">End</button>
+						</div>
 						<div class="dropdown-divider"></div>
 						<a href="../index.html" class="dropdown-item logout-link">
 							<i class="ph-sign-out me-2"></i>
@@ -711,6 +716,55 @@
 				window.location.href = '../index.html';
 			} else {
 				console.log('Access granted for admin.');
+			}
+		});
+	</script>
+
+	<!-- Impersonation functionality -->
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Check if we are already impersonating a user
+			const impersonatedUser = sessionStorage.getItem('impersonatedUser');
+			const impersonatedUserEmail = sessionStorage.getItem('impersonatedUserEmail');
+			const impersonatedUserType = sessionStorage.getItem('impersonatedUserType');
+			
+			if (impersonatedUser && impersonatedUserEmail && impersonatedUserType) {
+				showImpersonationStatus(impersonatedUser, impersonatedUserEmail, impersonatedUserType);
+			}
+			
+			// Add click event listener to end impersonation button
+			const endImpersonationButton = document.getElementById('end-impersonation');
+			if (endImpersonationButton) {
+				endImpersonationButton.addEventListener('click', function(e) {
+					e.preventDefault();
+					e.stopPropagation();  // Prevent dropdown from closing
+					endImpersonation();
+				});
+			}
+			
+			// Function to end impersonation
+			function endImpersonation() {
+				// Remove impersonation data from session storage
+				sessionStorage.removeItem('impersonatedUser');
+				sessionStorage.removeItem('impersonatedUserEmail');
+				sessionStorage.removeItem('impersonatedUserType');
+				
+				// Hide impersonation status
+				document.getElementById('impersonation-status').classList.add('d-none');
+				
+				// Redirect back to admin dashboard
+				window.location.href = 'admin-dashboard.html';
+			}
+			
+			// Function to show impersonation status in the UI
+			function showImpersonationStatus(userId, userEmail, userType) {
+				const impersonationStatus = document.getElementById('impersonation-status');
+				const impersonatedUserElement = document.getElementById('impersonated-user');
+				
+				if (impersonationStatus && impersonatedUserElement) {
+					impersonatedUserElement.textContent = userEmail;
+					impersonationStatus.classList.remove('d-none');
+				}
 			}
 		});
 	</script>

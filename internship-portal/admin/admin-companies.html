@@ -133,6 +133,11 @@
 							<i class="ph-gear me-2"></i>
 							Account settings
 						</a>
+						<div id="impersonation-status" class="dropdown-item d-none">
+							<i class="ph-user-switch me-2"></i>
+							<span class="text-warning">Impersonating: <span id="impersonated-user">User</span></span>
+							<button id="end-impersonation" class="btn btn-sm btn-warning ms-2">End</button>
+						</div>
 						<div class="dropdown-divider"></div>
 						<a href="../index.html" class="dropdown-item">
 							<i class="ph-sign-out me-2"></i>
@@ -352,6 +357,7 @@
 												<a href="#" class="dropdown-item"><i class="ph-pencil me-2"></i>Edit Account</a>
 												<a href="#" class="dropdown-item"><i class="ph-building me-2"></i>Manage Internships</a>
 												<a href="#" class="dropdown-item"><i class="ph-user-minus me-2"></i>Deactivate</a>
+												<a href="#" class="dropdown-item impersonate-btn" data-user-id="1" data-user-email="hr@xyzcorp.com" data-user-type="company" data-user-name="XYZ Corporation"><i class="ph-user-switch me-2"></i>Impersonate User</a>
 												<div class="dropdown-divider"></div>
 												<a href="#" class="dropdown-item text-danger"><i class="ph-trash me-2"></i>Delete Account</a>
 											</div>
@@ -384,6 +390,7 @@
 												<a href="#" class="dropdown-item"><i class="ph-eye me-2"></i>View Details</a>
 												<a href="#" class="dropdown-item"><i class="ph-check-circle me-2"></i>Approve</a>
 												<a href="#" class="dropdown-item"><i class="ph-x-circle me-2"></i>Reject</a>
+												<a href="#" class="dropdown-item impersonate-btn" data-user-id="2" data-user-email="info@abctech.com" data-user-type="company" data-user-name="ABC Technologies"><i class="ph-user-switch me-2"></i>Impersonate User</a>
 												<div class="dropdown-divider"></div>
 												<a href="#" class="dropdown-item text-danger"><i class="ph-trash me-2"></i>Delete Request</a>
 											</div>
@@ -406,4 +413,93 @@
 	<!-- /page content -->
 
 </body>
+<!-- Impersonation functionality -->
+<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		// Check if we are already impersonating a user
+		const impersonatedUser = sessionStorage.getItem('impersonatedUser');
+		const impersonatedUserEmail = sessionStorage.getItem('impersonatedUserEmail');
+		const impersonatedUserType = sessionStorage.getItem('impersonatedUserType');
+		
+		if (impersonatedUser && impersonatedUserEmail && impersonatedUserType) {
+			showImpersonationStatus(impersonatedUser, impersonatedUserEmail, impersonatedUserType);
+		}
+		
+		// Add click event listeners to all impersonate buttons
+		const impersonateButtons = document.querySelectorAll('.impersonate-btn');
+		impersonateButtons.forEach(button => {
+			button.addEventListener('click', function(e) {
+				e.preventDefault();
+				
+				const userId = this.getAttribute('data-user-id');
+				const userEmail = this.getAttribute('data-user-email');
+				const userType = this.getAttribute('data-user-type');
+				
+				// Ask for confirmation
+				if (confirm(`Are you sure you want to impersonate user: ${userEmail}?`)) {
+					impersonateUser(userId, userEmail, userType);
+				}
+			});
+		});
+		
+		// Add click event listener to end impersonation button
+		const endImpersonationButton = document.getElementById('end-impersonation');
+		if (endImpersonationButton) {
+			endImpersonationButton.addEventListener('click', function(e) {
+				e.preventDefault();
+				e.stopPropagation();  // Prevent dropdown from closing
+				endImpersonation();
+			});
+		}
+		
+		// Function to impersonate a user
+		function impersonateUser(userId, userEmail, userType) {
+			// Get the user name from the button
+			const button = document.querySelector(`.impersonate-btn[data-user-id="${userId}"]`);
+			const userName = button ? button.getAttribute('data-user-name') : '';
+			
+			// Store impersonation data in session storage
+			sessionStorage.setItem('impersonatedUser', userId);
+			sessionStorage.setItem('impersonatedUserEmail', userEmail);
+			sessionStorage.setItem('impersonatedUserType', userType);
+			sessionStorage.setItem('impersonatedUserName', userName);
+			
+			// Update UI to show impersonation status
+			showImpersonationStatus(userId, userEmail, userType);
+			
+			// Redirect to appropriate dashboard based on user type
+			if (userType === 'student') {
+				window.location.href = '../student/student-dashboard.html';
+			} else if (userType === 'company') {
+				window.location.href = '../company/company-dashboard.html';
+			}
+		}
+		
+		// Function to end impersonation
+		function endImpersonation() {
+			// Remove impersonation data from session storage
+			sessionStorage.removeItem('impersonatedUser');
+			sessionStorage.removeItem('impersonatedUserEmail');
+			sessionStorage.removeItem('impersonatedUserType');
+			sessionStorage.removeItem('impersonatedUserName');
+			
+			// Hide impersonation status
+			document.getElementById('impersonation-status').classList.add('d-none');
+			
+			// Redirect back to admin dashboard
+			window.location.href = 'admin-dashboard.html';
+		}
+		
+		// Function to show impersonation status in the UI
+		function showImpersonationStatus(userId, userEmail, userType) {
+			const impersonationStatus = document.getElementById('impersonation-status');
+			const impersonatedUserElement = document.getElementById('impersonated-user');
+			
+			if (impersonationStatus && impersonatedUserElement) {
+				impersonatedUserElement.textContent = userEmail;
+				impersonationStatus.classList.remove('d-none');
+			}
+		}
+	});
+</script>
 </html> 
