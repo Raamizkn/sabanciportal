@@ -192,8 +192,8 @@
 			</div>
 
 			<div class="navbar-brand flex-1 flex-lg-0">
-				<a href="admin-dashboard.html" class="d-inline-flex align-items-center">
-					<img src="/assets/images/logo.svg" alt="Sabancı University Logo" class="h-32px">
+				<a href="/internship-portal/admin/admin-dashboard.html" class="d-inline-flex align-items-center">
+					<img src="/internship-portal/assets/images/logo.svg" alt="Sabancı University Logo" class="h-48px me-2">
 					<span class="d-none d-lg-inline-block h6 mb-0 ms-2">Sabancı University Internship Portal</span>
 				</a>
 			</div>
@@ -271,28 +271,13 @@
 							Account settings
 						</a>
 						<div class="dropdown-divider"></div>
-						<a href="../index.html" class="dropdown-item">
+						<a href="#" id="profile-logout" class="dropdown-item logout-link">
 							<i class="ph-sign-out me-2"></i>
 							Logout
 						</a>
 					</div>
 				</li>
 			</ul>
-
-			<div class="navbar navbar-sm navbar-footer border-top">
-				<div class="container-fluid">
-					<span>&copy; 2023 <a href="#">Sabancı University Internship Portal</a></span>
-
-					<ul class="nav">
-						<li class="nav-item">
-							<a href="#" class="nav-link">Privacy Policy</a>
-						</li>
-						<li class="nav-item">
-							<a href="#" class="nav-link">Terms of Service</a>
-						</li>
-					</ul>
-				</div>
-			</div>
 		</div>
 	</div>
 	<!-- /main navbar -->
@@ -401,7 +386,7 @@
 							</a>
 						</li>
 						<li class="nav-item">
-							<a href="../index.html" class="nav-link">
+							<a href="#" id="sidebar-logout" class="nav-link logout-link">
 								<i class="ph-sign-out"></i>
 								<span>Logout</span>
 							</a>
@@ -1164,5 +1149,56 @@
         loadDraft();
         startAutoSave();
     });
+</script>
+
+<!-- Standalone Logout Script - Isolated from other scripts -->
+<script>
+	// Run immediately to ensure it's loaded before other scripts might interfere
+	(function() {
+		// Wait for DOM to be fully loaded
+		document.addEventListener('DOMContentLoaded', function() {
+			console.log('Logout script initialized');
+			
+			// Get both logout links by ID to be absolutely certain
+			const profileLogout = document.getElementById('profile-logout');
+			const sidebarLogout = document.getElementById('sidebar-logout');
+			
+			// Function to handle logout
+			function handleLogout(e) {
+				console.log('Logout function triggered');
+				// Prevent default behavior
+				e.preventDefault();
+				e.stopPropagation();
+				
+				// Clear all relevant storage
+				localStorage.removeItem('userRole');
+				sessionStorage.removeItem('impersonatedUser');
+				sessionStorage.removeItem('impersonatedUserEmail');
+				sessionStorage.removeItem('impersonatedUserType');
+				sessionStorage.removeItem('impersonatedUserName');
+				sessionStorage.removeItem('selectedTerm');
+				
+				console.log('All session data cleared, redirecting to login page...');
+				
+				// Redirect to login page
+				window.location.href = '../index.html';
+			}
+			
+			// Attach event handlers to both logout buttons
+			if (profileLogout) {
+				console.log('Profile logout button found, attaching event handler');
+				profileLogout.addEventListener('click', handleLogout);
+			} else {
+				console.error('Profile logout button not found');
+			}
+			
+			if (sidebarLogout) {
+				console.log('Sidebar logout button found, attaching event handler');
+				sidebarLogout.addEventListener('click', handleLogout);
+			} else {
+				console.error('Sidebar logout button not found');
+			}
+		});
+	})();
 </script>
 </html> 
