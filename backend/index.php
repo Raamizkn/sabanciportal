@@ -3,98 +3,81 @@
 // Set the content type to JSON
 header('Content-Type: application/json');
 
-// Mock data (replace with database calls later)
-$all_applications = [
+// --- Mock Data (replace with database calls later) ---
+
+// Available Internships
+$internships = [
+    "INT001" => ['id' => "INT001", 'company_id' => "COMP001", 'company_name' => 'Tech Solutions Inc.', 'position' => 'Software Engineer Intern', 'description' => 'Work on exciting new software projects.', 'location' => 'Remote', 'posted_date' => '2024-06-15', 'status' => 'active'],
+    "INT002" => ['id' => "INT002", 'company_id' => "COMP002", 'company_name' => 'Innovate Hub', 'position' => 'Data Analyst Intern', 'description' => 'Analyze data and generate insights.', 'location' => 'New York, NY', 'posted_date' => '2024-06-20', 'status' => 'active'],
+    "INT003" => ['id' => "INT003", 'company_id' => "COMP003", 'company_name' => 'Marketing Masters', 'position' => 'Marketing Intern', 'description' => 'Assist with marketing campaigns.', 'location' => 'San Francisco, CA', 'posted_date' => '2024-06-25', 'status' => 'active'],
+    "INT004" => ['id' => "INT004", 'company_id' => "COMP004", 'company_name' => 'Green Future Co.', 'position' => 'Sustainability Intern', 'description' => 'Support sustainability initiatives.', 'location' => 'Austin, TX', 'posted_date' => '2024-07-01', 'status' => 'inactive'],
+];
+
+// Student Applications (keyed by application_id for easier lookup)
+// student_id will be part of the application data
+$applications = [
+    "APP001" => ['id' => "APP001", 'student_id' => 1, 'internship_id' => "INT001", 'company_name' => 'Tech Solutions Inc.', 'position' => 'Software Engineer Intern', 'status' => 'Pending', 'applied_date' => '2024-07-01', 'cover_letter' => 'I am very interested in this role.'],
+    "APP002" => ['id' => "APP002", 'student_id' => 1, 'internship_id' => "INT002", 'company_name' => 'Innovate Hub', 'position' => 'Data Analyst Intern', 'status' => 'Offered', 'applied_date' => '2024-07-05', 'offer_details' => 'Offer valid until 2024-07-20.', 'cover_letter' => 'Eager to analyze data.'],
+    "APP003" => ['id' => "APP003", 'student_id' => 2, 'internship_id' => "INT001", 'company_name' => 'Tech Solutions Inc.', 'position' => 'Software Engineer Intern', 'status' => 'Rejected', 'applied_date' => '2024-07-10', 'cover_letter' => 'Passionate about software.'],
+];
+
+// Uploaded Documents (keyed by document_id)
+$documents = [
+    "DOC001" => ['id' => "DOC001", 'application_id' => "APP002", 'student_id' => 1, 'document_type' => 'CV', 'file_name' => 'student1_cv.pdf', 'upload_date' => '2024-07-15', 'file_path_mock' => '/uploads/student1/APP002/student1_cv.pdf'],
+];
+
+// Original $all_applications (keyed by student_id, then app_id) - We will transition away from this towards $applications
+$all_applications_legacy = [
     1 => [
         "101" => ['id' => "101", 'internship_id' => "INT001", 'company_name' => 'Tech Solutions Inc.', 'position' => 'Software Engineer Intern', 'status' => 'Pending', 'applied_date' => '2024-07-01'],
-        "102" => ['id' => "102", 'internship_id' => "INT002", 'company_name' => 'Innovate Hub', 'position' => 'Data Analyst Intern', 'status' => 'Accepted', 'applied_date' => '2024-07-05'],
+        "102" => ['id' => "102", 'internship_id' => "INT002", 'company_name' => 'Innovate Hub', 'position' => 'Data Analyst Intern', 'status' => 'Accepted', 'applied_date' => '2024-07-05'], // Note: status was 'Accepted', now using 'Offered', 'Confirmed' etc.
         "103" => ['id' => "103", 'internship_id' => "INT003", 'company_name' => 'Marketing Masters', 'position' => 'Marketing Intern', 'status' => 'Rejected', 'applied_date' => '2024-07-10']
     ],
-    // ...applications for other students...
 ];
+
+// --- End Mock Data ---
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Simple routing
+// Simple routing parameters
 $entity = $_GET['entity'] ?? null;
 $action = $_GET['action'] ?? null;
-$student_id = isset($_GET['student_id']) ? (int)$_GET['student_id'] : null; // Example: /index.php?entity=applications&student_id=1
-$application_id = $_GET['application_id'] ?? null; // Example: /index.php?action=withdraw&application_id=101
+$id = $_GET['id'] ?? null; // Generic ID, could be application_id, student_id, internship_id
+$student_id_param = $_GET['student_id'] ?? null;
+$application_id_param = $_GET['application_id'] ?? null;
 
+$input = null;
+if ($method === 'POST' || $method === 'PUT') { // Assuming PUT might be used later
+    $input = json_decode(file_get_contents('php://input'), true);
+}
 
-if ($method === 'GET') {
-    if ($entity === 'applications' && $student_id !== null) {
-        if (isset($all_applications[$student_id])) {
-            echo json_encode(array_values($all_applications[$student_id])); // Return applications for the student
-        } else {
-            echo json_encode([]); // No applications for this student
-        }
-    } elseif (isset($_GET['path']) && $_GET['path'] === 'users') { // Keep existing example
-        $users = [
-            ['id' => 1, 'name' => 'Alice'],
-            ['id' => 2, 'name' => 'Bob']
-        ];
-        echo json_encode($users);
-    } 
-    else {
-        echo json_encode(['message' => 'Welcome to the PHP Backend! Use specific endpoints like ?entity=applications&student_id=1']);
-    }
+// Route to the appropriate handler
+if ($entity === 'internships') {
+    require_once __DIR__ . '/handlers/internships_handler.php';
+}
+elseif ($entity === 'applications') {
+    require_once __DIR__ . '/handlers/applications_handler.php';
+}
+elseif ($entity === 'documents') {
+    require_once __DIR__ . '/handlers/documents_handler.php';
+}
+// Legacy endpoint for old tests - can be removed later
+elseif ($method === 'GET' && isset($_GET['path']) && $_GET['path'] === 'users') {
+    $users = [ ['id' => 1, 'name' => 'Alice'], ['id' => 2, 'name' => 'Bob'] ];
+    echo json_encode($users);
 } 
-elseif ($method === 'POST') {
-    if ($action === 'withdraw' && $application_id !== null) {
-        // Simulate withdrawing an application
-        // In a real app, you'd find the student_id from session/auth
-        // and update the status in the database.
-        $found_app = false;
-        foreach ($all_applications as $s_id => $apps) {
-            if (isset($apps[$application_id])) {
-                $all_applications[$s_id][$application_id]['status'] = 'Withdrawn';
-                // Note: This change to $all_applications is only for the duration of this script execution.
-                // It won't persist without a database.
-                echo json_encode(['message' => "Application {$application_id} withdrawn successfully.", 'application' => $all_applications[$s_id][$application_id]]);
-                $found_app = true;
-                break;
-            }
-        }
-        if (!$found_app) {
-            http_response_code(404);
-            echo json_encode(['error' => "Application {$application_id} not found."]);
-        }
-
-    } elseif ($action === 'confirm' && $application_id !== null) {
-        // Simulate confirming an application
-        $found_app = false;
-        foreach ($all_applications as $s_id => $apps) {
-            if (isset($apps[$application_id]) && $all_applications[$s_id][$application_id]['status'] === 'Accepted') {
-                $all_applications[$s_id][$application_id]['status'] = 'Confirmed';
-                echo json_encode(['message' => "Application {$application_id} confirmed successfully.", 'application' => $all_applications[$s_id][$application_id]]);
-                $found_app = true;
-                break;
-            } elseif (isset($apps[$application_id])) { // App exists but not in 'Accepted' state
-                 echo json_encode(['message' => "Application {$application_id} cannot be confirmed. Status is not 'Accepted'.", 'application' => $all_applications[$s_id][$application_id]]);
-                 $found_app = true; // Still counts as found for response purposes
-                 break;
-            }
-        }
-         if (!$found_app) {
-            http_response_code(404);
-            echo json_encode(['error' => "Application {$application_id} not found or cannot be confirmed."]);
-        }
-    }
-    // Keep existing POST example for /api/data if ?action is not specified
-    // This condition might need refinement based on actual desired behavior for general POSTs.
-    elseif (empty($action)) { 
-        $input = json_decode(file_get_contents('php://input'), true);
-        echo json_encode(['message' => 'Data received (general POST)', 'received_data' => $input]);
-    }
-    else {
-        http_response_code(400); // Bad Request for unknown POST actions
-        echo json_encode(['error' => 'Unknown POST action.']);
-    }
-} 
+// Legacy general POST data receiver - can be removed later
+elseif ($method === 'POST' && empty($action) && empty($entity) && !empty($input)) { 
+    echo json_encode(['message' => 'Data received (general POST)', 'received_data' => $input]);
+}
 else {
-    http_response_code(405); // Method Not Allowed
-    echo json_encode(['error' => 'Method Not Allowed']);
+    // If no entity is matched by handlers or legacy routes
+    if ($entity !== null) { // An entity was specified but not handled
+        http_response_code(404);
+        echo json_encode(['error' => "Entity '{$entity}' not found or no handler defined."]);
+    } else { // No entity specified at all, default welcome
+        echo json_encode(['message' => 'Welcome to the PHP Backend! Please specify an entity (e.g., /index.php?entity=internships).']);
+    }
 }
 
 ?> 
