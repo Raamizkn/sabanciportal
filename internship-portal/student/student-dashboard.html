@@ -54,6 +54,19 @@
 
 	<!-- Main navbar -->
 	<div class="navbar navbar-dark navbar-expand-lg navbar-static border-bottom border-bottom-white border-opacity-10">
+		<!-- Impersonation alert - will be shown when admin is impersonating a student -->
+		<div id="impersonation-banner" class="d-none position-relative w-100" style="z-index:1050;">
+			<div class="alert alert-warning alert-dismissible border-0 rounded-0 m-0 d-flex align-items-center">
+				<div class="flex-fill">
+					<i class="ph-user-switch me-2"></i>
+					<span class="fw-semibold">You are impersonating:</span> <span id="impersonated-user-banner">Student</span>
+				</div>
+				<div>
+					<button id="end-impersonation-banner" class="btn btn-warning btn-sm ms-3">End Impersonation</button>
+				</div>
+			</div>
+		</div>
+		
 		<div class="container-fluid">
 			<div class="d-flex d-lg-none me-2">
 				<button type="button" class="navbar-toggler sidebar-mobile-main-toggle rounded-pill">
@@ -155,6 +168,10 @@
 							<i class="ph-file-text me-2"></i>
 							My documents
 						</a>
+						<a href="student-evaluations.html" class="dropdown-item">
+							<i class="ph-star me-2"></i>
+							Evaluations
+						</a>
 						<a href="student-settings.html" class="dropdown-item">
 							<i class="ph-gear me-2"></i>
 							Account settings
@@ -231,6 +248,12 @@
 							<a href="student-documents.html" class="nav-link">
 								<i class="ph-file-doc"></i>
 								<span>Documents</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-evaluations.html" class="nav-link">
+								<i class="ph-star"></i>
+								<span>Evaluations</span>
 							</a>
 						</li>
 
@@ -598,7 +621,9 @@
 
 			// Auth check
 			const userRole = localStorage.getItem('userRole');
-			if (userRole !== 'student') {
+			const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'student';
+			
+			if (userRole !== 'student' && !isBeingImpersonated) {
 				alert('Access denied. Redirecting to login page.');
 				window.location.href = '../index.html';
 			}
@@ -869,6 +894,51 @@
 		// Example: Find the 'Approved' row and add a button to simulate approval
 		// Note: This is just for demo, real approval would come from backend/notifications
 		
+	</script>
+
+	<!-- Impersonation detection script -->
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Check if an admin is impersonating this user
+			const impersonatedUser = sessionStorage.getItem('impersonatedUser');
+			const impersonatedUserEmail = sessionStorage.getItem('impersonatedUserEmail');
+			const impersonatedUserType = sessionStorage.getItem('impersonatedUserType');
+			const impersonatedUserName = sessionStorage.getItem('impersonatedUserName');
+			
+			if (impersonatedUser && impersonatedUserEmail && impersonatedUserType === 'student') {
+				// Show impersonation banner
+				const impersonationBanner = document.getElementById('impersonation-banner');
+				const impersonatedUserBanner = document.getElementById('impersonated-user-banner');
+				
+				if (impersonationBanner && impersonatedUserBanner) {
+					impersonatedUserBanner.textContent = impersonatedUserEmail;
+					impersonationBanner.classList.remove('d-none');
+				}
+				
+				// Update profile info in the header
+				if (impersonatedUserName) {
+					const userNameElement = document.querySelector('.navbar-nav-link .d-none.d-lg-inline-block.mx-lg-2');
+					if (userNameElement) {
+						userNameElement.textContent = impersonatedUserName;
+					}
+				}
+				
+				// Add event listener to end impersonation button
+				const endImpersonationButton = document.getElementById('end-impersonation-banner');
+				if (endImpersonationButton) {
+					endImpersonationButton.addEventListener('click', function() {
+						// Clear impersonation data
+						sessionStorage.removeItem('impersonatedUser');
+						sessionStorage.removeItem('impersonatedUserEmail');
+						sessionStorage.removeItem('impersonatedUserType');
+						sessionStorage.removeItem('impersonatedUserName');
+						
+						// Redirect back to admin dashboard
+						window.location.href = '../admin/admin-dashboard.html';
+					});
+				}
+			}
+		});
 	</script>
 
 </body>

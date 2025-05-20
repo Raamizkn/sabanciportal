@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Student Evaluations - Sabancı University Internship Portal</title>
+
+	<!-- Global stylesheets -->
+	<link href="/bs5/template/assets/fonts/inter/inter.css" rel="stylesheet" type="text/css">
+	<link href="/bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
+	<link href="/bs5/template/html/layout_1/full/assets/css/ltr/all.min.css?v=1" id="stylesheet" rel="stylesheet" type="text/css">
+	<link href="/internship-portal/assets/css/sabanci-theme.css" rel="stylesheet" type="text/css">
+	<!-- /global stylesheets -->
+
+	<!-- Core JS files -->
+	<script src="/bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+	<!-- /core JS files -->
+
+	<!-- Theme JS files -->
+	<script src="/bs5/template/assets/js/vendor/visualization/d3/d3.min.js"></script>
+	<script src="/bs5/template/assets/js/vendor/visualization/d3/d3_tooltip.js"></script>
+	<script src="/bs5/template/assets/js/vendor/tables/datatables/datatables.min.js"></script>
+	<script src="/bs5/template/html/layout_1/full/assets/js/app.js"></script>
+	<script src="/bs5/template/assets/demo/charts/pages/dashboard/streamgraph.js"></script>
+	<script src="/bs5/template/assets/demo/charts/pages/dashboard/sparklines.js"></script>
+	<script src="/bs5/template/assets/demo/charts/pages/dashboard/lines.js"></script>	
+	<script src="/bs5/template/assets/demo/charts/pages/dashboard/areas.js"></script>
+	<script src="/bs5/template/assets/demo/charts/pages/dashboard/donuts.js"></script>
+	<script src="/bs5/template/assets/demo/pages/datatables_basic.js"></script>
+	<!-- /theme JS files -->
+	
+	<!-- Custom style for proper scrolling -->
+	<style>
+		.content-wrapper {
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+		}
+		.content {
+			flex: 1;
+			overflow-y: auto;
+			padding-bottom: 1rem;
+		}
+		.page-content {
+			height: 100vh;
+			display: flex;
+			overflow: hidden;
+		}
+	</style>
+</head>
+
+<body>
+
+	<!-- Main navbar -->
+	<div class="navbar navbar-dark navbar-expand-lg navbar-static border-bottom border-bottom-white border-opacity-10">
+		<!-- Impersonation alert - will be shown when admin is impersonating a student -->
+		<div id="impersonation-banner" class="d-none position-relative w-100" style="z-index:1050;">
+			<div class="alert alert-warning alert-dismissible border-0 rounded-0 m-0 d-flex align-items-center">
+				<div class="flex-fill">
+					<i class="ph-user-switch me-2"></i>
+					<span class="fw-semibold">You are impersonating:</span> <span id="impersonated-user-banner">Student</span>
+				</div>
+				<div>
+					<button id="end-impersonation-banner" class="btn btn-warning btn-sm ms-3">End Impersonation</button>
+				</div>
+			</div>
+		</div>
+		
+		<div class="container-fluid">
+			<div class="d-flex d-lg-none me-2">
+				<button type="button" class="navbar-toggler sidebar-mobile-main-toggle rounded-pill">
+					<i class="ph-list"></i>
+				</button>
+			</div>
+
+			<div class="navbar-brand flex-1 flex-lg-0">
+				<a href="/internship-portal/student/student-dashboard.html" class="d-inline-flex align-items-center">
+					<img src="/internship-portal/assets/images/logo.svg" alt="Sabancı University Logo" class="h-32px">
+					<span class="d-none d-sm-inline-block h6 mb-0 ms-2">Sabancı University Internship Portal</span>
+				</a>
+			</div>
+
+			<div class="navbar-collapse justify-content-center flex-lg-1 order-2 order-lg-1 collapse" id="navbar_search">
+				<div class="navbar-search flex-fill position-relative mt-2 mt-lg-0 mx-lg-3">
+					<div class="form-control-feedback form-control-feedback-start flex-grow-1">
+						<input type="text" class="form-control bg-transparent rounded-pill" placeholder="Search internships...">
+						<div class="form-control-feedback-icon">
+							<i class="ph-magnifying-glass"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<ul class="nav flex-row justify-content-end order-1 order-lg-2">
+				<li class="nav-item nav-item-dropdown-lg dropdown">
+					<a href="#" class="navbar-nav-link navbar-nav-link-icon rounded-pill" data-bs-toggle="dropdown">
+						<i class="ph-bell"></i>
+						<span class="badge bg-yellow text-black position-absolute top-0 end-0 translate-middle-top zindex-1 rounded-pill mt-1 me-1">2</span>
+					</a>
+					
+					<div class="dropdown-menu dropdown-menu-end dropdown-menu-scrollable-sm wmin-lg-350">
+						<div class="d-flex align-items-center border-bottom py-2 px-3">
+							<h6 class="mb-0">Notifications</h6>
+							<a href="#" class="ms-auto text-body">
+								<i class="ph-check-square me-1"></i>
+								Mark all as read
+							</a>
+						</div>
+
+						<div class="dropdown-item d-flex py-2">
+							<div class="flex-shrink-0 me-3">
+								<div class="bg-success bg-opacity-10 text-success rounded-pill p-2">
+									<i class="ph-check"></i>
+								</div>
+							</div>
+
+							<div class="flex-grow-1">
+								<a href="#" class="d-block fw-semibold">Your application has been accepted</a>
+								<span class="text-muted">Marketing Intern at XYZ Corp</span>
+							</div>
+							<div class="flex-shrink-0 align-self-center">
+								<span class="text-muted fs-sm">2 hours ago</span>
+							</div>
+						</div>
+
+						<div class="dropdown-item d-flex py-2">
+							<div class="flex-shrink-0 me-3">
+								<div class="bg-primary bg-opacity-10 text-primary rounded-pill p-2">
+									<i class="ph-user-plus"></i>
+								</div>
+							</div>
+
+							<div class="flex-grow-1">
+								<a href="#" class="d-block fw-semibold">New internship posted</a>
+								<span class="text-muted">Software Developer at ABC Tech</span>
+							</div>
+							<div class="flex-shrink-0 align-self-center">
+								<span class="text-muted fs-sm">1 day ago</span>
+							</div>
+						</div>
+
+						<div class="text-center border-top p-2">
+							<a href="#" class="text-body">View all</a>
+						</div>
+					</div>
+				</li>
+
+				<li class="nav-item nav-item-dropdown-lg dropdown ms-lg-2">
+					<a href="#" class="navbar-nav-link align-items-center rounded-pill p-1" data-bs-toggle="dropdown">
+						<div class="status-indicator-container">
+							<img src="/bs5/template/assets/images/demo/users/face11.jpg" class="w-32px h-32px rounded-pill" alt="">
+							<span class="status-indicator bg-success"></span>
+						</div>
+						<span class="d-none d-lg-inline-block mx-lg-2">John Doe</span>
+					</a>
+
+					<div class="dropdown-menu dropdown-menu-end">
+						<a href="student-profile.html" class="dropdown-item">
+							<i class="ph-user-circle me-2"></i>
+							My profile
+						</a>
+						<a href="student-applications.html" class="dropdown-item">
+							<i class="ph-briefcase me-2"></i>
+							My applications
+						</a>
+						<a href="student-documents.html" class="dropdown-item">
+							<i class="ph-file-text me-2"></i>
+							My documents
+						</a>
+						<a href="student-settings.html" class="dropdown-item">
+							<i class="ph-gear me-2"></i>
+							Account settings
+						</a>
+						<div class="dropdown-divider"></div>
+						<a href="../index.html" class="dropdown-item logout-link">
+							<i class="ph-sign-out me-2"></i>
+							Logout
+						</a>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<!-- /main navbar -->
+
+	<!-- Page content -->
+	<div class="page-content">
+
+		<!-- Main sidebar -->
+		<div class="sidebar sidebar-dark sidebar-main sidebar-expand-lg">
+
+			<!-- Sidebar content -->
+			<div class="sidebar-content">
+
+				<!-- Sidebar header -->
+				<div class="sidebar-section">
+					<div class="sidebar-section-body d-flex justify-content-center">
+						<h5 class="sidebar-resize-hide flex-grow-1 my-auto">Navigation</h5>
+
+						<div>
+							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-control sidebar-main-resize d-none d-lg-inline-flex">
+								<i class="ph-arrows-left-right"></i>
+							</button>
+
+							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-mobile-main-toggle d-lg-none">
+								<i class="ph-x"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+				<!-- /sidebar header -->
+
+
+				<!-- Main navigation -->
+				<div class="sidebar-section">
+					<ul class="nav nav-sidebar" data-nav-type="accordion">
+
+						<!-- Main -->
+						<li class="nav-item-header">
+							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Main</div>
+							<i class="ph-dots-three sidebar-resize-show"></i>
+						</li>
+						<li class="nav-item">
+							<a href="student-dashboard.html" class="nav-link">
+								<i class="ph-house"></i>
+								<span>Dashboard</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-internships.html" class="nav-link">
+								<i class="ph-briefcase"></i>
+								<span>Browse Internships</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-applications.html" class="nav-link">
+								<i class="ph-file-text"></i>
+								<span>My Applications</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-documents.html" class="nav-link">
+								<i class="ph-file-doc"></i>
+								<span>Documents</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-evaluations.html" class="nav-link active">
+								<i class="ph-star"></i>
+								<span>Evaluations</span>
+							</a>
+						</li>
+
+						<!-- Profile -->
+						<li class="nav-item-header">
+							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Profile</div>
+							<i class="ph-dots-three sidebar-resize-show"></i>
+						</li>
+						<li class="nav-item">
+							<a href="student-profile.html" class="nav-link">
+								<i class="ph-user-circle"></i>
+								<span>My Profile</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="student-settings.html" class="nav-link">
+								<i class="ph-gear"></i>
+								<span>Account Settings</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../index.html" class="nav-link logout-link">
+								<i class="ph-sign-out"></i>
+								<span>Logout</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<!-- /main navigation -->
+
+			</div>
+			<!-- /sidebar content -->
+			
+		</div>
+		<!-- /main sidebar -->
+
+
+		<!-- Main content -->
+		<div class="content-wrapper" style="overflow-y: auto;">
+
+			<!-- Page header -->
+			<div class="page-header page-header-light shadow">
+				<div class="page-header-content d-flex justify-content-between align-items-center">
+					<div>
+						<h4 class="page-title mb-0">Internship Evaluations</h4>
+						<span class="text-muted fs-sm">Provide feedback about your internship experience</span>
+					</div>
+					
+					<div>
+						<button type="button" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#evaluation_form">
+							<i class="ph-plus me-2"></i>
+							Submit New Evaluation
+						</button>
+					</div>
+				</div>
+
+				<div class="page-header-content border-top">
+					<div class="d-flex">
+						<div class="breadcrumb py-2">
+							<a href="student-dashboard.html" class="breadcrumb-item"><i class="ph-house"></i></a>
+							<span class="breadcrumb-item active">Evaluations</span>
+						</div>
+
+						<div class="dropdown ms-auto">
+							<button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown">
+								<i class="ph-funnel me-2"></i>
+								Filter
+							</button>
+
+							<div class="dropdown-menu dropdown-menu-end">
+								<a href="#" class="dropdown-item" data-filter="all">All evaluations</a>
+								<a href="#" class="dropdown-item" data-filter="submitted">Submitted evaluations</a>
+								<a href="#" class="dropdown-item" data-filter="pending">Pending evaluations</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /page header -->
+
+			<!-- Content area -->
+			<div class="content">
+
+				<!-- Evaluation form collapse -->
+				<div class="collapse mb-3" id="evaluation_form">
+					<div class="card">
+						<div class="card-header d-flex align-items-center">
+							<h5 class="mb-0">First Step to the Business World Program Evaluation Form</h5>
+							<div class="ms-auto">
+								<button type="button" class="btn-close" data-bs-toggle="collapse" data-bs-target="#evaluation_form"></button>
+							</div>
+						</div>
+
+						<div class="card-body">
+							<form action="#" class="evaluation-form">
+								<!-- Rating questions section -->
+								<div class="mb-4">
+									<h6 class="fw-bold mb-3">Program Experience Rating</h6>
+									<div class="mb-3">
+										<label class="form-label">I was satisfied with the First Step to the Business World Program.*</label>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction1" value="1" required>
+											<label class="form-check-label" for="satisfaction1">1</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction2" value="2">
+											<label class="form-check-label" for="satisfaction2">2</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction3" value="3">
+											<label class="form-check-label" for="satisfaction3">3</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction4" value="4">
+											<label class="form-check-label" for="satisfaction4">4</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction5" value="5">
+											<label class="form-check-label" for="satisfaction5">5</label>
+										</div>
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">The institution/company generally left a positive impression on me.*</label>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="company_impression" id="impression1" value="1" required>
+											<label class="form-check-label" for="impression1">1</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="company_impression" id="impression2" value="2">
+											<label class="form-check-label" for="impression2">2</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="company_impression" id="impression3" value="3">
+											<label class="form-check-label" for="impression3">3</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="company_impression" id="impression4" value="4">
+											<label class="form-check-label" for="impression4">4</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="company_impression" id="impression5" value="5">
+											<label class="form-check-label" for="impression5">5</label>
+										</div>
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">Did a consultant regularly take care of you at the institution?*</label>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="consultant_care" id="consultant_yes" value="yes" required>
+											<label class="form-check-label" for="consultant_yes">Yes</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="consultant_care" id="consultant_no" value="no">
+											<label class="form-check-label" for="consultant_no">No</label>
+										</div>
+									</div>
+
+									<div class="mb-3 consultant-satisfaction" style="display: none;">
+										<label class="form-label">(If your answer is yes) I was satisfied with the guidance of my institution consultant.*</label>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction1" value="1">
+											<label class="form-check-label" for="consultant_satisfaction1">1</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction2" value="2">
+											<label class="form-check-label" for="consultant_satisfaction2">2</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction3" value="3">
+											<label class="form-check-label" for="consultant_satisfaction3">3</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction4" value="4">
+											<label class="form-check-label" for="consultant_satisfaction4">4</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction5" value="5">
+											<label class="form-check-label" for="consultant_satisfaction5">5</label>
+										</div>
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">I would recommend the First Step to the Business World Program to other students.*</label>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program1" value="1" required>
+											<label class="form-check-label" for="recommend_program1">1</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program2" value="2">
+											<label class="form-check-label" for="recommend_program2">2</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program3" value="3">
+											<label class="form-check-label" for="recommend_program3">3</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program4" value="4">
+											<label class="form-check-label" for="recommend_program4">4</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program5" value="5">
+											<label class="form-check-label" for="recommend_program5">5</label>
+										</div>
+									</div>
+
+									<div class="mb-3">
+										<label class="form-label">I would recommend the institution/company to other students.*</label>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company1" value="1" required>
+											<label class="form-check-label" for="recommend_company1">1</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company2" value="2">
+											<label class="form-check-label" for="recommend_company2">2</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company3" value="3">
+											<label class="form-check-label" for="recommend_company3">3</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company4" value="4">
+											<label class="form-check-label" for="recommend_company4">4</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company5" value="5">
+											<label class="form-check-label" for="recommend_company5">5</label>
+										</div>
+									</div>
+								</div>
+
+								<!-- Multiple choice section -->
+								<div class="mb-4">
+									<h6 class="fw-bold mb-3">Program Benefits</h6>
+									<div class="mb-3">
+										<label class="form-label">In which of the following areas do you think the First Step to the Business Program benefited you? (You can mark more than one option.)*</label>
+										<div class="form-check">
+											<input type="checkbox" class="form-check-input" id="benefit1" name="benefits[]" value="business_environment">
+											<label class="form-check-label" for="benefit1">I discovered the business environment and different departments.</label>
+										</div>
+										<div class="form-check">
+											<input type="checkbox" class="form-check-input" id="benefit2" name="benefits[]" value="career_interests">
+											<label class="form-check-label" for="benefit2">I discovered my career interests.</label>
+										</div>
+										<div class="form-check">
+											<input type="checkbox" class="form-check-input" id="benefit3" name="benefits[]" value="personal_awareness">
+											<label class="form-check-label" for="benefit3">I gained personal awareness.</label>
+										</div>
+										<div class="form-check">
+											<input type="checkbox" class="form-check-input" id="benefit4" name="benefits[]" value="academic_choice">
+											<label class="form-check-label" for="benefit4">It helped me choose an academic program.</label>
+										</div>
+										<div class="form-check">
+											<input type="checkbox" class="form-check-input" id="benefit5" name="benefits[]" value="network">
+											<label class="form-check-label" for="benefit5">I developed a network.</label>
+										</div>
+									</div>
+								</div>
+
+								<!-- Open-ended questions section -->
+								<div class="mb-4">
+									<h6 class="fw-bold mb-3">Additional Feedback</h6>
+									<div class="mb-3">
+										<label class="form-label">In which department did you attend the program? If it was rotational, please specify.*</label>
+										<textarea class="form-control" name="department" rows="2" required></textarea>
+									</div>
+									<div class="mb-3">
+										<label class="form-label">Did you encounter any significant problems during your internship? If so, please specify.</label>
+										<textarea class="form-control" name="problems" rows="3"></textarea>
+									</div>
+								</div>
+
+								<div class="d-flex justify-content-end">
+									<button type="reset" class="btn btn-light me-2">Reset Form</button>
+									<button type="submit" class="btn btn-primary">Submit Evaluation</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+				<!-- /evaluation form collapse -->
+
+				<!-- Previous evaluations -->
+				<div class="card">
+					<div class="card-header">
+						<h5 class="mb-0">My Evaluations</h5>
+					</div>
+
+					<div class="table-responsive">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th>Company</th>
+									<th>Position</th>
+									<th>Department</th>
+									<th>Evaluation Date</th>
+									<th>Status</th>
+									<th class="text-center">Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										<div class="d-flex align-items-center">
+											<div class="me-3">
+												<img src="/assets/images/company-logo1.png" class="rounded-circle" width="32" height="32" alt="">
+											</div>
+											<div>XYZ Corporation</div>
+										</div>
+									</td>
+									<td>Marketing Intern</td>
+									<td>Marketing</td>
+									<td>Aug 30, 2023</td>
+									<td><span class="badge bg-success">Submitted</span></td>
+									<td class="text-center">
+										<button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#view_evaluation">
+											<i class="ph-eye me-1"></i> View
+										</button>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div class="d-flex align-items-center">
+											<div class="me-3">
+												<img src="/assets/images/company-logo2.png" class="rounded-circle" width="32" height="32" alt="">
+											</div>
+											<div>ABC Technologies</div>
+										</div>
+									</td>
+									<td>Software Developer Intern</td>
+									<td>IT Department</td>
+									<td>-</td>
+									<td><span class="badge bg-warning text-dark">Pending</span></td>
+									<td class="text-center">
+										<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#evaluation_form">
+											<i class="ph-note-pencil me-1"></i> Complete
+										</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<!-- /previous evaluations -->
+
+			</div>
+			<!-- /content area -->
+
+			<!-- Footer -->
+			<div class="navbar navbar-sm navbar-footer border-top">
+				<div class="container-fluid">
+					<span>&copy; 2023 <a href="#">Sabancı University Internship Portal</a></span>
+
+					<ul class="nav">
+						<li class="nav-item">
+							<a href="#" class="navbar-nav-link">
+								Support
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="#" class="navbar-nav-link">
+								Help
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="#" class="navbar-nav-link">
+								Contact
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<!-- /footer -->
+
+		</div>
+		<!-- /main content -->
+
+	</div>
+	<!-- /page content -->
+
+	<!-- View evaluation modal -->
+	<div id="view_evaluation" class="modal fade" tabindex="-1">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Evaluation Details</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+
+				<div class="modal-body">
+					<div class="mb-3">
+						<h6 class="fw-bold">XYZ Corporation - Marketing Intern</h6>
+						<p class="text-muted">Submitted on August 30, 2023</p>
+					</div>
+
+					<div class="mb-3">
+						<h6 class="fw-semibold">Program Experience Rating</h6>
+						<div class="table-responsive">
+							<table class="table table-bordered">
+								<tbody>
+									<tr>
+										<th width="70%">I was satisfied with the First Step to the Business World Program.</th>
+										<td><div class="text-center">4/5</div></td>
+									</tr>
+									<tr>
+										<th>The institution/company generally left a positive impression on me.</th>
+										<td><div class="text-center">5/5</div></td>
+									</tr>
+									<tr>
+										<th>Did a consultant regularly take care of you at the institution?</th>
+										<td><div class="text-center">Yes</div></td>
+									</tr>
+									<tr>
+										<th>I was satisfied with the guidance of my institution consultant.</th>
+										<td><div class="text-center">4/5</div></td>
+									</tr>
+									<tr>
+										<th>I would recommend the First Step to the Business World Program to other students.</th>
+										<td><div class="text-center">5/5</div></td>
+									</tr>
+									<tr>
+										<th>I would recommend the institution/company to other students.</th>
+										<td><div class="text-center">5/5</div></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<div class="mb-3">
+						<h6 class="fw-semibold">Program Benefits</h6>
+						<ul class="mb-0">
+							<li>I discovered the business environment and different departments.</li>
+							<li>I discovered my career interests.</li>
+							<li>I developed a network.</li>
+						</ul>
+					</div>
+
+					<div class="mb-3">
+						<h6 class="fw-semibold">Department</h6>
+						<p>Marketing Department</p>
+					</div>
+
+					<div class="mb-3">
+						<h6 class="fw-semibold">Problems Encountered</h6>
+						<p>No significant problems encountered during the internship.</p>
+					</div>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /view evaluation modal -->
+
+	<!-- Add script to toggle consultant satisfaction question -->
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Show/hide consultant satisfaction question based on "Yes" response
+			const consultantYes = document.getElementById('consultant_yes');
+			const consultantNo = document.getElementById('consultant_no');
+			const consultantSatisfactionDiv = document.querySelector('.consultant-satisfaction');
+			
+			if (consultantYes && consultantNo && consultantSatisfactionDiv) {
+				consultantYes.addEventListener('change', function() {
+					if (this.checked) {
+						consultantSatisfactionDiv.style.display = 'block';
+						document.querySelectorAll('[name="consultant_satisfaction"]').forEach(radio => {
+							radio.setAttribute('required', 'required');
+						});
+					}
+				});
+				
+				consultantNo.addEventListener('change', function() {
+					if (this.checked) {
+						consultantSatisfactionDiv.style.display = 'none';
+						document.querySelectorAll('[name="consultant_satisfaction"]').forEach(radio => {
+							radio.removeAttribute('required');
+						});
+					}
+				});
+			}
+			
+			// Basic form validation (you can expand this)
+			const evaluationForm = document.querySelector('.evaluation-form');
+			if (evaluationForm) {
+				evaluationForm.addEventListener('submit', function(e) {
+					e.preventDefault();
+					
+					// Check if at least one benefit is selected
+					const benefits = document.querySelectorAll('[name="benefits[]"]:checked');
+					if (benefits.length === 0) {
+						alert('Please select at least one benefit.');
+						return;
+					}
+					
+					// If all validations pass, submit the form
+					alert('Evaluation submitted successfully!');
+					document.querySelector('[data-bs-target="#evaluation_form"]').click(); // Collapse the form
+				});
+			}
+		});
+	</script>
+
+	<!-- Add logout script -->
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			console.log('Student evaluations script loaded.');
+			
+			// Logout functionality
+			const logoutLinks = document.querySelectorAll('.logout-link');
+			logoutLinks.forEach(link => {
+				link.addEventListener('click', () => {
+					localStorage.removeItem('userRole');
+				});
+			});
+
+			// Auth check
+			const userRole = localStorage.getItem('userRole');
+			const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'student';
+			
+			if (userRole !== 'student' && !isBeingImpersonated) {
+				alert('Access denied. Redirecting to login page.');
+				window.location.href = '../index.html';
+			}
+		});
+	</script>
+
+	<!-- Impersonation detection script -->
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Check if an admin is impersonating this user
+			const impersonatedUser = sessionStorage.getItem('impersonatedUser');
+			const impersonatedUserEmail = sessionStorage.getItem('impersonatedUserEmail');
+			const impersonatedUserType = sessionStorage.getItem('impersonatedUserType');
+			const impersonatedUserName = sessionStorage.getItem('impersonatedUserName');
+			
+			if (impersonatedUser && impersonatedUserEmail && impersonatedUserType === 'student') {
+				// Show impersonation banner
+				const impersonationBanner = document.getElementById('impersonation-banner');
+				const impersonatedUserBanner = document.getElementById('impersonated-user-banner');
+				
+				if (impersonationBanner && impersonatedUserBanner) {
+					impersonatedUserBanner.textContent = impersonatedUserEmail;
+					impersonationBanner.classList.remove('d-none');
+				}
+				
+				// Update profile info in the header
+				if (impersonatedUserName) {
+					const userNameElement = document.querySelector('.navbar-nav-link .d-none.d-lg-inline-block.mx-lg-2');
+					if (userNameElement) {
+						userNameElement.textContent = impersonatedUserName;
+					}
+				}
+				
+				// Add event listener to end impersonation button
+				const endImpersonationButton = document.getElementById('end-impersonation-banner');
+				if (endImpersonationButton) {
+					endImpersonationButton.addEventListener('click', function() {
+						// Clear impersonation data
+						sessionStorage.removeItem('impersonatedUser');
+						sessionStorage.removeItem('impersonatedUserEmail');
+						sessionStorage.removeItem('impersonatedUserType');
+						sessionStorage.removeItem('impersonatedUserName');
+						
+						// Redirect back to admin dashboard
+						window.location.href = '../admin/admin-dashboard.html';
+					});
+				}
+			}
+		});
+	</script>
+
+</body>
+</html> 

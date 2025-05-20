@@ -77,6 +77,22 @@
 			</ul>
 
 			<ul class="nav flex-row justify-content-end order-1 order-lg-2">
+				<li class="nav-item me-lg-2">
+					<div class="dropdown">
+						<button class="btn btn-outline-primary dropdown-toggle" type="button" id="termDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+							<i class="ph-calendar me-1"></i>
+							Select Term
+						</button>
+						<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="termDropdown">
+							<li><h6 class="dropdown-header">Academic Terms</h6></li>
+							<li><a class="dropdown-item" href="#">2025-2026 Term</a></li>
+							<li><a class="dropdown-item" href="#">2026-2027 Term</a></li>
+							<li><a class="dropdown-item" href="#">2027-2028 Term</a></li>
+							<li><a class="dropdown-item" href="#">2028-2029 Term</a></li>
+							<li><a class="dropdown-item" href="#">2029-2030 Term</a></li>
+						</ul>
+					</div>
+				</li>
 				<li class="nav-item">
 					<a href="#" class="navbar-nav-link navbar-nav-link-icon rounded-pill" data-bs-toggle="modal" data-bs-target="#login_modal">
 						<i class="ph-sign-in"></i>
@@ -381,63 +397,123 @@
 	</div>
 	<!-- /sign up modal -->
 
+	<!-- Term Selection Script -->
 	<script>
-	document.addEventListener('DOMContentLoaded', () => {
-		console.log('Login page script loaded.');
-		// Select the container of the main login form elements
-		const loginContainer = document.querySelector('.content .card .card-body'); 
+		document.addEventListener('DOMContentLoaded', function() {
+			// Get references to dropdown elements
+			const termDropdown = document.getElementById('termDropdown');
+			const dropdownItems = document.querySelectorAll('.dropdown-menu .dropdown-item');
+			
+			// Set default selected term
+			const defaultTerm = '2025-2026 Term';
+			termDropdown.innerHTML = '<i class="ph-calendar me-1"></i>' + defaultTerm;
+			
+			// Store selected term in session storage
+			if (!sessionStorage.getItem('selectedTerm')) {
+				sessionStorage.setItem('selectedTerm', defaultTerm);
+			} else {
+				termDropdown.innerHTML = '<i class="ph-calendar me-1"></i>' + sessionStorage.getItem('selectedTerm');
+			}
+			
+			// Add click event listeners to dropdown items
+			dropdownItems.forEach(item => {
+				item.addEventListener('click', function(e) {
+					e.preventDefault();
+					const selectedTerm = this.textContent;
+					termDropdown.innerHTML = '<i class="ph-calendar me-1"></i>' + selectedTerm;
+					sessionStorage.setItem('selectedTerm', selectedTerm);
+					
+					// You can add code here to refresh content based on selected term if needed
+					console.log('Selected term: ' + selectedTerm);
+				});
+			});
+		});
+	</script>
 
-		if (!loginContainer) {
-			console.error('Login form container (.content .card .card-body) not found!');
-			return;
-		}
-		// Find elements within the container
-		const loginButton = loginContainer.querySelector('button[type="submit"]');
-		const emailInput = loginContainer.querySelector('input[type="text"]'); 
-		const passwordInput = loginContainer.querySelector('input[type="password"]');
+    <!-- Login functionality script -->
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Main login form on the page
+			const mainLoginForm = document.querySelector('.content .card .card-body');
+			if (mainLoginForm) {
+				const mainLoginButton = mainLoginForm.querySelector('button[type="submit"]');
+				const mainEmailInput = mainLoginForm.querySelector('input[type="text"]');
+				const mainPasswordInput = mainLoginForm.querySelector('input[type="password"]');
 
-		if (loginButton && emailInput && passwordInput) {
-			console.log('Login form elements found within container.');
-			loginButton.addEventListener('click', (event) => {
-				// No need for preventDefault() as there is no form submission to prevent
-				console.log('Login button clicked.');
+				if (mainLoginButton && mainEmailInput && mainPasswordInput) {
+					mainLoginButton.addEventListener('click', function(e) {
+						e.preventDefault();
+						handleLogin(mainEmailInput.value.trim(), mainPasswordInput.value, '');
+					});
+				}
+			}
 
-				const email = emailInput.value.trim().toLowerCase();
-				console.log('Email entered:', email);
+			// Modal login form
+			const modalLoginForm = document.querySelector('#login_modal form');
+			if (modalLoginForm) {
+				const modalLoginButton = modalLoginForm.querySelector('button[type="submit"]');
+				const modalEmailInput = modalLoginForm.querySelector('input[type="text"]');
+				const modalPasswordInput = modalLoginForm.querySelector('input[type="password"]');
+				const modalUserTypeSelect = modalLoginForm.querySelector('select');
 
-				let userRole = null;
+				if (modalLoginButton && modalEmailInput && modalPasswordInput && modalUserTypeSelect) {
+					modalLoginButton.addEventListener('click', function(e) {
+						e.preventDefault();
+						handleLogin(
+							modalEmailInput.value.trim(), 
+							modalPasswordInput.value, 
+							modalUserTypeSelect.value
+						);
+					});
+				}
+			}
+
+			// Common login handler function
+			function handleLogin(email, password, userType) {
+				// For demo purposes, we'll just check specific email examples
+				// In a production environment, this would connect to a backend service
+				email = email.toLowerCase();
+				
 				let redirectUrl = null;
+				let role = null;
 
-				// Role assignment based on email
-				if (email === 'admin@example.com') {
-					userRole = 'admin';
+				if (email === 'admin@example.com' || (email.includes('admin') && userType === 'admin')) {
+					role = 'admin';
 					redirectUrl = 'admin/admin-dashboard.html';
-				} else if (email === 'company@example.com') {
-					userRole = 'company';
+				} else if (email === 'company@example.com' || (email.includes('company') && userType === 'company')) {
+					role = 'company';
 					redirectUrl = 'company/company-dashboard.html';
-				} else if (email === 'student@example.com') {
-					userRole = 'student';
+				} else if (email === 'student@example.com' || (email.includes('student') && userType === 'student')) {
+					role = 'student';
 					redirectUrl = 'student/student-dashboard.html';
 				} else {
-					console.log('Invalid credentials entered.');
-					alert('Invalid login credentials for simulation. Use admin@example.com, company@example.com, or student@example.com');
-					return;
+					// For demonstration, allow any email with the correct user type
+					if (userType === 'admin') {
+						role = 'admin';
+						redirectUrl = 'admin/admin-dashboard.html';
+					} else if (userType === 'company') {
+						role = 'company';
+						redirectUrl = 'company/company-dashboard.html';
+					} else if (userType === 'student') {
+						role = 'student';
+						redirectUrl = 'student/student-dashboard.html';
+					} else {
+						alert('Please select a user type.');
+						return;
+					}
 				}
 
-				if (userRole && redirectUrl) {
-					console.log('Role identified:', userRole, 'Redirecting to:', redirectUrl);
-					// Store role in localStorage
-					localStorage.setItem('userRole', userRole);
-					// Redirect to the dashboard
+				if (role && redirectUrl) {
+					// Store role in localStorage for session management
+					localStorage.setItem('userRole', role);
+					
+					// Redirect to appropriate dashboard
 					window.location.href = redirectUrl;
 				} else {
-					console.error('Login successful but role or redirect URL missing?'); // Should not happen
+					alert('Invalid login credentials. For demo, use admin@example.com, company@example.com, student@example.com, or select a user type.');
 				}
-			});
-		} else {
-			console.error('Could not find required login elements (button, email, password) within .card-body.');
-		}
-	});
+			}
+		});
 	</script>
 
 </body>

@@ -52,6 +52,24 @@
 			</div>
 
 			<ul class="nav flex-row justify-content-end order-1 order-lg-2">
+				<li class="nav-item me-lg-2">
+					<div class="dropdown">
+						<button class="btn btn-outline-primary dropdown-toggle" type="button" id="termDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+							<i class="ph-calendar me-1"></i>
+							Select Term
+						</button>
+						<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="termDropdown">
+							<li><h6 class="dropdown-header">Academic Terms</h6></li>
+							<li><a class="dropdown-item term-item" href="#">2025-2026 Term</a></li>
+							<li><a class="dropdown-item term-item" href="#">2026-2027 Term</a></li>
+							<li><a class="dropdown-item term-item" href="#">2027-2028 Term</a></li>
+							<li><a class="dropdown-item term-item" href="#">2028-2029 Term</a></li>
+							<li><a class="dropdown-item term-item" href="#">2029-2030 Term</a></li>
+							<li><hr class="dropdown-divider"></li>
+							<li><a class="dropdown-item" href="/internship-portal/admin/admin-terms.html"><i class="ph-gear me-2"></i>Edit Terms</a></li>
+						</ul>
+					</div>
+				</li>
 				<li class="nav-item nav-item-dropdown-lg dropdown">
 					<a href="#" class="navbar-nav-link navbar-nav-link-icon rounded-pill" data-bs-toggle="dropdown">
 						<i class="ph-bell"></i>
@@ -123,8 +141,13 @@
 							<i class="ph-gear me-2"></i>
 							Account settings
 						</a>
+						<div id="impersonation-status" class="dropdown-item d-none">
+							<i class="ph-user-switch me-2"></i>
+							<span class="text-warning">Impersonating: <span id="impersonated-user">User</span></span>
+							<button id="end-impersonation" class="btn btn-sm btn-warning ms-2">End</button>
+						</div>
 						<div class="dropdown-divider"></div>
-						<a href="../index.html" class="dropdown-item logout-link">
+						<a href="#" id="profile-logout" class="dropdown-item logout-link">
 							<i class="ph-sign-out me-2"></i>
 							Logout
 						</a>
@@ -233,13 +256,19 @@
 							</a>
 						</li>
 						<li class="nav-item">
+							<a href="admin-terms.html" class="nav-link">
+								<i class="ph-calendar"></i>
+								<span>Academic Terms</span>
+							</a>
+						</li>
+						<li class="nav-item">
 							<a href="admin-settings.html" class="nav-link">
 								<i class="ph-gear"></i>
 								<span>Settings</span>
 							</a>
 						</li>
 						<li class="nav-item">
-							<a href="../index.html" class="nav-link logout-link">
+							<a href="#" id="sidebar-logout" class="nav-link logout-link">
 								<i class="ph-sign-out"></i>
 								<span>Logout</span>
 							</a>
@@ -686,23 +715,67 @@
 	</div>
 	<!-- /page content -->
 
+	<!-- Term Selection Script -->
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Get references to dropdown elements
+			const termDropdown = document.getElementById('termDropdown');
+			// Only get dropdown items from the term dropdown with the term-item class
+			const termDropdownItems = document.querySelectorAll('.dropdown-item.term-item');
+			
+			// Set default selected term
+			const defaultTerm = '2025-2026 Term';
+			termDropdown.innerHTML = '<i class="ph-calendar me-1"></i>' + defaultTerm;
+			
+			// Store selected term in session storage
+			if (!sessionStorage.getItem('selectedTerm')) {
+				sessionStorage.setItem('selectedTerm', defaultTerm);
+			} else {
+				termDropdown.innerHTML = '<i class="ph-calendar me-1"></i>' + sessionStorage.getItem('selectedTerm');
+			}
+			
+			// Add click event listeners to term dropdown items only
+			termDropdownItems.forEach(item => {
+				item.addEventListener('click', function(e) {
+					e.preventDefault();
+					const selectedTerm = this.textContent.trim();
+					termDropdown.innerHTML = '<i class="ph-calendar me-1"></i>' + selectedTerm;
+					sessionStorage.setItem('selectedTerm', selectedTerm);
+					
+					// Refresh dashboard content based on selected term
+					updateDashboardData(selectedTerm);
+				});
+			});
+			
+			// Function to update dashboard data based on selected term
+			function updateDashboardData(term) {
+				console.log('Updating dashboard for term: ' + term);
+				// In a real implementation, this would fetch data specific to the selected term
+				// and update all the dashboard widgets, charts, and tables
+				
+				// For demo purposes, show a loading indicator
+				const contentArea = document.querySelector('.content');
+				if (contentArea) {
+					contentArea.innerHTML += '<div class="position-fixed top-50 start-50 translate-middle p-3 bg-dark text-white rounded" id="termUpdateToast" style="z-index: 999;">Updating dashboard for ' + term + '...</div>';
+					
+					// Remove the toast after 2 seconds
+					setTimeout(() => {
+						const toast = document.getElementById('termUpdateToast');
+						if (toast) {
+							toast.remove();
+						}
+					}, 2000);
+				}
+			}
+		});
+	</script>
+
+	<!-- Basic Admin Dashboard Scripts -->
 	<script>
 		document.addEventListener('DOMContentLoaded', () => {
 			console.log('Admin dashboard script loaded.');
-			const logoutLinks = document.querySelectorAll('.logout-link');
-			console.log('Found', logoutLinks.length, 'logout links.');
-			logoutLinks.forEach(link => {
-				link.addEventListener('click', (event) => {
-					console.log('Logout link clicked:', event.target.href);
-					// Clear user role from localStorage
-					localStorage.removeItem('userRole');
-					console.log('userRole removed from localStorage.');
-					// Allow the link's default behavior (navigation) to proceed
-					console.log('Proceeding with navigation...');
-				});
-			});
-
-			// Optional: Add protection - redirect if not logged in as admin
+			
+			// Protection - redirect if not logged in as admin
 			const userRole = localStorage.getItem('userRole');
 			console.log('Current userRole from localStorage:', userRole);
 			if (userRole !== 'admin') {
@@ -711,6 +784,130 @@
 				window.location.href = '../index.html';
 			} else {
 				console.log('Access granted for admin.');
+			}
+		});
+	</script>
+	
+	<!-- Standalone Logout Script - Isolated from other scripts -->
+	<script>
+		// Run immediately to ensure it's loaded before other scripts might interfere
+		(function() {
+			// Wait for DOM to be fully loaded
+			document.addEventListener('DOMContentLoaded', function() {
+				console.log('Logout script initialized');
+				
+				// Get both logout links by ID to be absolutely certain
+				const profileLogout = document.getElementById('profile-logout');
+				const sidebarLogout = document.getElementById('sidebar-logout');
+				
+				// Function to handle logout
+				function handleLogout(e) {
+					console.log('Logout function triggered');
+					// Prevent default behavior
+					e.preventDefault();
+					e.stopPropagation();
+					
+					// Clear all relevant storage
+					localStorage.removeItem('userRole');
+					sessionStorage.removeItem('impersonatedUser');
+					sessionStorage.removeItem('impersonatedUserEmail');
+					sessionStorage.removeItem('impersonatedUserType');
+					sessionStorage.removeItem('impersonatedUserName');
+					sessionStorage.removeItem('selectedTerm');
+					
+					console.log('All session data cleared, redirecting to login page...');
+					
+					// Redirect to login page
+					window.location.href = '../index.html';
+				}
+				
+				// Attach event handlers to both logout buttons
+				if (profileLogout) {
+					console.log('Profile logout button found, attaching event handler');
+					profileLogout.addEventListener('click', handleLogout);
+				} else {
+					console.error('Profile logout button not found');
+				}
+				
+				if (sidebarLogout) {
+					console.log('Sidebar logout button found, attaching event handler');
+					sidebarLogout.addEventListener('click', handleLogout);
+				} else {
+					console.error('Sidebar logout button not found');
+				}
+			});
+		})();
+	</script>
+
+	<!-- Impersonation functionality -->
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Check if we are already impersonating a user
+			const impersonatedUser = sessionStorage.getItem('impersonatedUser');
+			const impersonatedUserEmail = sessionStorage.getItem('impersonatedUserEmail');
+			const impersonatedUserType = sessionStorage.getItem('impersonatedUserType');
+			const impersonatedUserName = sessionStorage.getItem('impersonatedUserName');
+			
+			// Only show impersonation if all values exist AND we have a valid user type
+			if (impersonatedUser && impersonatedUserEmail && impersonatedUserType && 
+				(impersonatedUserType === 'student' || impersonatedUserType === 'company')) {
+				showImpersonationStatus(impersonatedUser, impersonatedUserEmail, impersonatedUserType, impersonatedUserName);
+			} else {
+				// Clear any lingering impersonation data if incomplete
+				sessionStorage.removeItem('impersonatedUser');
+				sessionStorage.removeItem('impersonatedUserEmail');
+				sessionStorage.removeItem('impersonatedUserType');
+				sessionStorage.removeItem('impersonatedUserName');
+			}
+			
+			// Add click event listener to end impersonation button
+			const endImpersonationButton = document.getElementById('end-impersonation');
+			if (endImpersonationButton) {
+				endImpersonationButton.addEventListener('click', function(e) {
+					e.preventDefault();
+					endImpersonation();
+				});
+			}
+			
+			// Function to end impersonation
+			function endImpersonation() {
+				// Remove impersonation data from session storage
+				sessionStorage.removeItem('impersonatedUser');
+				sessionStorage.removeItem('impersonatedUserEmail');
+				sessionStorage.removeItem('impersonatedUserType');
+				sessionStorage.removeItem('impersonatedUserName');
+				
+				// Hide impersonation UI elements
+				document.getElementById('impersonation-controls').classList.add('d-none');
+				document.getElementById('end-impersonation').classList.add('d-none');
+				document.getElementById('impersonation-display').classList.add('d-none');
+				
+				// Redirect back to admin dashboard
+				window.location.href = 'admin-dashboard.html';
+			}
+			
+			// Function to show impersonation status in the UI
+			function showImpersonationStatus(userId, userEmail, userType, userName) {
+				// Update dropdown menu items
+				const impersonationControls = document.getElementById('impersonation-controls');
+				const impersonatedUserElement = document.getElementById('impersonated-user');
+				const endImpersonationButton = document.getElementById('end-impersonation');
+				
+				if (impersonationControls && impersonatedUserElement && endImpersonationButton) {
+					impersonatedUserElement.textContent = userEmail;
+					impersonationControls.classList.remove('d-none');
+					endImpersonationButton.classList.remove('d-none');
+				}
+				
+				// Update profile button display
+				const impersonationDisplay = document.getElementById('impersonation-display');
+				const impersonatedNameDisplay = document.getElementById('impersonated-name-display');
+				
+				if (impersonationDisplay && impersonatedNameDisplay) {
+					// Use the name if available, otherwise use email
+					impersonatedNameDisplay.textContent = userName || userEmail;
+					impersonationDisplay.classList.remove('d-none');
+				}
 			}
 		});
 	</script>
