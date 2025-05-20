@@ -118,10 +118,10 @@
 				<li class="nav-item nav-item-dropdown-lg dropdown ms-lg-2">
 					<a href="#" class="navbar-nav-link align-items-center rounded-pill p-1" data-bs-toggle="dropdown">
 						<div class="status-indicator-container">
-							<img src="../../bs5/template/assets/images/demo/logos/2.svg" class="w-32px h-32px rounded-pill" alt="">
+							<img src="/bs5/template/assets/images/demo/logos/2.svg" class="w-32px h-32px rounded-pill" alt="">
 							<span class="status-indicator bg-success"></span>
 						</div>
-						<span class="d-none d-lg-inline-block mx-lg-2">XYZ Corporation</span>
+						<span class="d-none d-lg-inline-block mx-lg-2" id="user-display-name">XYZ Corporation</span>
 					</a>
 
 					<div class="dropdown-menu dropdown-menu-end">
@@ -142,7 +142,11 @@
 							Account settings
 						</a>
 						<div class="dropdown-divider"></div>
-						<a href="../index.html" class="dropdown-item">
+						<a href="#" id="end-impersonation" class="dropdown-item d-none text-warning">
+							<i class="ph-user-switch me-2"></i>
+							End Impersonation
+						</a>
+						<a href="../index.html" class="dropdown-item logout-link">
 							<i class="ph-sign-out me-2"></i>
 							Logout
 						</a>
@@ -728,5 +732,68 @@
 		<!-- /main content -->
 	</div>
 	<!-- /page content -->
+
+	<!-- Add logout script -->
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			console.log('Company evaluations script loaded.');
+			
+			// Logout functionality
+			const logoutLinks = document.querySelectorAll('.logout-link');
+			logoutLinks.forEach(link => {
+				link.addEventListener('click', () => {
+					localStorage.removeItem('userRole');
+				});
+			});
+
+			// Auth check
+			const userRole = localStorage.getItem('userRole');
+			const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'company';
+			
+			if (userRole !== 'company' && !isBeingImpersonated) {
+				alert('Access denied. Redirecting to login page.');
+				window.location.href = '../index.html';
+			}
+		});
+	</script>
+
+	<!-- Impersonation detection script -->
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Check if an admin is impersonating this user
+			const impersonatedUser = sessionStorage.getItem('impersonatedUser');
+			const impersonatedUserEmail = sessionStorage.getItem('impersonatedUserEmail');
+			const impersonatedUserType = sessionStorage.getItem('impersonatedUserType');
+			const impersonatedUserName = sessionStorage.getItem('impersonatedUserName');
+			
+			if (impersonatedUser && impersonatedUserEmail && impersonatedUserType === 'company') {
+				// Update profile display name to show impersonation status
+				const userDisplayName = document.getElementById('user-display-name');
+				if (userDisplayName) {
+					userDisplayName.textContent = `Impersonating: ${impersonatedUserName || impersonatedUserEmail}`;
+					userDisplayName.classList.add('text-warning');
+				}
+				
+				// Show the end impersonation option in dropdown
+				const endImpersonationOption = document.getElementById('end-impersonation');
+				if (endImpersonationOption) {
+					endImpersonationOption.classList.remove('d-none');
+					
+					// Add event listener to end impersonation option
+					endImpersonationOption.addEventListener('click', function(e) {
+						e.preventDefault();
+						// Clear impersonation data
+						sessionStorage.removeItem('impersonatedUser');
+						sessionStorage.removeItem('impersonatedUserEmail');
+						sessionStorage.removeItem('impersonatedUserType');
+						sessionStorage.removeItem('impersonatedUserName');
+						
+						// Redirect back to admin dashboard
+						window.location.href = '../admin/admin-dashboard.html';
+					});
+				}
+			}
+		});
+	</script>
 </body>
 </html> 
