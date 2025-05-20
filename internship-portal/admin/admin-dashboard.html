@@ -52,6 +52,24 @@
 			</div>
 
 			<ul class="nav flex-row justify-content-end order-1 order-lg-2">
+				<li class="nav-item me-lg-2">
+					<div class="dropdown">
+						<button class="btn btn-outline-primary dropdown-toggle" type="button" id="termDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+							<i class="ph-calendar me-1"></i>
+							Select Term
+						</button>
+						<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="termDropdown">
+							<li><h6 class="dropdown-header">Academic Terms</h6></li>
+							<li><a class="dropdown-item" href="#">2025-2026 Term</a></li>
+							<li><a class="dropdown-item" href="#">2026-2027 Term</a></li>
+							<li><a class="dropdown-item" href="#">2027-2028 Term</a></li>
+							<li><a class="dropdown-item" href="#">2028-2029 Term</a></li>
+							<li><a class="dropdown-item" href="#">2029-2030 Term</a></li>
+							<li><hr class="dropdown-divider"></li>
+							<li><a class="dropdown-item" href="/internship-portal/admin/admin-terms.html"><i class="ph-gear me-2"></i>Edit Terms</a></li>
+						</ul>
+					</div>
+				</li>
 				<li class="nav-item nav-item-dropdown-lg dropdown">
 					<a href="#" class="navbar-nav-link navbar-nav-link-icon rounded-pill" data-bs-toggle="dropdown">
 						<i class="ph-bell"></i>
@@ -235,6 +253,12 @@
 							<a href="admin-csv-import.html" class="nav-link">
 								<i class="ph-file-csv"></i>
 								<span>CSV Import</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-terms.html" class="nav-link">
+								<i class="ph-calendar"></i>
+								<span>Academic Terms</span>
 							</a>
 						</li>
 						<li class="nav-item">
@@ -690,6 +714,66 @@
 
 	</div>
 	<!-- /page content -->
+
+	<!-- Term Selection Script -->
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Get references to dropdown elements
+			const termDropdown = document.getElementById('termDropdown');
+			const dropdownItems = document.querySelectorAll('.dropdown-menu .dropdown-item');
+			
+			// Set default selected term
+			const defaultTerm = '2025-2026 Term';
+			termDropdown.innerHTML = '<i class="ph-calendar me-1"></i>' + defaultTerm;
+			
+			// Store selected term in session storage
+			if (!sessionStorage.getItem('selectedTerm')) {
+				sessionStorage.setItem('selectedTerm', defaultTerm);
+			} else {
+				termDropdown.innerHTML = '<i class="ph-calendar me-1"></i>' + sessionStorage.getItem('selectedTerm');
+			}
+			
+			// Add click event listeners to dropdown items
+			dropdownItems.forEach(item => {
+				item.addEventListener('click', function(e) {
+					// Check if this is the "Edit Terms" item
+					if (this.querySelector('i.ph-gear')) {
+						// Allow default navigation for "Edit Terms"
+						return;
+					}
+					
+					e.preventDefault();
+					const selectedTerm = this.textContent;
+					termDropdown.innerHTML = '<i class="ph-calendar me-1"></i>' + selectedTerm;
+					sessionStorage.setItem('selectedTerm', selectedTerm);
+					
+					// Refresh dashboard content based on selected term
+					updateDashboardData(selectedTerm);
+				});
+			});
+			
+			// Function to update dashboard data based on selected term
+			function updateDashboardData(term) {
+				console.log('Updating dashboard for term: ' + term);
+				// In a real implementation, this would fetch data specific to the selected term
+				// and update all the dashboard widgets, charts, and tables
+				
+				// For demo purposes, show a loading indicator
+				const contentArea = document.querySelector('.content');
+				if (contentArea) {
+					contentArea.innerHTML += '<div class="position-fixed top-50 start-50 translate-middle p-3 bg-dark text-white rounded" id="termUpdateToast" style="z-index: 999;">Updating dashboard for ' + term + '...</div>';
+					
+					// Remove the toast after 2 seconds
+					setTimeout(() => {
+						const toast = document.getElementById('termUpdateToast');
+						if (toast) {
+							toast.remove();
+						}
+					}, 2000);
+				}
+			}
+		});
+	</script>
 
 	<script>
 		document.addEventListener('DOMContentLoaded', () => {
