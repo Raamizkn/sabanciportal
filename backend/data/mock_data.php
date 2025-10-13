@@ -63,4 +63,31 @@ $documents = [
     ]
 ];
 
+$terms = [
+    ["id" => 1, "name" => "2023-2024 Fall", "start_date" => "2023-09-15", "end_date" => "2024-01-15"],
+    ["id" => 2, "name" => "2023-2024 Spring", "start_date" => "2024-02-01", "end_date" => "2024-06-15"],
+    ["id" => 3, "name" => "2024-2025 Fall", "start_date" => "2024-09-15", "end_date" => "2025-01-15"]
+];
+
+$companies = [
+    [
+        "id" => 1,
+        "name" => "ABC Technologies",
+        "email" => "company@example.com",
+        "industry" => "Information Technology",
+        "website" => "http://abctech.example.com",
+        "phone" => "987-654-3210",
+        "address" => "456 Tech Park, Istanbul"
+    ],
+    [
+        "id" => 2,
+        "name" => "Global Innovations",
+        "email" => "innovate@example.com",
+        "industry" => "Research & Development",
+        "website" => "http://globalinnovations.example.com",
+        "phone" => "876-543-2109",
+        "address" => "789 Innovation Hub, Remote"
+    ]
+];
+
 ?>
