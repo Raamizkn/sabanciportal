@@ -1,191 +1,258 @@
-# API Documentation - Sabanci Internship Portal
+# API Documentation & Postman Guide
 
-This document outlines the implemented API endpoints for the internship portal. The backend is built with PHP and uses a mock data store.
+This document provides a complete guide to testing the backend API endpoints using Postman. The backend server is running on `http://localhost:8001`.
 
-## General Concepts
+## How to Use with Postman
 
-- **Base URL**: All API endpoints are relative to the server root.
-- **Data Format**: All requests and responses are in JSON format.
-- **Authentication**: Currently, authentication is not implemented. A `student_id` or `admin_id` is assumed or passed as a URL parameter for testing.
+You can easily import these examples into Postman:
+
+1.  Copy the complete `curl` command provided for an endpoint.
+2.  In Postman, click the **Import** button.
+3.  Select the **Raw Text** tab.
+4.  Paste the `curl` command and click **Continue**.
+5.  Postman will automatically create the request for you.
 
 ---
 
-## Student API
+## Student-Facing Endpoints
 
-**Endpoint File**: `/api/student.php`
+These endpoints are for student-related actions like viewing internships and managing applications.
 
-### Profile Management
+### 1. List All Available Internships
 
-#### Get Profile Info
-- **Action**: `get_profile_info`
+- **Name**: `Get All Internships`
+- **Description**: Retrieves a list of all internships currently marked as 'active'.
 - **Method**: `GET`
-- **Description**: Retrieves the profile information for a specific student.
-- **Parameters**: `student_id` (integer, URL parameter)
-- **Example Request**:
+- **URL**: `http://localhost:8001/index.php?entity=internships`
+- **cURL Command for Postman**:
   ```bash
-  curl "http://localhost:8000/api/student.php?action=get_profile_info&student_id=1"
+  curl --location 'http://localhost:8001/index.php?entity=internships'
   ```
 
-#### Update Profile
-- **Action**: `update_profile`
-- **Method**: `POST`
-- **Description**: Updates a student's profile information.
-- **Parameters**: `student_id` (integer, URL parameter), JSON body with fields to update (e.g., `{"phone": "555-123-4567", "bio": "New bio."}`).
-- **Example Request**:
+### 2. Get Details of a Specific Internship
+
+- **Name**: `Get Single Internship`
+- **Description**: Retrieves the full details for a single internship by its ID.
+- **Method**: `GET`
+- **URL**: `http://localhost:8001/index.php?entity=internships&id=INT001`
+- **cURL Command for Postman**:
   ```bash
-  curl -X POST -H "Content-Type: application/json" -d '{"phone": "555-123-4567"}' "http://localhost:8000/api/student.php?action=update_profile&student_id=1"
+  curl --location 'http://localhost:8001/index.php?entity=internships&id=INT001'
   ```
 
-### Internship & Application Management
+### 3. List a Student's Applications
 
-#### Get All Internships
-- **Action**: `get_internships`
-- **Method**: `GET`
-- **Description**: Retrieves a list of all available internships.
-- **Example Request**:
-  ```bash
-  curl "http://localhost:8000/api/student.php?action=get_internships"
-  ```
-
-#### Get Student's Applications
-- **Action**: `get_student_applications`
-- **Method**: `GET`
+- **Name**: `Get Student Applications`
 - **Description**: Retrieves all applications submitted by a specific student.
-- **Parameters**: `student_id` (integer, URL parameter)
-- **Example Request**:
-  ```bash
-  curl "http://localhost:8000/api/student.php?action=get_student_applications&student_id=1"
-  ```
-
-#### View Application Details
-- **Action**: `view_application`
 - **Method**: `GET`
-- **Description**: Retrieves the full details of a single application.
-- **Parameters**: `student_id`, `application_id` (integer, URL parameters)
-- **Example Request**:
+- **URL**: `http://localhost:8001/index.php?entity=applications&student_id=1`
+- **cURL Command for Postman**:
   ```bash
-  curl "http://localhost:8000/api/student.php?action=view_application&student_id=1&application_id=1001"
+  curl --location 'http://localhost:8001/index.php?entity=applications&student_id=1'
   ```
 
-#### Apply for Internship
-- **Action**: `apply`
-- **Method**: `POST`
-- **Description**: Submits a new application for an internship.
-- **Parameters**: `student_id` (URL parameter), JSON body with `internship_id`.
-- **Example Request**:
-  ```bash
-  curl -X POST -H "Content-Type: application/json" -d '{"internship_id": 101}' "http://localhost:8000/api/student.php?action=apply&student_id=1"
-  ```
+### 4. Get Details of a Specific Application
 
-#### Withdraw Application
-- **Action**: `withdraw_application`
-- **Method**: `POST`
-- **Description**: Withdraws a previously submitted application.
-- **Parameters**: `student_id` (URL parameter), JSON body with `application_id`.
-- **Example Request**:
-  ```bash
-  curl -X POST -H "Content-Type: application/json" -d '{"application_id": 1001}' "http://localhost:8000/api/student.php?action=withdraw_application&student_id=1"
-  ```
-
-#### Accept Internship Offer
-- **Action**: `accept_internship`
-- **Method**: `POST`
-- **Description**: Accepts an internship offer that has been approved by an admin.
-- **Parameters**: `student_id` (URL parameter), JSON body with `application_id`.
-- **Example Request**:
-  ```bash
-  curl -X POST -H "Content-Type: application/json" -d '{"application_id": 1001}' "http://localhost:8000/api/student.php?action=accept_internship&student_id=1"
-  ```
-
-### Document Management
-
-#### Get Documents
-- **Action**: `get_docs`
+- **Name**: `Get Single Application`
+- **Description**: Retrieves the details for a single application by its ID.
 - **Method**: `GET`
-- **Description**: Retrieves a list of a student's uploaded documents.
-- **Parameters**: `student_id` (URL parameter)
-- **Example Request**:
+- **URL**: `http://localhost:8001/index.php?entity=applications&id=APP001`
+- **cURL Command for Postman**:
   ```bash
-  curl "http://localhost:8000/api/student.php?action=get_docs&student_id=1"
+  curl --location 'http://localhost:8001/index.php?entity=applications&id=APP001'
   ```
 
-#### Upload Document
-- **Action**: `upload_doc`
+### 5. Apply for an Internship
+
+- **Name**: `Apply for Internship`
+- **Description**: Submits a new application for an internship on behalf of a student.
 - **Method**: `POST`
-- **Description**: Simulates uploading a document.
-- **Parameters**: `student_id` (URL parameter), JSON body with `document_type` and `file_name`.
-- **Example Request**:
+- **URL**: `http://localhost:8001/index.php?entity=applications&action=apply`
+- **Body**:
+  ```json
+  {
+      "student_id": 1,
+      "internship_id": "INT003",
+      "cover_letter": "I am very interested in the Marketing Intern position and believe my skills are a great fit."
+  }
+  ```
+- **cURL Command for Postman**:
   ```bash
-  curl -X POST -H "Content-Type: application/json" -d '{"document_type": "Cover Letter", "file_name": "my_cover_letter.pdf"}' "http://localhost:8000/api/student.php?action=upload_doc&student_id=1"
+  curl --location --request POST 'http://localhost:8001/index.php?entity=applications&action=apply' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+      "student_id": 1,
+      "internship_id": "INT003",
+      "cover_letter": "I am very interested in the Marketing Intern position and believe my skills are a great fit."
+  }'
   ```
 
-#### Delete Document
-- **Action**: `delete_doc`
+### 6. Withdraw an Application
+
+- **Name**: `Withdraw Application`
+- **Description**: Withdraws a student's application.
 - **Method**: `POST`
-- **Description**: Simulates deleting a document.
-- **Parameters**: `student_id` (URL parameter), JSON body with `document_id`.
-- **Example Request**:
+- **URL**: `http://localhost:8001/index.php?entity=applications&id=APP001&action=withdraw`
+- **cURL Command for Postman**:
   ```bash
-  curl -X POST -H "Content-Type: application/json" -d '{"document_id": 2001}' "http://localhost:8000/api/student.php?action=delete_doc&student_id=1"
+  curl --location --request POST 'http://localhost:8001/index.php?entity=applications&id=APP001&action=withdraw'
   ```
 
-#### Download Document
-- **Action**: `download_doc`
+### 7. Confirm Internship Offer
+
+- **Name**: `Confirm Offer`
+- **Description**: Allows a student to confirm an offer they have received.
+- **Method**: `POST`
+- **URL**: `http://localhost:8001/index.php?entity=applications&id=APP002&action=confirm_offer`
+- **cURL Command for Postman**:
+  ```bash
+  curl --location --request POST 'http://localhost:8001/index.php?entity=applications&id=APP002&action=confirm_offer'
+  ```
+
+### 8. List Documents for an Application
+
+- **Name**: `Get Application Documents`
+- **Description**: Retrieves a list of documents associated with a specific application.
 - **Method**: `GET`
-- **Description**: Returns a simulated download URL for a document.
-- **Parameters**: `student_id`, `document_id` (URL parameters)
-- **Example Request**:
+- **URL**: `http://localhost:8001/index.php?entity=documents&application_id=APP002`
+- **cURL Command for Postman**:
   ```bash
-  curl "http://localhost:8000/api/student.php?action=download_doc&student_id=1&document_id=2001"
+  curl --location 'http://localhost:8001/index.php?entity=documents&application_id=APP002'
+  ```
+
+### 9. Upload a Document
+
+- **Name**: `Upload Document`
+- **Description**: Uploads a new document for an application. The application status must be `Confirmed_By_Student` or `Approved_By_Company`.
+- **Method**: `POST`
+- **URL**: `http://localhost:8001/index.php?entity=documents&action=upload&application_id=APP002`
+- **Body**:
+  ```json
+  {
+      "student_id": 1,
+      "document_type": "SGK Form",
+      "file_name": "student1_sgk_form.pdf"
+  }
+  ```
+- **cURL Command for Postman**:
+  ```bash
+  curl --location --request POST 'http://localhost:8001/index.php?entity=documents&action=upload&application_id=APP002' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+      "student_id": 1,
+      "document_type": "SGK Form",
+      "file_name": "student1_sgk_form.pdf"
+  }'
   ```
 
 ---
 
-## Admin API
+## Company-Facing Endpoints
 
-**Endpoint File**: `/api/admin.php`
+These endpoints are for company-related actions like managing internship postings and reviewing applications.
 
-### Term Management
+### 1. List a Company's Internships
 
-- **Get All Terms**: `?action=get_terms` (GET)
-- **Add Term**: `?action=add_term` (POST, Body: `{"name": "...", "start_date": "...", "end_date": "..."}`)
-- **Update Term**: `?action=update_term` (POST, Body: `{"term_id": 1, "name": "..."}`)
-- **Delete Term**: `?action=delete_term` (POST, Body: `{"term_id": 1}`)
+- **Name**: `Get Company Internships`
+- **Description**: Retrieves all internships posted by a specific company.
+- **Method**: `GET`
+- **URL**: `http://localhost:8001/index.php?entity=internships&company_id=COMP001`
+- **cURL Command for Postman**:
+  ```bash
+  curl --location 'http://localhost:8001/index.php?entity=internships&company_id=COMP001'
+  ```
 
-### Student Management
+### 2. Create a New Internship
 
-- **Get All Students**: `?action=get_students` (GET)
-- **Get Student Details**: `?action=get_student_details&student_id=1` (GET)
-- **Add Student**: `?action=add_student` (POST, Body: `{"name": "...", "email": "...", ...}`)
-- **Update Student**: `?action=update_student` (POST, Body: `{"student_id": 1, "name": "..."}`)
-- **Delete Student**: `?action=delete_student` (POST, Body: `{"student_id": 1}`)
-- **Impersonate Student**: `?action=impersonate_student&student_id=1` (GET)
+- **Name**: `Create Internship`
+- **Description**: Creates a new internship posting for a company.
+- **Method**: `POST`
+- **URL**: `http://localhost:8001/index.php?entity=internships&action=create`
+- **Body**:
+  ```json
+  {
+      "company_id": "COMP001",
+      "company_name": "Tech Solutions Inc.",
+      "position": "Frontend Developer Intern",
+      "description": "Work with our team on a new React-based UI.",
+      "location": "Remote"
+  }
+  ```
+- **cURL Command for Postman**:
+  ```bash
+  curl --location --request POST 'http://localhost:8001/index.php?entity=internships&action=create' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+      "company_id": "COMP001",
+      "company_name": "Tech Solutions Inc.",
+      "position": "Frontend Developer Intern",
+      "description": "Work with our team on a new React-based UI.",
+      "location": "Remote"
+  }'
+  ```
 
-### Company Management
+### 3. Update an Internship
 
-- **Get All Companies**: `?action=get_companies` (GET)
-- **Get Company Details**: `?action=get_company_details&company_id=1` (GET)
-- **Add Company**: `?action=add_company` (POST, Body: `{"name": "...", "email": "...", ...}`)
-- **Update Company**: `?action=update_company` (POST, Body: `{"company_id": 1, "name": "..."}`)
-- **Delete Company**: `?action=delete_company` (POST, Body: `{"company_id": 1}`)
-- **Impersonate Company**: `?action=impersonate_company&company_id=1` (GET)
+- **Name**: `Update Internship`
+- **Description**: Updates the details of an existing internship.
+- **Method**: `POST`
+- **URL**: `http://localhost:8001/index.php?entity=internships&id=INT001&action=update`
+- **Body**:
+  ```json
+  {
+      "description": "Work on exciting new software projects, now with a focus on backend services.",
+      "location": "New York, NY"
+  }
+  ```
+- **cURL Command for Postman**:
+  ```bash
+  curl --location --request POST 'http://localhost:8001/index.php?entity=internships&id=INT001&action=update' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+      "description": "Work on exciting new software projects, now with a focus on backend services.",
+      "location": "New York, NY"
+  }'
+  ```
 
-### Internship Management
+### 4. Delete an Internship
 
-- **Get All Internships**: `?action=get_internships` (GET)
-- **Get Internship Info**: `?action=get_internship_info&internship_id=101` (GET)
-- **Edit Internship**: `?action=edit_internship` (POST, Body: `{"internship_id": 101, "title": "..."}`)
-- **Delete Internship**: `?action=delete_internship` (POST, Body: `{"internship_id": 101}`)
-- **Get Internship Applicants**: `?action=get_internship_applicants&internship_id=101` (GET)
+- **Name**: `Delete Internship`
+- **Description**: Deletes an internship posting.
+- **Method**: `POST`
+- **URL**: `http://localhost:8001/index.php?entity=internships&id=INT004&action=delete`
+- **cURL Command for Postman**:
+  ```bash
+  curl --location --request POST 'http://localhost:8001/index.php?entity=internships&id=INT004&action=delete'
+  ```
 
-### Application Management
+### 5. List Applications for a Company
 
-- **Get Application Details**: `?action=get_application_details&application_id=1001` (GET)
-- **Approve Application**: `?action=approve_application` (POST, Body: `{"application_id": 1001}`)
-- **Reject Application**: `?action=reject_application` (POST, Body: `{"application_id": 1001}`)
+- **Name**: `Get Company Applications`
+- **Description**: Retrieves all applications for all internships at a specific company.
+- **Method**: `GET`
+- **URL**: `http://localhost:8001/index.php?entity=applications&company_id=COMP001`
+- **cURL Command for Postman**:
+  ```bash
+  curl --location 'http://localhost:8001/index.php?entity=applications&company_id=COMP001'
+  ```
 
-### Reports & Tools
+### 6. Update Application Status
 
-- **Generate Report**: `?action=generate_report` (POST, Body: `{"report_type": "..."}`)
-- **Get Evaluation**: `?action=get_evaluation&evaluation_id=1` (GET)
-- **Send Email**: `?action=send_email` (POST, Body: `{"to": "...", "subject": "...", "body": "..."}`)
+- **Name**: `Update Application Status (Company)`
+- **Description**: Allows a company to change the status of an application (e.g., to make an offer).
+- **Method**: `POST`
+- **URL**: `http://localhost:8001/index.php?entity=applications&id=APP001&action=update_status_company`
+- **Body**:
+  ```json
+  {
+      "status": "Offered"
+  }
+  ```
+- **cURL Command for Postman**:
+  ```bash
+  curl --location --request POST 'http://localhost:8001/index.php?entity=applications&id=APP001&action=update_status_company' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+      "status": "Offered"
+  }'
+  ```
