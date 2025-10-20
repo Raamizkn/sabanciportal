@@ -1,0 +1,303 @@
+{
+	"info": {
+		"_postman_id": "company-api-2024-sabanci",
+		"name": "🏢 Sabanci Company API",
+		"description": "Complete Company API collection for the Sabanci University Internship Portal.\n\n**Company Features:**\n- Company profile management\n- Internship posting and management\n- Application review and status updates\n- Student evaluation system\n- Dashboard analytics and statistics\n\n**Base URL:** `http://localhost:8001/backend/api/company.php`\n\n**Usage:**\n1. Set the `base_url` environment variable\n2. Use `company_id=1` for testing (ABC Technologies)\n3. All endpoints require company_id parameter",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "company-api"
+	},
+	"item": [
+		{
+			"name": "🏢 Profile Management",
+			"item": [
+				{
+					"name": "Get Company Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/company.php?company_id=1&action=get_profile",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "company.php"],
+							"query": [
+								{"key": "company_id", "value": "1"},
+								{"key": "action", "value": "get_profile"}
+							]
+						},
+						"description": "Retrieves detailed company profile information including business details, contact information, and industry classification."
+					}
+				},
+				{
+					"name": "Update Company Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"ABC Technologies Inc.\",\n    \"email\": \"contact@abctech.com\",\n    \"industry\": \"Information Technology & Software\",\n    \"website\": \"https://www.abctech.com\",\n    \"phone\": \"+90 212 555 0123\",\n    \"address\": \"Maslak Technology Park, Istanbul, Turkey\",\n    \"description\": \"Leading technology company specializing in web development, mobile applications, and cloud solutions.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/backend/api/company.php?company_id=1&action=update_profile",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "company.php"],
+							"query": [
+								{"key": "company_id", "value": "1"},
+								{"key": "action", "value": "update_profile"}
+							]
+						},
+						"description": "Updates company profile information including business details and contact information."
+					}
+				}
+			]
+		},
+		{
+			"name": "💼 Internship Management",
+			"item": [
+				{
+					"name": "Get My Internships",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/company.php?company_id=1&action=get_internships",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "company.php"],
+							"query": [
+								{"key": "company_id", "value": "1"},
+								{"key": "action", "value": "get_internships"}
+							]
+						},
+						"description": "Retrieves all internship postings created by the company."
+					}
+				},
+				{
+					"name": "Create New Internship",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Full Stack Developer Intern\",\n    \"description\": \"Join our dynamic development team to work on cutting-edge web applications using React, Node.js, and MongoDB. You'll gain hands-on experience in full-stack development, API design, and cloud deployment.\",\n    \"location\": \"Istanbul, Turkey (Hybrid)\",\n    \"dates\": \"June 2024 - August 2024\",\n    \"requirements\": \"JavaScript, React, Node.js knowledge preferred. Strong problem-solving skills and willingness to learn.\",\n    \"salary\": \"4000 TL/month\",\n    \"type\": \"Full-time\",\n    \"application_deadline\": \"2024-05-15\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/backend/api/company.php?company_id=1&action=create_internship",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "company.php"],
+							"query": [
+								{"key": "company_id", "value": "1"},
+								{"key": "action", "value": "create_internship"}
+							]
+						},
+						"description": "Creates a new internship posting with detailed job requirements and information."
+					}
+				},
+				{
+					"name": "Update Internship",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"Updated: Join our development team working on innovative web applications. Now including mobile app development with React Native.\",\n    \"location\": \"Istanbul, Turkey (Remote Available)\",\n    \"requirements\": \"JavaScript, React, Node.js. Mobile development experience is a plus.\",\n    \"salary\": \"4500 TL/month\",\n    \"application_deadline\": \"2024-05-20\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/backend/api/company.php?company_id=1&action=update_internship&internship_id=101",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "company.php"],
+							"query": [
+								{"key": "company_id", "value": "1"},
+								{"key": "action", "value": "update_internship"},
+								{"key": "internship_id", "value": "101"}
+							]
+						},
+						"description": "Updates an existing internship posting with new information or requirements."
+					}
+				},
+				{
+					"name": "Delete Internship",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/company.php?company_id=1&action=delete_internship&internship_id=101",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "company.php"],
+							"query": [
+								{"key": "company_id", "value": "1"},
+								{"key": "action", "value": "delete_internship"},
+								{"key": "internship_id", "value": "101"}
+							]
+						},
+						"description": "Deletes an internship posting (marks as deleted in the system)."
+					}
+				}
+			]
+		},
+		{
+			"name": "📋 Application Management",
+			"item": [
+				{
+					"name": "Get All Applications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/company.php?company_id=1&action=get_applications",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "company.php"],
+							"query": [
+								{"key": "company_id", "value": "1"},
+								{"key": "action", "value": "get_applications"}
+							]
+						},
+						"description": "Retrieves all applications received for company's internship postings with student and internship details."
+					}
+				},
+				{
+					"name": "Get Application Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/company.php?company_id=1&action=get_application&application_id=1001",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "company.php"],
+							"query": [
+								{"key": "company_id", "value": "1"},
+								{"key": "action", "value": "get_application"},
+								{"key": "application_id", "value": "1001"}
+							]
+						},
+						"description": "Gets detailed information about a specific application including student profile, documents, and internship details."
+					}
+				},
+				{
+					"name": "Update Application Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"Interview Scheduled\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/backend/api/company.php?company_id=1&action=update_application_status&application_id=1001",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "company.php"],
+							"query": [
+								{"key": "company_id", "value": "1"},
+								{"key": "action", "value": "update_application_status"},
+								{"key": "application_id", "value": "1001"}
+							]
+						},
+						"description": "Updates the status of a student's application. Valid statuses: Pending, Under Review, Shortlisted, Interview Scheduled, Offered, Rejected, Accepted, Declined."
+					}
+				}
+			]
+		},
+		{
+			"name": "⭐ Evaluation System",
+			"item": [
+				{
+					"name": "Create Student Evaluation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 4.5,\n    \"comments\": \"Excellent intern who showed great technical skills and professional attitude throughout the internship period.\",\n    \"technical_skills\": 4.0,\n    \"communication_skills\": 4.5,\n    \"teamwork\": 5.0,\n    \"problem_solving\": 4.0,\n    \"overall_performance\": 4.5,\n    \"recommendation\": \"Highly recommend for future full-time positions\",\n    \"evaluator_name\": \"Jane Smith, Technical Lead\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/backend/api/company.php?company_id=1&action=create_evaluation&application_id=1001",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "company.php"],
+							"query": [
+								{"key": "company_id", "value": "1"},
+								{"key": "action", "value": "create_evaluation"},
+								{"key": "application_id", "value": "1001"}
+							]
+						},
+						"description": "Creates a detailed evaluation for a student's internship performance including ratings and feedback."
+					}
+				},
+				{
+					"name": "Get My Evaluations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/company.php?company_id=1&action=get_evaluations",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "company.php"],
+							"query": [
+								{"key": "company_id", "value": "1"},
+								{"key": "action", "value": "get_evaluations"}
+							]
+						},
+						"description": "Retrieves all evaluations created by the company for their intern students."
+					}
+				}
+			]
+		},
+		{
+			"name": "📊 Dashboard & Analytics",
+			"item": [
+				{
+					"name": "Get Dashboard Statistics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/company.php?company_id=1&action=get_dashboard_stats",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "company.php"],
+							"query": [
+								{"key": "company_id", "value": "1"},
+								{"key": "action", "value": "get_dashboard_stats"}
+							]
+						},
+						"description": "Gets comprehensive dashboard statistics including internship counts, application statistics, and recent activity."
+					}
+				}
+			]
+		},
+		{
+			"name": "📋 Testing & Help",
+			"item": [
+				{
+					"name": "API Help & Documentation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/company.php?company_id=1",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "company.php"],
+							"query": [
+								{"key": "company_id", "value": "1"}
+							]
+						},
+						"description": "Returns API documentation and available endpoints for the Company API."
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8001",
+			"type": "string"
+		}
+	]
+}

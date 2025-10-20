@@ -1,0 +1,218 @@
+{
+	"info": {
+		"_postman_id": "student-api-2024-sabanci",
+		"name": "🎓 Sabanci Student API",
+		"description": "Complete Student API collection for the Sabanci University Internship Portal.\n\n**Student Features:**\n- Profile management\n- Browse available internships\n- Submit and manage applications\n- View application status and feedback\n- Access documents and evaluations\n\n**Base URL:** `http://localhost:8001/backend/api/student.php`\n\n**Usage:**\n1. Set the `base_url` environment variable\n2. Use `student_id=1` for testing (John Doe)\n3. All endpoints require student_id parameter",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "student-api"
+	},
+	"item": [
+		{
+			"name": "👤 Profile Management",
+			"item": [
+				{
+					"name": "Get Student Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/student.php?student_id=1&action=get_profile_info",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "student.php"],
+							"query": [
+								{"key": "student_id", "value": "1"},
+								{"key": "action", "value": "get_profile_info"}
+							]
+						},
+						"description": "Retrieves complete student profile including personal information, academic details, and contact information."
+					}
+				},
+				{
+					"name": "Update Student Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe Updated\",\n    \"email\": \"john.updated@student.sabanciuniv.edu\",\n    \"phone\": \"555-123-4567\",\n    \"address\": \"Updated Address, Istanbul\",\n    \"bio\": \"Updated bio with new information about my interests and goals.\",\n    \"major\": \"Computer Engineering\",\n    \"gpa\": \"3.7\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/backend/api/student.php?student_id=1&action=update_profile",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "student.php"],
+							"query": [
+								{"key": "student_id", "value": "1"},
+								{"key": "action", "value": "update_profile"}
+							]
+						},
+						"description": "Updates student profile information including contact details, academic information, and bio."
+					}
+				}
+			]
+		},
+		{
+			"name": "💼 Internships & Applications",
+			"item": [
+				{
+					"name": "Browse Available Internships",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/student.php?student_id=1&action=get_internships",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "student.php"],
+							"query": [
+								{"key": "student_id", "value": "1"},
+								{"key": "action", "value": "get_internships"}
+							]
+						},
+						"description": "Retrieves all available internship opportunities that students can browse and apply to."
+					}
+				},
+				{
+					"name": "Apply for Internship",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"internship_id\": 102,\n    \"cover_letter\": \"I am very interested in this Data Analyst position and believe my skills in Python and SQL make me a great fit for this role. I have completed relevant coursework and projects that demonstrate my analytical abilities.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/backend/api/student.php?student_id=1&action=apply",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "student.php"],
+							"query": [
+								{"key": "student_id", "value": "1"},
+								{"key": "action", "value": "apply"}
+							]
+						},
+						"description": "Submits a new internship application with optional cover letter."
+					}
+				},
+				{
+					"name": "Get My Applications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/student.php?student_id=1&action=get_student_applications",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "student.php"],
+							"query": [
+								{"key": "student_id", "value": "1"},
+								{"key": "action", "value": "get_student_applications"}
+							]
+						},
+						"description": "Retrieves all applications submitted by the student with current status and details."
+					}
+				},
+				{
+					"name": "View Application Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/student.php?student_id=1&action=view_application&application_id=1001",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "student.php"],
+							"query": [
+								{"key": "student_id", "value": "1"},
+								{"key": "action", "value": "view_application"},
+								{"key": "application_id", "value": "1001"}
+							]
+						},
+						"description": "Gets detailed information about a specific application including internship details and current status."
+					}
+				},
+				{
+					"name": "Withdraw Application",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/student.php?student_id=1&action=withdraw&application_id=1001",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "student.php"],
+							"query": [
+								{"key": "student_id", "value": "1"},
+								{"key": "action", "value": "withdraw"},
+								{"key": "application_id", "value": "1001"}
+							]
+						},
+						"description": "Allows a student to withdraw their application for an internship."
+					}
+				}
+			]
+		},
+		{
+			"name": "📄 Documents & Evaluations",
+			"item": [
+				{
+					"name": "Get My Documents",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/student.php?student_id=1&action=get_documents",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "student.php"],
+							"query": [
+								{"key": "student_id", "value": "1"},
+								{"key": "action", "value": "get_documents"}
+							]
+						},
+						"description": "Retrieves all documents uploaded by the student including CV, transcripts, and other required documents."
+					}
+				},
+				{
+					"name": "Get My Evaluations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/student.php?student_id=1&action=get_evaluations",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "student.php"],
+							"query": [
+								{"key": "student_id", "value": "1"},
+								{"key": "action", "value": "get_evaluations"}
+							]
+						},
+						"description": "Gets all evaluations and feedback received by the student from companies and supervisors."
+					}
+				}
+			]
+		},
+		{
+			"name": "📋 Testing & Help",
+			"item": [
+				{
+					"name": "API Help & Documentation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/student.php",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "student.php"]
+						},
+						"description": "Returns API documentation and available endpoints for the Student API."
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8001",
+			"type": "string"
+		}
+	]
+}

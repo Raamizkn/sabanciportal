@@ -1,0 +1,285 @@
+{
+	"info": {
+		"_postman_id": "admin-api-2024-sabanci",
+		"name": "👨‍💼 Sabanci Admin API",
+		"description": "Complete Admin API collection for the Sabanci University Internship Portal.\n\n**Admin Features:**\n- Academic term management\n- Student administration\n- Company management\n- System oversight and statistics\n- Application monitoring\n\n**Base URL:** `http://localhost:8001/backend/api/admin.php`\n\n**Usage:**\n1. Set the `base_url` environment variable\n2. Admin endpoints don't require user ID\n3. Most POST requests require JSON body data",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "admin-api"
+	},
+	"item": [
+		{
+			"name": "📅 Term Management",
+			"item": [
+				{
+					"name": "Get All Academic Terms",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/admin.php?action=get_terms",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "admin.php"],
+							"query": [
+								{"key": "action", "value": "get_terms"}
+							]
+						},
+						"description": "Retrieves all academic terms in the system with their details and dates."
+					}
+				},
+				{
+					"name": "Add New Academic Term",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"2024-2025 Spring\",\n    \"start_date\": \"2025-02-01\",\n    \"end_date\": \"2025-06-15\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/backend/api/admin.php?action=add_term",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "admin.php"],
+							"query": [
+								{"key": "action", "value": "add_term"}
+							]
+						},
+						"description": "Creates a new academic term with specified start and end dates."
+					}
+				},
+				{
+					"name": "Update Academic Term",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"term_id\": 1,\n    \"name\": \"2023-2024 Fall (Updated)\",\n    \"start_date\": \"2023-09-20\",\n    \"end_date\": \"2024-01-20\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/backend/api/admin.php?action=update_term",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "admin.php"],
+							"query": [
+								{"key": "action", "value": "update_term"}
+							]
+						},
+						"description": "Updates an existing academic term's information."
+					}
+				},
+				{
+					"name": "Delete Academic Term",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"term_id\": 3\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/backend/api/admin.php?action=delete_term",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "admin.php"],
+							"query": [
+								{"key": "action", "value": "delete_term"}
+							]
+						},
+						"description": "Deletes an academic term from the system."
+					}
+				}
+			]
+		},
+		{
+			"name": "🎓 Student Management",
+			"item": [
+				{
+					"name": "Get All Students",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/admin.php?action=get_students",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "admin.php"],
+							"query": [
+								{"key": "action", "value": "get_students"}
+							]
+						},
+						"description": "Retrieves all students registered in the system with their details."
+					}
+				},
+				{
+					"name": "Get Student Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/admin.php?action=get_student_details&student_id=1",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "admin.php"],
+							"query": [
+								{"key": "action", "value": "get_student_details"},
+								{"key": "student_id", "value": "1"}
+							]
+						},
+						"description": "Gets detailed information about a specific student including applications and activity."
+					}
+				},
+				{
+					"name": "Add New Student",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Alice Johnson\",\n    \"email\": \"alice.johnson@student.sabanciuniv.edu\",\n    \"student_id\": \"20002\",\n    \"major\": \"Industrial Engineering\",\n    \"gpa\": \"3.8\",\n    \"phone\": \"555-987-6543\",\n    \"address\": \"Sabanci University Campus, Istanbul\",\n    \"bio\": \"Industrial engineering student with interests in operations research and data analytics.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/backend/api/admin.php?action=add_student",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "admin.php"],
+							"query": [
+								{"key": "action", "value": "add_student"}
+							]
+						},
+						"description": "Adds a new student to the system with complete profile information."
+					}
+				},
+				{
+					"name": "Update Student Information",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"student_id\": 1,\n    \"name\": \"John Doe (Updated)\",\n    \"email\": \"john.doe.updated@student.sabanciuniv.edu\",\n    \"major\": \"Computer Engineering\",\n    \"gpa\": \"3.6\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/backend/api/admin.php?action=update_student",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "admin.php"],
+							"query": [
+								{"key": "action", "value": "update_student"}
+							]
+						},
+						"description": "Updates an existing student's information."
+					}
+				}
+			]
+		},
+		{
+			"name": "🏢 Company Management",
+			"item": [
+				{
+					"name": "Get All Companies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/admin.php?action=get_companies",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "admin.php"],
+							"query": [
+								{"key": "action", "value": "get_companies"}
+							]
+						},
+						"description": "Retrieves all companies registered in the system."
+					}
+				},
+				{
+					"name": "Add New Company",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Innovative Solutions Ltd\",\n    \"email\": \"hr@innovativesolutions.com\",\n    \"industry\": \"Software Development\",\n    \"website\": \"https://www.innovativesolutions.com\",\n    \"phone\": \"+90 212 555 7890\",\n    \"address\": \"Levent Business District, Istanbul, Turkey\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/backend/api/admin.php?action=add_company",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "admin.php"],
+							"query": [
+								{"key": "action", "value": "add_company"}
+							]
+						},
+						"description": "Adds a new company to the system with complete business information."
+					}
+				}
+			]
+		},
+		{
+			"name": "📊 System Oversight",
+			"item": [
+				{
+					"name": "Get All Applications (System-wide)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/admin.php?action=get_all_applications",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "admin.php"],
+							"query": [
+								{"key": "action", "value": "get_all_applications"}
+							]
+						},
+						"description": "Retrieves all internship applications across the entire system for administrative oversight."
+					}
+				},
+				{
+					"name": "Get System Statistics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/admin.php?action=get_system_stats",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "admin.php"],
+							"query": [
+								{"key": "action", "value": "get_system_stats"}
+							]
+						},
+						"description": "Gets comprehensive system statistics including total users, applications, internships, and success rates."
+					}
+				}
+			]
+		},
+		{
+			"name": "📋 Testing & Help",
+			"item": [
+				{
+					"name": "API Help & Documentation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/backend/api/admin.php",
+							"host": ["{{base_url}}"],
+							"path": ["backend", "api", "admin.php"]
+						},
+						"description": "Returns API documentation and available endpoints for the Admin API."
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8001",
+			"type": "string"
+		}
+	]
+}
