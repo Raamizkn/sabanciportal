@@ -20,19 +20,33 @@ $students = [
 $internships = [
     [
         "id" => 101,
+        "company_id" => 1,
         "company_name" => "ABC Technologies",
         "title" => "Software Engineer Intern",
         "location" => "Istanbul, Turkey",
         "dates" => "June 2024 - August 2024",
-        "description" => "Work on exciting projects in the web development team. Required skills: PHP, JavaScript, HTML, CSS."
+        "description" => "Work on exciting projects in the web development team. Required skills: PHP, JavaScript, HTML, CSS.",
+        "requirements" => "PHP, JavaScript, HTML, CSS experience preferred",
+        "salary" => "3500 TL/month",
+        "type" => "Full-time",
+        "status" => "Active",
+        "created_date" => "2024-05-01",
+        "application_deadline" => "2024-05-30"
     ],
     [
         "id" => 102,
+        "company_id" => 2,
         "company_name" => "Global Innovations",
         "title" => "Data Analyst Intern",
         "location" => "Remote",
         "dates" => "July 2024 - September 2024",
-        "description" => "Analyze large datasets and generate reports. Required skills: Python, SQL, Tableau."
+        "description" => "Analyze large datasets and generate reports. Required skills: Python, SQL, Tableau.",
+        "requirements" => "Python, SQL, Tableau knowledge required",
+        "salary" => "4000 TL/month",
+        "type" => "Full-time",
+        "status" => "Active",
+        "created_date" => "2024-05-05",
+        "application_deadline" => "2024-06-15"
     ]
 ];
 
