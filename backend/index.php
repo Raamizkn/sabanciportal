@@ -61,6 +61,61 @@ elseif ($entity === 'applications') {
 elseif ($entity === 'documents') {
     require_once __DIR__ . '/handlers/documents_handler.php';
 }
+elseif ($entity === 'admin') {
+    require_once __DIR__ . '/handlers/admin_handler.php';
+    
+    $resource = $_GET['resource'] ?? null;
+    // Note: The 'id' from the general parameters is used here as well.
+    $action = $_GET['action'] ?? null;
+    $response = null;
+
+    switch ($resource) {
+        case 'students':
+            if ($method === 'GET') {
+                $response = ($id !== null) ? get_student_details_admin($id) : get_all_students();
+            } elseif ($method === 'POST') {
+                if ($action === 'add') $response = add_new_student($input);
+                elseif ($action === 'update' && $id !== null) $response = update_student($id, $input);
+                elseif ($action === 'delete' && $id !== null) $response = delete_student($id);
+                elseif ($action === 'impersonate' && $id !== null) $response = impersonate_student($id);
+            }
+            break;
+
+        case 'companies':
+            if ($method === 'GET') {
+                $response = ($id !== null) ? get_company_details_admin($id) : get_all_companies();
+            } elseif ($method === 'POST') {
+                if ($action === 'add') $response = add_new_company($input);
+                elseif ($action === 'update' && $id !== null) $response = update_company($id, $input);
+                elseif ($action === 'delete' && $id !== null) $response = delete_company($id);
+                elseif ($action === 'impersonate' && $id !== null) $response = impersonate_company($id);
+            }
+            break;
+
+        case 'terms':
+            if ($method === 'GET') {
+                $response = get_all_terms();
+            } elseif ($method === 'POST') {
+                if ($action === 'add') $response = add_term($input);
+                elseif ($action === 'update' && $id !== null) $response = update_term($id, $input);
+                elseif ($action === 'delete' && $id !== null) $response = delete_term($id);
+            }
+            break;
+        
+        // Add more admin resources here as needed...
+    }
+
+    if ($response !== null) {
+        if (isset($response['error'])) {
+            http_response_code(400); // Bad Request or Not Found, depending on context
+        }
+        echo json_encode($response);
+    } else {
+        http_response_code(400);
+        echo json_encode(['error' => 'Invalid or unsupported admin resource or action.']);
+    }
+    exit; // IMPORTANT: Stop script execution to prevent falling through to the default message
+}
 // Legacy endpoint for old tests - can be removed later
 elseif ($method === 'GET' && isset($_GET['path']) && $_GET['path'] === 'users') {
     $users = [ ['id' => 1, 'name' => 'Alice'], ['id' => 2, 'name' => 'Bob'] ];
