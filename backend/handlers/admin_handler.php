@@ -158,11 +158,18 @@ function add_new_company($data) {
     }
 
     try {
+        // Hash password if provided
+        $passwordHash = null;
+        if (!empty($data['password'])) {
+            $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
+        }
+        
         // Insert into database
-        $stmt = $db->prepare("INSERT INTO companies (name, email, industry, website, phone, address, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $db->prepare("INSERT INTO companies (name, email, password_hash, industry, website, phone, address, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $data['name'],
             $data['email'],
+            $passwordHash,
             $data['industry'] ?? null,
             $data['website'] ?? null,
             $data['phone'] ?? null,

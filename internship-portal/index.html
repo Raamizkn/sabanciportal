@@ -483,12 +483,12 @@
 					email = email.toLowerCase();
 					if (email.includes('admin')) {
 						userType = 'admin';
-					} else if (email.includes('company')) {
+					} else if (email.includes('company') || email.includes('super') || email.includes('innovate') || email.includes('tech')) {
 						userType = 'company';
-					} else if (email.includes('student')) {
+					} else if (email.includes('student') || email.includes('jane') || email.includes('ahmet')) {
 						userType = 'student';
 					} else {
-						alert('Please select a user type.');
+						alert('Please select a user type from the dropdown.');
 						return;
 					}
 				}
