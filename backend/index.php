@@ -1,5 +1,43 @@
 <?php
 
+// Get the origin from the request
+$origin = $_SERVER['HTTP_ORIGIN'] ?? null;
+
+// Allow specific origins (for development and production)
+$allowedOrigins = [
+    'http://localhost:8000',
+    'http://localhost:3000',
+    'http://127.0.0.1:8000',
+    'http://127.0.0.1:3000',
+    'http://pro2-dev.sabanciuniv.edu',
+    'https://pro2-dev.sabanciuniv.edu'
+];
+
+// Set the allowed origin
+if ($origin && in_array($origin, $allowedOrigins)) {
+    $allowedOrigin = $origin;
+} else {
+    // Fallback for wildcard (no credentials)
+    $allowedOrigin = '*';
+}
+
+// Handle CORS preflight requests
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header("Access-Control-Allow-Origin: $allowedOrigin");
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization');
+    header('Access-Control-Allow-Credentials: true');
+    header('Access-Control-Max-Age: 86400');
+    http_response_code(200);
+    exit;
+}
+
+// Set CORS headers for all requests
+header("Access-Control-Allow-Origin: $allowedOrigin");
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Access-Control-Allow-Credentials: true');
+
 // Set the content type to JSON
 header('Content-Type: application/json');
 

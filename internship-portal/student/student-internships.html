@@ -6,22 +6,30 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>Browse Internships - Sabancı University Internship Portal</title>
 
+	
+	<!-- Path Resolver - MUST be loaded first -->
+	<script src="../js/path-resolver.js"></script>
+
 	<!-- Global stylesheets -->
-	<link href="/bs5/template/assets/fonts/inter/inter.css" rel="stylesheet" type="text/css">
-	<link href="/bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
-	<link href="/bs5/template/html/layout_1/full/assets/css/ltr/all.min.css?v=1" id="stylesheet" rel="stylesheet" type="text/css">
-	<link href="/internship-portal/assets/css/sabanci-theme.css" rel="stylesheet" type="text/css">
+	<link href="../bs5/template/assets/fonts/inter/inter.css" rel="stylesheet" type="text/css">
+	<link href="../bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
+	<link href="../bs5/template/html/layout_1/full/assets/css/ltr/all.min.css?v=1" id="stylesheet" rel="stylesheet" type="text/css">
+	<link href="../assets/css/sabanci-theme.css" rel="stylesheet" type="text/css">
 	<!-- /global stylesheets -->
 
 	<!-- Core JS files -->
-	<script src="/bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+	<script src="../bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
 	<!-- /core JS files -->
 
 	<!-- Theme JS files -->
-	<script src="/bs5/template/assets/js/vendor/tables/datatables/datatables.min.js"></script>
-	<script src="/bs5/template/html/layout_1/full/assets/js/app.js"></script>
-	<script src="/bs5/template/assets/demo/pages/datatables_basic.js"></script>
+	<script src="../bs5/template/assets/js/vendor/tables/datatables/datatables.min.js"></script>
+	<script src="../bs5/template/html/layout_1/full/assets/js/app.js"></script>
+	<script src="../bs5/template/assets/demo/pages/datatables_basic.js"></script>
 	<!-- /theme JS files -->
+	
+	<!-- API Service -->
+	<script src="../js/api.js"></script>
+	<!-- /API Service -->
 	
 	<!-- Custom style for proper scrolling -->
 	<style>
@@ -68,7 +76,7 @@
 
 			<div class="navbar-brand flex-1 flex-lg-0">
 				<a href="student-dashboard.html" class="d-inline-flex align-items-center">
-					<img src="/assets/images/logo.svg" alt="Sabancı University Logo" class="h-48px me-2">
+					<img src="../assets/images/logo.svg" alt="Sabancı University Logo" class="h-48px me-2">
 					<span class="d-none d-sm-inline-block h6 mb-0 ms-2">Sabancı University Internship Portal</span>
 				</a>
 			</div>
@@ -141,7 +149,7 @@
 				<li class="nav-item nav-item-dropdown-lg dropdown ms-lg-2">
 					<a href="#" class="navbar-nav-link align-items-center rounded-pill p-1" data-bs-toggle="dropdown">
 						<div class="status-indicator-container">
-							<img src="/bs5/template/assets/images/demo/users/face11.jpg" class="w-32px h-32px rounded-pill" alt="">
+							<img src="../bs5/template/assets/images/demo/users/face11.jpg" class="w-32px h-32px rounded-pill" alt="">
 							<span class="status-indicator bg-success"></span>
 						</div>
 						<span class="d-none d-lg-inline-block mx-lg-2">John Doe</span>
@@ -385,7 +393,7 @@
 							<div class="card-body">
 								<div class="d-flex align-items-start mb-3">
 									<div class="me-3">
-										<img src="../../bs5/template/assets/images/demo/logos/2.svg" class="rounded" width="44" height="44" alt="">
+										<img src="../bs5/template/assets/images/demo/logos/2.svg" class="rounded" width="44" height="44" alt="">
 									</div>
 									<div>
 										<h5 class="mb-1">Marketing Intern</h5>
@@ -429,7 +437,7 @@
 							<div class="card-body">
 								<div class="d-flex align-items-start mb-3">
 									<div class="me-3">
-										<img src="../../bs5/template/assets/images/demo/logos/3.svg" class="rounded" width="44" height="44" alt="">
+										<img src="../bs5/template/assets/images/demo/logos/3.svg" class="rounded" width="44" height="44" alt="">
 									</div>
 									<div>
 										<h5 class="mb-1">Software Developer Intern</h5>
@@ -473,7 +481,7 @@
 							<div class="card-body">
 								<div class="d-flex align-items-start mb-3">
 									<div class="me-3">
-										<img src="../../bs5/template/assets/images/demo/logos/4.svg" class="rounded" width="44" height="44" alt="">
+										<img src="../bs5/template/assets/images/demo/logos/4.svg" class="rounded" width="44" height="44" alt="">
 									</div>
 									<div>
 										<h5 class="mb-1">Data Analyst Intern</h5>
@@ -517,7 +525,7 @@
 							<div class="card-body">
 								<div class="d-flex align-items-start mb-3">
 									<div class="me-3">
-										<img src="../../bs5/template/assets/images/demo/logos/1.svg" class="rounded" width="44" height="44" alt="">
+										<img src="../bs5/template/assets/images/demo/logos/1.svg" class="rounded" width="44" height="44" alt="">
 									</div>
 									<div>
 										<h5 class="mb-1">UI/UX Designer Intern</h5>
@@ -561,7 +569,7 @@
 							<div class="card-body">
 								<div class="d-flex align-items-start mb-3">
 									<div class="me-3">
-										<img src="../../bs5/template/assets/images/demo/logos/5.svg" class="rounded" width="44" height="44" alt="">
+										<img src="../bs5/template/assets/images/demo/logos/5.svg" class="rounded" width="44" height="44" alt="">
 									</div>
 									<div>
 										<h5 class="mb-1">Digital Marketing Intern</h5>
@@ -605,7 +613,7 @@
 							<div class="card-body">
 								<div class="d-flex align-items-start mb-3">
 									<div class="me-3">
-										<img src="../../bs5/template/assets/images/demo/logos/6.svg" class="rounded" width="44" height="44" alt="">
+										<img src="../bs5/template/assets/images/demo/logos/6.svg" class="rounded" width="44" height="44" alt="">
 									</div>
 									<div>
 										<h5 class="mb-1">Financial Analyst Intern</h5>
@@ -709,7 +717,7 @@
 	</div>
 	<!-- /page content -->
 
-    <!-- Add logout script -->
+    <!-- Main functionality script -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Student internships script loaded.');
@@ -719,21 +727,26 @@
             logoutLinks.forEach(link => {
                 link.addEventListener('click', (event) => {
                     localStorage.removeItem('userRole');
+                    localStorage.removeItem('userId');
                 });
             });
 
             // Auth check
             const userRole = localStorage.getItem('userRole');
+            const userId = localStorage.getItem('userId');
             const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'student';
             
             if (userRole !== 'student' && !isBeingImpersonated) {
                 alert('Access denied. Redirecting to login page.');
                 window.location.href = '../index.html';
+                return;
             }
+
+            // Load internships from API
+            loadInternships();
 
             // Filtering functionality
             const filterSelects = document.querySelectorAll('.filter-select');
-            const internshipCards = document.querySelectorAll('.card[data-category]');
             const keywordsInput = document.querySelector('input[placeholder="Job title, skills, etc"]');
             const locationInput = document.querySelector('input[placeholder="City, country, region"]');
 
@@ -744,49 +757,6 @@
                 keywords: '',
                 location: ''
             };
-
-            // Function to check if a card matches all current filters
-            function cardMatchesFilters(card) {
-                // Check category
-                if (currentFilters.category !== 'all' && card.dataset.category !== currentFilters.category) {
-                    return false;
-                }
-
-                // Check mode
-                if (currentFilters.mode !== 'all' && card.dataset.mode !== currentFilters.mode) {
-                    return false;
-                }
-
-                // Check keywords
-                if (currentFilters.keywords) {
-                    const cardText = card.textContent.toLowerCase();
-                    const keywords = currentFilters.keywords.toLowerCase().split(' ');
-                    if (!keywords.every(keyword => cardText.includes(keyword))) {
-                        return false;
-                    }
-                }
-
-                // Check location
-                if (currentFilters.location) {
-                    const locationText = card.querySelector('.ph-map-pin')?.parentElement?.textContent.toLowerCase() || '';
-                    if (!locationText.includes(currentFilters.location.toLowerCase())) {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-
-            // Function to apply all filters
-            function applyFilters() {
-                internshipCards.forEach(card => {
-                    if (cardMatchesFilters(card)) {
-                        card.style.display = '';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            }
 
             // Add event listeners to select elements
             filterSelects.forEach(select => {
@@ -812,6 +782,192 @@
                 });
             }
         });
+
+        async function loadInternships() {
+            try {
+                const response = await fetch('http://localhost:8001/index.php?entity=internships', {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    displayInternships(data);
+                }
+            } catch (error) {
+                console.error('Error loading internships:', error);
+            }
+        }
+
+        function displayInternships(internships) {
+            const container = document.querySelector('.row');
+            if (!container || !internships || internships.length === 0) return;
+
+            // Clear existing static content
+            container.innerHTML = '';
+
+            internships.forEach(internship => {
+                const card = createInternshipCard(internship);
+                container.appendChild(card);
+            });
+        }
+
+        function createInternshipCard(internship) {
+            const col = document.createElement('div');
+            col.className = 'col-xl-4 col-md-6';
+            
+            // Set data attributes for filtering
+            const locationLower = (internship.location || '').toLowerCase();
+            if (locationLower.includes('remote')) {
+                col.setAttribute('data-mode', 'remote');
+            } else if (locationLower.includes('hybrid')) {
+                col.setAttribute('data-mode', 'hybrid');
+            } else {
+                col.setAttribute('data-mode', 'in-person');
+            }
+
+            col.innerHTML = `
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="me-3">
+                                <img src="../bs5/template/assets/images/demo/logos/2.svg" class="rounded" width="44" height="44" alt="">
+                            </div>
+                            <div>
+                                <h5 class="mb-1">${internship.position || 'N/A'}</h5>
+                                <div class="text-muted">${internship.company_name || 'Company'}</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <p>${internship.description || 'No description available'}</p>
+                        </div>
+
+                        <ul class="list-unstyled mb-3">
+                            <li class="mb-1">
+                                <i class="ph-map-pin me-1"></i>
+                                ${internship.location || 'Not specified'}
+                            </li>
+                            <li>
+                                <i class="ph-calendar me-1"></i>
+                                ${internship.dates || 'Not specified'}
+                            </li>
+                        </ul>
+
+                        ${internship.requirements ? `
+                        <div class="mb-3">
+                            ${internship.requirements.split(',').map(req => 
+                                `<span class="badge bg-primary rounded-pill me-1">${req.trim()}</span>`
+                            ).join('')}
+                        </div>
+                        ` : ''}
+
+                        <div class="d-flex mt-auto">
+                            <div>
+                                <span class="text-muted">${internship.created_at ? 'Posted ' + new Date(internship.created_at).toLocaleDateString() : ''}</span>
+                            </div>
+                            <button type="button" class="btn btn-primary ms-auto" onclick="applyForInternship(${internship.id})">Apply Now</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            return col;
+        }
+
+        async function applyForInternship(internshipId) {
+            const studentId = localStorage.getItem('userId');
+            
+            if (!studentId) {
+                alert('Please login to apply for internships.');
+                window.location.href = '../index.html';
+                return;
+            }
+
+            const coverLetter = prompt('Please enter your cover letter (optional):');
+            
+            try {
+                const response = await fetch('http://localhost:8001/index.php?entity=applications&action=apply', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        internship_id: internshipId,
+                        cover_letter: coverLetter || ''
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('Application submitted successfully!');
+                } else {
+                    alert(data.error || 'Failed to submit application. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error applying for internship:', error);
+                alert('An error occurred. Please try again.');
+            }
+        }
+
+        function applyFilters() {
+            const internshipCards = document.querySelectorAll('.card[data-mode]');
+            const keywordsInput = document.querySelector('input[placeholder="Job title, skills, etc"]');
+            const locationInput = document.querySelector('input[placeholder="City, country, region"]');
+            
+            // Store current filter values
+            let currentFilters = {
+                category: 'all',
+                mode: 'all',
+                keywords: keywordsInput ? keywordsInput.value : '',
+                location: locationInput ? locationInput.value : ''
+            };
+
+            const filterSelects = document.querySelectorAll('.filter-select');
+            filterSelects.forEach(select => {
+                const filterType = select.dataset.filterType;
+                if (filterType) {
+                    currentFilters[filterType] = select.value;
+                }
+            });
+
+            // Function to check if a card matches all current filters
+            function cardMatchesFilters(card) {
+                // Check mode
+                if (currentFilters.mode !== 'all' && card.dataset.mode !== currentFilters.mode) {
+                    return false;
+                }
+
+                // Check keywords
+                if (currentFilters.keywords) {
+                    const cardText = card.textContent.toLowerCase();
+                    const keywords = currentFilters.keywords.toLowerCase().split(' ');
+                    if (!keywords.every(keyword => cardText.includes(keyword))) {
+                        return false;
+                    }
+                }
+
+                // Check location
+                if (currentFilters.location) {
+                    const locationText = card.querySelector('.ph-map-pin')?.parentElement?.textContent.toLowerCase() || '';
+                    if (!locationText.includes(currentFilters.location.toLowerCase())) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            // Apply filters
+            internshipCards.forEach(card => {
+                if (cardMatchesFilters(card)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
     </script>
 
 	<!-- Impersonation detection script -->

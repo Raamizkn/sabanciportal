@@ -6,19 +6,22 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>Sabancı University - Internship Portal</title>
 
+	<!-- Path Resolver - MUST be loaded first -->
+	<script src="js/path-resolver.js"></script>
+
 	<!-- Global stylesheets -->
-	<link href="/bs5/template/assets/fonts/inter/inter.css" rel="stylesheet" type="text/css">
-	<link href="/bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
-	<link href="/bs5/template/html/layout_1/full/assets/css/ltr/all.min.css" id="stylesheet" rel="stylesheet" type="text/css">
-	<link href="/internship-portal/assets/css/sabanci-theme.css" rel="stylesheet" type="text/css">
+	<link href="bs5/template/assets/fonts/inter/inter.css" rel="stylesheet" type="text/css">
+	<link href="bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
+	<link href="bs5/template/html/layout_1/full/assets/css/ltr/all.min.css" id="stylesheet" rel="stylesheet" type="text/css">
+	<link href="assets/css/sabanci-theme.css" rel="stylesheet" type="text/css">
 	<!-- /global stylesheets -->
 
 	<!-- Core JS files -->
-	<script src="/bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+	<script src="bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
 	<!-- /core JS files -->
 
 	<!-- Theme JS files -->
-	<script src="/bs5/template/html/layout_1/full/assets/js/app.js"></script>
+	<script src="bs5/template/html/layout_1/full/assets/js/app.js"></script>
 	<!-- /theme JS files -->
 
 </head>
@@ -35,8 +38,8 @@
 			</div>
 
 			<div class="navbar-brand flex-1 flex-lg-0">
-				<a href="/internship-portal/index.html" class="d-inline-flex align-items-center">
-					<img src="/assets/images/logo.svg" alt="Sabancı University Logo" class="h-48px">
+				<a href="index.html" class="d-inline-flex align-items-center">
+					<img src="assets/images/logo.svg" alt="Sabancı University Logo" class="h-48px">
 					<span class="d-none d-sm-inline-block h5 mb-0 ms-2">Sabancı University Internship Portal</span>
 				</a>
 			</div>
@@ -124,14 +127,14 @@
 
 					<!-- Login form -->
 					<div class="card mb-0">
-						<div class="card-body">
-							<div class="text-center mb-3">
-								<div class="d-inline-flex align-items-center justify-content-center mb-4 mt-2">
-									<img src="/assets/images/logo.svg" class="h-48px" alt="Sabancı University Logo">
-								</div>
-								<h5 class="mb-0">Login to your account</h5>
-								<span class="d-block text-muted">Enter your credentials below</span>
+					<div class="card-body">
+						<div class="text-center mb-3">
+							<div class="d-inline-flex align-items-center justify-content-center mb-4 mt-2">
+								<img src="assets/images/logo.svg" class="h-48px" alt="Sabancı University Logo">
 							</div>
+							<h5 class="mb-0">Login to your account</h5>
+							<span class="d-block text-muted">Enter your credentials below</span>
+						</div>
 
 							<div class="mb-3">
 								<label class="form-label">Email</label>
@@ -469,48 +472,69 @@
 			}
 
 			// Common login handler function
-			function handleLogin(email, password, userType) {
-				// For demo purposes, we'll just check specific email examples
-				// In a production environment, this would connect to a backend service
-				email = email.toLowerCase();
-				
-				let redirectUrl = null;
-				let role = null;
+			async function handleLogin(email, password, userType) {
+				if (!email || !password) {
+					alert('Please enter both email and password.');
+					return;
+				}
 
-				if (email === 'admin@example.com' || (email.includes('admin') && userType === 'admin')) {
-					role = 'admin';
-					redirectUrl = 'admin/admin-dashboard.html';
-				} else if (email === 'company@example.com' || (email.includes('company') && userType === 'company')) {
-					role = 'company';
-					redirectUrl = 'company/company-dashboard.html';
-				} else if (email === 'student@example.com' || (email.includes('student') && userType === 'student')) {
-					role = 'student';
-					redirectUrl = 'student/student-dashboard.html';
-				} else {
-					// For demonstration, allow any email with the correct user type
-					if (userType === 'admin') {
-						role = 'admin';
-						redirectUrl = 'admin/admin-dashboard.html';
-					} else if (userType === 'company') {
-						role = 'company';
-						redirectUrl = 'company/company-dashboard.html';
-					} else if (userType === 'student') {
-						role = 'student';
-						redirectUrl = 'student/student-dashboard.html';
+				// If no user type selected, try to infer from email
+				if (!userType) {
+					email = email.toLowerCase();
+					if (email.includes('admin')) {
+						userType = 'admin';
+					} else if (email.includes('company')) {
+						userType = 'company';
+					} else if (email.includes('student')) {
+						userType = 'student';
 					} else {
 						alert('Please select a user type.');
 						return;
 					}
 				}
 
-				if (role && redirectUrl) {
-					// Store role in localStorage for session management
-					localStorage.setItem('userRole', role);
-					
-					// Redirect to appropriate dashboard
-					window.location.href = redirectUrl;
-				} else {
-					alert('Invalid login credentials. For demo, use admin@example.com, company@example.com, student@example.com, or select a user type.');
+				try {
+					const response = await fetch('http://localhost:8001/index.php?entity=auth&action=login', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						credentials: 'include', // Important for cookies
+						body: JSON.stringify({
+							email: email,
+							password: password,
+							role: userType
+						})
+					});
+
+					const data = await response.json();
+
+					if (response.ok && data.status === 'success') {
+						// Store user info in localStorage
+						localStorage.setItem('userRole', data.user.role);
+						localStorage.setItem('userId', data.user.id);
+						localStorage.setItem('userEmail', data.user.email);
+						localStorage.setItem('userName', data.user.name || data.user.username);
+
+						// Redirect based on role
+						let redirectUrl = '';
+						if (data.user.role === 'admin') {
+							redirectUrl = 'admin/admin-dashboard.html';
+						} else if (data.user.role === 'company') {
+							redirectUrl = 'company/company-dashboard.html';
+						} else if (data.user.role === 'student') {
+							redirectUrl = 'student/student-dashboard.html';
+						}
+
+						if (redirectUrl) {
+							window.location.href = redirectUrl;
+						}
+					} else {
+						alert(data.error || 'Login failed. Please check your credentials.');
+					}
+				} catch (error) {
+					console.error('Login error:', error);
+					alert('An error occurred during login. Please try again.');
 				}
 			}
 		});
