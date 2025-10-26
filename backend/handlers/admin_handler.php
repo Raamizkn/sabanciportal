@@ -2,6 +2,11 @@
 
 // Admin Handler - Contains all business logic for admin-related API calls.
 
+// Get database connection
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../auth/auth.php';
+$db = getDB();
+
 // --- Term Management --- //
 function get_all_terms() {
     global $terms;
@@ -9,6 +14,10 @@ function get_all_terms() {
 }
 function add_term($data) {
     global $terms;
+    
+    // Require admin role
+    requireRole(ROLE_ADMIN);
+    
     // Basic validation
     if (empty($data['name']) || empty($data['start_date']) || empty($data['end_date'])) {
         return ['error' => 'Missing required term data.'];
@@ -26,6 +35,10 @@ function add_term($data) {
 }
 function update_term($term_id, $data) {
     global $terms;
+    
+    // Require admin role
+    requireRole(ROLE_ADMIN);
+    
     foreach ($terms as &$term) {
         if ($term['id'] == $term_id) {
             $term = array_merge($term, $data);
@@ -36,6 +49,10 @@ function update_term($term_id, $data) {
 }
 function delete_term($term_id) {
     global $terms;
+    
+    // Require admin role
+    requireRole(ROLE_ADMIN);
+    
     foreach ($terms as $key => $term) {
         if ($term['id'] == $term_id) {
             // In a real app, you would delete from the database.
@@ -53,6 +70,10 @@ function get_all_students() {
 }
 function add_new_student($data) {
     global $students;
+    
+    // Require admin role
+    requireRole(ROLE_ADMIN);
+    
     // Basic validation
     if (empty($data['name']) || empty($data['email']) || empty($data['student_id'])) {
         return ['error' => 'Missing required student data.'];
@@ -75,6 +96,10 @@ function add_new_student($data) {
 }
 function update_student($student_id, $data) {
     global $students;
+    
+    // Require admin role
+    requireRole(ROLE_ADMIN);
+    
     foreach ($students as &$student) {
         if ($student['id'] == $student_id) {
             $student = array_merge($student, $data);
@@ -85,6 +110,10 @@ function update_student($student_id, $data) {
 }
 function delete_student($student_id) {
     global $students;
+    
+    // Require admin role
+    requireRole(ROLE_ADMIN);
+    
     foreach ($students as $key => $student) {
         if ($student['id'] == $student_id) {
             // unset($students[$key]);
@@ -119,22 +148,39 @@ function get_all_companies() {
     return $companies;
 }
 function add_new_company($data) {
-    global $companies;
+    global $db;
+    
+    // Require admin role
+    requireRole(ROLE_ADMIN);
+    
     if (empty($data['name']) || empty($data['email'])) {
         return ['error' => 'Missing required company data.'];
     }
 
-    $new_company = [
-        'id' => count($companies) + 1,
-        'name' => $data['name'],
-        'email' => $data['email'],
-        'industry' => $data['industry'] ?? '',
-        'website' => $data['website'] ?? '',
-        'phone' => $data['phone'] ?? '',
-        'address' => $data['address'] ?? ''
-    ];
-
-    return ['status' => 'success', 'message' => 'Company added successfully.', 'data' => $new_company];
+    try {
+        // Insert into database
+        $stmt = $db->prepare("INSERT INTO companies (name, email, industry, website, phone, address, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([
+            $data['name'],
+            $data['email'],
+            $data['industry'] ?? null,
+            $data['website'] ?? null,
+            $data['phone'] ?? null,
+            $data['address'] ?? null,
+            $data['description'] ?? null
+        ]);
+        
+        $newId = $db->lastInsertId();
+        
+        // Fetch the created company
+        $stmt = $db->prepare("SELECT * FROM companies WHERE id = ?");
+        $stmt->execute([$newId]);
+        $new_company = $stmt->fetch();
+        
+        return ['status' => 'success', 'message' => 'Company added successfully.', 'data' => $new_company];
+    } catch(PDOException $e) {
+        return ['error' => 'Failed to create company: ' . $e->getMessage()];
+    }
 }
 function get_company_details_admin($company_id) {
     global $companies;
@@ -147,6 +193,10 @@ function get_company_details_admin($company_id) {
 }
 function update_company($company_id, $data) {
     global $companies;
+    
+    // Require admin role
+    requireRole(ROLE_ADMIN);
+    
     foreach ($companies as &$company) {
         if ($company['id'] == $company_id) {
             $company = array_merge($company, $data);
@@ -157,6 +207,10 @@ function update_company($company_id, $data) {
 }
 function delete_company($company_id) {
     global $companies;
+    
+    // Require admin role
+    requireRole(ROLE_ADMIN);
+    
     foreach ($companies as $key => $company) {
         if ($company['id'] == $company_id) {
             // unset($companies[$key]);

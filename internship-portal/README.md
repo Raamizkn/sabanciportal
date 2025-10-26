@@ -35,24 +35,70 @@ The portal provides distinct functionalities based on user roles:
 *   HTML5
 *   CSS3 (with custom Sabancı theme)
 *   Bootstrap 5
-*   JavaScript (Note: Currently uses `localStorage` for state management, needs modification for backend integration)
+*   JavaScript with API service (`js/api.js`)
+
+## Backend Integration
+
+The frontend is ready to integrate with the backend API. An API service has been created at `js/api.js` that provides methods for all backend operations.
+
+### API Service Usage
+
+Include the API service in your HTML:
+```html
+<script src="../js/api.js"></script>
+```
+
+Then use API methods:
+```javascript
+// Login
+const response = await api.login('company@example.com', 'password123', 'company');
+
+// Create internship
+const internship = await api.createInternship(companyId, {
+  position: "Software Developer Intern",
+  description: "Join our team...",
+  location: "Istanbul, Turkey"
+});
+
+// Apply
+const application = await api.applyForInternship(studentId, internshipId, "Cover letter...");
+```
+
+See `js/api.js` for all available methods.
 
 ## Setup and Running
 
 (Instructions for setting up and running the frontend project locally would go here - currently TBD based on further analysis of assets/scripts.)
 
-## Backend Integration
+## Backend Status
 
-This frontend requires a backend API to handle:
-*   User authentication (login, registration)
-*   Data storage and retrieval (user profiles, company profiles, internship listings, applications)
-*   Business logic for application processing, status updates, etc.
+✅ **Backend is fully functional!**
 
-A basic PHP backend is under development in the `/backend` directory.
+The PHP backend in `/backend` directory includes:
+*   ✅ Complete database integration (MySQL)
+*   ✅ Authentication & authorization
+*   ✅ Role-based access control
+*   ✅ Complete API endpoints
+*   ✅ Session management
 
-**Current Backend Status:**
-*   Uses a single `index.php` entry point.
-*   Handles basic student application actions (`fetch`, `withdraw`, `confirm`) using **mock data**.
-*   Next steps involve adding database integration, user authentication, and implementing other modules.
+### Next Steps for Frontend Integration
 
-*(This README will be updated as the project evolves.)* 
+1. **Update HTML pages** to use `js/api.js`
+2. **Add login functionality** using API service
+3. **Replace localStorage** with API calls
+4. **Add error handling** for API responses
+5. **Test end-to-end workflows**
+
+### Example Integration
+
+**Before (localStorage):**
+```javascript
+localStorage.setItem('applications', JSON.stringify(applications));
+```
+
+**After (API):**
+```javascript
+const applications = await api.getStudentApplications(studentId);
+```
+
+See `../WORKFLOW_TEST.md` for complete integration examples. 

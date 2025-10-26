@@ -4,9 +4,27 @@ This document outlines the available endpoints for the backend. The API follows 
 
 **Base URL:** `http://localhost:8001/`
 
+## 🔒 Authentication
+
+**IMPORTANT**: All POST operations require authentication. You must login first.
+
+### Login
+```bash
+POST /index.php?entity=auth&action=login
+Body: {
+  "email": "company@example.com",
+  "password": "password123",
+  "role": "company"
+}
+```
+
+After login, use session cookies for subsequent requests.
+
 ## API Design
 
 The API uses a **Front Controller** pattern. All requests are routed through `index.php`. The type of data you want to interact with is specified by the `entity` URL parameter, and the specific action is specified by the `action` parameter for POST requests.
+
+**Security**: All endpoints now enforce role-based access control and ownership verification.
 
 ---
 
@@ -33,14 +51,15 @@ These endpoints are for actions a student would typically perform.
 ### 4. Apply for an Internship
 - **Method:** `POST`
 - **URL:** `http://localhost:8001/index.php?entity=applications&action=apply`
+- **Auth Required:** ✅ Student role
 - **Body (JSON):**
   ```json
   {
-      "student_id": 1,
-      "internship_id": "INT003",
+      "internship_id": 1,
       "cover_letter": "I am very excited about this opportunity."
   }
   ```
+- **Note:** `student_id` is automatically retrieved from session. No need to specify it.
 
 ### 5. Withdraw an Application
 - **Method:** `POST`
@@ -89,20 +108,26 @@ These endpoints are for actions a company representative would perform.
 ### 2. Create a New Internship
 - **Method:** `POST`
 - **URL:** `http://localhost:8001/index.php?entity=internships&action=create`
+- **Auth Required:** ✅ Company role
 - **Body (JSON):**
   ```json
   {
-      "company_id": "COMP001",
-      "company_name": "Tech Solutions Inc.",
       "position": "Frontend Developer Intern",
       "description": "Work with our amazing frontend team on a new product.",
-      "location": "Remote"
+      "location": "Remote",
+      "dates": "June 2025 - August 2025",
+      "requirements": "React, JavaScript",
+      "salary": "4000 TL/month",
+      "type": "Full-time",
+      "application_deadline": "2025-05-31"
   }
   ```
+- **Note:** `company_id` and `company_name` are automatically retrieved from session. No need to specify them.
 
 ### 3. Update an Internship
 - **Method:** `POST`
 - **URL:** `http://localhost:8001/index.php?entity=internships&id={internship_id}&action=update`
+- **Auth Required:** ✅ Company role (must own the internship)
 - **URL Parameters:**
   - `id`: The ID of the internship to update.
 - **Body (JSON):**
@@ -112,6 +137,7 @@ These endpoints are for actions a company representative would perform.
       "description": "An updated description for the role."
   }
   ```
+- **Note:** Only the company that created the internship can update it.
 
 ### 4. List Applications for Your Company
 - **Method:** `GET`
@@ -184,6 +210,7 @@ These endpoints provide administrative control over the platform's core data.
 ### 6. Add a New Company
 - **Method:** `POST`
 - **URL:** `http://localhost:8001/index.php?entity=admin&resource=companies&action=add`
+- **Auth Required:** ✅ Admin role
 - **Body (JSON):**
   ```json
   {

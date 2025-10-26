@@ -4,6 +4,11 @@
 
 global $internships, $method, $entity, $id, $action, $input;
 
+// Get database connection
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../auth/auth.php';
+$db = getDB();
+
 // Helper function to generate a new internship ID (mock)
 function generateNewInternshipId() {
     global $internships;
@@ -47,76 +52,218 @@ if ($entity === 'internships') {
     elseif ($method === 'POST') {
         // Assumes company_id is part of the input for create, or derived from auth later
         if ($action === 'create') {
-            if (!isset($input['company_id']) || !isset($input['position']) || !isset($input['description'])) {
+            // Require company role
+            requireRole(ROLE_COMPANY);
+            
+            // Use authenticated company's ID
+            $company_id = getCurrentUserId();
+            
+            if (!isset($input['position']) || !isset($input['description'])) {
                 http_response_code(400);
-                echo json_encode(['error' => 'Missing company_id, position, or description for creating internship.']);
+                echo json_encode(['error' => 'Missing position or description for creating internship.']);
                 exit;
             }
-            $new_internship_id = generateNewInternshipId();
-            $new_internship = [
-                'id' => $new_internship_id,
-                'company_id' => $input['company_id'], // This would come from authenticated user later
-                'company_name' => $input['company_name'] ?? 'Unknown Company', // Should be linked from company profile
-                'position' => $input['position'],
-                'description' => $input['description'],
-                'location' => $input['location'] ?? 'Not specified',
-                'posted_date' => date('Y-m-d'),
-                'status' => 'active' // Default status
-                // Add other fields like duration, requirements etc. from $input
-            ];
-            $internships[$new_internship_id] = $new_internship;
-            http_response_code(201);
-            echo json_encode($new_internship);
+            
+            try {
+                // Get company name from authenticated user
+                $stmt = $db->prepare("SELECT name FROM companies WHERE id = ?");
+                $stmt->execute([$company_id]);
+                $company = $stmt->fetch();
+                
+                if (!$company) {
+                    http_response_code(400);
+                    echo json_encode(['error' => 'Company not found.']);
+                    exit;
+                }
+                
+                // Insert into database
+                $stmt = $db->prepare("INSERT INTO internships (company_id, company_name, title, position, description, location, dates, requirements, salary, type, status, application_deadline, posted_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', ?, CURDATE())");
+                $stmt->execute([
+                    $company_id,
+                    $company['name'],
+                    $input['position'], // title
+                    $input['position'],
+                    $input['description'],
+                    $input['location'] ?? 'Not specified',
+                    $input['dates'] ?? 'TBD',
+                    $input['requirements'] ?? '',
+                    $input['salary'] ?? 'Not specified',
+                    $input['type'] ?? 'Full-time',
+                    $input['application_deadline'] ?? null
+                ]);
+                
+                $newId = $db->lastInsertId();
+                
+                // Fetch the created internship
+                $stmt = $db->prepare("SELECT * FROM internships WHERE id = ?");
+                $stmt->execute([$newId]);
+                $new_internship = $stmt->fetch();
+                
+                http_response_code(201);
+                echo json_encode($new_internship);
+            } catch(PDOException $e) {
+                http_response_code(500);
+                echo json_encode(['error' => 'Failed to create internship: ' . $e->getMessage()]);
+            }
         }
         elseif ($id !== null && $action === 'update') { // For POST-based update
-            if (!isset($internships[$id])) {
+            // Require company role
+            requireRole(ROLE_COMPANY);
+            
+            // Verify company owns this internship
+            $stmt = $db->prepare("SELECT company_id FROM internships WHERE id = ?");
+            $stmt->execute([$id]);
+            $internship = $stmt->fetch();
+            
+            if (!$internship) {
                 http_response_code(404);
                 echo json_encode(['error' => "Internship {$id} not found for update."]);
                 exit;
             }
-            // Assuming company_id in $input is checked against the internship's owner later with auth
-            $internships[$id] = array_merge($internships[$id], $input); // Simple merge, can be more specific
-            $internships[$id]['id'] = $id; // Ensure ID is not overwritten by input
-            echo json_encode($internships[$id]);
+            
+            if ($internship['company_id'] != getCurrentUserId()) {
+                http_response_code(403);
+                echo json_encode(['error' => "Access denied. You don't own this internship."]);
+                exit;
+            }
+            
+            // Update allowed fields
+            $allowed_fields = ['title', 'position', 'description', 'location', 'dates', 'requirements', 'salary', 'type', 'application_deadline'];
+            $update_fields = [];
+            $update_values = [];
+            
+            foreach ($allowed_fields as $field) {
+                if (isset($input[$field])) {
+                    $update_fields[] = "$field = ?";
+                    $update_values[] = $input[$field];
+                }
+            }
+            
+            if (empty($update_fields)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'No valid fields to update.']);
+                exit;
+            }
+            
+            $update_values[] = $id;
+            $stmt = $db->prepare("UPDATE internships SET " . implode(', ', $update_fields) . " WHERE id = ?");
+            $stmt->execute($update_values);
+            
+            // Fetch updated internship
+            $stmt = $db->prepare("SELECT * FROM internships WHERE id = ?");
+            $stmt->execute([$id]);
+            $updated_internship = $stmt->fetch();
+            
+            echo json_encode($updated_internship);
         }
         elseif ($id !== null && $action === 'set_status') {
-            if (!isset($internships[$id])) {
+            // Require company role
+            requireRole(ROLE_COMPANY);
+            
+            // Verify company owns this internship
+            $stmt = $db->prepare("SELECT * FROM internships WHERE id = ?");
+            $stmt->execute([$id]);
+            $internship = $stmt->fetch();
+            
+            if (!$internship) {
                 http_response_code(404);
                 echo json_encode(['error' => "Internship {$id} not found."]);
                 exit;
             }
-            if (!isset($input['status']) || !in_array($input['status'], ['active', 'inactive'])){
-                http_response_code(400);
-                echo json_encode(['error' => "Invalid status provided. Must be 'active' or 'inactive'."]);
+            
+            if ($internship['company_id'] != getCurrentUserId()) {
+                http_response_code(403);
+                echo json_encode(['error' => "Access denied. You don't own this internship."]);
                 exit;
             }
-            $internships[$id]['status'] = $input['status'];
-            echo json_encode($internships[$id]);
+            
+            if (!isset($input['status']) || !in_array($input['status'], ['Active', 'Inactive', 'Closed'])){
+                http_response_code(400);
+                echo json_encode(['error' => "Invalid status provided. Must be 'Active', 'Inactive', or 'Closed'."]);
+                exit;
+            }
+            
+            $stmt = $db->prepare("UPDATE internships SET status = ? WHERE id = ?");
+            $stmt->execute([$input['status'], $id]);
+            
+            // Fetch updated internship
+            $stmt = $db->prepare("SELECT * FROM internships WHERE id = ?");
+            $stmt->execute([$id]);
+            $updated_internship = $stmt->fetch();
+            
+            echo json_encode($updated_internship);
         }
         elseif ($id !== null && $action === 'delete') {
-            if (!isset($internships[$id])) {
+            // Require company role
+            requireRole(ROLE_COMPANY);
+            
+            // Verify company owns this internship
+            $stmt = $db->prepare("SELECT company_id FROM internships WHERE id = ?");
+            $stmt->execute([$id]);
+            $internship = $stmt->fetch();
+            
+            if (!$internship) {
                 http_response_code(404);
                 echo json_encode(['error' => "Internship {$id} not found."]);
                 exit;
             }
-            // Add auth check: ensure this company owns the internship
-            unset($internships[$id]);
+            
+            if ($internship['company_id'] != getCurrentUserId()) {
+                http_response_code(403);
+                echo json_encode(['error' => "Access denied. You don't own this internship."]);
+                exit;
+            }
+            
+            // Soft delete - set status to 'Deleted'
+            $stmt = $db->prepare("UPDATE internships SET status = 'Deleted' WHERE id = ?");
+            $stmt->execute([$id]);
+            
             echo json_encode(['message' => "Internship {$id} deleted successfully."]);
         }
         elseif ($id !== null && $action === 'duplicate') {
-            if (!isset($internships[$id])) {
+            // Require company role
+            requireRole(ROLE_COMPANY);
+            
+            // Verify company owns this internship
+            $stmt = $db->prepare("SELECT * FROM internships WHERE id = ?");
+            $stmt->execute([$id]);
+            $original_internship = $stmt->fetch();
+            
+            if (!$original_internship) {
                 http_response_code(404);
                 echo json_encode(['error' => "Internship {$id} not found to duplicate."]);
                 exit;
             }
-            $original_internship = $internships[$id];
-            $new_internship_id = generateNewInternshipId();
-            $duplicated_internship = $original_internship;
-            $duplicated_internship['id'] = $new_internship_id;
-            $duplicated_internship['position'] = $original_internship['position'] . ' (Copy)';
-            $duplicated_internship['posted_date'] = date('Y-m-d');
-            $duplicated_internship['status'] = 'inactive'; // Duplicates are inactive by default
-            $internships[$new_internship_id] = $duplicated_internship;
+            
+            if ($original_internship['company_id'] != getCurrentUserId()) {
+                http_response_code(403);
+                echo json_encode(['error' => "Access denied. You don't own this internship."]);
+                exit;
+            }
+            
+            // Create duplicate
+            $stmt = $db->prepare("INSERT INTO internships (company_id, company_name, title, position, description, location, dates, requirements, salary, type, status, application_deadline, posted_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Inactive', ?, CURDATE())");
+            $stmt->execute([
+                $original_internship['company_id'],
+                $original_internship['company_name'],
+                $original_internship['title'] . ' (Copy)',
+                $original_internship['position'] . ' (Copy)',
+                $original_internship['description'],
+                $original_internship['location'],
+                $original_internship['dates'],
+                $original_internship['requirements'],
+                $original_internship['salary'],
+                $original_internship['type'],
+                $original_internship['application_deadline']
+            ]);
+            
+            $newId = $db->lastInsertId();
+            
+            // Fetch duplicated internship
+            $stmt = $db->prepare("SELECT * FROM internships WHERE id = ?");
+            $stmt->execute([$newId]);
+            $duplicated_internship = $stmt->fetch();
+            
             http_response_code(201);
             echo json_encode($duplicated_internship);
         }

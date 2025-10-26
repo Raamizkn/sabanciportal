@@ -21,7 +21,11 @@ if ($method === 'POST' || $method === 'PUT') { // Assuming PUT might be used lat
 }
 
 // Route to the appropriate handler
-if ($entity === 'internships') {
+if ($entity === 'auth') {
+    require_once __DIR__ . '/auth/login_handler.php';
+    exit;
+}
+elseif ($entity === 'internships') {
     require_once __DIR__ . '/handlers/internships_handler.php';
 }
 elseif ($entity === 'applications') {

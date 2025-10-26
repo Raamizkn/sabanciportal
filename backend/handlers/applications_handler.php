@@ -6,6 +6,7 @@ global $applications, $internships, $method, $entity, $id, $action, $student_id_
 
 // Get database connection
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../auth/auth.php';
 $db = getDB();
 
 if ($entity === 'applications') {
@@ -54,10 +55,16 @@ if ($entity === 'applications') {
     elseif ($method === 'POST') {
         // Student actions: apply, withdraw, confirm_offer
         if ($action === 'apply') {
-            // Expected input: {"student_id": 1, "internship_id": 1, "cover_letter": "My letter"}
-            if (!isset($input['student_id']) || !isset($input['internship_id'])) {
+            // Require student role
+            requireRole(ROLE_STUDENT);
+            
+            // Use authenticated student's ID
+            $student_id = getCurrentUserId();
+            
+            // Expected input: {"internship_id": 1, "cover_letter": "My letter"}
+            if (!isset($input['internship_id'])) {
                 http_response_code(400);
-                echo json_encode(['error' => 'Missing student_id or internship_id.']);
+                echo json_encode(['error' => 'Missing internship_id.']);
                 exit;
             }
             
@@ -77,14 +84,14 @@ if ($entity === 'applications') {
             $count = $stmt->fetch()['count'];
             $new_app_id = "APP" . str_pad($count + 100, 3, "0", STR_PAD_LEFT);
             
-            // Insert into database
-            $stmt = $db->prepare("INSERT INTO applications (application_id, student_id, internship_id, status, cover_letter, applied_date) VALUES (?, ?, ?, 'Pending', ?, CURDATE())");
-            $stmt->execute([$new_app_id, $input['student_id'], $input['internship_id'], $input['cover_letter'] ?? '']);
+                // Insert into database
+                $stmt = $db->prepare("INSERT INTO applications (application_id, student_id, internship_id, status, cover_letter, applied_date) VALUES (?, ?, ?, 'Pending', ?, CURDATE())");
+                $stmt->execute([$new_app_id, $student_id, $input['internship_id'], $input['cover_letter'] ?? '']);
             
             // Return the new application
             $new_application = [
                 'id' => $new_app_id,
-                'student_id' => $input['student_id'],
+                'student_id' => $student_id,
                 'internship_id' => $input['internship_id'],
                 'company_name' => $internship['company_name'],
                 'position' => $internship['position'],
@@ -97,47 +104,88 @@ if ($entity === 'applications') {
             echo json_encode($new_application);
         }
         elseif ($id !== null && $action === 'withdraw') {
-            if (isset($applications[$id])) {
-                if ($applications[$id]['status'] !== 'Withdrawn' && $applications[$id]['status'] !== 'Confirmed_By_Student' && $applications[$id]['status'] !== 'Approved_By_Company') {
-                    $applications[$id]['status'] = 'Withdrawn';
-                    echo json_encode(['message' => "Application {$id} withdrawn successfully.", 'application' => $applications[$id]]);
+            // Require student role
+            requireRole(ROLE_STUDENT);
+            
+            try {
+                // Fetch application from database
+                $stmt = $db->prepare("SELECT * FROM applications WHERE application_id = ? AND student_id = ?");
+                $stmt->execute([$id, getCurrentUserId()]);
+                $application = $stmt->fetch();
+                
+                if (!$application) {
+                    http_response_code(404);
+                    echo json_encode(['error' => "Application {$id} not found."]);
+                    exit;
+                }
+                
+                if ($application['status'] !== 'Withdrawn' && $application['status'] !== 'Confirmed_By_Student' && $application['status'] !== 'Approved_By_Company') {
+                    // Update status to Withdrawn
+                    $stmt = $db->prepare("UPDATE applications SET status = 'Withdrawn', status_updated_date = NOW() WHERE application_id = ?");
+                    $stmt->execute([$id]);
+                    
+                    // Fetch updated application
+                    $stmt = $db->prepare("SELECT * FROM applications WHERE application_id = ?");
+                    $stmt->execute([$id]);
+                    $updated_application = $stmt->fetch();
+                    
+                    echo json_encode(['message' => "Application {$id} withdrawn successfully.", 'application' => $updated_application]);
                 } else {
                     http_response_code(400);
-                    echo json_encode(['error' => "Application {$id} cannot be withdrawn (current status: {$applications[$id]['status']})."]);
+                    echo json_encode(['error' => "Application {$id} cannot be withdrawn (current status: {$application['status']})."]);
                 }
-            } else {
-                http_response_code(404);
-                echo json_encode(['error' => "Application {$id} not found."]);
+            } catch(PDOException $e) {
+                http_response_code(500);
+                echo json_encode(['error' => 'Failed to withdraw application: ' . $e->getMessage()]);
             }
         }
         elseif ($id !== null && $action === 'confirm_offer') {
-            if (isset($applications[$id])) {
-                if ($applications[$id]['status'] === 'Offered') {
-                    $applications[$id]['status'] = 'Confirmed_By_Student'; // Student confirms the offer
-                    echo json_encode(['message' => "Application {$id} offer confirmed successfully by student.", 'application' => $applications[$id]]);
+            // Require student role
+            requireRole(ROLE_STUDENT);
+            
+            try {
+                // Fetch application from database
+                $stmt = $db->prepare("SELECT * FROM applications WHERE application_id = ? AND student_id = ?");
+                $stmt->execute([$id, getCurrentUserId()]);
+                $application = $stmt->fetch();
+                
+                if (!$application) {
+                    http_response_code(404);
+                    echo json_encode(['error' => "Application {$id} not found."]);
+                    exit;
+                }
+                
+                if ($application['status'] === 'Offered') {
+                    // Update status to Confirmed_By_Student
+                    $stmt = $db->prepare("UPDATE applications SET status = 'Confirmed_By_Student', status_updated_date = NOW() WHERE application_id = ?");
+                    $stmt->execute([$id]);
+                    
+                    // Fetch updated application
+                    $stmt = $db->prepare("SELECT * FROM applications WHERE application_id = ?");
+                    $stmt->execute([$id]);
+                    $updated_application = $stmt->fetch();
+                    
+                    echo json_encode(['message' => "Application {$id} offer confirmed successfully by student.", 'application' => $updated_application]);
                 } else {
                     http_response_code(400);
-                    echo json_encode(['error' => "Application {$id} cannot be confirmed. Status must be 'Offered'. Current status: {$applications[$id]['status']}."]);
+                    echo json_encode(['error' => "Application {$id} cannot be confirmed. Status must be 'Offered'. Current status: {$application['status']}."]);
                 }
-            } else {
-                http_response_code(404);
-                echo json_encode(['error' => "Application {$id} not found."]);
+            } catch(PDOException $e) {
+                http_response_code(500);
+                echo json_encode(['error' => 'Failed to confirm offer: ' . $e->getMessage()]);
             }
         }
         // Company actions on applications: e.g. offer, reject
         elseif ($id !== null && $action === 'update_status_company') { // Example: ?entity=applications&id=APP001&action=update_status_company
-            // Expected input: {"status": "Offered"} or {"status": "Rejected_By_Company"}
-            // Here, we'd also check if the logged-in company owns the internship linked to this application.
-            if (!isset($applications[$id])) {
-                http_response_code(404);
-                echo json_encode(['error' => "Application {$id} not found."]);
-                exit;
-            }
+            // Require company role
+            requireRole(ROLE_COMPANY);
+            
             if (!isset($input['status'])) {
                 http_response_code(400);
                 echo json_encode(['error' => "Missing status in request body."]);
                 exit;
             }
+            
             // Add more validation for allowed status transitions by company
             $allowed_statuses = ['Offered', 'Rejected_By_Company', 'Interview_Scheduled', 'Approved_By_Company'];
             if (!in_array($input['status'], $allowed_statuses)){
@@ -145,13 +193,32 @@ if ($entity === 'applications') {
                 echo json_encode(['error' => "Invalid status '{$input['status']}' for company update."]);
                 exit;
             }
-            $applications[$id]['status'] = $input['status'];
-            // If status is 'Offered', maybe add offer_details from input?
-            if ($input['status'] === 'Offered' && isset($input['offer_details'])) {
-                $applications[$id]['offer_details'] = $input['offer_details'];
+            
+            try {
+                // Update in database
+                $stmt = $db->prepare("UPDATE applications SET status = ?, offer_details = ?, status_updated_date = NOW() WHERE application_id = ?");
+                $stmt->execute([
+                    $input['status'],
+                    $input['offer_details'] ?? null,
+                    $id
+                ]);
+                
+                // Fetch updated application
+                $stmt = $db->prepare("SELECT * FROM applications WHERE application_id = ?");
+                $stmt->execute([$id]);
+                $updated_application = $stmt->fetch();
+                
+                if (!$updated_application) {
+                    http_response_code(404);
+                    echo json_encode(['error' => "Application {$id} not found."]);
+                    exit;
+                }
+                
+                echo json_encode(['message' => "Application {$id} status updated to {$input['status']} by company.", 'application' => $updated_application]);
+            } catch(PDOException $e) {
+                http_response_code(500);
+                echo json_encode(['error' => 'Failed to update application: ' . $e->getMessage()]);
             }
-            echo json_encode(['message' => "Application {$id} status updated to {$input['status']} by company.", 'application' => $applications[$id]]);
-
         }
         else {
             http_response_code(400);
