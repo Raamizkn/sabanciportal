@@ -4,6 +4,10 @@
 
 global $applications, $internships, $method, $entity, $id, $action, $student_id_param, $input;
 
+// Get database connection
+require_once __DIR__ . '/../config/database.php';
+$db = getDB();
+
 if ($entity === 'applications') {
     if ($method === 'GET') {
         $company_id_param = $_GET['company_id'] ?? null;
@@ -50,14 +54,34 @@ if ($entity === 'applications') {
     elseif ($method === 'POST') {
         // Student actions: apply, withdraw, confirm_offer
         if ($action === 'apply') {
-            // Expected input: {"student_id": 1, "internship_id": "INT00X", "cover_letter": "My letter"}
-            if (!isset($input['student_id']) || !isset($input['internship_id']) || !isset($internships[$input['internship_id']])) {
+            // Expected input: {"student_id": 1, "internship_id": 1, "cover_letter": "My letter"}
+            if (!isset($input['student_id']) || !isset($input['internship_id'])) {
                 http_response_code(400);
-                echo json_encode(['error' => 'Missing student_id, internship_id, or invalid internship_id.']);
+                echo json_encode(['error' => 'Missing student_id or internship_id.']);
                 exit;
             }
-            $new_app_id = "APP" . str_pad(count($applications) + 100, 3, "0", STR_PAD_LEFT); // Adjusted to avoid simple count collision if script re-runs fast, better with DB sequence
-            $internship = $internships[$input['internship_id']];
+            
+            // Check if internship exists
+            $stmt = $db->prepare("SELECT * FROM internships WHERE id = ?");
+            $stmt->execute([$input['internship_id']]);
+            $internship = $stmt->fetch();
+            
+            if (!$internship) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Invalid internship_id.']);
+                exit;
+            }
+            
+            // Generate application_id
+            $stmt = $db->query("SELECT COUNT(*) as count FROM applications");
+            $count = $stmt->fetch()['count'];
+            $new_app_id = "APP" . str_pad($count + 100, 3, "0", STR_PAD_LEFT);
+            
+            // Insert into database
+            $stmt = $db->prepare("INSERT INTO applications (application_id, student_id, internship_id, status, cover_letter, applied_date) VALUES (?, ?, ?, 'Pending', ?, CURDATE())");
+            $stmt->execute([$new_app_id, $input['student_id'], $input['internship_id'], $input['cover_letter'] ?? '']);
+            
+            // Return the new application
             $new_application = [
                 'id' => $new_app_id,
                 'student_id' => $input['student_id'],
@@ -68,7 +92,7 @@ if ($entity === 'applications') {
                 'applied_date' => date('Y-m-d'),
                 'cover_letter' => $input['cover_letter'] ?? ''
             ];
-            $applications[$new_app_id] = $new_application; // Add to our mock data
+            
             http_response_code(201); // Created
             echo json_encode($new_application);
         }
