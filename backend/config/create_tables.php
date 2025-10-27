@@ -233,5 +233,31 @@ echo "✓ Inserted evaluations\n";
 
 echo "\n🎉 Database setup complete!\n";
 
+// Set common passwords for all users
+echo "\nSetting up common passwords...\n";
+$common_password = 'password123';
+$password_hash = password_hash($common_password, PASSWORD_DEFAULT);
+
+// Update student passwords
+$stmt = $conn->prepare("UPDATE students SET password_hash = ? WHERE email IN (?, ?, ?)");
+$stmt->execute([$password_hash, 'student@example.com', 'jane.smith@example.com', 'ahmet.yilmaz@example.com']);
+echo "✓ Set passwords for students\n";
+
+// Update company passwords
+$stmt = $conn->prepare("UPDATE companies SET password_hash = ? WHERE email IN (?, ?, ?)");
+$stmt->execute([$password_hash, 'company@example.com', 'innovate@example.com', 'techsolutions@example.com']);
+echo "✓ Set passwords for companies\n";
+
+// Insert admin user with password
+$stmt = $conn->prepare("INSERT INTO admin_users (username, email, password_hash, full_name) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE password_hash = ?");
+$stmt->execute(['admin', 'admin@example.com', $password_hash, 'System Administrator', $password_hash]);
+echo "✓ Set password for admin\n";
+
+echo "\n✅ All passwords set to: $common_password\n";
+echo "\nTest Credentials:\n";
+echo "Admin: admin@example.com / $common_password\n";
+echo "Company: company@example.com / $common_password\n";
+echo "Student: student@example.com / $common_password\n";
+
 ?>
 

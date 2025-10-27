@@ -435,21 +435,46 @@
 
     <!-- Login functionality script -->
 	<script>
-		document.addEventListener('DOMContentLoaded', function() {
-			// Main login form on the page
-			const mainLoginForm = document.querySelector('.content .card .card-body');
-			if (mainLoginForm) {
-				const mainLoginButton = mainLoginForm.querySelector('button[type="submit"]');
-				const mainEmailInput = mainLoginForm.querySelector('input[type="text"]');
-				const mainPasswordInput = mainLoginForm.querySelector('input[type="password"]');
-
-				if (mainLoginButton && mainEmailInput && mainPasswordInput) {
-					mainLoginButton.addEventListener('click', function(e) {
-						e.preventDefault();
-						handleLogin(mainEmailInput.value.trim(), mainPasswordInput.value, '');
-					});
-				}
+		// Detect API base URL dynamically
+		function getAPIBaseURL() {
+			const hostname = window.location.hostname;
+			const protocol = window.location.protocol;
+			
+			// If running on localhost, use localhost:8001
+			if (hostname === 'localhost' || hostname === '127.0.0.1') {
+				return 'http://localhost:8001';
 			}
+			
+			// On server, use relative path to backend
+			const pathname = window.location.pathname;
+			if (pathname.includes('/shadowing/internship-portal/')) {
+				return `${protocol}//${hostname}/shadowing/backend`;
+			}
+			
+			// Fallback: try to find backend in parent directory
+			return `${protocol}//${hostname}/backend`;
+		}
+
+		document.addEventListener('DOMContentLoaded', function() {
+		// Main login form on the page
+		const mainLoginForm = document.querySelector('.content .card .card-body');
+		if (mainLoginForm) {
+			const mainLoginButton = mainLoginForm.querySelector('button[type="submit"]');
+			const mainEmailInput = mainLoginForm.querySelector('input[type="text"]');
+			const mainPasswordInput = mainLoginForm.querySelector('input[type="password"]');
+			const mainUserTypeSelect = mainLoginForm.querySelector('select');
+
+			if (mainLoginButton && mainEmailInput && mainPasswordInput) {
+				mainLoginButton.addEventListener('click', function(e) {
+					e.preventDefault();
+					handleLogin(
+						mainEmailInput.value.trim(), 
+						mainPasswordInput.value, 
+						mainUserTypeSelect ? mainUserTypeSelect.value : ''
+					);
+				});
+			}
+		}
 
 			// Modal login form
 			const modalLoginForm = document.querySelector('#login_modal form');
@@ -478,23 +503,25 @@
 					return;
 				}
 
-				// If no user type selected, try to infer from email
-				if (!userType) {
-					email = email.toLowerCase();
-					if (email.includes('admin')) {
-						userType = 'admin';
-					} else if (email.includes('company') || email.includes('super') || email.includes('innovate') || email.includes('tech')) {
-						userType = 'company';
-					} else if (email.includes('student') || email.includes('jane') || email.includes('ahmet')) {
-						userType = 'student';
-					} else {
-						alert('Please select a user type from the dropdown.');
-						return;
-					}
+			// If no user type selected, try to infer from email
+			if (!userType) {
+				email = email.toLowerCase();
+				if (email.includes('admin')) {
+					userType = 'admin';
+				} else if (email.includes('company') || email.includes('super') || email.includes('innovate') || email.includes('tech')) {
+					userType = 'company';
+				} else if (email.includes('student') || email.includes('jane') || email.includes('ahmet')) {
+					userType = 'student';
+				} else {
+					// Default to trying company role if no pattern matches
+					// The backend will return an error if credentials are wrong
+					userType = 'company';
 				}
+			}
 
 				try {
-					const response = await fetch('http://localhost:8001/index.php?entity=auth&action=login', {
+					const apiBaseURL = getAPIBaseURL();
+					const response = await fetch(`${apiBaseURL}/index.php?entity=auth&action=login`, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json'

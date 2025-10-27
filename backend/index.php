@@ -16,6 +16,9 @@ $allowedOrigins = [
 // Set the allowed origin
 if ($origin && in_array($origin, $allowedOrigins)) {
     $allowedOrigin = $origin;
+} else if ($origin) {
+    // If origin is provided but not in list, use it anyway (for flexibility)
+    $allowedOrigin = $origin;
 } else {
     // Fallback for wildcard (no credentials)
     $allowedOrigin = '*';

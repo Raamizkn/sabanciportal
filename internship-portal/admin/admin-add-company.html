@@ -367,28 +367,19 @@
 						industry: document.getElementById('industry').value
 					};
 
-					try {
-						const response = await fetch('http://localhost:8001/index.php?entity=admin&resource=companies&action=add', {
-							method: 'POST',
-							headers: {
-								'Content-Type': 'application/json'
-							},
-							credentials: 'include',
-							body: JSON.stringify(companyData)
-						});
+				try {
+					const data = await api.createCompany(companyData);
 
-						const data = await response.json();
-
-						if (response.ok) {
-							alert('Company added successfully!');
-							window.location.href = 'admin-companies.html';
-						} else {
-							alert(data.error || 'Failed to add company. Please try again.');
-						}
-					} catch (error) {
-						console.error('Error adding company:', error);
-						alert('An error occurred. Please try again.');
+					if (data.status === 'success') {
+						alert('Company added successfully!');
+						window.location.href = 'admin-companies.html';
+					} else {
+						alert(data.error || 'Failed to add company. Please try again.');
 					}
+				} catch (error) {
+					console.error('Error adding company:', error);
+					alert('An error occurred. Please try again.');
+				}
 				});
 			}
 		});

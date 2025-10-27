@@ -5,7 +5,14 @@
  * Handles user login, session management, and role-based access control
  */
 
-session_start();
+// Configure session cookies to work across subdirectories
+if (session_status() === PHP_SESSION_NONE) {
+    // Set cookie path to root so cookies work across all subdirectories
+    ini_set('session.cookie_path', '/');
+    // Use lax SameSite for better compatibility
+    ini_set('session.cookie_samesite', 'Lax');
+    session_start();
+}
 
 // User roles
 define('ROLE_ADMIN', 'admin');

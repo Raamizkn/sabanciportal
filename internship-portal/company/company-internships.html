@@ -710,32 +710,23 @@
 						department: document.getElementById('department').value
 					};
 
-					try {
-						const response = await fetch('http://localhost:8001/index.php?entity=internships&action=create', {
-							method: 'POST',
-							headers: {
-								'Content-Type': 'application/json'
-							},
-							credentials: 'include',
-							body: JSON.stringify(internshipData)
-						});
+				try {
+					const data = await api.createInternship(userId, internshipData);
 
-						const data = await response.json();
-
-						if (response.ok) {
-							alert('Internship posted successfully!');
-							// Close modal
-							const modal = bootstrap.Modal.getInstance(document.getElementById('new_internship_modal'));
-							if (modal) modal.hide();
-							// Reload page to show new internship
-							location.reload();
-						} else {
-							alert(data.error || 'Failed to post internship. Please try again.');
-						}
-					} catch (error) {
-						console.error('Error creating internship:', error);
-						alert('An error occurred. Please try again.');
+					if (data.status === 'success') {
+						alert('Internship posted successfully!');
+						// Close modal
+						const modal = bootstrap.Modal.getInstance(document.getElementById('new_internship_modal'));
+						if (modal) modal.hide();
+						// Reload page to show new internship
+						location.reload();
+					} else {
+						alert(data.error || 'Failed to post internship. Please try again.');
 					}
+				} catch (error) {
+					console.error('Error creating internship:', error);
+					alert('An error occurred. Please try again.');
+				}
 				});
 			}
 
@@ -744,19 +735,13 @@
 		});
 
 		async function loadCompanyInternships() {
-			try {
-				const userId = localStorage.getItem('userId');
-				const response = await fetch(`http://localhost:8001/index.php?entity=internships&company_id=${userId}`, {
-					credentials: 'include'
-				});
-
-				if (response.ok) {
-					const data = await response.json();
-					displayInternships(data);
-				}
-			} catch (error) {
-				console.error('Error loading internships:', error);
-			}
+		try {
+			const userId = localStorage.getItem('userId');
+			const data = await api.getCompanyInternships(userId);
+			displayInternships(data);
+		} catch (error) {
+			console.error('Error loading internships:', error);
+		}
 		}
 
 		function displayInternships(internships) {

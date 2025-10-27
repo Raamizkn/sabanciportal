@@ -549,18 +549,10 @@
         async function loadInternships() {
             try {
                 console.log('Loading internships from API...');
-                const response = await fetch('http://localhost:8001/index.php?entity=internships', {
-                    credentials: 'include'
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('Received internships:', data);
-                    console.log('Number of internships:', data.length);
-                    displayInternships(data);
-                } else {
-                    console.error('API response not OK:', response.status);
-                }
+                const data = await api.getInternships();
+                console.log('Received internships:', data);
+                console.log('Number of internships:', data.length);
+                displayInternships(data);
             } catch (error) {
                 console.error('Error loading internships:', error);
             }
@@ -742,21 +734,9 @@
             const coverLetter = prompt('Please enter your cover letter (optional):');
             
             try {
-                const response = await fetch('http://localhost:8001/index.php?entity=applications&action=apply', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                        internship_id: internshipId,
-                        cover_letter: coverLetter || ''
-                    })
-                });
+                const data = await api.applyForInternship(studentId, internshipId, coverLetter || '');
 
-                const data = await response.json();
-
-                if (response.ok) {
+                if (data.status === 'success') {
                     alert('Application submitted successfully!');
                 } else {
                     alert(data.error || 'Failed to submit application. Please try again.');

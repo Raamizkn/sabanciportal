@@ -531,6 +531,98 @@ WHERE i.company_id = 1;
 SELECT status, COUNT(*) as count FROM applications GROUP BY status;
 ```
 
+## Deployment to pro2-dev Server
+
+### Prerequisites
+- SSH access to pro2-dev.sabanciuniv.edu
+- SU-net credentials (email: raamiz.niazi@sabanciuniv.edu)
+- Source files ready locally
+
+### Deployment Steps
+
+1. **Connect to the server via SSH**:
+```bash
+ssh raamiz.niazi@sabanciuniv.edu@pro2-dev.sabanciuniv.edu
+# Enter password when prompted: Fizmiz210104**
+```
+
+2. **Navigate to the web directory**:
+```bash
+cd /var/www/html/shadowing
+```
+
+3. **Check existing files**:
+```bash
+ls -la
+# Look for existing internship-portal folder
+```
+
+4. **Backup existing files (if they exist)**:
+```bash
+# If internship-portal exists, create a backup
+mv internship-portal internship-portal-backup-$(date +%Y%m%d-%H%M%S)
+```
+
+5. **Upload files from local machine** (run from your local terminal):
+```bash
+# From your local project directory
+# Upload frontend
+scp -r internship-portal raamiz.niazi@sabanciuniv.edu@pro2-dev.sabanciuniv.edu:/var/www/html/shadowing/
+
+# Upload backend (IMPORTANT: backend must be deployed for API to work)
+scp -r backend raamiz.niazi@sabanciuniv.edu@pro2-dev.sabanciuniv.edu:/var/www/html/shadowing/
+```
+
+6. **Verify upload**:
+```bash
+# On the server
+cd /var/www/html/shadowing
+ls -la internship-portal
+```
+
+7. **Set correct permissions**:
+```bash
+chmod -R 755 internship-portal
+chown -R www-data:www-data internship-portal
+chmod -R 755 backend
+chown -R www-data:www-data backend
+```
+
+8. **Set up the database** (on the server):
+```bash
+cd /var/www/html/shadowing/backend
+php config/create_tables.php
+```
+
+This will:
+- Create all database tables
+- Insert sample data
+- Set all passwords to `password123`
+
+9. **Test the deployment**:
+Open in browser: `http://pro2-dev.sabanciuniv.edu/shadowing/internship-portal/`
+
+Login credentials:
+- **Admin:** `admin@example.com` / `password123`
+- **Company:** `company@example.com` / `password123`
+- **Student:** `student@example.com` / `password123`
+
+### Alternative: Using rsync (Recommended)
+
+If rsync is available, use it for faster, incremental sync:
+
+```bash
+# From your local machine
+rsync -avz --delete internship-portal/ raamiz.niazi@sabanciuniv.edu@pro2-dev.sabanciuniv.edu:/var/www/html/shadowing/internship-portal/
+```
+
+### Note on Path Resolution
+
+The internship-portal uses path-resolver.js which automatically detects the server environment and adjusts paths accordingly. Ensure:
+- Path resolver is loaded first in all HTML files
+- All paths use relative references (not absolute `/`)
+- The resolver script is in: `internship-portal/js/path-resolver.js`
+
 ## Support
 
 For issues or questions about the database:
