@@ -18,6 +18,7 @@
 	<!-- /global stylesheets -->
 
 	<!-- Core JS files -->
+	<script src="../bs5/template/assets/js/jquery/jquery.min.js"></script>
 	<script src="../bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
 	<!-- /core JS files -->
 
@@ -710,23 +711,24 @@
 						department: document.getElementById('department').value
 					};
 
-				try {
-					const data = await api.createInternship(userId, internshipData);
+			try {
+				const data = await api.createInternship(userId, internshipData);
 
-					if (data.status === 'success') {
-						alert('Internship posted successfully!');
-						// Close modal
-						const modal = bootstrap.Modal.getInstance(document.getElementById('new_internship_modal'));
-						if (modal) modal.hide();
-						// Reload page to show new internship
-						location.reload();
-					} else {
-						alert(data.error || 'Failed to post internship. Please try again.');
-					}
-				} catch (error) {
-					console.error('Error creating internship:', error);
-					alert('An error occurred. Please try again.');
+				// Backend returns the internship object directly with id if successful
+				if (data && data.id) {
+					alert('Internship posted successfully!');
+					// Close modal
+					const modal = bootstrap.Modal.getInstance(document.getElementById('new_internship_modal'));
+					if (modal) modal.hide();
+					// Reload page to show new internship
+					location.reload();
+				} else {
+					alert(data.error || 'Failed to post internship. Please try again.');
 				}
+			} catch (error) {
+				console.error('Error creating internship:', error);
+				alert('An error occurred. Please try again.');
+			}
 				});
 			}
 
