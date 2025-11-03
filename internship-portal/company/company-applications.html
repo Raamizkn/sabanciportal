@@ -569,6 +569,37 @@
 				</div>
 				<!-- /view student profile modal -->
 
+				<!-- Update Status Modal -->
+				<div id="update_status_modal" class="modal fade" tabindex="-1">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">Update Application Status</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+							</div>
+							<div class="modal-body">
+								<input type="hidden" id="updateApplicationId">
+								<div class="mb-3">
+									<label for="applicationStatusSelect" class="form-label">Status</label>
+									<select class="form-select" id="applicationStatusSelect">
+										<option value="Pending Review">Pending Review</option>
+										<option value="Under Review">Under Review</option>
+										<option value="Shortlisted">Shortlisted</option>
+										<option value="Interview Scheduled">Interview Scheduled</option>
+										<option value="Offered">Offered</option>
+										<option value="Rejected">Rejected</option>
+									</select>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-link" data-bs-dismiss="modal">Cancel</button>
+								<button type="button" class="btn btn-primary" id="saveStatusBtn">Save Changes</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /update status modal -->
+
 			</div>
 			<!-- /content area -->
 
@@ -594,12 +625,78 @@
 	</div>
 	<!-- /page content -->
 
+<script src="../js/api.js"></script>
+<script src="../js/company-applications.js"></script>
+
 <script>
-	document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
+    // Modal handler for viewing an application
+    const viewApplicationModal = document.getElementById('view_application_modal');
+    viewApplicationModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const app = JSON.parse(button.getAttribute('data-application'));
+
+        const modalTitle = viewApplicationModal.querySelector('.modal-title');
+        const modalBody = viewApplicationModal.querySelector('.modal-body');
+
+        modalTitle.textContent = `Application for ${app.internship_position}`;
+        modalBody.innerHTML = `
+            <h6 class="fw-semibold">Student: ${app.student_name} (${app.student_major || 'N/A'})</h6>
+            <p><strong>Applied on:</strong> ${new Date(app.created_at).toLocaleDateString()}</p>
+            <p><strong>Status:</strong> ${app.status}</p>
+            <hr>
+            <h6>Cover Letter</h6>
+            <p>${app.cover_letter || 'No cover letter provided.'}</p>
+            <hr>
+            <h6>Resume/CV</h6>
+            <p><a href="#">Download Resume (Placeholder)</a></p>
+        `;
+    });
+
+    // Modal handler for updating status
+    const updateStatusModal = document.getElementById('update_status_modal');
+    updateStatusModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const applicationId = button.getAttribute('data-application-id');
+        const currentStatus = button.getAttribute('data-current-status');
+
+        const applicationIdInput = updateStatusModal.querySelector('#updateApplicationId');
+        const statusSelect = updateStatusModal.querySelector('#applicationStatusSelect');
+
+        applicationIdInput.value = applicationId;
+        statusSelect.value = currentStatus;
+    });
+
+    // Handler for submitting status update
+    const saveStatusBtn = document.getElementById('saveStatusBtn');
+    saveStatusBtn.addEventListener('click', async () => {
+        const applicationId = document.getElementById('updateApplicationId').value;
+        const newStatus = document.getElementById('applicationStatusSelect').value;
+
+        try {
+            const result = await api.updateApplicationStatus(applicationId, newStatus);
+            if (result.status === 'success') {
+                alert('Status updated successfully!');
+                
+                // Update the UI in real-time
+                const row = document.querySelector(`tr[data-application-id="${applicationId}"]`);
+                const statusCell = row.querySelector('td:nth-child(6)');
+                statusCell.innerHTML = getStatusBadge(newStatus);
+
+                const modalInstance = bootstrap.Modal.getInstance(updateStatusModal);
+                modalInstance.hide();
+            } else {
+                alert('Failed to update status: ' + result.error);
+            }
+        } catch (error) {
+            console.error('Error updating status:', error);
+            alert('An error occurred while updating the status.');
+        }
+    });
 		// Initialize DataTable for applications
 		var applicationsTable = $('#applicationsTable').DataTable({
 			autoWidth: false,
-			dom: '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
+			dom: '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip">',
 			language: {
 				search: '<span class="me-3">Filter:</span> <div class="form-control-feedback form-control-feedback-end flex-fill">_INPUT_<div class="form-control-feedback-icon"><i class="ph-magnifying-glass opacity-50"></i></div></div>',
 				searchPlaceholder: 'Type to filter...',
@@ -734,7 +831,7 @@
 			document.querySelector('.applied-date-column').innerHTML = 'Applied Date <i class="ph-sort"></i>';
 			dateSortClicks = 0;
 		});
-	});
+});
 </script>
 </body>
 </html> 

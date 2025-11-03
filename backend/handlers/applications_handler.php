@@ -15,20 +15,73 @@ if ($entity === 'applications') {
         $internship_id_param = $_GET['internship_id'] ?? null;
 
         if ($id !== null) { // Get specific application by its ID: ?entity=applications&id=APP001
-            if (isset($applications[$id])) {
-                echo json_encode($applications[$id]);
-            } else {
-                http_response_code(404);
-                echo json_encode(['error' => "Application with ID {$id} not found."]);
+            try {
+                $stmt = $db->prepare("
+                    SELECT 
+                        a.*, 
+                        i.position as internship_position, 
+                        i.description as internship_description,
+                        i.location as internship_location,
+                        i.dates as internship_dates,
+                        c.name as company_name
+                    FROM applications a
+                    JOIN internships i ON a.internship_id = i.id
+                    JOIN companies c ON i.company_id = c.id
+                    WHERE a.application_id = ?
+                ");
+                $stmt->execute([$id]);
+                $application = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($application) {
+                    // Authorization check: Ensure the current user is the student who owns the application or an admin
+                    $currentUser = getCurrentUserId();
+                    $userRole = getCurrentUserRole();
+                    if ($userRole !== ROLE_ADMIN && $application['student_id'] != $currentUser) {
+                        http_response_code(403);
+                        echo json_encode(['error' => 'Forbidden: You do not have access to this application.']);
+                        exit;
+                    }
+                    echo json_encode($application);
+                } else {
+                    http_response_code(404);
+                    echo json_encode(['error' => "Application with ID {$id} not found."]);
+                }
+            } catch (PDOException $e) {
+                http_response_code(500);
+                echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
             }
         } elseif ($student_id_param !== null) { // Get applications for a specific student: ?entity=applications&student_id=1
-            $student_apps = [];
-            foreach ($applications as $app) {
-                if ($app['student_id'] == $student_id_param) {
-                    $student_apps[] = $app;
-                }
+            requireRole(ROLE_STUDENT);
+            if (getCurrentUserId() != $student_id_param) {
+                http_response_code(403);
+                echo json_encode(['error' => 'You are not authorized to view these applications.']);
+                exit;
             }
-            echo json_encode($student_apps);
+
+            try {
+                $stmt = $db->prepare("
+                    SELECT 
+                        a.application_id, 
+                        a.status, 
+                        a.applied_date as created_at, 
+                        a.cover_letter,
+                        i.position as internship_position, 
+                        i.location as internship_location,
+                        i.dates as internship_dates,
+                        c.name as company_name
+                    FROM applications a
+                    JOIN internships i ON a.internship_id = i.id
+                    JOIN companies c ON i.company_id = c.id
+                    WHERE a.student_id = ?
+                    ORDER BY a.applied_date DESC
+                ");
+                $stmt->execute([$student_id_param]);
+                $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                echo json_encode($applications);
+            } catch (PDOException $e) {
+                http_response_code(500);
+                echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+            }
         } elseif ($company_id_param !== null) { // Get applications for a specific company: ?entity=applications&company_id=COMP001 (mock)
             $company_apps = [];
             foreach ($applications as $app) {

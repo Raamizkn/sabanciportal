@@ -456,6 +456,31 @@
 	</div>
 	<!-- /page content -->
 
+	<!-- Application Modal -->
+	<div class="modal fade" id="applyModal" tabindex="-1" aria-labelledby="applyModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="applyModalLabel">Apply for Internship</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<input type="hidden" id="internshipIdInput">
+					<div class="mb-3">
+						<label for="coverLetterInput" class="form-label">Cover Letter (Optional)</label>
+						<textarea class="form-control" id="coverLetterInput" rows="8" placeholder="Explain why you are a good fit for this role..."></textarea>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-primary" id="submitApplicationBtn">Submit Application</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /Application Modal -->
+
+
     <!-- Main functionality script -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -544,6 +569,28 @@
                     }, 300);
                 });
             }
+
+			// Modal functionality
+			const applyModal = document.getElementById('applyModal');
+			if (applyModal) {
+				applyModal.addEventListener('show.bs.modal', function (event) {
+					// Button that triggered the modal
+					const button = event.relatedTarget;
+					// Extract info from data-bs-* attributes
+					const internshipId = button.getAttribute('data-bs-internship-id');
+					const internshipTitle = button.getAttribute('data-bs-internship-title');
+
+					// Update the modal's content.
+					const modalTitle = applyModal.querySelector('.modal-title');
+					const internshipIdInput = applyModal.querySelector('#internshipIdInput');
+
+					modalTitle.textContent = 'Apply for ' + internshipTitle;
+					internshipIdInput.value = internshipId;
+				});
+
+				const submitApplicationBtn = document.getElementById('submitApplicationBtn');
+				submitApplicationBtn.addEventListener('click', submitApplication);
+			}
         });
 
         async function loadInternships() {
@@ -713,7 +760,13 @@
                             <div>
                                 <span class="text-muted">${internship.created_at ? 'Posted ' + new Date(internship.created_at).toLocaleDateString() : ''}</span>
                             </div>
-                            <button type="button" class="btn btn-primary ms-auto" onclick="applyForInternship(${internship.id})">Apply Now</button>
+							<button type="button" class="btn btn-primary ms-auto" 
+									data-bs-toggle="modal" 
+									data-bs-target="#applyModal" 
+									data-bs-internship-id="${internship.id}"
+									data-bs-internship-title="${internship.position}">
+								Apply Now
+							</button>
                         </div>
                     </div>
                 </div>
@@ -722,30 +775,33 @@
             return col;
         }
 
-        async function applyForInternship(internshipId) {
-            const studentId = localStorage.getItem('userId');
-            
-            if (!studentId) {
-                alert('Please login to apply for internships.');
-                window.location.href = '../index.html';
-                return;
-            }
+		async function submitApplication() {
+			const studentId = localStorage.getItem('userId');
+			const internshipId = document.getElementById('internshipIdInput').value;
+			const coverLetter = document.getElementById('coverLetterInput').value;
 
-            const coverLetter = prompt('Please enter your cover letter (optional):');
-            
-            try {
-                const data = await api.applyForInternship(studentId, internshipId, coverLetter || '');
+			if (!studentId) {
+				alert('Please login to apply for internships.');
+				window.location.href = '../index.html';
+				return;
+			}
 
-                if (data.status === 'success') {
-                    alert('Application submitted successfully!');
-                } else {
-                    alert(data.error || 'Failed to submit application. Please try again.');
-                }
-            } catch (error) {
-                console.error('Error applying for internship:', error);
-                alert('An error occurred. Please try again.');
-            }
-        }
+			try {
+				const data = await api.applyForInternship(studentId, internshipId, coverLetter || '');
+
+				if (data.status === 'success') {
+					alert('Application submitted successfully!');
+					const modalInstance = bootstrap.Modal.getInstance(document.getElementById('applyModal'));
+					modalInstance.hide();
+					document.getElementById('coverLetterInput').value = ''; // Clear textarea
+				} else {
+					alert(data.error || 'Failed to submit application. Please try again.');
+				}
+			} catch (error) {
+				console.error('Error applying for internship:', error);
+				alert('An error occurred. Please try again.');
+			}
+		}
 
         function applyFilters() {
             const keywordsInput = document.querySelector('input[placeholder="Job title, skills, etc"]');
@@ -804,7 +860,7 @@
             });
 
             // Display filtered results
-            displayFilteredInternships(filteredInternships);
+            displayFiltered_internships(filteredInternships);
         }
 
         function displayFilteredInternships(filteredInternships) {

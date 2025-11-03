@@ -229,8 +229,8 @@
 				<div class="page-header page-header-light shadow">
 					<div class="page-header-content d-lg-flex">
 						<div class="d-flex">
-							<h4 class="page-title mb-0">
-								Application Details - <span class="fw-normal">Marketing Intern at XYZ Corporation</span>
+							<h4 class="page-title mb-0" id="page-title">
+								Application Details - <span class="fw-normal">Loading...</span>
 							</h4>
 						</div>
 					</div>
@@ -253,43 +253,23 @@
 						<div class="card">
 							<div class="card-header d-flex align-items-center">
 								<div>
-									<h5 class="mb-0">Marketing Intern</h5>
-									<span class="text-muted">XYZ Corporation</span>
+									<h5 class="mb-0" id="internship-title">Loading...</h5>
+									<span class="text-muted" id="company-name">Loading...</span>
 								</div>
 							</div>
 
 							<div class="card-body">
 								<h6>Internship Description</h6>
-								<p>This is a placeholder for the internship description. As a Marketing Intern at XYZ Corporation, you will support the marketing team in various tasks including market research, campaign analysis, content creation, and social media management. You will gain hands-on experience in a fast-paced corporate environment.</p>
-								
-								<h6>Responsibilities</h6>
-								<ul class="list-unstyled">
-									<li><i class="ph-check text-success me-2"></i>Assist with market research and competitor analysis.</li>
-									<li><i class="ph-check text-success me-2"></i>Support the creation of marketing materials and presentations.</li>
-									<li><i class="ph-check text-success me-2"></i>Help manage social media accounts and track engagement.</li>
-									<li><i class="ph-check text-success me-2"></i>Analyze campaign performance data.</li>
-								</ul>
-
-								<h6>Qualifications</h6>
-								<ul class="list-unstyled">
-									<li><i class="ph-caret-right text-primary me-2"></i>Currently pursuing a Bachelor's degree in Marketing, Business, or related field.</li>
-									<li><i class="ph-caret-right text-primary me-2"></i>Strong written and verbal communication skills.</li>
-									<li><i class="ph-caret-right text-primary me-2"></i>Familiarity with social media platforms.</li>
-									<li><i class="ph-caret-right text-primary me-2"></i>Proficient in Microsoft Office Suite.</li>
-								</ul>
+								<p id="internship-description">Loading...</p>
 							</div>
 						</div>
 
 						<div class="card">
 							<div class="card-header">
-								<h6 class="mb-0">Submitted Documents</h6>
+								<h6 class="mb-0">My Cover Letter</h6>
 							</div>
 							<div class="card-body">
-								<ul class="list-unstyled mb-0">
-									<li class="mb-2"><i class="ph-file-pdf me-2"></i> <a href="#">Resume_JohnDoe.pdf</a></li>
-									<li class="mb-2"><i class="ph-file-doc me-2"></i> <a href="#">CoverLetter_XYZ.docx</a></li>
-									<li><i class="ph-file-image me-2"></i> <a href="#">Transcript_JDoe.pdf</a></li>
-								</ul>
+								<p id="cover-letter">Loading...</p>
 							</div>
 						</div>
 					</div>
@@ -300,59 +280,32 @@
 								<h6 class="mb-0">Application Status</h6>
 							</div>
 							<div class="card-body">
-								<div class="d-flex align-items-center mb-3">
-									<span class="badge bg-success fs-lg me-2">Accepted</span>
+								<div class="d-flex align-items-center mb-3" id="status-badge-container">
+									<span class="badge bg-secondary fs-lg me-2">Loading...</span>
 								</div>
 								<dl class="row">
 									<dt class="col-sm-5">Application ID:</dt>
-									<dd class="col-sm-7">APP-2023-001</dd>
+									<dd class="col-sm-7" id="application-id">Loading...</dd>
 
 									<dt class="col-sm-5">Applied On:</dt>
-									<dd class="col-sm-7">August 15, 2023</dd>
-
-									<dt class="col-sm-5">Status Updated:</dt>
-									<dd class="col-sm-7">August 20, 2023</dd>
+									<dd class="col-sm-7" id="applied-on">Loading...</dd>
 
 									<dt class="col-sm-5">Location:</dt>
-									<dd class="col-sm-7">New York, USA</dd>
+									<dd class="col-sm-7" id="internship-location">Loading...</dd>
 
 									<dt class="col-sm-5">Duration:</dt>
-									<dd class="col-sm-7">3 Months</dd>
+									<dd class="col-sm-7" id="internship-dates">Loading...</dd>
 								</dl>
 								
 								<hr>
 
 								<h6 class="mb-3">Actions</h6>
-								<div class="d-grid gap-2">
-									<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirm_internship_modal">
-										<i class="ph-check-circle me-2"></i>Confirm Acceptance
-									</button>
-									<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#withdraw_application_modal">
-										<i class="ph-x-circle me-2"></i>Withdraw Application
-									</button>
+								<div class="d-grid gap-2" id="action-buttons">
+									<!-- Action buttons will be dynamically added here -->
 									<a href="student-applications.html" class="btn btn-light">
 										<i class="ph-arrow-left me-2"></i>Back to Applications
 									</a>
 								</div>
-							</div>
-						</div>
-
-						<div class="card">
-							<div class="card-header">
-								<h6 class="mb-0">Required Documents for Confirmation</h6>
-							</div>
-							<div class="card-body">
-								<ul class="list-unstyled mb-0">
-									<li class="d-flex justify-content-between align-items-center mb-2">
-										<span><i class="ph-file-doc me-2"></i>Insurance Form</span>
-										<span class="badge bg-warning">Pending</span>
-									</li>
-									<li class="d-flex justify-content-between align-items-center mb-2">
-										<span><i class="ph-file-doc me-2"></i>Agreement Form</span>
-										<span class="badge bg-warning">Pending</span>
-									</li>
-								</ul>
-								<a href="student-documents.html" class="btn btn-light btn-sm mt-3">Upload Documents</a>
 							</div>
 						</div>
 					</div>
@@ -378,79 +331,138 @@
 	</div>
 	<!-- /page content -->
 
-	<!-- Confirm Internship Modal (Example) -->
-	<div id="confirm_internship_modal" class="modal fade" tabindex="-1">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header bg-success text-white">
-					<h5 class="modal-title">Confirm Internship Acceptance</h5>
-					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-				</div>
-				<div class="modal-body">
-					<p>Are you sure you want to confirm your acceptance for the <strong>Marketing Intern</strong> position at <strong>XYZ Corporation</strong>?</p>
-					<p>Remember to upload the required documents (Insurance Form, Agreement Form) via the Documents page.</p>
-					<div class="form-check mt-3">
-						<input type="checkbox" class="form-check-input" id="confirm_check">
-						<label class="form-check-label" for="confirm_check">I understand and agree to the terms.</label>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-link" data-bs-dismiss="modal">Cancel</button>
-					<button type="button" class="btn btn-success" id="confirm_acceptance_button" disabled>Confirm Acceptance</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- /confirm internship modal -->
+	<!-- Modals can be kept for actions if needed -->
 
-	<!-- Withdraw Application Modal (Example) -->
-	<div id="withdraw_application_modal" class="modal fade" tabindex="-1">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header bg-danger text-white">
-					<h5 class="modal-title">Withdraw Application</h5>
-					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-				</div>
-				<div class="modal-body">
-					<p>Are you sure you want to withdraw your application for the <strong>Marketing Intern</strong> position at <strong>XYZ Corporation</strong>?</p>
-					<p class="text-danger">This action cannot be undone.</p>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-link" data-bs-dismiss="modal">Cancel</button>
-					<button type="button" class="btn btn-danger">Withdraw Application</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- /withdraw application modal -->
-
-
+	<script src="../js/api.js"></script>
 	<script>
-		// Basic logout functionality & auth check
 		document.addEventListener('DOMContentLoaded', () => {
-			const logoutLinks = document.querySelectorAll('.logout-link');
-			logoutLinks.forEach(link => {
-				link.addEventListener('click', (event) => {
-					localStorage.removeItem('userRole');
-				});
-			});
+			const urlParams = new URLSearchParams(window.location.search);
+			const applicationId = urlParams.get('id');
+
+			// Auth check
 			const userRole = localStorage.getItem('userRole');
-			const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'student';
-			
-			if (userRole !== 'student' && !isBeingImpersonated) {
-				alert('Access denied. Redirecting to login page.');
-				window.location.href = '../index.html';
+            const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'student';
+            if (userRole !== 'student' && !isBeingImpersonated) {
+                alert('Access denied. Redirecting to login page.');
+                window.location.href = '../index.html';
+                return;
+            }
+
+			if (!applicationId) {
+				document.body.innerHTML = '<div class="alert alert-danger m-5">Application ID not found in URL.</div>';
+				return;
 			}
 
-			// Enable confirm button only when checkbox is checked
-			const confirmCheckbox = document.getElementById('confirm_check');
-			const confirmButton = document.getElementById('confirm_acceptance_button');
-			if (confirmCheckbox && confirmButton) {
-				confirmCheckbox.addEventListener('change', () => {
-					confirmButton.disabled = !confirmCheckbox.checked;
+			loadApplicationDetails(applicationId);
+		});
+
+		async function loadApplicationDetails(applicationId) {
+			try {
+				const app = await api.getApplicationDetails(applicationId);
+
+				// Populate page with data
+				document.getElementById('page-title').innerHTML = `Application Details - <span class="fw-normal">${app.internship_position} at ${app.company_name}</span>`;
+				document.getElementById('internship-title').textContent = app.internship_position;
+				document.getElementById('company-name').textContent = app.company_name;
+				document.getElementById('internship-description').textContent = app.internship_description || 'No description provided.';
+				document.getElementById('cover-letter').textContent = app.cover_letter || 'No cover letter provided.';
+				
+				// Status Badge
+				const statusContainer = document.getElementById('status-badge-container');
+				statusContainer.innerHTML = getStatusBadge(app.status);
+
+				// Details table
+				document.getElementById('application-id').textContent = app.application_id;
+				document.getElementById('applied-on').textContent = new Date(app.created_at).toLocaleDateString();
+				document.getElementById('internship-location').textContent = app.internship_location;
+				document.getElementById('internship-dates').textContent = app.internship_dates;
+
+				// Action Buttons
+				const actionContainer = document.getElementById('action-buttons');
+				actionContainer.innerHTML = getActionButtons(app) + actionContainer.innerHTML; // Prepend to keep 'Back' button
+
+				addEventListeners(app.application_id);
+
+			} catch (error) {
+				console.error('Failed to load application details:', error);
+				document.querySelector('.content').innerHTML = `<div class="alert alert-danger m-3">Error: ${error.message}</div>`;
+			}
+		}
+
+		function getStatusBadge(status) {
+			let badgeClass = 'bg-secondary';
+			switch (status) {
+                case 'Confirmed_By_Student':
+                case 'Accepted':
+                    badgeClass = 'bg-success';
+                    break;
+                case 'Offered':
+                    badgeClass = 'bg-info';
+                    break;
+                case 'Pending Review':
+                case 'Under Review':
+                    badgeClass = 'bg-warning text-dark';
+                    break;
+                case 'Rejected':
+                    badgeClass = 'bg-danger';
+                    break;
+            }
+			return `<span class="badge ${badgeClass} fs-lg me-2">${status}</span>`;
+		}
+
+		function getActionButtons(application) {
+			let buttons = '';
+			if (application.status === 'Offered') {
+				buttons += `<button class="btn btn-success confirm-offer-btn" data-application-id="${application.application_id}"><i class="ph-check-circle me-2"></i>Confirm Acceptance</button>`;
+			}
+
+			const withdrawable_statuses = ['Pending Review', 'Under Review', 'Shortlisted', 'Offered'];
+			if (withdrawable_statuses.includes(application.status)) {
+				buttons += `<button class="btn btn-danger withdraw-btn mt-2" data-application-id="${application.application_id}"><i class="ph-x-circle me-2"></i>Withdraw Application</button>`;
+			}
+			return buttons;
+		}
+
+		function addEventListeners(applicationId) {
+			const confirmBtn = document.querySelector('.confirm-offer-btn');
+			if(confirmBtn) {
+				confirmBtn.addEventListener('click', async () => {
+					if (confirm('Are you sure you want to confirm this internship offer? This action cannot be undone.')) {
+						try {
+							const result = await api.confirmOffer(applicationId);
+							if (result.message) {
+								alert('Offer confirmed! Congratulations!');
+								loadApplicationDetails(applicationId); // Refresh details
+							} else {
+								alert('Error: ' + (result.error || 'Unknown error'));
+							}
+						} catch (error) {
+							alert('An error occurred while confirming the offer.');
+						}
+					}
 				});
 			}
-		});
+
+			const withdrawBtn = document.querySelector('.withdraw-btn');
+			if(withdrawBtn) {
+				withdrawBtn.addEventListener('click', async () => {
+					if (confirm('Are you sure you want to withdraw this application?')) {
+						try {
+							const result = await api.withdrawApplication(applicationId);
+							if (result.message) {
+								alert('Application withdrawn.');
+								loadApplicationDetails(applicationId); // Refresh details
+							} else {
+								alert('Error: ' + (result.error || 'Unknown error'));
+							}
+						} catch (error) {
+							alert('An error occurred while withdrawing the application.');
+						}
+					}
+				});
+			}
+		}
+
 	</script>
 
 	<!-- Impersonation detection script -->

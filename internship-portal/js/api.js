@@ -165,6 +165,13 @@ class APIService {
     }
 
     /**
+     * Get application details
+     */
+    async getApplicationDetails(applicationId) {
+        return this.request(`/index.php?entity=applications&id=${applicationId}`);
+    }
+
+    /**
      * Apply for internship
      */
     async applyForInternship(studentId, internshipId, coverLetter) {
