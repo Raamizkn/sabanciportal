@@ -35,13 +35,13 @@ function populateApplicationsTable(applications) {
     tableBody.innerHTML = ''; // Clear existing placeholder rows
 
     if (applications.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="7" class="text-center">No applications found.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="6" class="text-center">No applications found.</td></tr>';
         return;
     }
 
     applications.forEach((app, index) => {
         const row = document.createElement('tr');
-        row.setAttribute('data-application-id', app.id);
+        row.setAttribute('data-application-id', app.application_id);
 
         const statusBadge = getStatusBadge(app.status);
 
@@ -58,9 +58,8 @@ function populateApplicationsTable(applications) {
                     </div>
                 </div>
             </td>
-            <td>${app.student_faculty || 'N/A'}</td>
             <td>${app.internship_position || 'N/A'}</td>
-            <td>${new Date(app.created_at).toLocaleDateString()}</td>
+            <td>${new Date(app.applied_date).toLocaleDateString()}</td>
             <td>${statusBadge}</td>
             <td class="text-center">
                 <div class="dropdown">
@@ -71,7 +70,7 @@ function populateApplicationsTable(applications) {
                         <a href="#" class="dropdown-item view-application" data-bs-toggle="modal" data-bs-target="#view_application_modal" data-application='${JSON.stringify(app)}'>
                             <i class="ph-eye me-2"></i>View Application
                         </a>
-                        <a href="#" class="dropdown-item update-status" data-bs-toggle="modal" data-bs-target="#update_status_modal" data-application-id="${app.id}" data-current-status="${app.status}">
+                        <a href="#" class="dropdown-item update-status" data-bs-toggle="modal" data-bs-target="#update_status_modal" data-application-id="${app.application_id}" data-current-status="${app.status}">
                             <i class="ph-pencil me-2"></i>Update Status
                         </a>
                         <div class="dropdown-divider"></div>

@@ -82,16 +82,37 @@ if ($entity === 'applications') {
                 http_response_code(500);
                 echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
             }
-        } elseif ($company_id_param !== null) { // Get applications for a specific company: ?entity=applications&company_id=COMP001 (mock)
-            $company_apps = [];
-            foreach ($applications as $app) {
-                // We need to check if the application's internship_id belongs to the company.
-                // This requires that internships have a company_id and applications link to internships.
-                if (isset($internships[$app['internship_id']]) && $internships[$app['internship_id']]['company_id'] == $company_id_param) {
-                    $company_apps[] = $app;
-                }
+        } elseif ($company_id_param !== null) { // Get applications for a specific company
+            requireRole(ROLE_COMPANY);
+            if (getCurrentUserId() != $company_id_param) {
+                http_response_code(403);
+                echo json_encode(['error' => 'You are not authorized to view these applications.']);
+                exit;
             }
-            echo json_encode($company_apps);
+
+            try {
+                $stmt = $db->prepare("
+                    SELECT 
+                        a.application_id, 
+                        a.status, 
+                        a.applied_date, 
+                        a.cover_letter,
+                        i.position as internship_position, 
+                        s.name as student_name,
+                        s.major as student_major
+                    FROM applications a
+                    JOIN internships i ON a.internship_id = i.id
+                    JOIN students s ON a.student_id = s.id
+                    WHERE i.company_id = ?
+                    ORDER BY a.applied_date DESC
+                ");
+                $stmt->execute([$company_id_param]);
+                $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                echo json_encode($applications);
+            } catch (PDOException $e) {
+                http_response_code(500);
+                echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+            }
         } elseif ($internship_id_param !== null) { // Get applications for a specific internship: ?entity=applications&internship_id=INT001
             $internship_apps = [];
             foreach ($applications as $app) {
