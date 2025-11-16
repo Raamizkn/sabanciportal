@@ -1,5 +1,20 @@
 # Documentation Update Summary
 
+## Date: November 5, 2025
+
+### Highlights
+- ✅ Company internship payloads now include the live company profile (name, industry, website, phone, address, description, logo) that is stored in the database. The backend exposes this data through `/index.php?entity=internships` so the student-facing detail page can show real company info when navigating from “Browse Internships.”
+- ✅ Company application views now receive the exact documents a student attached during submission, including the chosen resume. Both the action dropdown and modal in `company-applications.html` link to those files, so recruiters download what the student selected rather than the default profile resume.
+- ✅ Student “Apply” modal (detail view) lets applicants pick any of their uploaded documents; the selected IDs are persisted in the `documents` table with `application_id`, which drives the company-side visibility mentioned above.
+- ✅ Student Documents page is fully dynamic: it fetches `/students?action=documents` and renders every upload with active download links, matching what’s stored in the backend.
+- ✅ Company profile management is now fully dynamic. The `/companies` API fetches and updates real company records, the profile page loads the authenticated company’s data, and saving changes persists them in MySQL—so the information displayed on student internship pages stays in sync with what the company edits.
+
+### Known Gaps
+- 🔄 Company public profile info isn’t yet shown on every internship card/listing in the student UI. The backend response already contains the data; the remaining work is purely front-end binding wherever it is still static.
+- 🔄 Company size, founding year, and social links remain static placeholders until we extend the database schema with those attributes. They’re currently displayed as read-only hints on the profile page.
+
+---
+
 ## Date: October 26, 2025
 
 ## Overview
@@ -212,4 +227,3 @@ curl -X POST '...' -b cookies.txt
 ---
 
 **Documentation Status**: ✅ **Current and Accurate**
-

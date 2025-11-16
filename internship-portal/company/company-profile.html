@@ -120,10 +120,10 @@
 				<li class="nav-item nav-item-dropdown-lg dropdown ms-lg-2">
 					<a href="#" class="navbar-nav-link align-items-center rounded-pill p-1" data-bs-toggle="dropdown">
 						<div class="status-indicator-container">
-							<img src="../bs5/template/assets/images/demo/logos/2.svg" class="w-32px h-32px rounded-pill" alt="">
+							<img id="navCompanyLogo" src="../bs5/template/assets/images/demo/logos/2.svg" class="w-32px h-32px rounded-pill" alt="">
 							<span class="status-indicator bg-success"></span>
 						</div>
-						<span class="d-none d-lg-inline-block mx-lg-2">XYZ Corporation</span>
+						<span id="navCompanyName" class="d-none d-lg-inline-block mx-lg-2">Company</span>
 					</a>
 
 					<div class="dropdown-menu dropdown-menu-end">
@@ -274,12 +274,13 @@
                         </div>
 
                         <div class="d-lg-flex align-items-center ms-lg-auto mt-3 mt-lg-0">
-                            <button type="submit" class="btn btn-primary">
+                            <button type="button" id="saveCompanyProfile" class="btn btn-primary">
                                 <i class="ph-floppy-disk me-2"></i>
                                 Save Changes
                             </button>
                         </div>
                     </div>
+                    <div id="companyProfileAlert" class="alert d-none mt-3" role="alert"></div>
                 </div>
                 <!-- /page header -->
 
@@ -292,31 +293,32 @@
                     <div class="card-body">
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3">
-                                <img src="../bs5/template/assets/images/demo/logos/2.svg" class="rounded-circle" width="100" height="100" alt="">
+                                <img id="companyLogo" src="../bs5/template/assets/images/demo/logos/2.svg" class="rounded-circle" width="100" height="100" alt="">
                             </div>
 
                             <div class="flex-fill">
-                                <div class="fw-semibold mb-2">XYZ Corporation</div>
-                                <div class="text-muted">Technology · 1000+ employees · Founded 2005</div>
+                                <div class="fw-semibold mb-2" id="companySummaryName">Company Name</div>
+                                <div class="text-muted" id="companySummaryMeta">Industry · Location</div>
                                 <div class="d-inline-flex mt-3">
                                     <a href="javascript:void(0);" role="button" class="btn btn-light border">Change logo</a>
                                 </div>
                             </div>
                         </div>
 
-                        <form>
+                        <div>
                             <div class="row mb-3">
                                 <label class="col-lg-3 col-form-label">Company name:</label>
                                 <div class="col-lg-9">
-                                    <input type="text" class="form-control" value="XYZ Corporation">
+                                    <input type="text" class="form-control" id="companyNameInput" placeholder="Company name">
                                 </div>
                             </div>
 
                             <div class="row mb-3">
                                 <label class="col-lg-3 col-form-label">Industry:</label>
                                 <div class="col-lg-9">
-                                    <select class="form-select">
-                                        <option value="technology" selected>Technology</option>
+                                    <select class="form-select" id="companyIndustrySelect">
+                                        <option value="">Select industry</option>
+                                        <option value="Technology">Technology</option>
                                         <option value="finance">Finance</option>
                                         <option value="healthcare">Healthcare</option>
                                         <option value="education">Education</option>
@@ -329,45 +331,38 @@
                             <div class="row mb-3">
                                 <label class="col-lg-3 col-form-label">Company size:</label>
                                 <div class="col-lg-9">
-                                    <select class="form-select">
-                                        <option value="1-10">1-10 employees</option>
-                                        <option value="11-50">11-50 employees</option>
-                                        <option value="51-200">51-200 employees</option>
-                                        <option value="201-500">201-500 employees</option>
-                                        <option value="501-1000">501-1000 employees</option>
-                                        <option value="1000+" selected>1000+ employees</option>
-                                    </select>
+                                    <input type="text" class="form-control" id="companySizeInput" placeholder="e.g. 100-500 employees" disabled>
                                 </div>
                             </div>
 
                             <div class="row mb-3">
                                 <label class="col-lg-3 col-form-label">Founded:</label>
                                 <div class="col-lg-9">
-                                    <input type="number" class="form-control" value="2005">
+                                    <input type="number" class="form-control" id="companyFoundedInput" placeholder="Year" disabled>
                                 </div>
                             </div>
 
                             <div class="row mb-3">
                                 <label class="col-lg-3 col-form-label">Website:</label>
                                 <div class="col-lg-9">
-                                    <input type="url" class="form-control" value="https://www.xyzcorp.com">
+                                    <input type="url" class="form-control" id="companyWebsiteInput" placeholder="https://example.com">
                                 </div>
                             </div>
 
                             <div class="row mb-3">
                                 <label class="col-lg-3 col-form-label">Headquarters:</label>
                                 <div class="col-lg-9">
-                                    <input type="text" class="form-control" value="San Francisco, CA">
+                                    <input type="text" class="form-control" id="companyHeadquartersInput" placeholder="Headquarters" disabled>
                                 </div>
                             </div>
 
                             <div class="row mb-3">
                                 <label class="col-lg-3 col-form-label">About:</label>
                                 <div class="col-lg-9">
-                                    <textarea rows="5" class="form-control">XYZ Corporation is a leading technology company specializing in innovative software solutions for enterprise clients worldwide. With a focus on cutting-edge technology and exceptional customer service, we help businesses transform their operations and achieve digital excellence.</textarea>
+                                    <textarea rows="5" class="form-control" id="companyDescriptionInput" placeholder="Describe your company"></textarea>
                                 </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
                 <!-- /profile information -->
@@ -379,30 +374,28 @@
                     </div>
 
                     <div class="card-body">
-                        <form>
+                        <div>
                             <div class="row mb-3">
                                 <label class="col-lg-3 col-form-label">Primary email:</label>
                                 <div class="col-lg-9">
-                                    <input type="email" class="form-control" value="info@xyzcorp.com">
+                                    <input type="email" class="form-control" id="companyEmailInput" readonly>
                                 </div>
                             </div>
 
                             <div class="row mb-3">
                                 <label class="col-lg-3 col-form-label">Phone number:</label>
                                 <div class="col-lg-9">
-                                    <input type="tel" class="form-control" value="+1 (415) 555-0123">
+                                    <input type="tel" class="form-control" id="companyPhoneInput" placeholder="+90 ...">
                                 </div>
                             </div>
 
                             <div class="row mb-3">
                                 <label class="col-lg-3 col-form-label">Address:</label>
                                 <div class="col-lg-9">
-                                    <textarea rows="3" class="form-control">123 Tech Drive
-San Francisco, CA 94105
-United States</textarea>
+                                    <textarea rows="3" class="form-control" id="companyAddressInput" placeholder="Company address"></textarea>
                                 </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
                 <!-- /contact information -->
@@ -414,35 +407,9 @@ United States</textarea>
                     </div>
 
                     <div class="card-body">
-                        <form>
-                            <div class="row mb-3">
-                                <label class="col-lg-3 col-form-label">LinkedIn:</label>
-                                <div class="col-lg-9">
-                                    <input type="url" class="form-control" value="https://linkedin.com/company/xyzcorp">
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <label class="col-lg-3 col-form-label">Twitter:</label>
-                                <div class="col-lg-9">
-                                    <input type="url" class="form-control" value="https://twitter.com/xyzcorp">
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <label class="col-lg-3 col-form-label">Facebook:</label>
-                                <div class="col-lg-9">
-                                    <input type="url" class="form-control" value="https://facebook.com/xyzcorp">
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <label class="col-lg-3 col-form-label">Instagram:</label>
-                                <div class="col-lg-9">
-                                    <input type="url" class="form-control" value="https://instagram.com/xyzcorp">
-                                </div>
-                            </div>
-                        </form>
+                        <div class="text-muted">
+                            Social media links are not yet configurable.
+                        </div>
                     </div>
                 </div>
                 <!-- /social links -->
@@ -472,4 +439,6 @@ United States</textarea>
 	</div>
 	<!-- /page content -->
 </body>
+<script src="../js/api.js"></script>
+<script src="../js/company-profile.js"></script>
 </html> 

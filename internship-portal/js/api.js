@@ -117,6 +117,16 @@ class APIService {
     }
 
     /**
+     * Update company profile
+     */
+    async updateCompanyProfile(profileData) {
+        return this.request('/index.php?entity=companies&action=update', {
+            method: 'POST',
+            body: JSON.stringify(profileData)
+        });
+    }
+
+    /**
      * Get company internships
      */
     async getCompanyInternships(companyId) {
