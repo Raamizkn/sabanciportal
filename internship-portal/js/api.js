@@ -237,6 +237,17 @@ class APIService {
             body: formData
         });
     }
+
+    /**
+     * Update student profile
+     */
+    async updateStudentProfile(profileData, studentId = null) {
+        const idParam = studentId ? `&id=${studentId}` : '';
+        return this.request(`/index.php?entity=students${idParam}&action=update`, {
+            method: 'POST',
+            body: JSON.stringify(profileData)
+        });
+    }
 }
 
 // Export instance

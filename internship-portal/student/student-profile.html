@@ -284,12 +284,7 @@
 						<span class="text-muted fs-sm">View and edit your profile information</span>
 					</div>
 					
-					<div>
-						<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#edit_profile">
-							<i class="ph-pencil me-2"></i>
-							Edit Profile
-						</button>
-					</div>
+					
 				</div>
 
 				<div class="page-header-content border-top">
@@ -317,9 +312,6 @@
 								<div>
 									<h2 id="student-name" class="mb-0">John Doe</h2>
 									<span id="student-major" class="d-block text-muted">Computer Science Student</span>
-									<div class="mt-1">
-										<i class="ph-map-pin me-1"></i> <span id="student-location">New York University</span>
-									</div>
 								</div>
 								<button type="button" class="btn btn-light ms-auto" data-bs-toggle="modal" data-bs-target="#edit_profile">
 									<i class="ph-pencil me-2"></i>
@@ -351,14 +343,8 @@
 
 								<dt class="col-sm-3"><i class="ph-phone me-2"></i>Phone</dt>
 								<dd id="student-phone" class="col-sm-9">+1 (123) 456-7890</dd>
-
-								<dt class="col-sm-3"><i class="ph-calendar me-2"></i>Date of Birth</dt>
-								<dd id="student-dob" class="col-sm-9">May 12, 2000</dd>
-
-								<dt class="col-sm-3"><i class="ph-map-pin me-2"></i>Address</dt>
-								<dd id="student-address" class="col-sm-9">123 University St, New York, NY 10001</dd>
-								</dl>
-							</div>
+							</dl>
+						</div>
 						</div>
 					</div>
 
@@ -369,13 +355,7 @@
 								<h5 class="mb-0">Education</h5>
 							</div>
 							<div class="card-body">
-								<div class="d-flex align-items-center mb-1">
-									<div class="me-auto">
-										<h6 id="student-degree" class="mb-0">Bachelor of Science in Computer Science</h6>
-										<span id="student-institution" class="text-muted">New York University</span>
-									</div>
-									<span id="student-education-dates" class="text-muted">2020 - 2024</span>
-								</div>
+								<h6 id="student-degree" class="mb-1">Bachelor of Science in Computer Science</h6>
 								<div id="student-gpa" class="text-muted">GPA: 3.8/4.0</div>
 							</div>
 						</div>
@@ -436,14 +416,6 @@
 										<i class="ph-phone me-2"></i>
 										<a id="contact-phone" href="tel:+11234567890">+1 (123) 456-7890</a>
 									</li>
-									<li class="mb-3 d-flex align-items-center">
-										<i class="ph-linkedin-logo me-2"></i>
-										<a href="#">linkedin.com/in/johndoe</a>
-									</li>
-									<li class="d-flex align-items-center">
-										<i class="ph-github-logo me-2"></i>
-										<a href="#">github.com/johndoe</a>
-									</li>
 								</ul>
 							</div>
 						</div>
@@ -495,101 +467,54 @@
 				</div>
 
 				<div class="modal-body">
-					<div class="mb-3">
-						<div class="fw-semibold mb-2">Profile Picture</div>
-						<div class="d-flex align-items-center">
-							<div class="me-3">
-								<img src="../bs5/template/assets/images/demo/users/face11.jpg" class="rounded-circle" width="80" height="80" alt="">
-							</div>
-							<div>
-								<input type="file" class="form-control">
-								<div class="form-text">Accepted formats: jpg, png. Max file size 2Mb</div>
-							</div>
+					<div id="profileFormFeedback" class="alert d-none" role="alert"></div>
+
+					<div class="row mb-3">
+						<div class="col-md-6">
+							<label class="form-label" for="profileNameInput">Full name</label>
+							<input type="text" id="profileNameInput" class="form-control">
+						</div>
+
+						<div class="col-md-6">
+							<label class="form-label" for="profileMajorInput">Major</label>
+							<input type="text" id="profileMajorInput" class="form-control">
 						</div>
 					</div>
 
 					<div class="row mb-3">
 						<div class="col-md-6">
-							<label class="form-label">First Name</label>
-							<input type="text" class="form-control" value="John">
+							<label class="form-label" for="profileEmailInput">Email</label>
+							<input type="email" id="profileEmailInput" class="form-control">
 						</div>
 
 						<div class="col-md-6">
-							<label class="form-label">Last Name</label>
-							<input type="text" class="form-control" value="Doe">
-						</div>
-					</div>
-
-					<div class="row mb-3">
-						<div class="col-md-6">
-							<label class="form-label">Email</label>
-							<input type="email" class="form-control" value="john.doe@email.com">
-						</div>
-
-						<div class="col-md-6">
-							<label class="form-label">Phone</label>
-							<input type="tel" class="form-control" value="+1 (123) 456-7890">
+							<label class="form-label" for="profilePhoneInput">Phone</label>
+							<input type="tel" id="profilePhoneInput" class="form-control">
 						</div>
 					</div>
 
 					<div class="row mb-3">
 						<div class="col-md-6">
-							<label class="form-label">Date of Birth</label>
-							<input type="date" class="form-control" value="2000-05-12">
-						</div>
-
-						<div class="col-md-6">
-							<label class="form-label">Address</label>
-							<input type="text" class="form-control" value="123 University St, New York, NY 10001">
+							<label class="form-label" for="profileGpaInput">GPA</label>
+							<input type="text" id="profileGpaInput" class="form-control">
 						</div>
 					</div>
 
 					<div class="mb-3">
-						<label class="form-label">About Me</label>
-						<textarea rows="3" class="form-control">I am a Computer Science student with a passion for software development. I'm looking for internship opportunities to gain real-world experience and apply my skills in a professional environment.</textarea>
-					</div>
-
-					<h6 class="fw-semibold">Education</h6>
-					<div class="border rounded p-3 mb-3">
-						<div class="row mb-3">
-							<div class="col-md-6">
-								<label class="form-label">Institution</label>
-								<input type="text" class="form-control" value="New York University">
-							</div>
-
-							<div class="col-md-6">
-								<label class="form-label">Degree</label>
-								<input type="text" class="form-control" value="Bachelor of Science in Computer Science">
-							</div>
-						</div>
-
-						<div class="row">
-							<div class="col-md-4">
-								<label class="form-label">GPA</label>
-								<input type="text" class="form-control" value="3.8/4.0">
-							</div>
-
-							<div class="col-md-4">
-								<label class="form-label">Start Date</label>
-								<input type="text" class="form-control" value="2020">
-							</div>
-
-							<div class="col-md-4">
-								<label class="form-label">End Date</label>
-								<input type="text" class="form-control" value="2024">
-							</div>
-						</div>
+						<label class="form-label" for="profileBioInput">About Me</label>
+						<textarea rows="4" id="profileBioInput" class="form-control"></textarea>
 					</div>
 				</div>
 
 				<div class="modal-footer">
 					<button type="button" class="btn btn-link" data-bs-dismiss="modal">Cancel</button>
-					<button type="button" class="btn btn-primary">Save changes</button>
+					<button type="button" id="saveProfileButton" class="btn btn-primary">Save changes</button>
 				</div>
 			</div>
 		</div>
 	</div>
 	<!-- /edit profile modal -->
+
 
 	<script src="../js/api.js"></script>
 	<script src="../js/student-profile.js"></script>

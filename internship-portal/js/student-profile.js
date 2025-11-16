@@ -1,12 +1,13 @@
 const profileDefaults = {
-    avatar: '../bs5/template/assets/images/demo/users/face11.jpg',
-    institution: 'Sabancı University',
-    educationDates: 'Current Term'
+    avatar: '../bs5/template/assets/images/demo/users/face11.jpg'
 };
+
+let currentProfile = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     attachLogoutHandlers();
     handleImpersonationBanner();
+    setupProfileForm();
 
     const storedRole = localStorage.getItem('userRole');
     const storedStudentId = localStorage.getItem('userId');
@@ -77,25 +78,18 @@ function handleImpersonationBanner() {
 }
 
 async function loadStudentProfile(studentId) {
-    const alertEl = document.getElementById('profile-alert');
-    if (alertEl) {
-        alertEl.classList.add('d-none');
-    }
-
+    showPageAlert(null);
     try {
         const profile = await api.getStudentProfile(studentId);
-        populateProfile(profile);
+        currentProfile = profile.student || profile;
+        populateProfile(currentProfile);
     } catch (error) {
         console.error('Failed to load student profile:', error);
-        if (alertEl) {
-            alertEl.textContent = 'Unable to load profile information. Please refresh the page.';
-            alertEl.classList.remove('d-none');
-        }
+        showPageAlert('Unable to load profile information. Please refresh the page.', 'danger');
     }
 }
 
-function populateProfile(profileResponse) {
-    const student = profileResponse.student || profileResponse;
+function populateProfile(student) {
     if (!student) {
         return;
     }
@@ -103,16 +97,11 @@ function populateProfile(profileResponse) {
     setTextContent('student-name', student.name || 'Student');
     setTextContent('student-full-name', student.name || 'Student');
     setTextContent('student-major', student.major || 'Student');
-    setTextContent('student-location', student.address || profileDefaults.institution);
     setTextContent('student-bio', student.bio || 'Add a short bio to tell companies more about yourself.');
     setTextContent('student-email', student.email || 'Not provided');
     setTextContent('student-phone', student.phone || 'Not provided');
-    setTextContent('student-address', student.address || 'Not provided');
-    setTextContent('student-dob', student.date_of_birth || 'Not provided');
 
-    setTextContent('student-degree', student.major ? `${student.major}` : 'Degree not specified');
-    setTextContent('student-institution', profileDefaults.institution);
-    setTextContent('student-education-dates', profileDefaults.educationDates);
+    setTextContent('student-degree', student.major ? student.major : 'Degree not specified');
     setTextContent('student-gpa', student.gpa ? `GPA: ${student.gpa}` : 'GPA: Not provided');
 
     const emailLink = document.getElementById('contact-email');
@@ -143,7 +132,8 @@ function populateProfile(profileResponse) {
         setTextContent('nav-student-name', student.name);
     }
 
-    updateResumeUI(student.resume || profileResponse.resume || null);
+    updateResumeUI(student.resume || null);
+    populateEditModal(student);
 }
 
 function setTextContent(elementId, value) {
@@ -213,6 +203,126 @@ function updateResumeUI(resume) {
         statusBadge.classList.remove('bg-warning', 'text-dark');
         statusBadge.classList.add('bg-success');
     }
+}
+
+function populateEditModal(profile) {
+    setInputValue('profileNameInput', profile.name || '');
+    setInputValue('profileMajorInput', profile.major || '');
+    setInputValue('profileEmailInput', profile.email || '');
+    setInputValue('profilePhoneInput', profile.phone || '');
+    setInputValue('profileGpaInput', profile.gpa || '');
+    setInputValue('profileBioInput', profile.bio || '');
+}
+
+function setInputValue(elementId, value) {
+    const el = document.getElementById(elementId);
+    if (el) {
+        el.value = value ?? '';
+    }
+}
+
+function getInputValue(elementId) {
+    const el = document.getElementById(elementId);
+    return el ? el.value.trim() : '';
+}
+
+function setupProfileForm() {
+    const saveButton = document.getElementById('saveProfileButton');
+    const editModal = document.getElementById('edit_profile');
+
+    if (editModal) {
+        editModal.addEventListener('show.bs.modal', () => {
+            showProfileFormFeedback(null);
+            if (currentProfile) {
+                populateEditModal(currentProfile);
+            }
+        });
+    }
+
+    if (!saveButton) {
+        return;
+    }
+
+    saveButton.addEventListener('click', async () => {
+        if (!currentProfile) {
+            showProfileFormFeedback('Profile has not finished loading yet.', 'danger');
+            return;
+        }
+
+        const updates = collectProfileFormData();
+        saveButton.disabled = true;
+        showProfileFormFeedback('Saving changes...', 'info');
+
+        try {
+            const response = await api.updateStudentProfile(updates);
+            const updatedProfile = response.data || response.student || response;
+            currentProfile = updatedProfile;
+            populateProfile(updatedProfile);
+            showProfileFormFeedback('Profile updated successfully.', 'success');
+
+            const modalInstance = (typeof bootstrap !== 'undefined' && editModal)
+                ? bootstrap.Modal.getInstance(editModal)
+                : null;
+            if (modalInstance) {
+                setTimeout(() => {
+                    modalInstance.hide();
+                    showProfileFormFeedback(null);
+                }, 800);
+            }
+            showPageAlert('Profile updated successfully.', 'success');
+            setTimeout(() => showPageAlert(null), 4000);
+        } catch (error) {
+            console.error('Failed to update profile:', error);
+            showProfileFormFeedback(error.message || 'Failed to update profile. Please try again.', 'danger');
+        } finally {
+            saveButton.disabled = false;
+        }
+    });
+}
+
+function collectProfileFormData() {
+    return {
+        name: getInputValue('profileNameInput'),
+        major: getInputValue('profileMajorInput'),
+        email: getInputValue('profileEmailInput'),
+        phone: getInputValue('profilePhoneInput'),
+        gpa: getInputValue('profileGpaInput'),
+        bio: getInputValue('profileBioInput')
+    };
+}
+
+function showProfileFormFeedback(message, state) {
+    const feedbackEl = document.getElementById('profileFormFeedback');
+    if (!feedbackEl) {
+        return;
+    }
+
+    if (!message) {
+        feedbackEl.classList.add('d-none');
+        feedbackEl.textContent = '';
+        return;
+    }
+
+    const stateClass = state === 'success' ? 'alert-success' : state === 'danger' ? 'alert-danger' : 'alert-info';
+    feedbackEl.className = `alert ${stateClass}`;
+    feedbackEl.textContent = message;
+}
+
+function showPageAlert(message, state = 'danger') {
+    const alertEl = document.getElementById('profile-alert');
+    if (!alertEl) {
+        return;
+    }
+
+    if (!message) {
+        alertEl.classList.add('d-none');
+        alertEl.textContent = '';
+        return;
+    }
+
+    alertEl.textContent = message;
+    alertEl.className = `alert alert-${state}`;
+    alertEl.classList.remove('d-none');
 }
 
 function setupResumeUpload() {
