@@ -17,6 +17,36 @@ function format_document_download_url($path) {
     return '/' . ltrim($normalized, '/');
 }
 
+function get_application_documents($application_primary_id) {
+    global $db;
+    try {
+        $stmt = $db->prepare("SELECT document_id, document_type, file_name, file_path, file_size, upload_date
+            FROM documents
+            WHERE application_id = ?
+            ORDER BY upload_date DESC, id DESC");
+        $stmt->execute([$application_primary_id]);
+        $documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($documents as &$doc) {
+            $doc['download_url'] = format_document_download_url($doc['file_path']);
+        }
+        return $documents;
+    } catch (PDOException $e) {
+        return [];
+    }
+}
+
+function get_primary_resume($documents) {
+    if (empty($documents)) {
+        return null;
+    }
+    foreach ($documents as $doc) {
+        if (isset($doc['document_type']) && strtoupper($doc['document_type']) === 'CV') {
+            return $doc;
+        }
+    }
+    return $documents[0];
+}
+
 if ($entity === 'applications') {
     if ($method === 'GET') {
         $company_id_param = $_GET['company_id'] ?? null;
@@ -26,7 +56,8 @@ if ($entity === 'applications') {
             try {
                 $stmt = $db->prepare("
                     SELECT 
-                        a.*, 
+                        a.*,
+                        a.id AS internal_id,
                         i.company_id as internship_company_id,
                         i.position as internship_position, 
                         i.description as internship_description,
@@ -44,20 +75,11 @@ if ($entity === 'applications') {
                         s.major as student_major,
                         s.gpa as student_gpa,
                         s.bio as student_bio,
-                        s.profile_pic as student_profile_pic,
-                        resume.document_id as resume_document_id,
-                        resume.file_name as resume_file_name,
-                        resume.file_path as resume_file_path
+                        s.profile_pic as student_profile_pic
                     FROM applications a
                     JOIN internships i ON a.internship_id = i.id
                     JOIN companies c ON i.company_id = c.id
                     JOIN students s ON a.student_id = s.id
-                    LEFT JOIN documents resume ON resume.id = (
-                        SELECT d.id FROM documents d
-                        WHERE d.student_id = s.id AND d.document_type = 'CV'
-                        ORDER BY d.upload_date DESC, d.id DESC
-                        LIMIT 1
-                    )
                     WHERE a.application_id = ?
                 ");
                 $stmt->execute([$id]);
@@ -75,9 +97,13 @@ if ($entity === 'applications') {
                         echo json_encode(['error' => 'Forbidden: You do not have access to this application.']);
                         exit;
                     }
-                    if ($application['resume_file_path']) {
-                        $application['resume_download_url'] = format_document_download_url($application['resume_file_path']);
+                    $application['documents'] = get_application_documents($application['internal_id']);
+                    $resume = get_primary_resume($application['documents']);
+                    if ($resume) {
+                        $application['resume_download_url'] = $resume['download_url'];
+                        $application['resume_file_name'] = $resume['file_name'];
                     }
+                    unset($application['internal_id']);
                     echo json_encode($application);
                 } else {
                     http_response_code(404);
@@ -130,6 +156,7 @@ if ($entity === 'applications') {
             try {
                 $stmt = $db->prepare("
                     SELECT 
+                        a.id AS internal_id,
                         a.application_id, 
                         a.status, 
                         a.applied_date, 
@@ -145,28 +172,24 @@ if ($entity === 'applications') {
                         s.phone as student_phone,
                         s.gpa as student_gpa,
                         s.bio as student_bio,
-                        s.profile_pic as student_profile_pic,
-                        resume.document_id as resume_document_id,
-                        resume.file_name as resume_file_name,
-                        resume.file_path as resume_file_path
+                        s.profile_pic as student_profile_pic
                     FROM applications a
                     JOIN internships i ON a.internship_id = i.id
                     JOIN students s ON a.student_id = s.id
-                    LEFT JOIN documents resume ON resume.id = (
-                        SELECT d.id FROM documents d
-                        WHERE d.student_id = s.id AND d.document_type = 'CV'
-                        ORDER BY d.upload_date DESC, d.id DESC
-                        LIMIT 1
-                    )
                     WHERE i.company_id = ?
                     ORDER BY a.applied_date DESC
                 ");
                 $stmt->execute([$company_id_param]);
                 $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 foreach ($applications as &$application) {
-                    if (!empty($application['resume_file_path'])) {
-                        $application['resume_download_url'] = format_document_download_url($application['resume_file_path']);
+                    $docs = get_application_documents($application['internal_id']);
+                    $application['documents'] = $docs;
+                    $resume = get_primary_resume($docs);
+                    if ($resume) {
+                        $application['resume_download_url'] = $resume['download_url'];
+                        $application['resume_file_name'] = $resume['file_name'];
                     }
+                    unset($application['internal_id']);
                 }
                 echo json_encode($applications);
             } catch (PDOException $e) {
