@@ -1,230 +1,126 @@
-# Sabanci Internship Portal API Documentation
+# Sabancı Internship Portal – API Guide (November 2025)
 
-This document outlines the available endpoints for the backend. The API follows a centralized routing model where all requests are sent to `index.php`.
+This is the single source of truth for the live REST-style API that powers the internship portal. Every request is routed through `backend/index.php` using the `entity` (resource) and optional `action` (operation) query parameters.
 
-**Base URL:** `http://localhost:8001/`
+- **Base URL (local dev):** `http://localhost:8001/index.php`
+- **Auth:** Session cookies. Always `POST /?entity=auth&action=login` first, store the cookie (`-c/-b cookies.txt`).
+- **Roles:** `student`, `company`, `admin`. Each endpoint enforces role + ownership checks.
 
-## 🔒 Authentication
-
-**IMPORTANT**: All POST operations require authentication. You must login first.
-
-### Login
 ```bash
-POST /index.php?entity=auth&action=login
-Body: {
-  "email": "company@example.com",
-  "password": "password123",
-  "role": "company"
-}
+curl -X POST 'http://localhost:8001/index.php?entity=auth&action=login' \
+  -H 'Content-Type: application/json' \
+  -c cookies.txt \
+  -d '{"email":"company@example.com","password":"secret","role":"company"}'
 ```
 
-After login, use session cookies for subsequent requests.
-
-## API Design
-
-The API uses a **Front Controller** pattern. All requests are routed through `index.php`. The type of data you want to interact with is specified by the `entity` URL parameter, and the specific action is specified by the `action` parameter for POST requests.
-
-**Security**: All endpoints now enforce role-based access control and ownership verification.
+Use the same cookie jar for all subsequent calls: `curl -b cookies.txt …`.
 
 ---
 
-## Student Endpoints
+## Key Entities & Endpoints
 
-These endpoints are for actions a student would typically perform.
+### Students
 
-### 1. List All Available Internships
-- **Method:** `GET`
-- **URL:** `http://localhost:8001/index.php?entity=internships`
+| Purpose | Method/Endpoint | Notes |
+| --- | --- | --- |
+| Fetch my profile | `GET ?entity=students` | Uses authenticated student ID. Admins can pass `&id=2` to impersonate. |
+| Update profile | `POST ?entity=students&action=update` | Body can include `name`, `phone`, `major`, `gpa`, `bio`, `profile_pic`. |
+| List my documents | `GET ?entity=students&action=documents` | Returns every upload with `document_id`, `download_url`, and `application_id` linkage. |
+| Upload resume | `POST ?entity=students&action=upload_resume` | Multipart form field `resume`. Updates/inserts a `documents` row of type `CV`. |
+| List my applications | `GET ?entity=applications&student_id={id}` | Requires the student to match `{id}`. Response includes `status`, `offer_details`, `internship_*` fields. |
+| Withdraw application | `POST ?entity=applications&id=APP123&action=withdraw` | Allowed if status ∈ `Pending Review`, `Under Review`, `Shortlisted`, `Offered`. |
+| Confirm offer | `POST ?entity=applications&id=APP123&action=confirm_offer` | Allowed when status = `Offered`; transitions to `Confirmed_By_Student`. |
 
-### 2. Get Details for a Specific Internship
-- **Method:** `GET`
-- **URL:** `http://localhost:8001/index.php?entity=internships&id={internship_id}`
-- **URL Parameters:**
-  - `id`: The ID of the internship (e.g., `INT001`).
+**Applying with selected documents**
+```bash
+curl -X POST '...&entity=applications&action=apply' \
+  -b cookies.txt \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "internship_id": 15,
+        "cover_letter": "Excited to join the team!",
+        "document_ids": ["DOC123456", "DOC654321"]
+      }'
+```
+- The backend uses the authenticated student ID, generates a collision-safe `application_id`, saves status `Pending Review`, and links each `document_id` to the new `applications.id`.
 
-### 3. List Your Applications
-- **Method:** `GET`
-- **URL:** `http://localhost:8001/index.php?entity=applications&student_id={student_id}`
-- **URL Parameters:**
-  - `student_id`: Your student ID (e.g., `1`).
+### Internships
 
-### 4. Apply for an Internship
-- **Method:** `POST`
-- **URL:** `http://localhost:8001/index.php?entity=applications&action=apply`
-- **Auth Required:** ✅ Student role
-- **Body (JSON):**
-  ```json
-  {
-      "internship_id": 1,
-      "cover_letter": "I am very excited about this opportunity."
-  }
-  ```
-- **Note:** `student_id` is automatically retrieved from session. No need to specify it.
+| Purpose | Method/Endpoint | Notes |
+| --- | --- | --- |
+| List all internships | `GET ?entity=internships` | Always returns live company metadata (`company.name`, `industry`, `phone`, `address`, `logo`). |
+| Get detail | `GET ?entity=internships&id=15` | Used by `student-internship-detail.html`. |
+| Company’s postings | `GET ?entity=internships&company_id=9` | Authenticated company only. |
+| Create posting | `POST ?entity=internships&action=create` | Body requires `position` + `description`; other fields optional. Uses logged-in company ID/name. |
 
-### 5. Withdraw an Application
-- **Method:** `POST`
-- **URL:** `http://localhost:8001/index.php?entity=applications&id={application_id}&action=withdraw`
-- **URL Parameters:**
-  - `id`: The ID of the application to withdraw (e.g., `APP001`).
+### Applications (Company view)
 
-### 6. Confirm an Internship Offer
-- **Method:** `POST`
-- **URL:** `http://localhost:8001/index.php?entity=applications&id={application_id}&action=confirm_offer`
-- **URL Parameters:**
-  - `id`: The ID of the application for which you are confirming the offer (e.g., `APP002`).
+| Purpose | Method/Endpoint | Notes |
+| --- | --- | --- |
+| List applications | `GET ?entity=applications&company_id=9` | Requires company 9 (or admin). Include `&status=Offered` to filter. Each item contains student profile fields, internship summary, `documents[]`, and `resume_download_url`. |
+| Single application | `GET ?entity=applications&id=APP115` | Authorizes student owner, company owner, or admin. Includes company + student + documents. |
+| Update status | `POST ?entity=applications&id=APP115&action=update_status_company` | Body `{ "status": "Offered", "offer_details": "Start 1 June" }`. Valid statuses: `Pending Review`, `Under Review`, `Shortlisted`, `Interview Scheduled`, `Offered`, `Rejected`, `Rejected_By_Company`, `Approved_By_Company`. |
 
-### 7. List Documents for an Application
-- **Method:** `GET`
-- **URL:** `http://localhost:8001/index.php?entity=documents&application_id={application_id}`
-- **URL Parameters:**
-  - `application_id`: The ID of the application (e.g., `APP002`).
+When status is set to `Offered`, include `offer_details`; students see the note inside their portal. Moving to `Approved_By_Company` surfaces the application on the Finalized page. Once a student hits `confirm_offer`, the status becomes `Confirmed_By_Student`.
 
-### 8. Upload a Document
-- **Method:** `POST`
-- **URL:** `http://localhost:8001/index.php?entity=documents&action=upload&application_id={application_id}`
-- **URL Parameters:**
-  - `application_id`: The ID of the application (e.g., `APP002`).
-- **Body (JSON):**
-  ```json
-  {
-      "student_id": 1,
-      "document_type": "CV",
-      "file_name": "my_updated_cv.pdf"
-  }
-  ```
+### Companies
+
+| Purpose | Method/Endpoint | Notes |
+| --- | --- | --- |
+| Fetch profile | `GET ?entity=companies&action=get_profile&company_id=9` | Company 9 or admin. Returns `name`, `industry`, `website`, `phone`, `address`, `description`, `logo`. |
+| Update profile | `POST ?entity=companies&action=update` | Body with any editable fields above; automatically ties to logged-in company. |
 
 ---
 
-## Company Endpoints
+## Application Status Flow
 
-These endpoints are for actions a company representative would perform.
+```
+Pending Review (default) → Under Review → Shortlisted → Interview Scheduled
+   → Offered → (student confirms) → Confirmed_By_Student
+   → Approved_By_Company (company finalizes) → Finalized dashboards
+   ↘ Rejected / Rejected_By_Company / Withdrawn (terminal)
+```
 
-### 1. List Your Company's Internships
-- **Method:** `GET`
-- **URL:** `http://localhost:8001/index.php?entity=internships&company_id={company_id}`
-- **URL Parameters:**
-  - `company_id`: Your company ID (e.g., `COMP001`).
-
-### 2. Create a New Internship
-- **Method:** `POST`
-- **URL:** `http://localhost:8001/index.php?entity=internships&action=create`
-- **Auth Required:** ✅ Company role
-- **Body (JSON):**
-  ```json
-  {
-      "position": "Frontend Developer Intern",
-      "description": "Work with our amazing frontend team on a new product.",
-      "location": "Remote",
-      "dates": "June 2025 - August 2025",
-      "requirements": "React, JavaScript",
-      "salary": "4000 TL/month",
-      "type": "Full-time",
-      "application_deadline": "2025-05-31"
-  }
-  ```
-- **Note:** `company_id` and `company_name` are automatically retrieved from session. No need to specify them.
-
-### 3. Update an Internship
-- **Method:** `POST`
-- **URL:** `http://localhost:8001/index.php?entity=internships&id={internship_id}&action=update`
-- **Auth Required:** ✅ Company role (must own the internship)
-- **URL Parameters:**
-  - `id`: The ID of the internship to update.
-- **Body (JSON):**
-  ```json
-  {
-      "position": "Senior Frontend Developer Intern",
-      "description": "An updated description for the role."
-  }
-  ```
-- **Note:** Only the company that created the internship can update it.
-
-### 4. List Applications for Your Company
-- **Method:** `GET`
-- **URL:** `http://localhost:8001/index.php?entity=applications&company_id={company_id}`
-- **URL Parameters:**
-  - `company_id`: Your company ID (e.g., `COMP001`).
-
-### 5. List Applications for a Specific Internship
-- **Method:** `GET`
-- **URL:** `http://localhost:8001/index.php?entity=applications&internship_id={internship_id}`
-- **URL Parameters:**
-  - `internship_id`: The ID of the internship.
-
-### 6. Update an Application's Status
-- **Method:** `POST`
-- **URL:** `http://localhost:8001/index.php?entity=applications&id={application_id}&action=update_status_company`
-- **URL Parameters:**
-  - `id`: The ID of the application to update.
-- **Body (JSON):**
-  ```json
-  {
-      "status": "Offered",
-      "offer_details": "Your offer is valid until July 30, 2025."
-  }
-  ```
-  *Other valid statuses include: `Rejected_By_Company`, `Interview_Scheduled`, `Approved_By_Company`.*
+- Duplicate submissions are blocked by a DB constraint on `(student_id, internship_id)` and handled as HTTP 409.
+- Every application response now normalizes the historical `Pending` label to `Pending Review` so UI badges stay consistent.
+- `documents[]` always includes `document_type`, `file_name`, `file_size`, and `download_url` (absolute path) so the frontend can build download buttons directly.
 
 ---
 
-## Admin Endpoints
+## Error Handling Cheatsheet
 
-These endpoints provide administrative control over the platform's core data.
+| Issue | Response |
+| --- | --- |
+| Missing auth / wrong role | `401/403` with `{ "error": "Access denied." }` |
+| Duplicate application | `409` `{ "error": "You have already applied for this internship." }` |
+| Invalid status transition | `400` `{ "error": "Invalid status 'Foo' for company update." }` |
+| DB failure | `500` `{ "error": "Failed to ..." }` (message logged server-side) |
 
-### 1. Get All Students
-- **Method:** `GET`
-- **URL:** `http://localhost:8001/index.php?entity=admin&resource=students`
+---
 
-### 2. Get a Specific Student
-- **Method:** `GET`
-- **URL:** `http://localhost:8001/index.php?entity=admin&resource=students&id={student_id}`
+## Testing Tips
 
-### 3. Add a New Student
-- **Method:** `POST`
-- **URL:** `http://localhost:8001/index.php?entity=admin&resource=students&action=add`
-- **Body (JSON):**
-  ```json
-  {
-    "name": "Jane Doe",
-    "email": "jane.doe@example.com",
-    "student_id": "98765",
-    "major": "Computer Science"
-  }
-  ```
+1. **Login once per role.** Maintain separate cookie jars: `student_cookies.txt`, `company_cookies.txt`, `admin_cookies.txt`.
+2. **Use `?status=` filters** while testing the Company Applications grid to validate pending/offered/finalized counts.
+3. **Check document linkage** by uploading from the student Documents page, applying with selected IDs, and verifying that `GET ?entity=applications&company_id=...` returns the same downloads.
+4. **Finalization flow:**
+   - Company `POST update_status_company` → `Approved_By_Company`
+   - Student `POST confirm_offer` → `Confirmed_By_Student`
+   - Refetch Finalized page (`company-finalized.html`) to see the record with attached documents.
 
-### 4. Update a Student
-- **Method:** `POST`
-- **URL:** `http://localhost:8001/index.php?entity=admin&resource=students&id={student_id}&action=update`
-- **Body (JSON):**
-  ```json
-  {
-    "major": "Electrical Engineering",
-    "gpa": "3.8"
-  }
-  ```
+This document replaces all previous API specs (`COMPANY_API_SUMMARY.md`, `API_Testing_Guide.md`, etc.). Keep it updated whenever an endpoint shape changes.
 
-### 5. Get All Companies
-- **Method:** `GET`
-- **URL:** `http://localhost:8001/index.php?entity=admin&resource=companies`
+### Admin
 
-### 6. Add a New Company
-- **Method:** `POST`
-- **URL:** `http://localhost:8001/index.php?entity=admin&resource=companies&action=add`
-- **Auth Required:** ✅ Admin role
-- **Body (JSON):**
-  ```json
-  {
-    "name": "New Innovators Inc.",
-    "email": "contact@newinnovators.com",
-    "industry": "Technology"
-  }
-  ```
+Admin endpoints are primarily used via the web UI or Postman while impersonating. All of them require an authenticated admin session.
 
-### 7. Get All Terms
-- **Method:** `GET`
-- **URL:** `http://localhost:8001/index.php?entity=admin&resource=terms`
+| Purpose | Method/Endpoint | Notes |
+| --- | --- | --- |
+| List companies | `GET ?entity=admin&resource=companies` | Returns every company record so admins can impersonate or audit. |
+| Create company | `POST ?entity=admin&resource=companies&action=add` | Body `{ "name", "email", "industry", ... }`. Sets temporary password and inserts into `companies`. |
+| List students | `GET ?entity=admin&resource=students` | Supports `&id=` to fetch a single student. |
+| Create student | `POST ?entity=admin&resource=students&action=add` | Seeds `students` table with the provided profile. |
+| List terms | `GET ?entity=admin&resource=terms` | Used for academic planning dashboards. |
+| Create term | `POST ?entity=admin&resource=terms&action=add` | Body `{ "name", "start_date", "end_date" }`. |
 
-### 8. Get All Applications (Unfiltered)
-- **Method:** `GET`
-- **URL:** `http://localhost:8001/index.php?entity=applications`
-*(This is an existing endpoint, but it is most useful in an Admin context).*
+Admin users can also impersonate via the UI: selecting a company or student writes `sessionStorage` keys (`impersonatedUser*`). The backend still enforces role checks, so impersonated requests go through the same company/student endpoints above.

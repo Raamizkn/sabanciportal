@@ -1,236 +1,132 @@
-# Sabanci University Internship Portal
+# Sabancı University Internship Portal
 
-A complete internship management platform connecting students with companies for internship opportunities.
+A full-stack internship management platform connecting students, companies, and admins. Backend is PHP/MySQL (front controller); frontend is Bootstrap 5 with a shared `api.js` client.
 
-## 🎯 Project Status
+## Documentation Map
 
-✅ **Backend**: Fully functional with database integration
-✅ **Authentication**: Complete role-based access control
-✅ **Database**: MySQL integration with remote hosting
-✅ **API**: RESTful API with security
-⚠️ **Frontend**: HTML pages ready for API integration
+We maintain **four** living documents only:
 
-## 🏗️ Architecture
+1. `README.md` (this file) – project overview, setup, and structure.
+2. `api_documentation.md` – definitive API reference and request samples.
+3. `COMPLETE_WORKFLOW_SUMMARY.md` – how the business flow works end to end.
+4. `learnings.md` – architecture lessons, debugging notes, and best practices.
 
-### Backend (`/backend`)
-- **Language**: PHP 8.4+
-- **Pattern**: Front Controller
-- **Database**: MySQL (Remote: pro2-dev.sabanciuniv.edu)
-- **Authentication**: Session-based with role verification
-- **API**: RESTful endpoints
-
-### Frontend (`/internship-portal`)
-- **Framework**: Bootstrap 5
-- **Pages**: Admin, Company, Student dashboards
-- **Status**: Ready for API integration
-- **JS Service**: `js/api.js` available
-
-## 🚀 Quick Start
-
-### Prerequisites
-- PHP 8.4+ (built-in server)
-- MySQL access to `pro2-dev.sabanciuniv.edu`
-- Browser with JavaScript enabled
-
-### 1. Database Setup
-
-```bash
-cd backend
-php config/create_tables.php
-```
-
-This will:
-- Create all tables (students, companies, internships, applications, etc.)
-- Insert sample data for testing
-
-### 2. Start Backend Server
-
-```bash
-cd backend
-php -S localhost:8001
-```
-
-### 3. Access Frontend
-
-Open `internship-portal/index.html` in your browser
-
-## 👥 User Roles
-
-### 🔐 Admin
-- Create/manage company accounts
-- Create/manage student accounts
-- Manage academic terms
-- System oversight
-
-**Test Credentials:**
-- Email: `admin@example.com`
-- Password: `password123`
-
-### 🏢 Company
-- Create internship postings
-- Review applications
-- Offer positions
-- Manage company profile
-
-**Test Credentials:**
-- Email: `company@example.com`
-- Password: `password123`
-
-### 🎓 Student
-- Browse internships
-- Apply for positions
-- Track application status
-- Confirm offers
-
-**Test Credentials:**
-- Email: `student@example.com`
-- Password: `password123`
-
-## 📡 API Endpoints
-
-### Authentication
-```bash
-POST /index.php?entity=auth&action=login
-POST /index.php?entity=auth&action=logout
-GET  /index.php?entity=auth&action=check
-```
-
-### Internships
-```bash
-GET  /index.php?entity=internships
-GET  /index.php?entity=internships&id={id}
-POST /index.php?entity=internships&action=create    # Requires: Company
-POST /index.php?entity=internships&id={id}&action=update    # Requires: Company
-POST /index.php?entity=internships&id={id}&action=delete    # Requires: Company
-```
-
-### Applications
-```bash
-GET  /index.php?entity=applications&student_id={id}
-POST /index.php?entity=applications&action=apply            # Requires: Student
-POST /index.php?entity=applications&id={id}&action=withdraw # Requires: Student
-POST /index.php?entity=applications&id={id}&action=confirm_offer # Requires: Student
-POST /index.php?entity=applications&id={id}&action=update_status_company # Requires: Company
-```
-
-### Admin
-```bash
-GET  /index.php?entity=admin&resource=companies
-POST /index.php?entity=admin&resource=companies&action=add # Requires: Admin
-POST /index.php?entity=admin&resource=students&action=add  # Requires: Admin
-POST /index.php?entity=admin&resource=terms&action=add     # Requires: Admin
-```
-
-**See `api_documentation.md` for complete API reference**
-
-## 🔒 Security Features
-
-✅ **Authentication Required**: All POST operations require login
-✅ **Role-Based Access**: Admin, Company, Student roles enforced
-✅ **Ownership Verification**: Users can only modify their own data
-✅ **Session Management**: Secure session handling
-✅ **Password Hashing**: bcrypt password hashing
-✅ **SQL Injection Protection**: Prepared statements
-
-## 📊 Database
-
-**Host**: `pro2-dev.sabanciuniv.edu`
-**Database**: `shadowing`
-**Tables**: 8 tables
-- `admin_users`
-- `students`
-- `companies`
-- `internships`
-- `applications`
-- `documents`
-- `terms`
-- `evaluations`
-
-**See `database.md` for complete schema**
-
-## 📁 Project Structure
-
-```
-sabanciportal-1/
-├── backend/                  # PHP Backend
-│   ├── auth/                # Authentication module
-│   ├── config/              # Database config
-│   ├── data/               # Data loading
-│   ├── handlers/           # API handlers
-│   └── index.php           # Main router
-├── internship-portal/      # Frontend
-│   ├── admin/              # Admin pages
-│   ├── company/            # Company pages
-│   ├── student/            # Student pages
-│   └── js/                 # JavaScript
-│       └── api.js          # API service
-├── *.md                    # Documentation
-└── database.md             # Database docs
-```
-
-## 🧪 Testing
-
-Test credentials are set up with password `password123`:
-- Admin: `admin@example.com`
-- Company: `company@example.com`
-- Student: `student@example.com`
-
-**See `API_TEST_RESULTS.md` for complete test results**
-
-## 📚 Documentation
-
-- `api_documentation.md` - Complete API reference
-- `database.md` - Database schema and connection
-- `AUTHENTICATION.md` - Authentication system
-- `WORKFLOW_TEST.md` - Complete workflow testing
-- `COMPLETE_WORKFLOW_SUMMARY.md` - Implementation summary
-- `API_TEST_RESULTS.md` - Test results
-
-## 🔄 Complete Workflow
-
-1. **Admin** creates company account → Database
-2. **Company** logs in and creates internship → Database
-3. **Student** logs in and applies → Database
-4. **Company** reviews and offers position → Database update
-5. **Student** confirms offer → Database update
-6. **Company** finalizes → Complete
-
-**See `WORKFLOW_TEST.md` for step-by-step instructions**
-
-## 🛠️ Development
-
-### Adding New Endpoints
-
-1. Create handler function in appropriate `handlers/*.php`
-2. Add routing in `backend/index.php`
-3. Add authentication checks
-4. Update `api_documentation.md`
-
-### Frontend Integration
-
-Use `internship-portal/js/api.js`:
-
-```javascript
-// Login
-await api.login(email, password, role);
-
-// Create internship
-await api.createInternship(companyId, data);
-
-// Apply
-await api.applyForInternship(studentId, internshipId, coverLetter);
-```
-
-## 📝 License
-
-Internal project for Sabanci University
-
-## 👥 Contributors
-
-Development Team
+Anything not covered by these four is either code or intentionally deleted.
 
 ---
 
-**Last Updated**: October 26, 2025  
-**Status**: Backend Complete, Frontend Integration Ready
+## Project Status (November 2025)
+
+| Layer | Status | Notes |
+| --- | --- | --- |
+| Backend | ✅ Production-ready | MySQL-backed, session auth, role/ownership checks, document linkage, workflow statuses. |
+| API Client | ✅ Shared `internship-portal/js/api.js` | Auto-detects base URL, injects credentials, normalizes errors. |
+| Frontend | ✅ Wired to backend | Student/company dashboards, application grids, finalization modals all consume live data. |
+| Documentation | ✅ Consolidated | Only the four docs above remain and are up to date. |
+
+---
+
+## Stack Overview
+
+- **Backend:** PHP 8+, MySQL (`shadowing` DB on `pro2-dev.sabanciuniv.edu`), front-controller router `backend/index.php`.
+- **Frontend:** Static HTML/Bootstrap 5 under `internship-portal/`, modular JS per page, centralized API client.
+- **Auth:** Session cookies (`auth/login`), role + ownership enforcement (`student`, `company`, `admin`).
+- **Data flow:** Student uploads docs → applies with selected IDs → backend attaches them to application → company downloads from Applications/Finalized pages.
+
+---
+
+## Quick Start
+
+### 1. Backend & Database
+
+```bash
+cd backend
+php config/create_tables.php   # sets up schema + seed data
+php -S localhost:8001          # run API server
+```
+
+- DB host: `pro2-dev.sabanciuniv.edu`
+- DB name: `shadowing`
+- DB user/pass: `shadowing` / `QT8rvzZF`
+- All handlers use prepared statements + shared `config/database.php`.
+
+### 2. Frontend
+
+Open `internship-portal/index.html` via any static server (or VS Code Live Server). The `api.js` client automatically points to `http://localhost:8001` while developing.
+
+### 3. Test Credentials
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Admin | `admin@example.com` | `password123` |
+| Company | `company@example.com` | `password123` |
+| Student | `student@example.com` | `password123` |
+
+Each login stores `userRole`/`userId` locally and session cookies server-side.
+
+---
+
+## Key Features
+
+- **Company workflow:** Profile editing → internship posting → application review with document downloads → status updates (`Pending Review` → `Approved_By_Company`) → Finalized placements page.
+- **Student workflow:** Document upload → internship detail page with “Apply Now” modal → choose uploaded docs per application → withdraw/confirm inside `student/student-applications.html`.
+- **Dashboards:** Company dashboard cards (active internships, total apps, finalized placements) and student dashboard cards (total/pending/offered/finalized) read live API data.
+- **Resilient UI:** Company applications grid fallbacks when DataTables is slow; all modals are fed via cached JSON rather than DOM scraping.
+
+See `COMPLETE_WORKFLOW_SUMMARY.md` for the narrative version.
+
+---
+
+## API Overview
+
+The API is centralized at `http://localhost:8001/index.php`. Highlights:
+
+- `entity=auth` – login/logout/check.
+- `entity=students` – profile, documents, resume upload.
+- `entity=companies` – profile fetch/update.
+- `entity=internships` – CRUD for postings (company-only). Every response includes live company metadata.
+- `entity=applications` – student lists, company lists (with `status` filter), apply/withdraw/confirm, update status.
+
+Full request/response details and sample curl commands live in `api_documentation.md`.
+
+---
+
+## Testing Tips
+
+1. Maintain separate cookie jars (`student_cookies.txt`, etc.) to switch roles quickly.
+2. Use browser DevTools → Network to confirm `applications&action=apply` payloads include `document_ids`.
+3. Hit `GET ?entity=applications&id=APP###` to confirm the API reflects whatever the UI shows (statuses, `offer_details`, documents).
+4. Verify the Finalized page after approving/confirming to ensure attachments, offer notes, and evaluation links appear.
+
+---
+
+## Project Structure
+
+```
+sabanciportal-1/
+├── backend/
+│   ├── auth/           # session helpers / role guards
+│   ├── config/         # DB connection + schema scripts
+│   ├── handlers/       # entity-specific controllers (students, companies, etc.)
+│   └── index.php       # single entry point / router
+├── internship-portal/
+│   ├── admin/
+│   ├── company/
+│   ├── student/
+│   └── js/
+│       └── api.js      # shared API client
+├── README.md
+├── api_documentation.md
+├── COMPLETE_WORKFLOW_SUMMARY.md
+└── learnings.md
+```
+
+---
+
+## Contribution Checklist
+
+- Update the relevant doc (API, workflow, or learnings) when behavior changes.
+- Keep `api.js` as the single HTTP abstraction; page-specific scripts should not hardcode URLs.
+- Run `php -l backend/handlers/*.php` before committing backend changes.
+- Manually sanity check the offer → confirmation → finalized flow whenever touching applications/documents.
 

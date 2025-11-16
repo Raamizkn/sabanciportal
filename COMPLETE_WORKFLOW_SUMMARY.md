@@ -1,251 +1,102 @@
-# Complete Application Workflow - Implementation Summary
+# Workflow Playbook (November 2025)
 
-## ✅ SUCCESSFULLY IMPLEMENTED
+This document captures the end-to-end flow of the Sabancı Internship Portal. It replaces `WORKFLOW_TEST.md`, `DOCUMENTATION_UPDATE_SUMMARY.md`, and every other workflow-related note. Keep it updated whenever the business flow changes.
 
-The complete application workflow from Admin → Company → Student → Company has been successfully implemented and tested with database persistence.
+---
 
-## Workflow Steps Implemented
+## What Works Today
 
-### 1. ✅ Admin Creates Company Account
-- **Endpoint**: `POST /index.php?entity=admin&resource=companies&action=add`
-- **Database**: Insert into `companies` table
-- **Status**: WORKING
+1. **Admin onboarding** – Admins can create company accounts and terms from the backend UI/API. Those records feed the company login flow.
+2. **Company lifecycle** – Companies edit their profile, create internships, review candidates, move them through statuses, and finalize placements. Every internship payload contains the authoritative company profile fields.
+3. **Student lifecycle** – Students maintain rich profiles, upload multiple documents, browse internships, pick files per application, withdraw, and confirm offers.
+4. **Document fidelity** – When a student applies, the selected `document_ids` are attached to the new application row so companies download exactly what was submitted.
+5. **Dashboards** – Student + company dashboards, the Company Applications grid, and the Finalized page all read live data (including offer notes and attached documents) via `internship-portal/js/api.js`.
 
-### 2. ✅ Company Creates Internship Posting
-- **Endpoint**: `POST /index.php?entity=internships&action=create`
-- **Database**: Insert into `internships` table
-- **Status**: WORKING
+---
 
-### 3. ✅ Student Browses Internships
-- **Endpoint**: `GET /index.php?entity=internships`
-- **Database**: Select from `internships` table
-- **Status**: WORKING
+## Roles & Key Pages
 
-### 4. ✅ Student Applies for Internship
-- **Endpoint**: `POST /index.php?entity=applications&action=apply`
-- **Database**: Insert into `applications` table
-- **Status**: WORKING
+| Role | Pages | Highlights |
+| --- | --- | --- |
+| Admin | `admin/admin-add-company.html`, Postman (`admin` endpoints) | Creates companies/terms, impersonates users for QA. |
+| Company | `company/company-dashboard.html`, `company-company-applications.html`, `company-company-finalized.html`, `company-company-internships.html`, `company/company-profile.html` | Dashboard metrics, live applications grid with resume/doc links, finalized placements modal, profile editing. |
+| Student | `student/student-dashboard.html`, `student/student-internships.html`, `student/student-internship-detail.html`, `student/student-applications.html`, `student/student-documents.html`, `student/student-profile.html` | Browse/apply with “Apply Now” modal, document picker, application table with withdraw/confirm buttons. |
 
-### 5. ✅ Company Views Applications
-- **Endpoint**: `GET /index.php?entity=applications&company_id={id}`
-- **Database**: Select from `applications` joined with `internships`
-- **Status**: WORKING
+---
 
-### 6. ✅ Company Offers Position
-- **Endpoint**: `POST /index.php?entity=applications&id={id}&action=update_status_company`
-- **Database**: Update `applications` table status to "Offered"
-- **Status**: WORKING
+## Workflow Walkthrough
 
-### 7. ✅ Student Confirms Offer
-- **Endpoint**: `POST /index.php?entity=applications&id={id}&action=confirm_offer`
-- **Database**: Update `applications` table status to "Confirmed_By_Student"
-- **Status**: WORKING
-
-### 8. ✅ Company Views Finalized Applications
-- **Endpoint**: `GET /index.php?entity=applications&company_id={id}`
-- **Database**: Select from `applications` with status "Confirmed_By_Student"
-- **Status**: WORKING
-
-## Application Status Flow
-
+### 1. Admin creates a company
 ```
-Pending
-  ↓
-Under Review
-  ↓
-Shortlisted
-  ↓
-Interview Scheduled
-  ↓
-Offered ← Company Offers
-  ↓
-Confirmed_By_Student ← Student Confirms
-  ↓
-Finalized
+curl -X POST '...&entity=admin&resource=companies&action=add' -d '{"name":"KFC","email":"kfc@example.com","industry":"Food"}'
 ```
+The new record appears instantly on the login form and in the admin UI. No manual database tweaks required.
 
-## Database Schema
+### 2. Company logs in & updates profile
+- Page: `company/company-profile.html`
+- API: `GET/POST ?entity=companies&action=...`
+- Outcome: Student-facing internship cards inherit `name`, `industry`, `website`, `phone`, `address`, `description`, `logo` from this source of truth.
 
-### Companies Table
-- Stores company information
-- Admin creates entries
-- Companies use these entries
+### 3. Company posts internships
+- Page: `company/company-internships.html`
+- API: `POST ?entity=internships&action=create`
+- Notes: `company_id` / `company_name` come from the authenticated session. No payload hacks needed.
 
-### Internships Table
-- Stores internship postings
-- Linked to companies via `company_id`
-- Status: Active, Inactive, Closed, Deleted
+### 4. Student browses & applies
+- Page: `student/student-internships.html` → `student/student-internship-detail.html`
+- API: `GET ?entity=internships`, `POST ?entity=applications&action=apply`
+- Student selects documents from `student/student-documents.html`. The modal sends `document_ids` along with the cover letter. The backend transaction creates the application, links the documents, and responds with `status: "Pending Review"`.
 
-### Applications Table
-- Stores student applications
-- Linked to students and internships
-- Status tracking throughout workflow
-- Unique constraint on (student_id, internship_id)
+### 5. Company reviews applications
+- Page: `company/company-applications.html`
+- API: `GET ?entity=applications&company_id=9`
+- Features: DataTable with retry fallback, document download list, resume download button, Update Status modal (with `offer_details`). Filtering by `status` is supported via query string.
 
-## Frontend Integration
+### 6. Offer → confirmation → finalization
+1. Company sets status to `Offered` with an offer note. Student sees the note in their Applications page and can **Confirm Offer**.
+2. After interviews, company can skip straight to `Approved_By_Company` to force a finalization (used when paperwork is done offline).
+3. Student confirming moves status to `Confirmed_By_Student`.
+4. Finalized applications auto-populate `company/company-finalized.html`, where recruiters can download attachments again and jump to evaluations.
 
-### ✅ COMPLETED - Frontend is now fully functional!
+### 7. Dashboards auto-update
+- Company dashboard counts: active internships, total applications, finalized placements.
+- Student dashboard cards: totals by `Pending Review`, `Offered`, `Approved_By_Company`, `Confirmed_By_Student`, `Rejected`.
+- The Finalized modal shows offer notes and attached documents, so no data entry is required outside the flow above.
 
-All frontend pages have been integrated with the backend API and are operational.
+---
 
-### Integrated Pages
+## Status Reference
 
-1. **Login Page** (`index.html`)
-   - Authenticates users via backend API
-   - Stores session in localStorage + cookies
-   - Redirects to appropriate dashboards
+| Status | Set By | Meaning |
+| --- | --- | --- |
+| `Pending Review` | System | New application, awaiting company action. |
+| `Under Review` / `Shortlisted` / `Interview Scheduled` | Company | Optional internal stages. |
+| `Offered` | Company | Offer sent; student can confirm. Include `offer_details`. |
+| `Approved_By_Company` | Company | Final paperwork done; shows on Finalized page even if student hasn’t confirmed. |
+| `Confirmed_By_Student` | Student | Offer accepted; appears on Finalized page and counts as filled. |
+| `Rejected` / `Rejected_By_Company` | Company | Candidate dropped (internal vs. public reason). |
+| `Withdrawn` | Student | Candidate pulled out. |
 
-2. **Admin Add Company** (`admin/admin-add-company.html`)
-   - Form submission calls backend API
-   - Creates company accounts in database
-   - Shows success/error messages
+Statuses are normalized by the backend so legacy `Pending` rows appear as `Pending Review` automatically.
 
-3. **Company Internships** (`company/company-internships.html`)
-   - Loads internships from API
-   - Create internship form fully functional
-   - Dynamic card display from API data
+---
 
-4. **Student Internships** (`student/student-internships.html`)
-   - Loads all internships from API
-   - Apply button submits to backend
-   - Cover letter prompt
+## How to Test the Flow Quickly
 
-### API Service
-**File**: `internship-portal/js/api.js`
+1. **Login** – Use `student_cookies.txt`, `company_cookies.txt`, `admin_cookies.txt` for parallel sessions.
+2. **Add mock document** – Upload on `student/student-documents.html`, note the `document_id` via developer tools (`api.getStudentDocuments`).
+3. **Apply** – From `student-student-internship-detail.html`, select the uploaded document and submit. Check DevTools → Network → `applications&action=apply` for success.
+4. **Verify as company** – Open `company/company-applications.html` and confirm:
+   - Resume/download links point to the selected document(s).
+   - Offer modal pre-fills previous `offer_details` when re-opened.
+5. **Finalize** – Update status to `Approved_By_Company` or `Offered` → Student confirms → refresh Finalized page.
+6. **Regression** – Hit `GET ?entity=applications&id=<APP>` to ensure API returns the same data the UI shows.
 
-Provides centralized API methods:
-- `createCompany()` - Admin creates company
-- `createInternship()` - Company creates internship
-- `getInternships()` - Student browses internships
-- `applyForInternship()` - Student applies
-- `updateApplicationStatus()` - Company offers
-- `confirmOffer()` - Student confirms
+---
 
-### Frontend-Backend Flow
+## House Rules
 
-```javascript
-// 1. Login
-await fetch('http://localhost:8001/index.php?entity=auth&action=login', {
-  method: 'POST',
-  credentials: 'include',
-  body: JSON.stringify({ email, password, role })
-});
+- **One source per topic**: The only workflow doc is this file. If you need to describe a change to the flow, update this file and nowhere else.
+- **Document status transitions**: Whenever a new status value is introduced, add it to the Status Reference table and to `api_documentation.md`.
+- **Keep screenshots out**: Text + sample requests are easier to diff and reason about.
 
-// 2. Admin creates company
-await fetch('http://localhost:8001/index.php?entity=admin&resource=companies&action=add', {
-  method: 'POST',
-  credentials: 'include',
-  body: JSON.stringify({ name, email, password })
-});
-
-// 3. Company creates internship
-await fetch('http://localhost:8001/index.php?entity=internships&action=create', {
-  method: 'POST',
-  credentials: 'include',
-  body: JSON.stringify({ position, description, location })
-});
-
-// 4. Student applies
-await fetch('http://localhost:8001/index.php?entity=applications&action=apply', {
-  method: 'POST',
-  credentials: 'include',
-  body: JSON.stringify({ internship_id, cover_letter })
-});
-```
-
-## Test Results
-
-✅ Company creation - TESTED & WORKING
-✅ Internship creation - TESTED & WORKING
-✅ Student application - TESTED & WORKING
-✅ Company offer - TESTED & WORKING
-✅ Student confirmation - TESTED & WORKING
-✅ Database persistence - VERIFIED
-
-## Files Modified
-
-### Backend
-1. `backend/handlers/admin_handler.php` - Added database creation for companies
-2. `backend/handlers/internships_handler.php` - Added database creation for internships
-3. `backend/handlers/applications_handler.php` - Added database operations for applications
-
-### Frontend
-1. `internship-portal/js/api.js` - Created centralized API service
-
-### Documentation
-1. `WORKFLOW_TEST.md` - Complete workflow testing guide
-2. `COMPLETE_WORKFLOW_SUMMARY.md` - This file
-3. `database.md` - Database documentation
-
-## ✅ Frontend Integration Complete
-
-### Implemented Features
-
-1. **✅ Admin Add Company Page**
-   - Fully functional form
-   - API integration complete
-   - Authentication checks
-   - Success/error handling
-
-2. **✅ Company Internships Page**
-   - Loads internships from API
-   - Create internship form working
-   - Dynamic card display
-   - Real-time updates
-
-3. **✅ Student Internships Page**
-   - Loads all internships from API
-   - Apply functionality working
-   - Cover letter input
-   - Filtering preserved
-
-4. **✅ Authentication Flow**
-   - Login connects to backend
-   - Session management with cookies
-   - Role-based redirects
-   - localStorage for user info
-
-## Recent Enhancements (November 2025)
-
-- ✅ `company/company-applications.html` consumes the live API, renders all applicants (with resumes and attached documents), and lets companies advance statuses from “Pending Review” through “Finalize Placement.”
-- ✅ `student/student-applications.html` shows real-time statuses, supports withdrawing/confirming offers, and synchronizes the status cards with `Approved_By_Company`/`Confirmed_By_Student` transitions.
-- ✅ `company/company-finalized.html` is now data-driven: every finalized application is listed with its documents, offer details, and quick links to evaluations.
-- ✅ Student “Browse Internships” cards navigate to the detailed page where students can review the real company profile and attach any uploaded documents when applying.
-- ✅ Documentation (`DOCUMENTATION_UPDATE_SUMMARY.md`) captures the new workflow so future contributors know how the finalization flow and document attachments behave end-to-end.
-
-## Testing Checklist
-
-- [x] Admin can create company accounts
-- [x] Companies can create internship postings
-- [x] Students can browse internships
-- [x] Students can apply for internships
-- [x] Companies can view applications
-- [x] Companies can offer positions
-- [x] Students can confirm offers
-- [x] All changes persist in database
-- [x] Status transitions work correctly
-- [x] Foreign key relationships maintained
-- [x] Unique constraints enforced
-
-## Verification Commands
-
-```bash
-# Check companies
-php -r "require 'config/database.php'; \$db = new Database(); \$conn = \$db->getConnection(); \$stmt = \$conn->query('SELECT * FROM companies'); print_r(\$stmt->fetchAll());"
-
-# Check internships
-php -r "require 'config/database.php'; \$db = new Database(); \$conn = \$db->getConnection(); \$stmt = \$conn->query('SELECT * FROM internships'); print_r(\$stmt->fetchAll());"
-
-# Check applications
-php -r "require 'config/database.php'; \$db = new Database(); \$conn = \$db->getConnection(); \$stmt = \$conn->query('SELECT * FROM applications'); print_r(\$stmt->fetchAll());"
-```
-
-## Summary
-
-✅ **Complete end-to-end workflow is functional**
-✅ **All CRUD operations persist to database**
-✅ **Status transitions work correctly**
-✅ **Frontend API service ready for integration**
-✅ **Comprehensive documentation created**
-
-The application is now ready for frontend integration. The backend API is fully functional and tested with database persistence.

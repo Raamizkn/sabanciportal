@@ -255,3 +255,45 @@ When deploying to production server (`pro2-dev.sabanciuniv.edu`):
 - `internship-portal/student/student-internships.html` - API integration
 
 **Date**: October 27, 2025
+
+## 9. Document Attachments & Status Normalization (November 7, 2025)
+
+### Problem
+Companies were receiving the wrong resumes (default profile CV) even when students picked other documents, and status labels differed between APIs (`Pending` vs `Pending Review`).
+
+### Solution
+- Application submission now runs in a DB transaction, generating a unique `application_id` and updating each selected `document_id` with the new primary key so company views always surface the chosen files.
+- The backend normalizes historical statuses on every response, so old `Pending` rows show up as `Pending Review`, and downstream UIs can rely on a single workflow vocabulary.
+- `offer_details` accompanies every application payload, allowing both company and student modals to show the same offer memo.
+
+### Key Learnings
+- **Link uploads immediately**: Attach documents to the new application row as soon as it exists to avoid mismatched resumes.
+- **Normalize at the source**: Fix data once in the API instead of sprinkling conversions throughout the frontend.
+- **Surface offer context everywhere**: Reusing the same `offer_details` message keeps company + student dashboards aligned.
+
+---
+
+## 10. Graceful DataTables Initialization (November 7, 2025)
+
+### Problem
+The Company Applications grid crashed on slower devices because we injected rows before DataTables finished initializing, resulting in `_DT_CellIndex` errors and empty screens.
+
+### Solution
+- Added a readiness check that retries for ~3 seconds until `window.applicationsTable` is available; if it never appears we fall back to a plain `<table>` render so recruiters still see the data.
+- Cached the latest application payloads on `window.companyApplicationsCache` to keep modals, document download buttons, and status updates in sync with the table.
+
+### Key Learnings
+- **Retry with a timeout**: A short polling loop is safer than assuming every vendor script loads instantly.
+- **Share one data source**: Modal handlers should read from a central object rather than scraping DOM fragments.
+
+---
+
+## 11. Documentation Consolidation (November 7, 2025)
+
+We now maintain only four living docs: `README.md`, `api_documentation.md`, `learnings.md`, and `COMPLETE_WORKFLOW_SUMMARY.md`. Everything else was removed to prevent drift.
+
+### Key Learnings
+- **One doc per theme** keeps responsibilities clear (API reference vs. workflow vs. lessons learned).
+- **README as the index** directs contributors to the other three docs, eliminating scavenger hunts for the latest info.
+
+---
