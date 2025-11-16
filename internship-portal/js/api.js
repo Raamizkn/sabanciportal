@@ -43,15 +43,23 @@ class APIService {
             const url = `${this.baseURL}${endpoint}`;
             console.log('Making request to:', url);
             console.log('With credentials:', 'include');
-            
-            const response = await fetch(url, {
+
+            const isFormData = options.body instanceof FormData;
+            const headers = {
+                ...(options.headers || {})
+            };
+
+            if (!isFormData) {
+                headers['Content-Type'] = headers['Content-Type'] || 'application/json';
+            }
+
+            const fetchOptions = {
                 ...options,
-                credentials: 'include', // Important for sending cookies with CORS
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...options.headers
-                }
-            });
+                credentials: 'include',
+                headers
+            };
+            
+            const response = await fetch(url, fetchOptions);
 
             console.log('Response status:', response.status);
             console.log('Response headers:', [...response.headers.entries()]);
@@ -158,6 +166,14 @@ class APIService {
     }
 
     /**
+     * Get student profile
+     */
+    async getStudentProfile(studentId) {
+        const idParam = studentId ? `&id=${studentId}` : '';
+        return this.request(`/index.php?entity=students${idParam}`);
+    }
+
+    /**
      * Get internship details
      */
     async getInternshipDetails(internshipId) {
@@ -209,8 +225,19 @@ class APIService {
             method: 'POST'
         });
     }
+
+    /**
+     * Upload student resume
+     */
+    async uploadStudentResume(file) {
+        const formData = new FormData();
+        formData.append('resume', file);
+        return this.request('/index.php?entity=students&action=upload_resume', {
+            method: 'POST',
+            body: formData
+        });
+    }
 }
 
 // Export instance
 const api = new APIService();
-

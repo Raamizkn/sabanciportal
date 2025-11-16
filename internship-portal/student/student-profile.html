@@ -131,10 +131,10 @@
 				<li class="nav-item nav-item-dropdown-lg dropdown ms-lg-2">
 					<a href="#" class="navbar-nav-link align-items-center rounded-pill p-1" data-bs-toggle="dropdown">
 						<div class="status-indicator-container">
-							<img src="../bs5/template/assets/images/demo/users/face11.jpg" class="w-32px h-32px rounded-pill" alt="">
+							<img id="nav-student-avatar" src="../bs5/template/assets/images/demo/users/face11.jpg" class="w-32px h-32px rounded-pill" alt="">
 							<span class="status-indicator bg-success"></span>
 						</div>
-						<span class="d-none d-lg-inline-block mx-lg-2">John Doe</span>
+						<span id="nav-student-name" class="d-none d-lg-inline-block mx-lg-2">John Doe</span>
 					</a>
 
 					<div class="dropdown-menu dropdown-menu-end">
@@ -305,19 +305,20 @@
 
 			<!-- Content area -->
 			<div class="content">
+				<div id="profile-alert" class="alert alert-danger d-none" role="alert"></div>
 				<div class="row">
 					<!-- Left Column: Profile Info -->
 					<div class="col-lg-8">
 						<div class="card">
 							<div class="card-body d-flex align-items-center">
 								<div class="me-3">
-									<img src="../bs5/template/assets/images/demo/users/face11.jpg" class="rounded-circle" width="120" height="120" alt="">
+									<img id="profile-avatar" src="../bs5/template/assets/images/demo/users/face11.jpg" class="rounded-circle" width="120" height="120" alt="">
 								</div>
 								<div>
-									<h2 class="mb-0">John Doe</h2>
-									<span class="d-block text-muted">Computer Science Student</span>
+									<h2 id="student-name" class="mb-0">John Doe</h2>
+									<span id="student-major" class="d-block text-muted">Computer Science Student</span>
 									<div class="mt-1">
-										<i class="ph-map-pin me-1"></i> New York University
+										<i class="ph-map-pin me-1"></i> <span id="student-location">New York University</span>
 									</div>
 								</div>
 								<button type="button" class="btn btn-light ms-auto" data-bs-toggle="modal" data-bs-target="#edit_profile">
@@ -332,7 +333,7 @@
 								<h5 class="mb-0">About Me</h5>
 							</div>
 							<div class="card-body">
-								<p class="text-muted">I am a Computer Science student with a passion for software development. I'm looking for internship opportunities to gain real-world experience and apply my skills in a professional environment.</p>
+								<p id="student-bio" class="text-muted">I am a Computer Science student with a passion for software development. I'm looking for internship opportunities to gain real-world experience and apply my skills in a professional environment.</p>
 							</div>
 						</div>
 
@@ -342,20 +343,20 @@
 							</div>
 							<div class="card-body">
 								<dl class="row">
-									<dt class="col-sm-3"><i class="ph-user me-2"></i>Full name</dt>
-									<dd class="col-sm-9">John Michael Doe</dd>
+								<dt class="col-sm-3"><i class="ph-user me-2"></i>Full name</dt>
+								<dd id="student-full-name" class="col-sm-9">John Michael Doe</dd>
 
-									<dt class="col-sm-3"><i class="ph-envelope me-2"></i>Email</dt>
-									<dd class="col-sm-9">john.doe@email.com</dd>
+								<dt class="col-sm-3"><i class="ph-envelope me-2"></i>Email</dt>
+								<dd id="student-email" class="col-sm-9">john.doe@email.com</dd>
 
-									<dt class="col-sm-3"><i class="ph-phone me-2"></i>Phone</dt>
-									<dd class="col-sm-9">+1 (123) 456-7890</dd>
+								<dt class="col-sm-3"><i class="ph-phone me-2"></i>Phone</dt>
+								<dd id="student-phone" class="col-sm-9">+1 (123) 456-7890</dd>
 
-									<dt class="col-sm-3"><i class="ph-calendar me-2"></i>Date of Birth</dt>
-									<dd class="col-sm-9">May 12, 2000</dd>
+								<dt class="col-sm-3"><i class="ph-calendar me-2"></i>Date of Birth</dt>
+								<dd id="student-dob" class="col-sm-9">May 12, 2000</dd>
 
-									<dt class="col-sm-3"><i class="ph-map-pin me-2"></i>Address</dt>
-									<dd class="col-sm-9">123 University St, New York, NY 10001</dd>
+								<dt class="col-sm-3"><i class="ph-map-pin me-2"></i>Address</dt>
+								<dd id="student-address" class="col-sm-9">123 University St, New York, NY 10001</dd>
 								</dl>
 							</div>
 						</div>
@@ -370,12 +371,12 @@
 							<div class="card-body">
 								<div class="d-flex align-items-center mb-1">
 									<div class="me-auto">
-										<h6 class="mb-0">Bachelor of Science in Computer Science</h6>
-										<span class="text-muted">New York University</span>
+										<h6 id="student-degree" class="mb-0">Bachelor of Science in Computer Science</h6>
+										<span id="student-institution" class="text-muted">New York University</span>
 									</div>
-									<span class="text-muted">2020 - 2024</span>
+									<span id="student-education-dates" class="text-muted">2020 - 2024</span>
 								</div>
-								<div class="text-muted">GPA: 3.8/4.0</div>
+								<div id="student-gpa" class="text-muted">GPA: 3.8/4.0</div>
 							</div>
 						</div>
 
@@ -383,18 +384,25 @@
 						<div class="card">
 							<div class="card-header d-flex align-items-center">
 								<h5 class="mb-0 me-auto">Key Documents</h5>
+								<button id="uploadResumeButton" class="btn btn-primary btn-sm me-2">
+									<i class="ph-upload-simple me-1"></i>
+									Upload Resume
+								</button>
 								<a href="student-documents.html" class="btn btn-light btn-sm">Manage All</a>
 							</div>
 							<div class="list-group list-group-flush">
 								<div class="list-group-item d-flex align-items-center">
 									<i class="ph-file-pdf ph-lg me-2 text-danger"></i>
 									<div class="flex-fill">
-										<a href="#" class="fw-semibold">Resume_JohnDoe.pdf</a>
-										<div class="fs-sm text-muted">Uploaded Aug 10, 2023</div>
+										<a id="resume-file-name" href="#" class="fw-semibold text-body text-decoration-none">Resume_JohnDoe.pdf</a>
+										<div id="resume-updated" class="fs-sm text-muted">Uploaded Aug 10, 2023</div>
 									</div>
-									<a href="#" class="btn btn-icon btn-light btn-sm ms-2" data-bs-popup="tooltip" title="View">
-										<i class="ph-eye"></i>
-									</a>
+									<div class="text-end ms-2">
+										<span id="resume-status" class="badge bg-success rounded-pill d-block mb-2">Current</span>
+										<button id="downloadResumeButton" class="btn btn-sm btn-light" disabled>
+											<i class="ph-download-simple me-1"></i>Download
+										</button>
+									</div>
 								</div>
 								<div class="list-group-item d-flex align-items-center">
 									<i class="ph-file-pdf ph-lg me-2 text-danger"></i>
@@ -408,6 +416,8 @@
 								</div>
 								<!-- Add more key documents here if needed -->
 							</div>
+							<input type="file" id="resumeFileInput" class="d-none" accept=".pdf,.doc,.docx">
+							<div id="resume-upload-feedback" class="text-muted fs-sm d-none border-top p-3"></div>
 						</div>
 						<!-- /key documents -->
 
@@ -420,11 +430,11 @@
 								<ul class="list-unstyled mb-0">
 									<li class="mb-3 d-flex align-items-center">
 										<i class="ph-envelope me-2"></i>
-										<a href="mailto:john.doe@email.com">john.doe@email.com</a>
+										<a id="contact-email" href="mailto:john.doe@email.com">john.doe@email.com</a>
 									</li>
 									<li class="mb-3 d-flex align-items-center">
 										<i class="ph-phone me-2"></i>
-										<a href="tel:+11234567890">+1 (123) 456-7890</a>
+										<a id="contact-phone" href="tel:+11234567890">+1 (123) 456-7890</a>
 									</li>
 									<li class="mb-3 d-flex align-items-center">
 										<i class="ph-linkedin-logo me-2"></i>
@@ -581,78 +591,8 @@
 	</div>
 	<!-- /edit profile modal -->
 
-	<!-- Add logout script -->
-	<script>
-		document.addEventListener('DOMContentLoaded', () => {
-			console.log('Student profile script loaded.');
-			const logoutLinks = document.querySelectorAll('.logout-link');
-			console.log('Found', logoutLinks.length, 'logout links.');
-			logoutLinks.forEach(link => {
-				link.addEventListener('click', (event) => {
-					console.log('Logout link clicked:', event.target.href);
-					// Clear user role from localStorage
-					localStorage.removeItem('userRole');
-					console.log('userRole removed from localStorage.');
-					// Allow the link's default behavior (navigation) to proceed
-					console.log('Proceeding with navigation...');
-				});
-			});
-
-			// Optional: Add protection - redirect if not logged in as student
-			const userRole = localStorage.getItem('userRole');
-			const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'student';
-			
-			if (userRole !== 'student' && !isBeingImpersonated) {
-				alert('Access denied. Redirecting to login page.');
-				window.location.href = '../index.html';
-			}
-		});
-	</script>
-
-	<!-- Impersonation detection script -->
-	<script>
-		document.addEventListener('DOMContentLoaded', function() {
-			// Check if an admin is impersonating this user
-			const impersonatedUser = sessionStorage.getItem('impersonatedUser');
-			const impersonatedUserEmail = sessionStorage.getItem('impersonatedUserEmail');
-			const impersonatedUserType = sessionStorage.getItem('impersonatedUserType');
-			const impersonatedUserName = sessionStorage.getItem('impersonatedUserName');
-			
-			if (impersonatedUser && impersonatedUserEmail && impersonatedUserType === 'student') {
-				// Show impersonation banner
-				const impersonationBanner = document.getElementById('impersonation-banner');
-				const impersonatedUserBanner = document.getElementById('impersonated-user-banner');
-				
-				if (impersonationBanner && impersonatedUserBanner) {
-					impersonatedUserBanner.textContent = impersonatedUserEmail;
-					impersonationBanner.classList.remove('d-none');
-				}
-				
-				// Update profile info in the header
-				if (impersonatedUserName) {
-					const userNameElement = document.querySelector('.navbar-nav-link .d-none.d-lg-inline-block.mx-lg-2');
-					if (userNameElement) {
-						userNameElement.textContent = impersonatedUserName;
-					}
-				}
-				
-				// Add event listener to end impersonation button
-				const endImpersonationButton = document.getElementById('end-impersonation-banner');
-				if (endImpersonationButton) {
-					endImpersonationButton.addEventListener('click', function() {
-						// Clear impersonation data
-						sessionStorage.removeItem('impersonatedUser');
-						sessionStorage.removeItem('impersonatedUserEmail');
-						sessionStorage.removeItem('impersonatedUserType');
-						sessionStorage.removeItem('impersonatedUserName');
-						
-						// Redirect back to admin dashboard
-						window.location.href = '../admin/admin-dashboard.html';
-					});
-				}
-			}
-		});
-	</script>
+	<script src="../js/api.js"></script>
+	<script src="../js/student-profile.js"></script>
 
 </body>
 </html> 

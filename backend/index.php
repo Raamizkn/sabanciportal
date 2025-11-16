@@ -75,6 +75,9 @@ elseif ($entity === 'applications') {
 elseif ($entity === 'documents') {
     require_once __DIR__ . '/handlers/documents_handler.php';
 }
+elseif ($entity === 'students') {
+    require_once __DIR__ . '/handlers/student_handler.php';
+}
 elseif ($entity === 'admin') {
     require_once __DIR__ . '/handlers/admin_handler.php';
     
