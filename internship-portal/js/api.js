@@ -190,13 +190,14 @@ class APIService {
     /**
      * Apply for internship
      */
-    async applyForInternship(studentId, internshipId, coverLetter) {
+    async applyForInternship(studentId, internshipId, coverLetter, documentIds = []) {
         return this.request('/index.php?entity=applications&action=apply', {
             method: 'POST',
             body: JSON.stringify({
                 student_id: studentId,
                 internship_id: internshipId,
-                cover_letter: coverLetter
+                cover_letter: coverLetter,
+                document_ids: documentIds
             })
         });
     }
@@ -206,6 +207,14 @@ class APIService {
      */
     async getStudentApplications(studentId) {
         return this.request(`/index.php?entity=applications&student_id=${studentId}`);
+    }
+
+    /**
+     * Get student documents
+     */
+    async getStudentDocuments(studentId) {
+        const idParam = studentId ? `&id=${studentId}` : '';
+        return this.request(`/index.php?entity=students${idParam}&action=documents`);
     }
 
     /**

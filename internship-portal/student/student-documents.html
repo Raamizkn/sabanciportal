@@ -367,108 +367,7 @@
 									<th class="text-center">Actions</th>
 								</tr>
 							</thead>
-							<tbody>
-								<tr>
-									<td>
-										<div class="d-flex align-items-center">
-											<i class="ph-file-pdf ph-lg me-2 text-danger"></i>
-											<div>Resume.pdf</div>
-										</div>
-									</td>
-									<td>Personal</td>
-									<td>458 KB</td>
-									<td>Aug 10, 2023, 10:15 AM</td>
-									<td><span class="badge bg-success">Approved</span></td>
-									<td class="text-center">
-										<div class="d-inline-flex">
-											<button class="btn btn-light btn-icon btn-sm" data-bs-popup="tooltip" title="View">
-												<i class="ph-eye"></i>
-											</button>
-											<button class="btn btn-light btn-icon btn-sm ms-1" data-bs-popup="tooltip" title="Download">
-												<i class="ph-download-simple"></i>
-											</button>
-											<button class="btn btn-light btn-icon btn-sm ms-1" data-bs-popup="tooltip" title="Delete">
-												<i class="ph-trash text-danger"></i>
-											</button>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<div class="d-flex align-items-center">
-											<i class="ph-file-doc ph-lg me-2 text-primary"></i>
-											<div>Cover_Letter.docx</div>
-										</div>
-									</td>
-									<td>Personal</td>
-									<td>215 KB</td>
-									<td>Aug 10, 2023, 10:18 AM</td>
-									<td><span class="badge bg-success">Approved</span></td>
-									<td class="text-center">
-										<div class="d-inline-flex">
-											<button class="btn btn-light btn-icon btn-sm" data-bs-popup="tooltip" title="View">
-												<i class="ph-eye"></i>
-											</button>
-											<button class="btn btn-light btn-icon btn-sm ms-1" data-bs-popup="tooltip" title="Download">
-												<i class="ph-download-simple"></i>
-											</button>
-											<button class="btn btn-light btn-icon btn-sm ms-1" data-bs-popup="tooltip" title="Delete">
-												<i class="ph-trash text-danger"></i>
-											</button>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<div class="d-flex align-items-center">
-											<i class="ph-file-pdf ph-lg me-2 text-danger"></i>
-											<div>Academic_Transcript.pdf</div>
-										</div>
-									</td>
-									<td>Academic</td>
-									<td>1.2 MB</td>
-									<td>Aug 11, 2023, 09:30 AM</td>
-									<td><span class="badge bg-success">Approved</span></td>
-									<td class="text-center">
-										<div class="d-inline-flex">
-											<button class="btn btn-light btn-icon btn-sm" data-bs-popup="tooltip" title="View">
-												<i class="ph-eye"></i>
-											</button>
-											<button class="btn btn-light btn-icon btn-sm ms-1" data-bs-popup="tooltip" title="Download">
-												<i class="ph-download-simple"></i>
-											</button>
-											<button class="btn btn-light btn-icon btn-sm ms-1" data-bs-popup="tooltip" title="Delete">
-												<i class="ph-trash text-danger"></i>
-											</button>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<div class="d-flex align-items-center">
-											<i class="ph-file-pdf ph-lg me-2 text-danger"></i>
-											<div>ID_Card.pdf</div>
-										</div>
-									</td>
-									<td>Personal</td>
-									<td>325 KB</td>
-									<td>Aug 12, 2023, 02:00 PM</td>
-									<td><span class="badge bg-info">Needs Review</span></td>
-									<td class="text-center">
-										<div class="d-inline-flex">
-											<button class="btn btn-light btn-icon btn-sm" data-bs-popup="tooltip" title="View">
-												<i class="ph-eye"></i>
-											</button>
-											<button class="btn btn-light btn-icon btn-sm ms-1" data-bs-popup="tooltip" title="Download">
-												<i class="ph-download-simple"></i>
-											</button>
-											<button class="btn btn-light btn-icon btn-sm ms-1" data-bs-popup="tooltip" title="Delete">
-												<i class="ph-trash text-danger"></i>
-											</button>
-										</div>
-									</td>
-								</tr>
-							</tbody>
+							<tbody id="documentsTableBody"><tr><td colspan="6" class="text-center text-muted">Loading documents…</td></tr></tbody>
 						</table>
 					</div>
 				</div>
@@ -555,33 +454,9 @@
 	</div>
 	<!-- /upload document modal -->
 
-    <!-- Add logout script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('Student documents script loaded.');
-            const logoutLinks = document.querySelectorAll('.logout-link');
-            console.log('Found', logoutLinks.length, 'logout links.');
-            logoutLinks.forEach(link => {
-                link.addEventListener('click', (event) => {
-                    console.log('Logout link clicked:', event.target.href);
-                    // Clear user role from localStorage
-                    localStorage.removeItem('userRole');
-                    console.log('userRole removed from localStorage.');
-                    // Allow the link's default behavior (navigation) to proceed
-                    console.log('Proceeding with navigation...');
-                });
-            });
+    	<script src="../js/api.js"></script>
+	<script src="../js/student-documents.js"></script>
 
-            // Optional: Add protection - redirect if not logged in as student
-            const userRole = localStorage.getItem('userRole');
-            const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'student';
-            
-            if (userRole !== 'student' && !isBeingImpersonated) {
-                alert('Access denied. Redirecting to login page.');
-                window.location.href = '../index.html';
-            }
-        });
-    </script>
 
 	<!-- Impersonation detection script -->
 	<script>

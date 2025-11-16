@@ -633,22 +633,35 @@ document.addEventListener('DOMContentLoaded', function() {
     const viewApplicationModal = document.getElementById('view_application_modal');
     viewApplicationModal.addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget;
-        const app = JSON.parse(button.getAttribute('data-application'));
+        const encodedApp = button.getAttribute('data-application');
+        const app = JSON.parse(decodeURIComponent(encodedApp));
 
         const modalTitle = viewApplicationModal.querySelector('.modal-title');
         const modalBody = viewApplicationModal.querySelector('.modal-body');
 
         modalTitle.textContent = `Application for ${app.internship_position}`;
         modalBody.innerHTML = `
-            <h6 class="fw-semibold">Student: ${app.student_name} (${app.student_major || 'N/A'})</h6>
-            <p><strong>Applied on:</strong> ${new Date(app.created_at).toLocaleDateString()}</p>
-            <p><strong>Status:</strong> ${app.status}</p>
-            <hr>
-            <h6>Cover Letter</h6>
-            <p>${app.cover_letter || 'No cover letter provided.'}</p>
-            <hr>
-            <h6>Resume/CV</h6>
-            <p><a href="#">Download Resume (Placeholder)</a></p>
+            <div class="mb-3">
+                <h6 class="fw-semibold mb-1">Student Information</h6>
+                <p class="mb-0"><strong>Name:</strong> ${app.student_name || 'N/A'}</p>
+                <p class="mb-0"><strong>Program:</strong> ${app.student_major || 'N/A'}</p>
+                <p class="mb-0"><strong>Email:</strong> ${app.student_email || 'N/A'}</p>
+                <p class="mb-0"><strong>Phone:</strong> ${app.student_phone || 'N/A'}</p>
+                <p class="mb-0"><strong>GPA:</strong> ${app.student_gpa || 'N/A'}</p>
+            </div>
+            <div class="mb-3">
+                <h6 class="fw-semibold mb-1">Application Details</h6>
+                <p class="mb-0"><strong>Applied on:</strong> ${new Date(app.applied_date).toLocaleDateString()}</p>
+                <p class="mb-0"><strong>Status:</strong> ${app.status}</p>
+            </div>
+            <div class="mb-3">
+                <h6>Cover Letter</h6>
+                <p>${app.cover_letter || 'No cover letter provided.'}</p>
+            </div>
+            <div class="mb-1">
+                <h6>Resume/CV</h6>
+                ${app.resume_download_url ? `<a href="${app.resume_download_url}" target="_blank">${app.resume_file_name || 'Download resume'}</a>` : '<p class="text-muted">No resume uploaded.</p>'}
+            </div>
         `;
     });
 

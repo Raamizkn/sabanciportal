@@ -44,13 +44,15 @@ function populateApplicationsTable(applications) {
         row.setAttribute('data-application-id', app.application_id);
 
         const statusBadge = getStatusBadge(app.status);
+        const profileImg = resolveProfileImage(app.student_profile_pic);
+        const encodedApp = encodeURIComponent(JSON.stringify(app));
 
         row.innerHTML = `
             <td>${index + 1}</td>
             <td>
                 <div class="d-flex align-items-center">
                     <div class="me-3">
-                        <img src="../bs5/template/assets/images/demo/users/face1.jpg" class="rounded-circle" width="36" height="36" alt="">
+                        <img src="${profileImg}" class="rounded-circle" width="36" height="36" alt="">
                     </div>
                     <div>
                         <a href="#" class="text-body fw-semibold">${app.student_name || 'N/A'}</a>
@@ -67,7 +69,7 @@ function populateApplicationsTable(applications) {
                         <i class="ph-dots-three-vertical"></i>
                     </button>
                     <div class="dropdown-menu dropdown-menu-end">
-                        <a href="#" class="dropdown-item view-application" data-bs-toggle="modal" data-bs-target="#view_application_modal" data-application='${JSON.stringify(app)}'>
+                        <a href="#" class="dropdown-item view-application" data-bs-toggle="modal" data-bs-target="#view_application_modal" data-application='${encodedApp}'>
                             <i class="ph-eye me-2"></i>View Application
                         </a>
                         <a href="#" class="dropdown-item update-status" data-bs-toggle="modal" data-bs-target="#update_status_modal" data-application-id="${app.application_id}" data-current-status="${app.status}">
@@ -95,4 +97,15 @@ function getStatusBadge(status) {
     return `<span class="badge ${badgeClass}">${status}</span>`;
 }
 
-// Event listeners for modals will be added later
+function resolveProfileImage(path) {
+    if (!path) {
+        return '../bs5/template/assets/images/demo/users/face1.jpg';
+    }
+    if (path.startsWith('http')) {
+        return path;
+    }
+    if (path.startsWith('/')) {
+        return `${API_BASE_URL}${path}`;
+    }
+    return path;
+}

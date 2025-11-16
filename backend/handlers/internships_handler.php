@@ -24,28 +24,72 @@ function generateNewInternshipId() {
     return "INT" . str_pad($max_id + 1, 3, "0", STR_PAD_LEFT);
 }
 
+function mapInternshipWithCompany($row) {
+    if (!$row) {
+        return null;
+    }
+
+    $company = [
+        'id' => $row['company_id'],
+        'name' => $row['company_name'],
+        'industry' => $row['company_industry'] ?? null,
+        'website' => $row['company_website'] ?? null,
+        'phone' => $row['company_phone'] ?? null,
+        'address' => $row['company_address'] ?? null,
+        'description' => $row['company_description'] ?? null,
+        'logo' => $row['company_logo'] ?? null
+    ];
+
+    unset($row['company_industry'], $row['company_website'], $row['company_phone'], $row['company_address'], $row['company_description'], $row['company_logo']);
+    $row['company'] = $company;
+    return $row;
+}
+
 if ($entity === 'internships') {
     if ($method === 'GET') {
-        if ($id !== null) { // Get specific internship: ?entity=internships&id=INT001
-            if (isset($internships[$id])) {
-                echo json_encode($internships[$id]);
-            } else {
-                http_response_code(404);
-                echo json_encode(['error' => "Internship with ID {$id} not found."]);
-            }
-        } else { // Get all internships (or filter by company_id if provided)
-            $company_id_param = $_GET['company_id'] ?? null;
-            if ($company_id_param !== null) {
-                $company_internships = [];
-                foreach ($internships as $internship) {
-                    // Assuming internships have a 'company_id' field when created
-                    if (isset($internship['company_id']) && $internship['company_id'] == $company_id_param) {
-                        $company_internships[] = $internship;
-                    }
+        $company_id_param = $_GET['company_id'] ?? null;
+        if ($id !== null) {
+            try {
+                $stmt = $db->prepare("SELECT i.*, c.industry AS company_industry, c.website AS company_website,
+                        c.phone AS company_phone, c.address AS company_address, c.description AS company_description,
+                        c.logo AS company_logo
+                    FROM internships i
+                    JOIN companies c ON i.company_id = c.id
+                    WHERE i.id = ? AND i.status != 'Deleted'");
+                $stmt->execute([$id]);
+                $internship = $stmt->fetch(PDO::FETCH_ASSOC);
+                if (!$internship) {
+                    http_response_code(404);
+                    echo json_encode(['error' => "Internship with ID {$id} not found."]);
+                    exit;
                 }
-                echo json_encode($company_internships);
-            } else {
-                echo json_encode(array_values($internships)); // List all
+                echo json_encode(mapInternshipWithCompany($internship));
+            } catch (PDOException $e) {
+                http_response_code(500);
+                echo json_encode(['error' => 'Failed to load internship: ' . $e->getMessage()]);
+            }
+        } else {
+            try {
+                $query = "SELECT i.*, c.industry AS company_industry, c.website AS company_website,
+                            c.phone AS company_phone, c.address AS company_address, c.description AS company_description,
+                            c.logo AS company_logo
+                        FROM internships i
+                        JOIN companies c ON i.company_id = c.id
+                        WHERE i.status != 'Deleted'";
+                $params = [];
+                if ($company_id_param !== null) {
+                    $query .= " AND i.company_id = ?";
+                    $params[] = $company_id_param;
+                }
+                $query .= " ORDER BY i.created_at DESC";
+                $stmt = $db->prepare($query);
+                $stmt->execute($params);
+                $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $result = array_map('mapInternshipWithCompany', $rows);
+                echo json_encode($result);
+            } catch (PDOException $e) {
+                http_response_code(500);
+                echo json_encode(['error' => 'Failed to load internships: ' . $e->getMessage()]);
             }
         }
     } 

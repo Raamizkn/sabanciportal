@@ -9,6 +9,14 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../auth/auth.php';
 $db = getDB();
 
+function format_document_download_url($path) {
+    if (!$path) {
+        return null;
+    }
+    $normalized = str_replace('\\', '/', $path);
+    return '/' . ltrim($normalized, '/');
+}
+
 if ($entity === 'applications') {
     if ($method === 'GET') {
         $company_id_param = $_GET['company_id'] ?? null;
@@ -19,14 +27,37 @@ if ($entity === 'applications') {
                 $stmt = $db->prepare("
                     SELECT 
                         a.*, 
+                        i.company_id as internship_company_id,
                         i.position as internship_position, 
                         i.description as internship_description,
                         i.location as internship_location,
                         i.dates as internship_dates,
-                        c.name as company_name
+                        c.name as company_name,
+                        c.industry as company_industry,
+                        c.website as company_website,
+                        c.phone as company_phone,
+                        c.address as company_address,
+                        c.description as company_description,
+                        s.name as student_name,
+                        s.email as student_email,
+                        s.phone as student_phone,
+                        s.major as student_major,
+                        s.gpa as student_gpa,
+                        s.bio as student_bio,
+                        s.profile_pic as student_profile_pic,
+                        resume.document_id as resume_document_id,
+                        resume.file_name as resume_file_name,
+                        resume.file_path as resume_file_path
                     FROM applications a
                     JOIN internships i ON a.internship_id = i.id
                     JOIN companies c ON i.company_id = c.id
+                    JOIN students s ON a.student_id = s.id
+                    LEFT JOIN documents resume ON resume.id = (
+                        SELECT d.id FROM documents d
+                        WHERE d.student_id = s.id AND d.document_type = 'CV'
+                        ORDER BY d.upload_date DESC, d.id DESC
+                        LIMIT 1
+                    )
                     WHERE a.application_id = ?
                 ");
                 $stmt->execute([$id]);
@@ -36,10 +67,16 @@ if ($entity === 'applications') {
                     // Authorization check: Ensure the current user is the student who owns the application or an admin
                     $currentUser = getCurrentUserId();
                     $userRole = getCurrentUserRole();
-                    if ($userRole !== ROLE_ADMIN && $application['student_id'] != $currentUser) {
+                    $isStudentOwner = ($userRole === ROLE_STUDENT && $application['student_id'] == $currentUser);
+                    $isCompanyOwner = ($userRole === ROLE_COMPANY && $application['internship_company_id'] == $currentUser);
+                    $isAdmin = ($userRole === ROLE_ADMIN);
+                    if (!$isStudentOwner && !$isCompanyOwner && !$isAdmin) {
                         http_response_code(403);
                         echo json_encode(['error' => 'Forbidden: You do not have access to this application.']);
                         exit;
+                    }
+                    if ($application['resume_file_path']) {
+                        $application['resume_download_url'] = format_document_download_url($application['resume_file_path']);
                     }
                     echo json_encode($application);
                 } else {
@@ -97,17 +134,40 @@ if ($entity === 'applications') {
                         a.status, 
                         a.applied_date, 
                         a.cover_letter,
+                        a.offer_details,
                         i.position as internship_position, 
+                        i.location as internship_location,
+                        i.dates as internship_dates,
+                        i.description as internship_description,
                         s.name as student_name,
-                        s.major as student_major
+                        s.major as student_major,
+                        s.email as student_email,
+                        s.phone as student_phone,
+                        s.gpa as student_gpa,
+                        s.bio as student_bio,
+                        s.profile_pic as student_profile_pic,
+                        resume.document_id as resume_document_id,
+                        resume.file_name as resume_file_name,
+                        resume.file_path as resume_file_path
                     FROM applications a
                     JOIN internships i ON a.internship_id = i.id
                     JOIN students s ON a.student_id = s.id
+                    LEFT JOIN documents resume ON resume.id = (
+                        SELECT d.id FROM documents d
+                        WHERE d.student_id = s.id AND d.document_type = 'CV'
+                        ORDER BY d.upload_date DESC, d.id DESC
+                        LIMIT 1
+                    )
                     WHERE i.company_id = ?
                     ORDER BY a.applied_date DESC
                 ");
                 $stmt->execute([$company_id_param]);
                 $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                foreach ($applications as &$application) {
+                    if (!empty($application['resume_file_path'])) {
+                        $application['resume_download_url'] = format_document_download_url($application['resume_file_path']);
+                    }
+                }
                 echo json_encode($applications);
             } catch (PDOException $e) {
                 http_response_code(500);
@@ -152,19 +212,37 @@ if ($entity === 'applications') {
                 echo json_encode(['error' => 'Invalid internship_id.']);
                 exit;
             }
+
+            // Ensure student has not already applied
+            $stmt = $db->prepare("SELECT COUNT(*) AS count FROM applications WHERE student_id = ? AND internship_id = ?");
+            $stmt->execute([$student_id, $input['internship_id']]);
+            if ($stmt->fetch()['count'] > 0) {
+                http_response_code(409);
+                echo json_encode(['error' => 'You have already applied for this internship.']);
+                exit;
+            }
             
             // Generate application_id
             $stmt = $db->query("SELECT COUNT(*) as count FROM applications");
             $count = $stmt->fetch()['count'];
             $new_app_id = "APP" . str_pad($count + 100, 3, "0", STR_PAD_LEFT);
             
-                // Insert into database
-                $stmt = $db->prepare("INSERT INTO applications (application_id, student_id, internship_id, status, cover_letter, applied_date) VALUES (?, ?, ?, 'Pending', ?, CURDATE())");
-                $stmt->execute([$new_app_id, $student_id, $input['internship_id'], $input['cover_letter'] ?? '']);
+            // Insert into database
+            $stmt = $db->prepare("INSERT INTO applications (application_id, student_id, internship_id, status, cover_letter, applied_date) VALUES (?, ?, ?, 'Pending', ?, CURDATE())");
+            $stmt->execute([$new_app_id, $student_id, $input['internship_id'], $input['cover_letter'] ?? '']);
+            $newPrimaryId = $db->lastInsertId();
+
+            // Link selected documents to this application
+            if (!empty($input['document_ids']) && is_array($input['document_ids'])) {
+                $docStmt = $db->prepare("UPDATE documents SET application_id = ? WHERE document_id = ? AND student_id = ?");
+                foreach ($input['document_ids'] as $docId) {
+                    $docStmt->execute([$newPrimaryId, $docId, $student_id]);
+                }
+            }
             
             // Return the new application
             $new_application = [
-                'id' => $new_app_id,
+                'application_id' => $new_app_id,
                 'student_id' => $student_id,
                 'internship_id' => $input['internship_id'],
                 'company_name' => $internship['company_name'],
@@ -175,7 +253,11 @@ if ($entity === 'applications') {
             ];
             
             http_response_code(201); // Created
-            echo json_encode($new_application);
+            echo json_encode([
+                'status' => 'success',
+                'message' => 'Application submitted successfully.',
+                'data' => $new_application
+            ]);
         }
         elseif ($id !== null && $action === 'withdraw') {
             // Require student role
