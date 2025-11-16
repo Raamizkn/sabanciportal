@@ -31,7 +31,7 @@ function mapInternshipWithCompany($row) {
 
     $company = [
         'id' => $row['company_id'],
-        'name' => $row['company_name'],
+        'name' => $row['live_company_name'] ?? $row['company_name'],
         'industry' => $row['company_industry'] ?? null,
         'website' => $row['company_website'] ?? null,
         'phone' => $row['company_phone'] ?? null,
@@ -40,7 +40,8 @@ function mapInternshipWithCompany($row) {
         'logo' => $row['company_logo'] ?? null
     ];
 
-    unset($row['company_industry'], $row['company_website'], $row['company_phone'], $row['company_address'], $row['company_description'], $row['company_logo']);
+    unset($row['company_industry'], $row['company_website'], $row['company_phone'], $row['company_address'], $row['company_description'], $row['company_logo'], $row['live_company_name']);
+    $row['company_name'] = $company['name'];
     $row['company'] = $company;
     return $row;
 }
@@ -50,7 +51,7 @@ if ($entity === 'internships') {
         $company_id_param = $_GET['company_id'] ?? null;
         if ($id !== null) {
             try {
-                $stmt = $db->prepare("SELECT i.*, c.industry AS company_industry, c.website AS company_website,
+                $stmt = $db->prepare("SELECT i.*, c.name AS live_company_name, c.industry AS company_industry, c.website AS company_website,
                         c.phone AS company_phone, c.address AS company_address, c.description AS company_description,
                         c.logo AS company_logo
                     FROM internships i
@@ -70,7 +71,7 @@ if ($entity === 'internships') {
             }
         } else {
             try {
-                $query = "SELECT i.*, c.industry AS company_industry, c.website AS company_website,
+                $query = "SELECT i.*, c.name AS live_company_name, c.industry AS company_industry, c.website AS company_website,
                             c.phone AS company_phone, c.address AS company_address, c.description AS company_description,
                             c.logo AS company_logo
                         FROM internships i

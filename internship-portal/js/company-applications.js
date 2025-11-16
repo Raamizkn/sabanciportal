@@ -1,37 +1,57 @@
 
-document.addEventListener('DOMContentLoaded', () => {
-    const companyId = localStorage.getItem('userId');
-    const userRole = localStorage.getItem('userRole');
+let currentCompanyId = null;
+let latestApplications = [];
+let tableInitAttempts = 0;
 
-    if (userRole !== 'company') {
+document.addEventListener('DOMContentLoaded', () => {
+    const userRole = localStorage.getItem('userRole');
+    const storedCompanyId = localStorage.getItem('userId');
+    const impersonatedType = sessionStorage.getItem('impersonatedUserType');
+    const impersonatedId = sessionStorage.getItem('impersonatedUser');
+    const isImpersonatedCompany = impersonatedType === 'company' && impersonatedId;
+
+    if (userRole !== 'company' && !isImpersonatedCompany) {
         alert('Access Denied. You must be logged in as a Company.');
         window.location.href = '../index.html';
         return;
     }
 
-    if (!companyId) {
+    currentCompanyId = userRole === 'company' ? storedCompanyId : impersonatedId;
+
+    if (!currentCompanyId) {
         alert('Company ID not found. Please log in again.');
         window.location.href = '../index.html';
         return;
     }
 
-    loadApplications(companyId);
+    loadApplications(currentCompanyId);
 });
 
 async function loadApplications(companyId) {
     try {
-        // This function needs to be added to api.js
         const applications = await api.getCompanyApplications(companyId);
-        populateApplicationsTable(applications);
+        latestApplications = Array.isArray(applications) ? applications : [];
+        window.companyApplicationsCache = latestApplications.reduce((acc, app) => {
+            acc[app.application_id] = app;
+            return acc;
+        }, {});
+        populateApplicationsTable(latestApplications);
     } catch (error) {
         console.error('Failed to load applications:', error);
-        const tableBody = document.getElementById('applicationsTable').querySelector('tbody');
-        tableBody.innerHTML = '<tr><td colspan="7" class="text-center">Failed to load applications.</td></tr>';
+        const tableBody = document.getElementById('applicationsTableBody');
+        if (tableBody) {
+            tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Failed to load applications.</td></tr>';
+        }
     }
 }
 
+function isDataTableReady() {
+    return window.applicationsTable && typeof window.applicationsTable.clear === 'function';
+}
+
 function populateApplicationsTable(applications) {
-    if (window.applicationsTable) {
+    if (isDataTableReady()) {
+        tableInitAttempts = 0;
         window.applicationsTable.clear();
         if (!applications.length) {
             window.applicationsTable.row.add([
@@ -60,7 +80,22 @@ function populateApplicationsTable(applications) {
         return;
     }
 
-    const tableBody = document.getElementById('applicationsTable').querySelector('tbody');
+    if (tableInitAttempts < 20) {
+        tableInitAttempts++;
+        setTimeout(() => populateApplicationsTable(applications), 150);
+        return;
+    }
+
+    tableInitAttempts = 0;
+    renderStaticApplications(applications);
+}
+
+function renderStaticApplications(applications) {
+    const table = document.getElementById('applicationsTable');
+    if (!table) {
+        return;
+    }
+    const tableBody = table.querySelector('tbody');
     tableBody.innerHTML = '';
 
     if (applications.length === 0) {
@@ -85,14 +120,31 @@ function populateApplicationsTable(applications) {
 
 function getStatusBadge(status) {
     let badgeClass = 'bg-secondary bg-opacity-20 text-secondary'; // Default
-    if (status === 'Offered' || status === 'Accepted') {
+    const normalized = formatStatusLabel(status);
+    if (['Offered', 'Accepted', 'Confirmed By Student'].includes(normalized)) {
         badgeClass = 'bg-success bg-opacity-20 text-success';
-    } else if (status === 'Pending Review' || status === 'Under Review') {
+    } else if (['Pending Review', 'Under Review'].includes(normalized)) {
         badgeClass = 'bg-warning bg-opacity-20 text-warning';
-    } else if (status === 'Rejected') {
+    } else if (normalized.startsWith('Rejected')) {
         badgeClass = 'bg-danger bg-opacity-20 text-danger';
+    } else if (normalized === 'Finalize Placement') {
+        badgeClass = 'bg-primary bg-opacity-20 text-primary';
     }
-    return `<span class="badge ${badgeClass}">${status}</span>`;
+    return `<span class="badge ${badgeClass}">${normalized}</span>`;
+}
+
+function formatStatusLabel(status) {
+    if (!status) {
+        return 'Unknown';
+    }
+    const map = {
+        'Pending': 'Pending Review',
+        'Pending Review': 'Pending Review',
+        'Rejected_By_Company': 'Rejected (Internal)',
+        'Approved_By_Company': 'Finalize Placement',
+        'Confirmed_By_Student': 'Confirmed By Student'
+    };
+    return map[status] || status.replace(/_/g, ' ');
 }
 
 function resolveProfileImage(path) {
@@ -163,7 +215,7 @@ function buildActionsCell(app, encodedApp) {
                 <a href="#" class="dropdown-item view-application" data-bs-toggle="modal" data-bs-target="#view_application_modal" data-application='${encodedApp}'>
                     <i class="ph-eye me-2"></i>View Application
                 </a>
-                <a href="#" class="dropdown-item update-status" data-bs-toggle="modal" data-bs-target="#update_status_modal" data-application-id="${app.application_id}" data-current-status="${app.status}">
+                <a href="#" class="dropdown-item update-status" data-bs-toggle="modal" data-bs-target="#update_status_modal" data-application-id="${app.application_id}" data-current-status="${app.status}" data-application='${encodedApp}'>
                     <i class="ph-pencil me-2"></i>Update Status
                 </a>
                 <div class="dropdown-divider"></div>

@@ -71,25 +71,48 @@ function populateApplicationsTable(applications) {
     addEventListeners();
 }
 
+function formatStatusLabel(status) {
+    if (!status) {
+        return 'Unknown';
+    }
+    const map = {
+        'Pending': 'Pending Review',
+        'Pending Review': 'Pending Review',
+        'Rejected_By_Company': 'Rejected by Company',
+        'Approved_By_Company': 'Finalized by Company'
+    };
+    return map[status] || status.replace(/_/g, ' ');
+}
+
 function getStatusBadge(status) {
     let badgeClass = 'bg-secondary';
     switch (status) {
         case 'Confirmed_By_Student':
+        case 'Approved_By_Company':
         case 'Accepted':
             badgeClass = 'bg-success';
             break;
         case 'Offered':
-             badgeClass = 'bg-info';
+            badgeClass = 'bg-info';
             break;
+        case 'Pending':
         case 'Pending Review':
         case 'Under Review':
             badgeClass = 'bg-warning text-dark';
             break;
+        case 'Shortlisted':
+        case 'Interview Scheduled':
+            badgeClass = 'bg-primary';
+            break;
         case 'Rejected':
+        case 'Rejected_By_Company':
             badgeClass = 'bg-danger';
             break;
+        case 'Withdrawn':
+            badgeClass = 'bg-secondary';
+            break;
     }
-    return `<span class="badge ${badgeClass}">${status}</span>`;
+    return `<span class="badge ${badgeClass}">${formatStatusLabel(status)}</span>`;
 }
 
 function getActionButtons(application) {
@@ -103,7 +126,7 @@ function getActionButtons(application) {
     }
 
     const withdrawable_statuses = ['Pending Review', 'Under Review', 'Shortlisted', 'Offered'];
-    if (withdrawable_statuses.includes(application.status)) {
+    if (withdrawable_statuses.includes(application.status) || application.status === 'Pending') {
         buttons += `<button class="btn btn-sm btn-icon btn-light withdraw-btn ms-1" data-application-id="${application.application_id}" data-bs-popup="tooltip" title="Withdraw Application"><i class="ph-x-circle text-danger"></i></button>`;
     }
 
@@ -118,12 +141,12 @@ function addEventListeners() {
             if (confirm('Are you sure you want to withdraw this application?')) {
                 try {
                     const result = await api.withdrawApplication(appId);
-                    if (result.status === 'success') {
-                        alert('Application withdrawn.');
-                        loadStudentApplications(localStorage.getItem('userId')); // Refresh list
-                    } else {
+                    if (result.error) {
                         alert('Error: ' + result.error);
+                        return;
                     }
+                    alert(result.message || 'Application withdrawn.');
+                    loadStudentApplications(localStorage.getItem('userId'));
                 } catch (error) {
                     alert('An error occurred while withdrawing the application.');
                 }
@@ -138,12 +161,12 @@ function addEventListeners() {
             if (confirm('Are you sure you want to confirm this internship offer? This action cannot be undone.')) {
                 try {
                     const result = await api.confirmOffer(appId);
-                    if (result.status === 'success') {
-                        alert('Offer confirmed! Congratulations!');
-                        loadStudentApplications(localStorage.getItem('userId')); // Refresh list
-                    } else {
+                    if (result.error) {
                         alert('Error: ' + result.error);
+                        return;
                     }
+                    alert(result.message || 'Offer confirmed!');
+                    loadStudentApplications(localStorage.getItem('userId'));
                 } catch (error) {
                     alert('An error occurred while confirming the offer.');
                 }
@@ -163,28 +186,31 @@ function updateStatusCards(applications) {
     };
 
     applications.forEach(app => {
-        switch(app.status) {
-            case 'Accepted':
-            case 'Confirmed_By_Student':
-                statusCounts.accepted++;
-                break;
-            case 'Pending Review':
-            case 'Under Review':
-                statusCounts.pending++;
-                break;
-            case 'Rejected':
-                statusCounts.rejected++;
-                break;
-            case 'Offered':
-                statusCounts.awaiting++;
-                break;
+        const status = app.status;
+        if (['Accepted', 'Confirmed_By_Student'].includes(status)) {
+            statusCounts.accepted++;
+        } else if (['Pending', 'Pending Review', 'Under Review'].includes(status)) {
+            statusCounts.pending++;
+        } else if (['Rejected', 'Rejected_By_Company'].includes(status)) {
+            statusCounts.rejected++;
+        } else if (status === 'Offered') {
+            statusCounts.awaiting++;
+        } else if (status === 'Approved_By_Company') {
+            statusCounts.approved++;
         }
     });
 
-    document.querySelector('.bg-primary h4').textContent = statusCounts.total;
-    document.querySelector('.bg-success h4').textContent = statusCounts.accepted;
-    document.querySelector('.bg-secondary h4').textContent = statusCounts.pending;
-    document.querySelector('.bg-danger h4').textContent = statusCounts.rejected;
-    document.querySelector('.bg-warning h4').textContent = statusCounts.awaiting;
-    document.querySelector('.bg-info h4').textContent = statusCounts.approved; // This status is not yet handled by the API
+    setCount('studentTotalApplicationsCount', statusCounts.total);
+    setCount('studentAcceptedApplicationsCount', statusCounts.accepted);
+    setCount('studentPendingApplicationsCount', statusCounts.pending);
+    setCount('studentRejectedApplicationsCount', statusCounts.rejected);
+    setCount('studentAwaitingApplicationsCount', statusCounts.awaiting);
+    setCount('studentApprovedApplicationsCount', statusCounts.approved);
+}
+
+function setCount(elementId, value) {
+    const el = document.getElementById(elementId);
+    if (el) {
+        el.textContent = value;
+    }
 }

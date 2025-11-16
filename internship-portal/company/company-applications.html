@@ -454,14 +454,21 @@
 								<input type="hidden" id="updateApplicationId">
 								<div class="mb-3">
 									<label for="applicationStatusSelect" class="form-label">Status</label>
-									<select class="form-select" id="applicationStatusSelect">
-										<option value="Pending Review">Pending Review</option>
-										<option value="Under Review">Under Review</option>
-										<option value="Shortlisted">Shortlisted</option>
-										<option value="Interview Scheduled">Interview Scheduled</option>
-										<option value="Offered">Offered</option>
-										<option value="Rejected">Rejected</option>
-									</select>
+                                    <select class="form-select" id="applicationStatusSelect">
+                                        <option value="Pending Review">Pending Review</option>
+                                        <option value="Under Review">Under Review</option>
+                                        <option value="Shortlisted">Shortlisted</option>
+                                        <option value="Interview Scheduled">Interview Scheduled</option>
+                                        <option value="Offered">Offered</option>
+                                        <option value="Rejected">Rejected</option>
+                                        <option value="Rejected_By_Company">Rejected (Internal)</option>
+                                        <option value="Approved_By_Company">Finalize Placement</option>
+                                    </select>
+                                </div>
+								<div class="mb-3">
+									<label for="offerDetailsInput" class="form-label">Offer Details / Notes</label>
+									<textarea class="form-control" id="offerDetailsInput" rows="3" placeholder="Share offer terms, start date, stipend or next steps"></textarea>
+									<div class="form-text">Students will see these details when the status is set to Offered.</div>
 								</div>
 							</div>
 							<div class="modal-footer">
@@ -532,6 +539,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <h6>Cover Letter</h6>
                 <p>${app.cover_letter || 'No cover letter provided.'}</p>
             </div>
+            ${app.offer_details ? `<div class="alert alert-info">${app.offer_details}</div>` : ''}
             <div class="mb-1">
                 <h6>Resume/CV</h6>
                 ${app.resume_download_url ? `<a href="${API_BASE_URL}${app.resume_download_url}" target="_blank">${app.resume_file_name || 'Download resume'}</a>` : '<p class="text-muted">No resume uploaded.</p>'}
@@ -550,12 +558,26 @@ document.addEventListener('DOMContentLoaded', function() {
         const button = event.relatedTarget;
         const applicationId = button.getAttribute('data-application-id');
         const currentStatus = button.getAttribute('data-current-status');
+        const encodedApp = button.getAttribute('data-application');
 
         const applicationIdInput = updateStatusModal.querySelector('#updateApplicationId');
         const statusSelect = updateStatusModal.querySelector('#applicationStatusSelect');
+        const offerInput = updateStatusModal.querySelector('#offerDetailsInput');
 
         applicationIdInput.value = applicationId;
         statusSelect.value = currentStatus;
+        if (offerInput) {
+            if (encodedApp) {
+                try {
+                    const app = JSON.parse(decodeURIComponent(encodedApp));
+                    offerInput.value = app.offer_details || '';
+                } catch (err) {
+                    offerInput.value = '';
+                }
+            } else {
+                offerInput.value = '';
+            }
+        }
     });
 
     // Handler for submitting status update
@@ -563,17 +585,15 @@ document.addEventListener('DOMContentLoaded', function() {
     saveStatusBtn.addEventListener('click', async () => {
         const applicationId = document.getElementById('updateApplicationId').value;
         const newStatus = document.getElementById('applicationStatusSelect').value;
+        const offerDetails = document.getElementById('offerDetailsInput').value.trim();
 
         try {
-            const result = await api.updateApplicationStatus(applicationId, newStatus);
-            if (result.status === 'success') {
+            const result = await api.updateApplicationStatus(applicationId, newStatus, offerDetails || null);
+            if (!result.error) {
                 alert('Status updated successfully!');
-                
-                // Update the UI in real-time
-                const row = document.querySelector(`tr[data-application-id="${applicationId}"]`);
-                const statusCell = row.querySelector('td:nth-child(6)');
-                statusCell.innerHTML = getStatusBadge(newStatus);
-
+                if (typeof loadApplications === 'function' && window.currentCompanyId) {
+                    loadApplications(window.currentCompanyId);
+                }
                 const modalInstance = bootstrap.Modal.getInstance(updateStatusModal);
                 modalInstance.hide();
             } else {

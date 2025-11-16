@@ -54,6 +54,7 @@ function renderDocuments(documents) {
     }
 
     documents.forEach(doc => {
+        const downloadUrl = resolveDownloadUrl(doc.download_url);
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>
@@ -68,7 +69,7 @@ function renderDocuments(documents) {
             <td><span class="badge bg-success">Uploaded</span></td>
             <td class="text-center">
                 <div class="d-inline-flex">
-                    ${doc.download_url ? `<a class="btn btn-light btn-icon btn-sm" href="${doc.download_url}" target="_blank" title="Download"><i class="ph-download-simple"></i></a>` : ''}
+                    ${downloadUrl ? `<a class="btn btn-light btn-icon btn-sm" href="${downloadUrl}" target="_blank" rel="noopener noreferrer" title="Download"><i class="ph-download-simple"></i></a>` : ''}
                 </div>
             </td>
         `;
@@ -81,4 +82,12 @@ function formatFileSize(size) {
     if (size < 1024) return `${size} B`;
     if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
     return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function resolveDownloadUrl(path) {
+    if (!path) return null;
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+        return path;
+    }
+    return `${API_BASE_URL}${path}`;
 }

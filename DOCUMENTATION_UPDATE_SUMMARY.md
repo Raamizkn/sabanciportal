@@ -1,5 +1,20 @@
 # Documentation Update Summary
 
+## Date: November 7, 2025
+
+### Highlights
+- ✅ Student → Company document flow is now end-to-end: students choose any uploaded document when applying, the backend pins those files to the application record, and companies download the exact files (including the selected resume) from the application drawer, finalized modal, and dashboards.
+- ✅ Company dashboards, applications grid, and finalized view consume the live database state. Active internship counts, pending tasks, and status badges all reflect the workflow statuses (`Pending Review → Offered → Approved_By_Company/Confirmed_By_Student`).
+- ✅ Finalization UX exists for both audiences. Companies can move applications to “Finalize Placement,” students confirm, and every finalized record is listed on `company/company-finalized.html` with modal details plus links to evaluations.
+- ✅ Student-facing tables (Profile, Documents, Applications, Browse Internships) now render purely dynamic data. Document downloads resolve against the backend, status cards reconcile `Pending` vs `Pending Review`, and internship cards link into the detailed “Apply” page.
+- ✅ Company public profile data flows into all internship payloads. Updating `company-profile.html` immediately updates student-facing internship listings and detail pages because `/internships` now joins and returns the canonical `companies` record.
+
+### Known Gaps
+- 🔄 Company dashboard still displays static evaluation reminders—the evaluations module itself remains read-only. Once evaluation endpoints are finalized we should surface their completion states beside finalized placements.
+- 🔄 Student internships table still uses the legacy inline filtering script; the logic works but should eventually migrate to the modular JS pattern we adopted elsewhere for consistency and testability.
+
+---
+
 ## Date: November 5, 2025
 
 ### Highlights

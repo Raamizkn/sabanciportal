@@ -1,3 +1,7 @@
+const FINALIZED_STATUSES = ['Approved_By_Company', 'Confirmed_By_Student'];
+const PENDING_REVIEW_STATUSES = ['Pending', 'Pending Review', 'Under Review'];
+const AWAITING_STATUSES = ['Offered'];
+
 document.addEventListener('DOMContentLoaded', function() {
     const api = new APIService();
 
@@ -9,131 +13,201 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    // Set company name in the welcome message
-    const welcomeMessage = document.querySelector('.card.bg-primary h5.mb-1');
+    const welcomeMessage = document.getElementById('dashboardWelcomeName');
     if (welcomeMessage) {
-        welcomeMessage.textContent = `Welcome, ${companyName}!`;
+        welcomeMessage.textContent = companyName || 'Company';
     }
     const companyNameNavbar = document.querySelector('.navbar .d-none.d-lg-inline-block.mx-lg-2');
     if (companyNameNavbar) {
-        companyNameNavbar.textContent = companyName;
+        companyNameNavbar.textContent = companyName || 'Company';
     }
 
-
-    // Fetch data and populate the dashboard
     Promise.all([
         api.getCompanyInternships(companyId),
         api.getCompanyApplications(companyId)
     ]).then(([internships, applications]) => {
         populateCompanyInfo(internships, applications);
         populateRecentApplications(applications);
-        populateActiveInternships(internships);
+        populateActiveInternships(internships, applications);
         populatePendingTasks(applications);
     }).catch(error => {
         console.error('Error fetching company data:', error);
     });
+});
 
-    function populateCompanyInfo(internships, applications) {
-        const activeInternships = internships.filter(internship => internship.status === 'Active').length;
-        const totalApplications = applications.length;
-        const positionsFilled = applications.filter(app => app.status === 'Accepted' || app.status === 'Confirmed_By_Student').length;
+function populateCompanyInfo(internships, applications) {
+    const activeInternships = internships.filter(internship => internship.status === 'Active').length;
+    const totalApplications = applications.length;
+    const positionsFilled = applications.filter(app => FINALIZED_STATUSES.includes(app.status)).length;
 
-        const stats = document.querySelectorAll('.card.bg-primary .row.text-center h5.mb-0');
-        if (stats.length === 3) {
-            stats[0].textContent = activeInternships;
-            stats[1].textContent = totalApplications;
-            stats[2].textContent = positionsFilled;
-        }
+    setDashboardMetric('dashboardActiveCount', activeInternships);
+    setDashboardMetric('dashboardApplicationsCount', totalApplications);
+    setDashboardMetric('dashboardFilledCount', positionsFilled);
+}
+
+function populateRecentApplications(applications) {
+    const tbody = document.getElementById('recentApplicationsBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!applications.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No applications yet.</td></tr>';
+        return;
     }
 
-    function populateRecentApplications(applications) {
-        const tbody = document.querySelector('.card .table-responsive tbody');
-        if (!tbody) return;
-
-        tbody.innerHTML = ''; // Clear existing rows
-
-        applications.slice(0, 5).forEach(app => {
-            const row = `
-                <tr>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <div>${app.student_name}</div>
-                        </div>
-                    </td>
-                    <td>${app.internship_position}</td>
-                    <td>${app.student_major || 'N/A'}</td>
-                    <td>${new Date(app.applied_date).toLocaleDateString()}</td>
-                    <td><span class="badge bg-secondary">${app.status}</span></td>
-                    <td class="text-center">
-                        <div class="d-inline-flex gap-1">
-                            <a href="company-applications.html?application_id=${app.application_id}" class="btn btn-outline-primary btn-sm btn-icon rounded-pill" data-bs-popup="tooltip" title="View Profile">
-                                <i class="ph-eye"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
+    applications
+        .slice(0, 5)
+        .forEach(app => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="fw-semibold">${app.student_name || 'N/A'}</div>
+                    </div>
+                </td>
+                <td>${app.internship_position || 'N/A'}</td>
+                <td>${app.student_major || 'N/A'}</td>
+                <td>${app.applied_date ? new Date(app.applied_date).toLocaleDateString() : '—'}</td>
+                <td>${renderStatusBadge(app.status)}</td>
+                <td class="text-center">
+                    <div class="d-inline-flex gap-1">
+                        <a href="company-applications.html?application_id=${encodeURIComponent(app.application_id)}" class="btn btn-outline-primary btn-sm btn-icon rounded-pill" title="View Application">
+                            <i class="ph-eye"></i>
+                        </a>
+                    </div>
+                </td>
             `;
-            tbody.insertAdjacentHTML('beforeend', row);
+            tbody.appendChild(row);
         });
+}
+
+function populateActiveInternships(internships, applications) {
+    const container = document.getElementById('activeInternshipsContainer');
+    if (!container) return;
+
+    const activeInternships = internships.filter(internship => internship.status === 'Active');
+    container.innerHTML = '';
+
+    if (!activeInternships.length) {
+        container.innerHTML = '<div class="col-12"><div class="text-center text-muted py-5">You have no active internships. <a href="company-internships.html">Post a new opening</a>.</div></div>';
+        return;
     }
 
-    function populateActiveInternships(internships) {
-        const container = document.querySelector('.card .card-body .row');
-        if (!container) return;
+    const applicantsByInternship = applications.reduce((acc, app) => {
+        if (!app.internship_id) {
+            return acc;
+        }
+        acc[app.internship_id] = (acc[app.internship_id] || 0) + 1;
+        return acc;
+    }, {});
 
-        const activeInternships = internships.filter(internship => internship.status === 'Active');
-        container.innerHTML = ''; // Clear existing content
-
-        activeInternships.forEach(internship => {
-            const internshipCard = `
-                <div class="col-lg-6">
-                    <div class="card card-body border-start-primary border-start-5">
-                        <div class="d-sm-flex align-items-start mb-3">
-                            <div class="flex-fill">
-                                <h5 class="mb-1">${internship.title}</h5>
-                                <ul class="list-inline list-inline-bullet text-muted mb-0">
-                                    <li class="list-inline-item">${internship.location}</li>
-                                    <li class="list-inline-item">${internship.dates}</li>
-                                </ul>
-                            </div>
-                            <div class="d-flex align-items-center ms-sm-3">
-                                <span class="badge bg-primary rounded-pill">${internship.application_count || 0} applicants</span>
-                            </div>
-                        </div>
-                        <div class="d-flex">
-                            <a href="company-internships.html#edit-${internship.id}" class="text-body me-3">
-                                <i class="ph-pencil me-1"></i>
-                                Edit
-                            </a>
-                            <a href="company-applications.html?internship_id=${internship.id}" class="text-body">
-                                <i class="ph-users me-1"></i>
-                                View Applicants
-                            </a>
-                        </div>
+    activeInternships.forEach(internship => {
+        const applicantCount = applicantsByInternship[internship.id] || 0;
+        const card = document.createElement('div');
+        card.className = 'col-lg-6';
+        card.innerHTML = `
+            <div class="card card-body border-start-primary border-start-5 mb-3">
+                <div class="d-sm-flex align-items-start mb-3">
+                    <div class="flex-fill">
+                        <h5 class="mb-1">${internship.title || internship.position || 'Internship'}</h5>
+                        <ul class="list-inline list-inline-bullet text-muted mb-0">
+                            <li class="list-inline-item">${internship.location || 'Location TBD'}</li>
+                            <li class="list-inline-item">${internship.dates || 'Dates TBD'}</li>
+                        </ul>
+                    </div>
+                    <div class="d-flex align-items-center ms-sm-3">
+                        <span class="badge bg-primary rounded-pill">${applicantCount} applicant${applicantCount === 1 ? '' : 's'}</span>
                     </div>
                 </div>
-            `;
-            container.insertAdjacentHTML('beforeend', internshipCard);
-        });
-    }
-
-    function populatePendingTasks(applications) {
-        const pendingTasksList = document.querySelector('.card .list-group');
-        if (!pendingTasksList) return;
-
-        pendingTasksList.innerHTML = ''; // Clear existing tasks
-
-        const pendingApplications = applications.filter(app => app.status === 'Pending').length;
-        if (pendingApplications > 0) {
-            const task = `
-                <li class="list-group-item d-flex flex-wrap align-items-center py-2">
-                    <a href="company-applications.html" class="d-flex align-items-center me-3">
-                        <i class="ph-users ph-lg me-2"></i>
-                        <span>Review ${pendingApplications} pending applications</span>
+                <div class="d-flex">
+                    <a href="company-internships.html#edit-${internship.id}" class="text-body me-3">
+                        <i class="ph-pencil me-1"></i>
+                        Edit
                     </a>
-                </li>
-            `;
-            pendingTasksList.insertAdjacentHTML('beforeend', task);
-        }
+                    <a href="company-applications.html?internship_id=${internship.id}" class="text-body">
+                        <i class="ph-users me-1"></i>
+                        View Applicants
+                    </a>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function populatePendingTasks(applications) {
+    const pendingTasksList = document.getElementById('pendingTasksList');
+    if (!pendingTasksList) return;
+    pendingTasksList.innerHTML = '';
+
+    const pendingCount = applications.filter(app => PENDING_REVIEW_STATUSES.includes(app.status)).length;
+    const awaitingCount = applications.filter(app => AWAITING_STATUSES.includes(app.status)).length;
+    const finalizedCount = applications.filter(app => FINALIZED_STATUSES.includes(app.status)).length;
+
+    if (pendingCount) {
+        pendingTasksList.appendChild(createTaskItem('ph-users', `Review ${pendingCount} pending application${pendingCount === 1 ? '' : 's'}`, 'company-applications.html'));
     }
-});
+
+    if (awaitingCount) {
+        pendingTasksList.appendChild(createTaskItem('ph-handshake', `Follow up with ${awaitingCount} student${awaitingCount === 1 ? '' : 's'} awaiting confirmation`, 'company-applications.html?status=Offered'));
+    }
+
+    if (finalizedCount) {
+        pendingTasksList.appendChild(createTaskItem('ph-check-circle', `Finalize paperwork for ${finalizedCount} placement${finalizedCount === 1 ? '' : 's'}`, 'company-finalized.html'));
+    }
+
+    if (!pendingTasksList.children.length) {
+        pendingTasksList.innerHTML = '<li class="list-group-item text-center text-muted">All caught up! No pending tasks.</li>';
+    }
+}
+
+function setDashboardMetric(elementId, value) {
+    const el = document.getElementById(elementId);
+    if (el) {
+        el.textContent = value;
+    }
+}
+
+function createTaskItem(icon, text, href) {
+    const li = document.createElement('li');
+    li.className = 'list-group-item d-flex flex-wrap align-items-center py-2';
+    li.innerHTML = `
+        <a href="${href}" class="d-flex align-items-center me-3">
+            <i class="${icon} ph-lg me-2"></i>
+            <span>${text}</span>
+        </a>
+        <div class="d-flex align-items-center text-muted ms-auto">
+            <i class="ph-calendar ph-sm me-1"></i>
+            <span>Updated just now</span>
+        </div>
+    `;
+    return li;
+}
+
+function renderStatusBadge(status) {
+    let badgeClass = 'badge bg-secondary bg-opacity-20 text-secondary';
+    const label = formatStatusLabel(status);
+    if (FINALIZED_STATUSES.includes(status)) {
+        badgeClass = 'badge bg-success bg-opacity-20 text-success';
+    } else if (PENDING_REVIEW_STATUSES.includes(status)) {
+        badgeClass = 'badge bg-warning bg-opacity-20 text-warning';
+    } else if (status === 'Offered') {
+        badgeClass = 'badge bg-info bg-opacity-20 text-info';
+    } else if (status && status.startsWith('Rejected')) {
+        badgeClass = 'badge bg-danger bg-opacity-20 text-danger';
+    }
+    return `<span class="${badgeClass}">${label}</span>`;
+}
+
+function formatStatusLabel(status) {
+    if (!status) {
+        return 'Unknown';
+    }
+    const map = {
+        'Pending': 'Pending Review',
+        'Rejected_By_Company': 'Rejected (Internal)',
+        'Approved_By_Company': 'Finalize Placement',
+        'Confirmed_By_Student': 'Confirmed By Student'
+    };
+    return map[status] || status.replace(/_/g, ' ');
+}

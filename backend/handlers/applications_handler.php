@@ -47,6 +47,24 @@ function get_primary_resume($documents) {
     return $documents[0];
 }
 
+function normalize_status($status) {
+    if (!$status) {
+        return 'Unknown';
+    }
+    return $status === 'Pending' ? 'Pending Review' : $status;
+}
+
+function generate_application_code(PDO $db) {
+    do {
+        $code = 'APP' . random_int(100000, 999999);
+        $stmt = $db->prepare('SELECT COUNT(*) FROM applications WHERE application_id = ?');
+        $stmt->execute([$code]);
+        $exists = $stmt->fetchColumn();
+    } while ($exists);
+
+    return $code;
+}
+
 if ($entity === 'applications') {
     if ($method === 'GET') {
         $company_id_param = $_GET['company_id'] ?? null;
@@ -103,6 +121,7 @@ if ($entity === 'applications') {
                         $application['resume_download_url'] = $resume['download_url'];
                         $application['resume_file_name'] = $resume['file_name'];
                     }
+                    $application['status'] = normalize_status($application['status']);
                     unset($application['internal_id']);
                     echo json_encode($application);
                 } else {
@@ -125,7 +144,8 @@ if ($entity === 'applications') {
                 $stmt = $db->prepare("
                     SELECT 
                         a.application_id, 
-                        a.status, 
+                        a.status,
+                        a.offer_details,
                         a.applied_date as created_at, 
                         a.cover_letter,
                         i.position as internship_position, 
@@ -140,6 +160,9 @@ if ($entity === 'applications') {
                 ");
                 $stmt->execute([$student_id_param]);
                 $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                foreach ($applications as &$application) {
+                    $application['status'] = normalize_status($application['status']);
+                }
                 echo json_encode($applications);
             } catch (PDOException $e) {
                 http_response_code(500);
@@ -154,10 +177,12 @@ if ($entity === 'applications') {
             }
 
             try {
+                $status_param = $_GET['status'] ?? null;
                 $stmt = $db->prepare("
                     SELECT 
                         a.id AS internal_id,
                         a.application_id, 
+                        i.id as internship_id,
                         a.status, 
                         a.applied_date, 
                         a.cover_letter,
@@ -176,10 +201,14 @@ if ($entity === 'applications') {
                     FROM applications a
                     JOIN internships i ON a.internship_id = i.id
                     JOIN students s ON a.student_id = s.id
-                    WHERE i.company_id = ?
+                    WHERE i.company_id = ?" . ($status_param ? " AND a.status = ?" : "") . "
                     ORDER BY a.applied_date DESC
                 ");
-                $stmt->execute([$company_id_param]);
+                $params = [$company_id_param];
+                if ($status_param) {
+                    $params[] = $status_param;
+                }
+                $stmt->execute($params);
                 $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 foreach ($applications as &$application) {
                     $docs = get_application_documents($application['internal_id']);
@@ -189,6 +218,7 @@ if ($entity === 'applications') {
                         $application['resume_download_url'] = $resume['download_url'];
                         $application['resume_file_name'] = $resume['file_name'];
                     }
+                    $application['status'] = normalize_status($application['status']);
                     unset($application['internal_id']);
                 }
                 echo json_encode($applications);
@@ -225,62 +255,74 @@ if ($entity === 'applications') {
                 exit;
             }
             
-            // Check if internship exists
-            $stmt = $db->prepare("SELECT * FROM internships WHERE id = ?");
-            $stmt->execute([$input['internship_id']]);
-            $internship = $stmt->fetch();
-            
-            if (!$internship) {
-                http_response_code(400);
-                echo json_encode(['error' => 'Invalid internship_id.']);
-                exit;
-            }
+            try {
+                $db->beginTransaction();
 
-            // Ensure student has not already applied
-            $stmt = $db->prepare("SELECT COUNT(*) AS count FROM applications WHERE student_id = ? AND internship_id = ?");
-            $stmt->execute([$student_id, $input['internship_id']]);
-            if ($stmt->fetch()['count'] > 0) {
-                http_response_code(409);
-                echo json_encode(['error' => 'You have already applied for this internship.']);
-                exit;
-            }
-            
-            // Generate application_id
-            $stmt = $db->query("SELECT COUNT(*) as count FROM applications");
-            $count = $stmt->fetch()['count'];
-            $new_app_id = "APP" . str_pad($count + 100, 3, "0", STR_PAD_LEFT);
-            
-            // Insert into database
-            $stmt = $db->prepare("INSERT INTO applications (application_id, student_id, internship_id, status, cover_letter, applied_date) VALUES (?, ?, ?, 'Pending', ?, CURDATE())");
-            $stmt->execute([$new_app_id, $student_id, $input['internship_id'], $input['cover_letter'] ?? '']);
-            $newPrimaryId = $db->lastInsertId();
+                $stmt = $db->prepare("SELECT id, company_name, position FROM internships WHERE id = ? AND status != 'Deleted'");
+                $stmt->execute([$input['internship_id']]);
+                $internship = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // Link selected documents to this application
-            if (!empty($input['document_ids']) && is_array($input['document_ids'])) {
-                $docStmt = $db->prepare("UPDATE documents SET application_id = ? WHERE document_id = ? AND student_id = ?");
-                foreach ($input['document_ids'] as $docId) {
-                    $docStmt->execute([$newPrimaryId, $docId, $student_id]);
+                if (!$internship) {
+                    $db->rollBack();
+                    http_response_code(400);
+                    echo json_encode(['error' => 'Invalid internship_id.']);
+                    exit;
+                }
+
+                $stmt = $db->prepare("SELECT COUNT(*) AS count FROM applications WHERE student_id = ? AND internship_id = ?");
+                $stmt->execute([$student_id, $input['internship_id']]);
+                if ($stmt->fetch()['count'] > 0) {
+                    $db->rollBack();
+                    http_response_code(409);
+                    echo json_encode(['error' => 'You have already applied for this internship.']);
+                    exit;
+                }
+
+                $new_app_id = generate_application_code($db);
+
+                $stmt = $db->prepare("INSERT INTO applications (application_id, student_id, internship_id, status, cover_letter, applied_date) VALUES (?, ?, ?, 'Pending Review', ?, CURDATE())");
+                $stmt->execute([$new_app_id, $student_id, $input['internship_id'], $input['cover_letter'] ?? '']);
+                $newPrimaryId = $db->lastInsertId();
+
+                if (!empty($input['document_ids']) && is_array($input['document_ids'])) {
+                    $docStmt = $db->prepare("UPDATE documents SET application_id = ? WHERE document_id = ? AND student_id = ?");
+                    foreach ($input['document_ids'] as $docId) {
+                        $docStmt->execute([$newPrimaryId, $docId, $student_id]);
+                    }
+                }
+
+                $db->commit();
+
+                $new_application = [
+                    'application_id' => $new_app_id,
+                    'student_id' => $student_id,
+                    'internship_id' => $input['internship_id'],
+                    'company_name' => $internship['company_name'],
+                    'position' => $internship['position'],
+                    'status' => 'Pending Review',
+                    'applied_date' => date('Y-m-d'),
+                    'cover_letter' => $input['cover_letter'] ?? ''
+                ];
+
+                http_response_code(201);
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'Application submitted successfully.',
+                    'data' => $new_application
+                ]);
+            } catch (PDOException $e) {
+                if ($db->inTransaction()) {
+                    $db->rollBack();
+                }
+
+                if ($e->getCode() === '23000') {
+                    http_response_code(409);
+                    echo json_encode(['error' => 'You have already applied for this internship.']);
+                } else {
+                    http_response_code(500);
+                    echo json_encode(['error' => 'Failed to submit application: ' . $e->getMessage()]);
                 }
             }
-            
-            // Return the new application
-            $new_application = [
-                'application_id' => $new_app_id,
-                'student_id' => $student_id,
-                'internship_id' => $input['internship_id'],
-                'company_name' => $internship['company_name'],
-                'position' => $internship['position'],
-                'status' => 'Pending', 
-                'applied_date' => date('Y-m-d'),
-                'cover_letter' => $input['cover_letter'] ?? ''
-            ];
-            
-            http_response_code(201); // Created
-            echo json_encode([
-                'status' => 'success',
-                'message' => 'Application submitted successfully.',
-                'data' => $new_application
-            ]);
         }
         elseif ($id !== null && $action === 'withdraw') {
             // Require student role
@@ -308,7 +350,8 @@ if ($entity === 'applications') {
                     $stmt->execute([$id]);
                     $updated_application = $stmt->fetch();
                     
-                    echo json_encode(['message' => "Application {$id} withdrawn successfully.", 'application' => $updated_application]);
+                    $updated_application['status'] = normalize_status($updated_application['status']);
+                    echo json_encode(['status' => 'success', 'message' => "Application {$id} withdrawn successfully.", 'application' => $updated_application]);
                 } else {
                     http_response_code(400);
                     echo json_encode(['error' => "Application {$id} cannot be withdrawn (current status: {$application['status']})."]);
@@ -344,7 +387,8 @@ if ($entity === 'applications') {
                     $stmt->execute([$id]);
                     $updated_application = $stmt->fetch();
                     
-                    echo json_encode(['message' => "Application {$id} offer confirmed successfully by student.", 'application' => $updated_application]);
+                    $updated_application['status'] = normalize_status($updated_application['status']);
+                    echo json_encode(['status' => 'success', 'message' => "Application {$id} offer confirmed successfully by student.", 'application' => $updated_application]);
                 } else {
                     http_response_code(400);
                     echo json_encode(['error' => "Application {$id} cannot be confirmed. Status must be 'Offered'. Current status: {$application['status']}."]);
@@ -366,7 +410,7 @@ if ($entity === 'applications') {
             }
             
             // Add more validation for allowed status transitions by company
-            $allowed_statuses = ['Offered', 'Rejected_By_Company', 'Interview_Scheduled', 'Approved_By_Company'];
+            $allowed_statuses = ['Pending Review','Under Review','Shortlisted','Interview Scheduled','Offered','Rejected','Rejected_By_Company','Approved_By_Company'];
             if (!in_array($input['status'], $allowed_statuses)){
                 http_response_code(400);
                 echo json_encode(['error' => "Invalid status '{$input['status']}' for company update."]);
@@ -393,7 +437,8 @@ if ($entity === 'applications') {
                     exit;
                 }
                 
-                echo json_encode(['message' => "Application {$id} status updated to {$input['status']} by company.", 'application' => $updated_application]);
+                $updated_application['status'] = normalize_status($updated_application['status']);
+                echo json_encode(['status' => 'success', 'message' => "Application {$id} status updated to {$input['status']} by company.", 'application' => $updated_application]);
             } catch(PDOException $e) {
                 http_response_code(500);
                 echo json_encode(['error' => 'Failed to update application: ' . $e->getMessage()]);

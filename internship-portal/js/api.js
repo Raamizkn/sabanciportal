@@ -149,8 +149,9 @@ class APIService {
     /**
      * Get company applications
      */
-    async getCompanyApplications(companyId) {
-        return this.request(`/index.php?entity=applications&company_id=${companyId}`);
+    async getCompanyApplications(companyId, status = null) {
+        const statusParam = status ? `&status=${encodeURIComponent(status)}` : '';
+        return this.request(`/index.php?entity=applications&company_id=${companyId}${statusParam}`);
     }
 
     /**
