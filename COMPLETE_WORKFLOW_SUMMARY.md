@@ -11,6 +11,9 @@ This document captures the end-to-end flow of the Sabancı Internship Portal. It
 3. **Student lifecycle** – Students maintain rich profiles, upload multiple documents, browse internships, pick files per application, withdraw, and confirm offers.
 4. **Document fidelity** – When a student applies, the selected `document_ids` are attached to the new application row so companies download exactly what was submitted.
 5. **Dashboards** – Student + company dashboards, the Company Applications grid, and the Finalized page all read live data (including offer notes and attached documents) via `internship-portal/js/api.js`.
+6. **Status standardization** – All application statuses use 6 clean names (`Pending`, `Accepted`, `Confirmed`, `Finalized`, `Rejected`, `Withdrawn`) consistently across frontend and backend, with automatic normalization from database values.
+7. **Dynamic UI** – Status cards, badges, and application counts update dynamically from API data. Filter and search functionality works across student and company pages.
+8. **Modal improvements** – Application detail modals populate dynamically, action buttons (Accept/Reject/Finalize) work correctly, and Bootstrap modals replace native browser dialogs for consistent UX.
 
 ---
 
@@ -19,8 +22,8 @@ This document captures the end-to-end flow of the Sabancı Internship Portal. It
 | Role | Pages | Highlights |
 | --- | --- | --- |
 | Admin | `admin/admin-add-company.html`, Postman (`admin` endpoints) | Creates companies/terms, impersonates users for QA. |
-| Company | `company/company-dashboard.html`, `company-company-applications.html`, `company-company-finalized.html`, `company-company-internships.html`, `company/company-profile.html` | Dashboard metrics, live applications grid with resume/doc links, finalized placements modal, profile editing. |
-| Student | `student/student-dashboard.html`, `student/student-internships.html`, `student/student-internship-detail.html`, `student/student-applications.html`, `student/student-documents.html`, `student/student-profile.html` | Browse/apply with “Apply Now” modal, document picker, application table with withdraw/confirm buttons. |
+| Company | `company/company-dashboard.html`, `company/company-applications.html`, `company/company-finalized.html`, `company/company-internships.html`, `company/company-profile.html` | Dashboard metrics, live applications grid with resume/doc links, finalized placements modal, profile editing, dynamic application modals with Accept/Reject/Finalize buttons. |
+| Student | `student/student-dashboard.html`, `student/student-internships.html`, `student/student-internship-detail.html`, `student/student-applications.html`, `student/student-documents.html`, `student/student-profile.html` | Browse/apply with "Apply Now" modal, document picker, application table with withdraw/confirm buttons, dynamic status cards, filter/search functionality. |
 
 ---
 
@@ -45,39 +48,47 @@ The new record appears instantly on the login form and in the admin UI. No manua
 ### 4. Student browses & applies
 - Page: `student/student-internships.html` → `student/student-internship-detail.html`
 - API: `GET ?entity=internships`, `POST ?entity=applications&action=apply`
-- Student selects documents from `student/student-documents.html`. The modal sends `document_ids` along with the cover letter. The backend transaction creates the application, links the documents, and responds with `status: "Pending Review"`.
+- Student selects documents from `student/student-documents.html`. The modal sends `document_ids` along with the cover letter. The backend transaction creates the application, links the documents, and responds with `status: "Pending"`.
 
 ### 5. Company reviews applications
 - Page: `company/company-applications.html`
 - API: `GET ?entity=applications&company_id=9`
-- Features: DataTable with retry fallback, document download list, resume download button, Update Status modal (with `offer_details`). Filtering by `status` is supported via query string.
+- Features: DataTable with retry fallback, document download list, resume download button, dynamic Application Details modal with Accept/Reject/Finalize buttons, Update Status modal (with `offer_details`). Filtering by `status` and keyword search work together seamlessly.
 
 ### 6. Offer → confirmation → finalization
-1. Company sets status to `Offered` with an offer note. Student sees the note in their Applications page and can **Confirm Offer**.
-2. After interviews, company can skip straight to `Approved_By_Company` to force a finalization (used when paperwork is done offline).
-3. Student confirming moves status to `Confirmed_By_Student`.
+1. Company sets status to `Accepted` (previously `Offered`) with an offer note. Student sees the note in their Applications page and can **Confirm Offer**.
+2. Student confirming moves status to `Confirmed` (database stores as `Confirmed_By_Student`).
+3. Company can finalize by setting status to `Finalized` (database stores as `Approved_By_Company`).
 4. Finalized applications auto-populate `company/company-finalized.html`, where recruiters can download attachments again and jump to evaluations.
 
 ### 7. Dashboards auto-update
 - Company dashboard counts: active internships, total applications, finalized placements.
-- Student dashboard cards: totals by `Pending Review`, `Offered`, `Approved_By_Company`, `Confirmed_By_Student`, `Rejected`.
+- Student dashboard cards: totals by `Pending`, `Accepted`, `Confirmed`, `Finalized`, `Rejected`, `Withdrawn` (all dynamic from API).
 - The Finalized modal shows offer notes and attached documents, so no data entry is required outside the flow above.
+- Status cards and badges update in real-time as applications move through the workflow.
 
 ---
 
 ## Status Reference
 
-| Status | Set By | Meaning |
-| --- | --- | --- |
-| `Pending Review` | System | New application, awaiting company action. |
-| `Under Review` / `Shortlisted` / `Interview Scheduled` | Company | Optional internal stages. |
-| `Offered` | Company | Offer sent; student can confirm. Include `offer_details`. |
-| `Approved_By_Company` | Company | Final paperwork done; shows on Finalized page even if student hasn’t confirmed. |
-| `Confirmed_By_Student` | Student | Offer accepted; appears on Finalized page and counts as filled. |
-| `Rejected` / `Rejected_By_Company` | Company | Candidate dropped (internal vs. public reason). |
-| `Withdrawn` | Student | Candidate pulled out. |
+**Standardized Status Names (December 2025):**
 
-Statuses are normalized by the backend so legacy `Pending` rows appear as `Pending Review` automatically.
+| Status | Set By | Meaning | Database Value |
+| --- | --- | --- | --- |
+| `Pending` | System | New application, awaiting company action. | `Pending` |
+| `Accepted` | Company | Company accepts application; student can confirm. Include `offer_details`. | `Accepted` |
+| `Confirmed` | Student | Student confirms acceptance; appears on Finalized page. | `Confirmed_By_Student` |
+| `Finalized` | Company | Company finalizes placement; shows on Finalized page. | `Approved_By_Company` |
+| `Rejected` | Company | Company rejects the application. | `Rejected` |
+| `Withdrawn` | Student | Student withdraws the application. | `Withdrawn` |
+
+**Status Workflow:**
+- `Pending` → `Accepted` (company accepts) or `Rejected` (company rejects)
+- `Accepted` → `Confirmed` (student confirms) or `Withdrawn` (student withdraws)
+- `Confirmed` → `Finalized` (company finalizes)
+- `Finalized`, `Rejected`, `Withdrawn` are terminal states
+
+**Note:** The backend automatically normalizes database values (`Confirmed_By_Student` → `Confirmed`, `Approved_By_Company` → `Finalized`) in all API responses, so the frontend always receives clean status names. This allows us to maintain user-friendly labels while working within database ENUM constraints.
 
 ---
 
@@ -89,7 +100,7 @@ Statuses are normalized by the backend so legacy `Pending` rows appear as `Pendi
 4. **Verify as company** – Open `company/company-applications.html` and confirm:
    - Resume/download links point to the selected document(s).
    - Offer modal pre-fills previous `offer_details` when re-opened.
-5. **Finalize** – Update status to `Approved_By_Company` or `Offered` → Student confirms → refresh Finalized page.
+5. **Finalize** – Update status to `Accepted` → Student confirms (`Confirmed`) → Company finalizes (`Finalized`) → refresh Finalized page.
 6. **Regression** – Hit `GET ?entity=applications&id=<APP>` to ensure API returns the same data the UI shows.
 
 ---

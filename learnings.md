@@ -297,3 +297,211 @@ We now maintain only four living docs: `README.md`, `api_documentation.md`, `lea
 - **README as the index** directs contributors to the other three docs, eliminating scavenger hunts for the latest info.
 
 ---
+
+## 12. Student Dashboard UI Improvements & Filter Implementation (December 2025)
+
+### Problem
+- Account settings page was accessible but not needed
+- Filters on student pages (internships, applications) were not functional
+- Document upload modal had unnecessary fields and wasn't working
+- Documents were stored in filesystem instead of database
+
+### Solution
+
+**UI Cleanup:**
+- Removed "Account settings" links from all student-facing pages (navbar dropdowns and sidebars)
+- Removed "Pending Uploads" section from documents page
+- Simplified document upload modal: removed document type dropdown and description field
+
+**Filter Implementation:**
+- Created modern filter UI for Browse Internships page:
+  - Horizontal filter bar with search, location, mode, duration filters
+  - Real-time filtering with debouncing (300ms)
+  - Clear filters button
+  - Filters work in combination (AND logic)
+- Updated Applications page filters:
+  - Combined search input and status dropdown
+  - Filters work together seamlessly
+
+**Document Management:**
+- Fixed document upload to use FormData (actual file upload, not just metadata)
+- Added delete functionality with confirmation dialog
+- Fixed download endpoint to serve files correctly (moved from POST to GET section)
+- Changed storage from filesystem to database BLOB storage
+
+**API Fixes:**
+- Fixed `upload_doc` action handler to accept FormData file uploads
+- Fixed `download_doc` action handler routing (moved to GET section)
+- Fixed API endpoint mismatch (`get_docs` vs `documents`)
+- Added proper error handling for file uploads
+- Fixed PHP output buffering issues causing HTML errors in JSON responses
+
+**Database Storage Migration:**
+- Added `file_content` LONGBLOB column to documents table
+- Updated upload function to store files in database instead of filesystem
+- Updated download function to serve from database BLOB with filesystem fallback
+- Created migration script: `backend/config/ALTER_documents_add_file_content.sql`
+
+### Key Learnings
+- **FormData handling**: When sending files via FormData, don't manually set Content-Type header - browser sets it with boundary automatically
+- **PHP upload limits**: Check `upload_max_filesize` (default 2MB) - can't always increase programmatically if PHP is restricted
+- **ENUM validation**: Database ENUM columns must match exact values - "General" not allowed, use "Other"
+- **Output buffering**: Use `ob_start()` and `ob_end_clean()` to prevent PHP warnings from corrupting JSON responses
+- **Function scope**: JavaScript variables declared inside event listeners aren't accessible to functions outside - move to global scope
+- **Download endpoints**: File downloads should be GET requests, not POST - set proper headers and use `readfile()` with `exit`
+- **Database vs Filesystem**: Storing files as BLOB in database simplifies deployment (no file permissions) but increases database size
+
+### Files Modified
+- `internship-portal/student/student-*.html` - Removed account settings links
+- `internship-portal/student/student-internships.html` - New filter UI and logic
+- `internship-portal/student/student-applications.html` - Updated filter UI
+- `internship-portal/student/student-documents.html` - Simplified upload modal, removed pending section
+- `internship-portal/js/student-applications.js` - Filter and search functionality
+- `internship-portal/js/student-documents.js` - Upload, delete, download functionality
+- `internship-portal/js/api.js` - Added upload/delete document methods, fixed FormData handling
+- `backend/handlers/student_handler.php` - File upload/download handlers, database storage
+- `backend/index.php` - Output buffering for clean JSON responses
+- `backend/config/ALTER_documents_add_file_content.sql` - Database migration
+
+---
+
+## 13. Bootstrap Modal Display & Backdrop Cleanup (December 2025)
+
+### Problem
+- Application detail modals were not populating with data
+- Dropdown menus inside modals were being clipped by `table-responsive` wrapper
+- Page became unresponsive after closing modals (couldn't click anything until refresh)
+
+### Root Cause
+- Modal content was being rendered statically in HTML instead of dynamically via JavaScript
+- `table-responsive` wrapper created overflow constraints that clipped dropdown menus
+- Bootstrap modal backdrop elements were not being cleaned up properly, leaving multiple `.modal-backdrop` divs and preventing interactions
+
+### Solution
+
+**Modal Content Population:**
+- Created `renderApplicationModal()` function to dynamically populate modal content from API data
+- Used event delegation on "View Application" links to ensure modal populates before showing
+- Removed `table-responsive` wrapper and used `card-body` with `p-0` for proper spacing
+
+**Backdrop Cleanup:**
+- Added `hidden.bs.modal` event listener to clean up lingering backdrop elements
+- Removed all `.modal-backdrop` elements and reset `body` classes/styles (`modal-open`, `overflow`, `paddingRight`)
+- Ensured proper modal lifecycle management
+
+**Action Buttons:**
+- Fixed Accept/Reject/Finalize buttons by calling `setupApplicationActionButtons()` from `renderApplicationModal()`
+- Replaced native `confirm()` and `alert()` dialogs with Bootstrap modals (`showConfirmModal()`, `showAlertModal()`) for consistent UI
+
+### Key Learnings
+- **Dynamic Modal Content**: Always populate modal content via JavaScript before showing, don't rely on static HTML
+- **Bootstrap Modal Lifecycle**: Always clean up backdrop elements on `hidden.bs.modal` event to prevent UI lockups
+- **Event Delegation**: Use event delegation for dynamically created elements (like "View Application" links)
+- **Consistent UI**: Replace native browser dialogs with Bootstrap modals for better UX
+- **Overflow Handling**: Avoid `table-responsive` wrappers around dropdown menus - use proper padding/margin instead
+
+### Files Modified
+- `internship-portal/company/company-applications.html` - Modal structure, backdrop cleanup, event delegation
+- `internship-portal/js/company-applications.js` - `renderApplicationModal()`, `setupApplicationActionButtons()`, modal utilities
+- `internship-portal/js/modal-utils.js` - Bootstrap modal confirmation/alert utilities
+
+---
+
+## 14. Application Status Standardization (December 2025)
+
+### Problem
+- Status names were inconsistent across frontend, backend, and database
+- Frontend used display names like `Pending Review`, `Approved_By_Company`, `Confirmed_By_Student`
+- Database ENUM contained verbose values that didn't match user-facing labels
+- Multiple status normalization functions scattered across codebase
+
+### Root Cause
+- Database ENUM was created with verbose status names (`Confirmed_By_Student`, `Approved_By_Company`)
+- Frontend code had inconsistent normalization logic
+- No single source of truth for status names
+
+### Solution
+
+**Standardized to 6 Core Statuses:**
+1. `Pending` - Initial status when student applies
+2. `Accepted` - Company accepts the application
+3. `Confirmed` - Student confirms acceptance (database: `Confirmed_By_Student`)
+4. `Finalized` - Company finalizes the placement (database: `Approved_By_Company`)
+5. `Rejected` - Company rejects the application
+6. `Withdrawn` - Student withdraws the application
+
+**Backend Normalization:**
+- Updated `normalize_status()` in `applications_handler.php` to map database values to clean display names
+- Database continues to store `Confirmed_By_Student` and `Approved_By_Company` (can't ALTER ENUM without DBA privileges)
+- All API responses normalize statuses before returning to frontend
+
+**Frontend Updates:**
+- Removed all status normalization functions from frontend JavaScript
+- Frontend now uses clean status names directly (`Pending`, `Accepted`, `Confirmed`, `Finalized`, `Rejected`, `Withdrawn`)
+- Updated all status badge rendering, conditional logic, and filter dropdowns to use clean names
+
+**Status Workflow:**
+- `Pending` → `Accepted` (company accepts) or `Rejected` (company rejects)
+- `Accepted` → `Confirmed` (student confirms) or `Withdrawn` (student withdraws)
+- `Confirmed` → `Finalized` (company finalizes)
+- `Finalized`, `Rejected`, `Withdrawn` are terminal states
+
+### Key Learnings
+- **Database Constraints**: When ALTER privileges aren't available, normalize at the API layer instead of schema changes
+- **Single Source of Truth**: Backend normalization ensures frontend always receives consistent status names
+- **Clean Display Names**: Use user-friendly status names (`Confirmed` not `Confirmed_By_Student`) for better UX
+- **Status Transitions**: Document valid status transitions and enforce them in backend logic
+- **Backward Compatibility**: Normalization function handles legacy database values gracefully
+
+### Files Modified
+- `backend/handlers/applications_handler.php` - Status normalization, workflow logic
+- `backend/handlers/admin_handler.php` - Status queries updated
+- `backend/handlers/student_handler.php` - Status checks updated
+- `backend/handlers/documents_handler.php` - Status checks updated
+- `internship-portal/js/company-applications.js` - Removed normalization, use clean names
+- `internship-portal/js/student-applications.js` - Removed normalization, use clean names
+- `internship-portal/js/company-dashboard.js` - Updated status constants
+- `internship-portal/js/company-finalized.js` - Updated status filtering
+- `internship-portal/student/student-*.html` - Updated status card labels and filters
+- `internship-portal/admin/admin-*.html` - Updated status badge rendering
+
+---
+
+## 15. UI Cleanup & Navigation Structure (December 2025)
+
+### Problem
+- Account Settings page was accessible but not needed for students
+- Navigation structure had broken HTML after script-based cleanup (missing `<li class="nav-item">` wrappers)
+- Filter and search functionality was not working on student pages
+
+### Solution
+
+**Removed Account Settings:**
+- Deleted `student-settings.html` and `company-settings.html` files
+- Removed all "Account Settings" links from student-facing pages (navbar dropdowns and sidebars)
+- Cleaned up empty `<a>` tags and duplicate closing tags
+
+**Fixed Navigation Structure:**
+- Restored proper `<li class="nav-item">` wrappers for all navigation items
+- Ensured proper HTML structure for Bootstrap navigation components
+
+**Filter & Search Implementation:**
+- Made status cards dynamic on student dashboard and applications pages
+- Implemented filter dropdowns and keyword search for applications table
+- Integrated DataTables.js custom filtering for real-time results
+- Filters work in combination (AND logic) - status + keyword search together
+
+### Key Learnings
+- **HTML Structure**: Always maintain proper HTML structure when doing bulk replacements - scripts can break markup
+- **Dynamic Content**: Status cards and badges should fetch counts from API, not be hardcoded
+- **DataTables Filtering**: Use DataTables.js custom filtering API for advanced search/filter combinations
+- **UI Consistency**: Remove unused pages and menu items to reduce confusion
+
+### Files Modified
+- `internship-portal/student/student-*.html` - Removed account settings links, fixed navigation structure
+- `internship-portal/student/student-dashboard.html` - Dynamic status cards, removed "Upcoming Deadlines"
+- `internship-portal/student/student-applications.html` - Dynamic status cards, filter/search functionality
+- `internship-portal/js/student-applications.js` - Filter and search implementation
+- Deleted: `internship-portal/student/student-settings.html`, `internship-portal/company/company-settings.html`
+
+---

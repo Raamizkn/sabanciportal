@@ -15,14 +15,14 @@ Anything not covered by these four is either code or intentionally deleted.
 
 ---
 
-## Project Status (November 2025)
+## Project Status (December 2025)
 
 | Layer | Status | Notes |
 | --- | --- | --- |
-| Backend | ✅ Production-ready | MySQL-backed, session auth, role/ownership checks, document linkage, workflow statuses. |
-| API Client | ✅ Shared `internship-portal/js/api.js` | Auto-detects base URL, injects credentials, normalizes errors. |
-| Frontend | ✅ Wired to backend | Student/company dashboards, application grids, finalization modals all consume live data. |
-| Documentation | ✅ Consolidated | Only the four docs above remain and are up to date. |
+| Backend | ✅ Production-ready | MySQL-backed, session auth, role/ownership checks, document linkage, standardized workflow statuses (6 core statuses). |
+| API Client | ✅ Shared `internship-portal/js/api.js` | Auto-detects base URL, injects credentials, normalizes errors, handles status normalization. |
+| Frontend | ✅ Wired to backend | Student/company dashboards, application grids, finalization modals all consume live data. Dynamic status cards, filter/search functionality, Bootstrap modals replace native dialogs. |
+| Documentation | ✅ Consolidated | Only the four docs above remain and are up to date with latest learnings and workflow changes. |
 
 ---
 
