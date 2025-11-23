@@ -316,92 +316,8 @@
 									<th class="text-center">Actions</th>
 								</tr>
 							</thead>
-							<tbody>
-								<tr>
-									<td>2025-2026 Term</td>
-									<td>Sept 1, 2025</td>
-									<td>June 30, 2026</td>
-									<td><span class="badge bg-success">Active</span></td>
-									<td>Jan 15, 2025</td>
-									<td class="text-center">
-										<div class="d-inline-flex">
-											<button type="button" class="btn btn-link text-body edit-term" data-term-id="1" data-bs-toggle="modal" data-bs-target="#edit_term_modal">
-												<i class="ph-pencil"></i>
-											</button>
-											<button type="button" class="btn btn-link text-danger delete-term" data-term-id="1" data-bs-toggle="modal" data-bs-target="#delete_term_modal">
-												<i class="ph-trash"></i>
-											</button>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td>2026-2027 Term</td>
-									<td>Sept 1, 2026</td>
-									<td>June 30, 2027</td>
-									<td><span class="badge bg-secondary">Upcoming</span></td>
-									<td>Jan 16, 2025</td>
-									<td class="text-center">
-										<div class="d-inline-flex">
-											<button type="button" class="btn btn-link text-body edit-term" data-term-id="2" data-bs-toggle="modal" data-bs-target="#edit_term_modal">
-												<i class="ph-pencil"></i>
-											</button>
-											<button type="button" class="btn btn-link text-danger delete-term" data-term-id="2" data-bs-toggle="modal" data-bs-target="#delete_term_modal">
-												<i class="ph-trash"></i>
-											</button>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td>2027-2028 Term</td>
-									<td>Sept 1, 2027</td>
-									<td>June 30, 2028</td>
-									<td><span class="badge bg-secondary">Upcoming</span></td>
-									<td>Jan 17, 2025</td>
-									<td class="text-center">
-										<div class="d-inline-flex">
-											<button type="button" class="btn btn-link text-body edit-term" data-term-id="3" data-bs-toggle="modal" data-bs-target="#edit_term_modal">
-												<i class="ph-pencil"></i>
-											</button>
-											<button type="button" class="btn btn-link text-danger delete-term" data-term-id="3" data-bs-toggle="modal" data-bs-target="#delete_term_modal">
-												<i class="ph-trash"></i>
-											</button>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td>2028-2029 Term</td>
-									<td>Sept 1, 2028</td>
-									<td>June 30, 2029</td>
-									<td><span class="badge bg-secondary">Upcoming</span></td>
-									<td>Jan 18, 2025</td>
-									<td class="text-center">
-										<div class="d-inline-flex">
-											<button type="button" class="btn btn-link text-body edit-term" data-term-id="4" data-bs-toggle="modal" data-bs-target="#edit_term_modal">
-												<i class="ph-pencil"></i>
-											</button>
-											<button type="button" class="btn btn-link text-danger delete-term" data-term-id="4" data-bs-toggle="modal" data-bs-target="#delete_term_modal">
-												<i class="ph-trash"></i>
-											</button>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td>2029-2030 Term</td>
-									<td>Sept 1, 2029</td>
-									<td>June 30, 2030</td>
-									<td><span class="badge bg-secondary">Upcoming</span></td>
-									<td>Jan 19, 2025</td>
-									<td class="text-center">
-										<div class="d-inline-flex">
-											<button type="button" class="btn btn-link text-body edit-term" data-term-id="5" data-bs-toggle="modal" data-bs-target="#edit_term_modal">
-												<i class="ph-pencil"></i>
-											</button>
-											<button type="button" class="btn btn-link text-danger delete-term" data-term-id="5" data-bs-toggle="modal" data-bs-target="#delete_term_modal">
-												<i class="ph-trash"></i>
-											</button>
-										</div>
-									</td>
-								</tr>
+							<tbody id="termsTableBody">
+								<!-- Terms will be loaded dynamically -->
 							</tbody>
 						</table>
 					</div>
@@ -736,22 +652,25 @@
 			});
 			
 			// Handle Delete Term Confirmation
-			document.getElementById('confirm_delete_term').addEventListener('click', function() {
+			document.getElementById('confirm_delete_term').addEventListener('click', async function() {
 				const termId = document.getElementById('delete_term_id').value;
 				
-				// In a real application, this would be an AJAX call to delete the term
-				console.log('Deleting term:', termId);
-				
-				// Show success message
-				alert('Term deleted successfully!');
-				
-				// Close modal and refresh page
-				const modal = bootstrap.Modal.getInstance(document.getElementById('delete_term_modal'));
-				modal.hide();
-				
-				// In a real application, you would update the table after deletion
-				// For demo purposes, let's refresh the page
-				location.reload();
+				try {
+					const result = await api.deleteTerm(termId);
+					
+					if (result.error) {
+						alert('Error: ' + result.error);
+						return;
+					}
+					
+					alert('Term deleted successfully!');
+					const modal = bootstrap.Modal.getInstance(document.getElementById('delete_term_modal'));
+					modal.hide();
+					await loadTerms();
+				} catch (error) {
+					alert('An error occurred while deleting the term.');
+					console.error(error);
+				}
 			});
 			
 			// Update term selection dropdown when a term is added/edited/deleted
@@ -761,7 +680,125 @@
 				console.log('Updating term dropdown');
 			}
 		});
+
+		// API Integration
+		async function loadTerms() {
+			try {
+				const terms = await api.getTerms();
+				if (terms.error) {
+					console.error('Failed to load terms:', terms.error);
+					document.getElementById('termsTableBody').innerHTML = '<tr><td colspan="6" class="text-center text-muted">Failed to load terms</td></tr>';
+					return;
+				}
+
+				populateTermsTable(Array.isArray(terms) ? terms : []);
+			} catch (error) {
+				console.error('Error loading terms:', error);
+				document.getElementById('termsTableBody').innerHTML = '<tr><td colspan="6" class="text-center text-muted">Error loading terms</td></tr>';
+			}
+		}
+
+		function populateTermsTable(terms) {
+			const tbody = document.getElementById('termsTableBody');
+			if (!tbody) return;
+
+			tbody.innerHTML = '';
+
+			if (terms.length === 0) {
+				tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No terms found</td></tr>';
+				return;
+			}
+
+			terms.forEach((term) => {
+				const row = document.createElement('tr');
+				const today = new Date();
+				const startDate = new Date(term.start_date);
+				const endDate = new Date(term.end_date);
+				let statusBadge = '<span class="badge bg-secondary">Upcoming</span>';
+				
+				if (today >= startDate && today <= endDate) {
+					statusBadge = '<span class="badge bg-success">Active</span>';
+				} else if (today > endDate) {
+					statusBadge = '<span class="badge bg-danger">Ended</span>';
+				}
+				
+				row.innerHTML = `
+					<td>${term.name || 'N/A'}</td>
+					<td>${term.start_date ? new Date(term.start_date).toLocaleDateString() : 'N/A'}</td>
+					<td>${term.end_date ? new Date(term.end_date).toLocaleDateString() : 'N/A'}</td>
+					<td>${statusBadge}</td>
+					<td>${term.created_at ? new Date(term.created_at).toLocaleDateString() : 'N/A'}</td>
+					<td class="text-center">
+						<div class="d-inline-flex">
+							<button type="button" class="btn btn-link text-body edit-term" data-term-id="${term.id}" data-bs-toggle="modal" data-bs-target="#edit_term_modal">
+								<i class="ph-pencil"></i>
+							</button>
+							<button type="button" class="btn btn-link text-danger delete-term" data-term-id="${term.id}" data-bs-toggle="modal" data-bs-target="#delete_term_modal">
+								<i class="ph-trash"></i>
+							</button>
+						</div>
+					</td>
+				`;
+				tbody.appendChild(row);
+			});
+
+			// Re-attach edit/delete handlers
+			attachTermHandlers();
+		}
+
+		function attachTermHandlers() {
+			document.querySelectorAll('.edit-term').forEach(button => {
+				button.addEventListener('click', function() {
+					const termId = this.getAttribute('data-term-id');
+					// Load term data and populate edit modal
+					loadTermForEdit(termId);
+				});
+			});
+
+			document.querySelectorAll('.delete-term').forEach(button => {
+				button.addEventListener('click', function() {
+					const termId = this.getAttribute('data-term-id');
+					const row = this.closest('tr');
+					const termName = row.cells[0].textContent;
+					
+					document.getElementById('delete_term_id').value = termId;
+					document.getElementById('delete_term_name').textContent = termName;
+				});
+			});
+		}
+
+		async function loadTermForEdit(termId) {
+			try {
+				const terms = await api.getTerms();
+				const term = Array.isArray(terms) ? terms.find(t => t.id == termId) : null;
+				
+				if (term) {
+					document.getElementById('edit_term_id').value = term.id;
+					document.getElementById('edit_term_name').value = term.name || '';
+					document.getElementById('edit_term_start_date').value = term.start_date || '';
+					document.getElementById('edit_term_end_date').value = term.end_date || '';
+					document.getElementById('edit_term_status').value = term.status || 'Active';
+					document.getElementById('edit_term_description').value = term.description || '';
+				}
+			} catch (error) {
+				console.error('Error loading term:', error);
+			}
+		}
+
+		// Load terms on page load
+		document.addEventListener('DOMContentLoaded', async function() {
+			const userRole = localStorage.getItem('userRole');
+			if (userRole !== 'admin') {
+				alert('Access denied. Redirecting to login page.');
+				window.location.href = '../index.html';
+				return;
+			}
+			await loadTerms();
+		});
 	</script>
+
+	<!-- API Service -->
+	<script src="../js/api.js"></script>
 
 	<!-- Logout Script -->
 	<script>

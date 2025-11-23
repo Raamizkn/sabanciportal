@@ -2,21 +2,58 @@
 document.addEventListener('DOMContentLoaded', () => {
     const studentId = localStorage.getItem('userId');
     const userRole = localStorage.getItem('userRole');
+    const isAdmin = userRole === 'admin';
+    const isImpersonating = sessionStorage.getItem('impersonatedUserType') === 'student';
 
-    if (userRole !== 'student') {
+    // Allow admin access or impersonated access
+    if (userRole !== 'student' && !isImpersonating && !isAdmin) {
         alert('Access Denied. You must be logged in as a Student.');
         window.location.href = '../index.html';
         return;
     }
 
-    if (!studentId) {
+    // For admin viewing, get student ID from URL or use impersonated ID
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlStudentId = urlParams.get('id');
+    const targetStudentId = urlStudentId || (isImpersonating ? sessionStorage.getItem('impersonatedUser') : studentId);
+
+    if (!targetStudentId || targetStudentId === 'undefined') {
         alert('Student ID not found. Please log in again.');
         window.location.href = '../index.html';
         return;
     }
 
-    loadStudentApplications(studentId);
+    // Add admin navigation bar if accessed by admin
+    if (isAdmin && !isImpersonating) {
+        addAdminNavigationBar();
+    }
+
+    loadStudentApplications(targetStudentId);
 });
+
+// Add admin navigation bar at the top of the page
+function addAdminNavigationBar() {
+    const adminNav = document.createElement('div');
+    adminNav.className = 'alert alert-info mb-0 rounded-0 border-0';
+    adminNav.style.cssText = 'position: sticky; top: 0; z-index: 1030; background: #0d6efd !important; color: white;';
+    adminNav.innerHTML = `
+        <div class="container-fluid d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <i class="ph-arrow-left me-2" style="cursor: pointer;" onclick="window.history.back()"></i>
+                <span><strong>Admin View:</strong> Viewing student applications (Admin Mode)</span>
+            </div>
+            <div>
+                <a href="../admin/admin-students.html" class="btn btn-sm btn-light me-2">
+                    <i class="ph-arrow-left me-1"></i>Back to Students
+                </a>
+                <a href="../admin/admin-dashboard.html" class="btn btn-sm btn-light">
+                    <i class="ph-house me-1"></i>Admin Dashboard
+                </a>
+            </div>
+        </div>
+    `;
+    document.body.insertBefore(adminNav, document.body.firstChild);
+}
 
 async function loadStudentApplications(studentId) {
     try {

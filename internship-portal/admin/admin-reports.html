@@ -392,9 +392,10 @@
 								</div>
 							</div>
 							<div class="text-end">
-								<button type="submit" class="btn btn-primary">Generate Report <i class="ph-arrow-circle-right ms-2"></i></button>
+								<button type="submit" class="btn btn-primary" id="generateReportBtn">Generate Report <i class="ph-arrow-circle-right ms-2"></i></button>
 							</div>
 						</form>
+						<div id="reportResults" class="mt-4"></div>
 					</div>
 				</div>
 				<!-- /Report Generation -->
@@ -1134,6 +1135,77 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+	<!-- API Integration -->
+	<script src="../js/api.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', async function() {
+			// Auth check
+			const userRole = localStorage.getItem('userRole');
+			if (userRole !== 'admin') {
+				alert('Access denied. Redirecting to login page.');
+				window.location.href = '../index.html';
+				return;
+			}
+
+			// Handle report generation form
+			const reportForm = document.querySelector('.card-body form');
+			if (reportForm) {
+				reportForm.addEventListener('submit', async function(e) {
+					e.preventDefault();
+					await generateReport();
+				});
+			}
+		});
+
+		async function generateReport() {
+			const reportType = document.querySelector('.card-body select').value;
+			const startDate = document.querySelector('.card-body input[type="date"]:first-of-type').value;
+			const endDate = document.querySelector('.card-body input[type="date"]:last-of-type').value;
+			
+			if (!reportType) {
+				alert('Please select a report type');
+				return;
+			}
+
+			try {
+				const result = await api.generateReport(reportType, {
+					start_date: startDate,
+					end_date: endDate
+				});
+
+				if (result.error) {
+					alert('Error: ' + result.error);
+					return;
+				}
+
+				displayReportResults(result.report);
+			} catch (error) {
+				alert('An error occurred while generating the report.');
+				console.error(error);
+			}
+		}
+
+		function displayReportResults(report) {
+			const resultsDiv = document.getElementById('reportResults');
+			if (!resultsDiv) return;
+
+			let html = '<div class="card"><div class="card-header"><h5 class="mb-0">Report Results</h5></div><div class="card-body">';
+			html += '<p><strong>Report Type:</strong> ' + (report.report_type || 'N/A') + '</p>';
+			html += '<p><strong>Generated On:</strong> ' + (report.generated_on || 'N/A') + '</p>';
+			
+			if (report.data && report.data.length > 0) {
+				html += '<table class="table table-striped"><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>';
+				report.data.forEach(item => {
+					html += '<tr><td>' + (item.metric || 'N/A') + '</td><td>' + (item.value || 'N/A') + '</td></tr>';
+				});
+				html += '</tbody></table>';
+			}
+
+			html += '</div></div>';
+			resultsDiv.innerHTML = html;
+		}
+	</script>
 
 </body>
 </html> 

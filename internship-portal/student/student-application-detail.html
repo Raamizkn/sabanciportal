@@ -339,14 +339,21 @@
 			const urlParams = new URLSearchParams(window.location.search);
 			const applicationId = urlParams.get('id');
 
-			// Auth check
+			// Auth check - allow students, impersonated students, and admins
 			const userRole = localStorage.getItem('userRole');
             const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'student';
-            if (userRole !== 'student' && !isBeingImpersonated) {
+            const isAdmin = userRole === 'admin';
+            
+            if (userRole !== 'student' && !isBeingImpersonated && !isAdmin) {
                 alert('Access denied. Redirecting to login page.');
                 window.location.href = '../index.html';
                 return;
             }
+
+			// Add admin navigation bar if accessed by admin
+			if (isAdmin && !isBeingImpersonated) {
+				addAdminNavigationBar();
+			}
 
 			if (!applicationId) {
 				document.body.innerHTML = '<div class="alert alert-danger m-5">Application ID not found in URL.</div>';
@@ -461,6 +468,30 @@
 					}
 				});
 			}
+		}
+
+		// Add admin navigation bar at the top of the page
+		function addAdminNavigationBar() {
+			const adminNav = document.createElement('div');
+			adminNav.className = 'alert alert-info mb-0 rounded-0 border-0';
+			adminNav.style.cssText = 'position: sticky; top: 0; z-index: 1030; background: #0d6efd !important; color: white;';
+			adminNav.innerHTML = `
+				<div class="container-fluid d-flex align-items-center justify-content-between">
+					<div class="d-flex align-items-center">
+						<i class="ph-arrow-left me-2" style="cursor: pointer;" onclick="window.history.back()"></i>
+						<span><strong>Admin View:</strong> Viewing application details (Admin Mode)</span>
+					</div>
+					<div>
+						<a href="../admin/admin-applications.html" class="btn btn-sm btn-light me-2">
+							<i class="ph-arrow-left me-1"></i>Back to Applications
+						</a>
+						<a href="../admin/admin-dashboard.html" class="btn btn-sm btn-light">
+							<i class="ph-house me-1"></i>Admin Dashboard
+						</a>
+					</div>
+				</div>
+			`;
+			document.body.insertBefore(adminNav, document.body.firstChild);
 		}
 
 	</script>

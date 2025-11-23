@@ -321,32 +321,9 @@
 								<th class="text-center">Actions</th>
 							</tr>
 						</thead>
-						<tbody>
-							<tr>
-								<td>1</td>
-								<td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#" class="d-inline-flex align-items-center me-3">
-                                            <img src="../bs5/template/assets/images/demo/users/face11.jpg" width="32" height="32" class="rounded-pill" alt="">
-                                        </a>
-                                        <div>
-                                            <a href="admin-student-profile.html" class="text-body fw-semibold">John Doe</a>
-                                            <div class="text-muted fs-sm">john.doe@university.edu</div>
-                                        </div>
-                                    </div>
-                                </td>
-								<td><a href="admin-internship-details.html">Software Developer Intern</a></td>
-								<td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#" class="d-inline-block me-3">
-                                            <img src="../bs5/template/assets/images/brands/youtube.svg" class="rounded-circle" width="32" height="32" alt="">
-                                        </a>
-                                        <div>
-                                            <a href="admin-company-profile.html" class="text-body fw-semibold">XYZ Corporation</a>
-                                        </div>
-                                    </div>
-                                </td>
-								<td>2025/03/15</td>
+						<tbody id="applicationsTableBody">
+							<!-- Applications will be loaded dynamically -->
+						</tbody>
 								<td><span class="badge bg-warning bg-opacity-10 text-warning">Pending Review</span></td>
 								<td class="text-center">
 									<div class="dropdown">
@@ -447,5 +424,116 @@
 	</div>
 	<!-- /page content -->
 
+	<!-- API Integration -->
+	<script src="../js/api.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', async function() {
+			// Auth check
+			const userRole = localStorage.getItem('userRole');
+			if (userRole !== 'admin') {
+				alert('Access denied. Redirecting to login page.');
+				window.location.href = '../index.html';
+				return;
+			}
+
+			await loadApplications();
+		});
+
+		async function loadApplications() {
+			try {
+				const applications = await api.getAllApplications();
+				if (applications.error) {
+					console.error('Failed to load applications:', applications.error);
+					document.getElementById('applicationsTableBody').innerHTML = '<tr><td colspan="7" class="text-center text-muted">Failed to load applications</td></tr>';
+					return;
+				}
+
+				populateApplicationsTable(Array.isArray(applications) ? applications : []);
+			} catch (error) {
+				console.error('Error loading applications:', error);
+				document.getElementById('applicationsTableBody').innerHTML = '<tr><td colspan="7" class="text-center text-muted">Error loading applications</td></tr>';
+			}
+		}
+
+		function populateApplicationsTable(applications) {
+			const tbody = document.getElementById('applicationsTableBody');
+			if (!tbody) return;
+
+			tbody.innerHTML = '';
+
+			if (applications.length === 0) {
+				tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No applications found</td></tr>';
+				return;
+			}
+
+			applications.forEach((app, index) => {
+				const row = document.createElement('tr');
+				const studentPic = app.student_profile_pic || `../bs5/template/assets/images/demo/users/face${(index % 4) + 1}.jpg`;
+				const companyLogo = app.company_logo || '../bs5/template/assets/images/demo/logos/1.svg';
+				const statusBadge = getStatusBadge(app.status || 'Pending Review');
+				
+				// Extract IDs - handle both application_id (string) and id (number)
+				const applicationId = app.application_id || app.id;
+				const studentId = app.student_id;
+				const companyId = app.company_id || app.internship_company_id;
+				const internshipId = app.internship_id;
+				
+				row.innerHTML = `
+					<td>${index + 1}</td>
+					<td>
+						<div class="d-flex align-items-center">
+							<a href="#" class="d-inline-flex align-items-center me-3">
+								<img src="${studentPic}" width="32" height="32" class="rounded-pill" alt="" onerror="this.src='../bs5/template/assets/images/demo/users/face1.jpg'">
+							</a>
+							<div>
+								<a href="../student/student-profile.html?id=${studentId || ''}" class="text-body fw-semibold">${app.student_name || 'N/A'}</a>
+								<div class="text-muted fs-sm">${app.student_email || 'N/A'}</div>
+							</div>
+						</div>
+					</td>
+					<td><a href="../student/student-internship-detail.html?id=${internshipId || ''}">${app.internship_position || app.position || 'N/A'}</a></td>
+					<td>
+						<div class="d-flex align-items-center">
+							<a href="#" class="d-inline-block me-3">
+								<img src="${companyLogo}" class="rounded-circle" width="32" height="32" alt="" onerror="this.src='../bs5/template/assets/images/demo/logos/1.svg'">
+							</a>
+							<div>
+								<a href="../company/company-profile.html?id=${companyId || ''}" class="text-body fw-semibold">${app.company_name || 'N/A'}</a>
+							</div>
+						</div>
+					</td>
+					<td>${app.created_at || app.applied_date ? new Date(app.created_at || app.applied_date).toLocaleDateString() : 'N/A'}</td>
+					<td>${statusBadge}</td>
+					<td class="text-center">
+						<div class="dropdown">
+							<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
+								<i class="ph-dots-three-vertical"></i>
+							</button>
+							<div class="dropdown-menu dropdown-menu-end">
+								<a href="admin-application-detail.html?id=${applicationId || ''}" class="dropdown-item"><i class="ph-eye me-2"></i>View Details</a>
+								<a href="../student/student-profile.html?id=${studentId || ''}" class="dropdown-item"><i class="ph-user me-2"></i>View Student</a>
+								<a href="../company/company-profile.html?id=${companyId || ''}" class="dropdown-item"><i class="ph-building me-2"></i>View Company</a>
+							</div>
+						</div>
+					</td>
+				`;
+				tbody.appendChild(row);
+			});
+		}
+
+		function getStatusBadge(status) {
+			let badgeClass = 'badge bg-secondary bg-opacity-20 text-secondary';
+			if (['Approved_By_Company', 'Confirmed_By_Student'].includes(status)) {
+				badgeClass = 'badge bg-success bg-opacity-20 text-success';
+			} else if (['Pending', 'Pending Review', 'Under Review'].includes(status)) {
+				badgeClass = 'badge bg-warning bg-opacity-20 text-warning';
+			} else if (status && status.startsWith('Rejected')) {
+				badgeClass = 'badge bg-danger bg-opacity-20 text-danger';
+			} else if (status === 'Offered') {
+				badgeClass = 'badge bg-info bg-opacity-20 text-info';
+			}
+			return `<span class="${badgeClass}">${status || 'Pending Review'}</span>`;
+		}
+	</script>
 </body>
 </html> 

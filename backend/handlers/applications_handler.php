@@ -235,8 +235,43 @@ if ($entity === 'applications') {
             }
             echo json_encode($internship_apps);
         }
-        else { // Get all applications (less common for students/companies, more for admin)
-            echo json_encode(array_values($applications));
+        else { // Get all applications (admin view)
+            requireRole(ROLE_ADMIN);
+            try {
+                $stmt = $db->prepare("
+                    SELECT 
+                        a.id AS internal_id,
+                        a.application_id,
+                        a.student_id,
+                        a.internship_id,
+                        a.status,
+                        a.applied_date as created_at,
+                        a.cover_letter,
+                        a.offer_details,
+                        i.company_id,
+                        i.position as internship_position,
+                        i.location as internship_location,
+                        c.name as company_name,
+                        c.logo as company_logo,
+                        s.name as student_name,
+                        s.email as student_email,
+                        s.profile_pic as student_profile_pic
+                    FROM applications a
+                    JOIN internships i ON a.internship_id = i.id
+                    JOIN companies c ON i.company_id = c.id
+                    JOIN students s ON a.student_id = s.id
+                    ORDER BY a.applied_date DESC
+                ");
+                $stmt->execute();
+                $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                foreach ($applications as &$application) {
+                    $application['status'] = normalize_status($application['status']);
+                }
+                echo json_encode($applications);
+            } catch (PDOException $e) {
+                http_response_code(500);
+                echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+            }
         }
     } 
     elseif ($method === 'POST') {

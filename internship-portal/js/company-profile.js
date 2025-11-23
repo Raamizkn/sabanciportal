@@ -14,15 +14,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const impersonatedType = sessionStorage.getItem('impersonatedUserType');
     const impersonatedId = sessionStorage.getItem('impersonatedUser');
     const isImpersonatedCompany = impersonatedType === 'company' && impersonatedId;
+    const isAdmin = userRole === 'admin';
+    
+    // Get company ID from URL parameter (for admin viewing)
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlCompanyId = urlParams.get('id');
 
-    if (userRole !== 'company' && !isImpersonatedCompany) {
+    // Allow access if: company user, impersonated company, admin, or viewing by URL ID
+    if (userRole !== 'company' && !isImpersonatedCompany && !isAdmin && !urlCompanyId) {
         alert('Access denied. Redirecting to login page.');
         window.location.href = '../index.html';
         return;
     }
 
-    const companyId = userRole === 'company' ? storedCompanyId : impersonatedId;
-    if (!companyId) {
+    // Determine which company ID to use: URL param > impersonated > stored
+    let companyId = urlCompanyId || (userRole === 'company' ? storedCompanyId : impersonatedId);
+    
+    if (!companyId || companyId === 'undefined') {
         showProfileAlert('Unable to determine company account. Please login again.', 'danger');
         return;
     }

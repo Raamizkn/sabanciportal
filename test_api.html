@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>API Testing Dashboard</h1>
+    
+    <div class="test-section">
+        <h2>1. Login Test</h2>
+        <button onclick="testLogin()">Test Admin Login</button>
+        <div id="loginResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Get All Applications Test</h2>
+        <button onclick="testGetApplications()">Test Get Applications</button>
+        <div id="applicationsResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Get Company Profile Test</h2>
+        <input type="number" id="companyIdInput" placeholder="Company ID" value="1" style="padding: 5px; margin: 5px;">
+        <button onclick="testGetCompany()">Test Get Company</button>
+        <div id="companyResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Frontend Data Mapping Test</h2>
+        <button onclick="testDataMapping()">Test Data Mapping</button>
+        <div id="mappingResult"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8001';
+        let authCookies = '';
+
+        async function testLogin() {
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.innerHTML = '<p class="info">Testing login...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/index.php?entity=auth&action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        email: 'admin@example.com',
+                        password: 'password123',
+                        role: 'admin'
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.status === 'success' || data.user) {
+                    resultDiv.innerHTML = `<p class="success">✓ Login successful!</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                    return true;
+                } else {
+                    resultDiv.innerHTML = `<p class="error">✗ Login failed</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                    return false;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">✗ Error: ${error.message}</p>`;
+                return false;
+            }
+        }
+
+        async function testGetApplications() {
+            const resultDiv = document.getElementById('applicationsResult');
+            resultDiv.innerHTML = '<p class="info">Fetching applications...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/index.php?entity=applications`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (Array.isArray(data) && data.length > 0) {
+                    const firstApp = data[0];
+                    const checks = {
+                        'Has company_id': !!firstApp.company_id,
+                        'Has student_id': !!firstApp.student_id,
+                        'Has internship_id': !!firstApp.internship_id,
+                        'Has student_name': !!firstApp.student_name,
+                        'Has company_name': !!firstApp.company_name,
+                        'Has internship_position': !!firstApp.internship_position,
+                        'Has created_at or applied_date': !!(firstApp.created_at || firstApp.applied_date)
+                    };
+                    
+                    let html = `<p class="success">✓ Got ${data.length} applications</p>`;
+                    html += `<h3>Data Structure Checks:</h3><ul>`;
+                    for (const [check, passed] of Object.entries(checks)) {
+                        html += `<li class="${passed ? 'success' : 'error'}">${check}: ${passed ? '✓' : '✗'}</li>`;
+                    }
+                    html += `</ul>`;
+                    html += `<h3>First Application Sample:</h3><pre>${JSON.stringify(firstApp, null, 2)}</pre>`;
+                    resultDiv.innerHTML = html;
+                } else if (data.error) {
+                    resultDiv.innerHTML = `<p class="error">✗ Error: ${data.error}</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    resultDiv.innerHTML = `<p class="info">No applications found or unexpected format</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">✗ Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testGetCompany() {
+            const resultDiv = document.getElementById('companyResult');
+            const companyId = document.getElementById('companyIdInput').value;
+            resultDiv.innerHTML = '<p class="info">Fetching company...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/index.php?entity=companies&id=${companyId}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (data.company || data.id) {
+                    const company = data.company || data;
+                    resultDiv.innerHTML = `<p class="success">✓ Company found!</p><pre>${JSON.stringify(company, null, 2)}</pre>`;
+                } else if (data.error) {
+                    resultDiv.innerHTML = `<p class="error">✗ Error: ${data.error}</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    resultDiv.innerHTML = `<p class="info">Unexpected response format</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">✗ Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testDataMapping() {
+            const resultDiv = document.getElementById('mappingResult');
+            resultDiv.innerHTML = '<p class="info">Testing data mapping...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/index.php?entity=applications`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include'
+                });
+                
+                const applications = await response.json();
+                
+                if (!Array.isArray(applications) || applications.length === 0) {
+                    resultDiv.innerHTML = '<p class="error">✗ No applications to test</p>';
+                    return;
+                }
+                
+                const testApp = applications[0];
+                const mapping = {
+                    'applicationId': testApp.application_id || testApp.id,
+                    'studentId': testApp.student_id,
+                    'companyId': testApp.company_id || testApp.internship_company_id,
+                    'internshipId': testApp.internship_id,
+                    'studentName': testApp.student_name,
+                    'companyName': testApp.company_name,
+                    'internshipPosition': testApp.internship_position || testApp.position,
+                    'createdAt': testApp.created_at || testApp.applied_date
+                };
+                
+                const allValid = Object.values(mapping).every(v => v !== undefined && v !== null && v !== 'undefined');
+                
+                let html = `<h3>Data Mapping Test Results:</h3>`;
+                html += `<p class="${allValid ? 'success' : 'error'}">${allValid ? '✓' : '✗'} All required fields mapped correctly</p>`;
+                html += `<pre>${JSON.stringify(mapping, null, 2)}</pre>`;
+                
+                // Test URL generation
+                html += `<h3>URL Generation Test:</h3>`;
+                html += `<ul>`;
+                html += `<li>Company Profile: <a href="../company/company-profile.html?id=${mapping.companyId}" target="_blank">company-profile.html?id=${mapping.companyId}</a></li>`;
+                html += `<li>Student Profile: <a href="../student/student-profile.html?id=${mapping.studentId}" target="_blank">student-profile.html?id=${mapping.studentId}</a></li>`;
+                html += `<li>Internship Detail: <a href="../student/student-internship-detail.html?id=${mapping.internshipId}" target="_blank">internship-detail.html?id=${mapping.internshipId}</a></li>`;
+                html += `</ul>`;
+                
+                resultDiv.innerHTML = html;
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">✗ Error: ${error.message}</p>`;
+            }
+        }
+
+        // Auto-run login test on page load
+        window.addEventListener('load', () => {
+            testLogin().then(success => {
+                if (success) {
+                    console.log('Login successful, ready for testing');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

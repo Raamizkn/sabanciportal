@@ -411,6 +411,33 @@ class APIService {
             body: JSON.stringify(profileData)
         });
     }
+
+    // ==================== EVALUATION APIs ====================
+
+    /**
+     * Get company evaluations
+     */
+    async getCompanyEvaluations(companyId) {
+        return this.request(`/index.php?entity=companies&action=get_evaluations&company_id=${companyId}`);
+    }
+
+    /**
+     * Create evaluation
+     */
+    async createEvaluation(applicationId, evaluationData) {
+        return this.request(`/index.php?entity=companies&action=create_evaluation&application_id=${applicationId}`, {
+            method: 'POST',
+            body: JSON.stringify(evaluationData)
+        });
+    }
+
+    /**
+     * Get student evaluations (for student view)
+     */
+    async getStudentEvaluations(studentId) {
+        // Note: This endpoint may need to be implemented in backend
+        return this.request(`/index.php?entity=students&action=evaluations&id=${studentId}`);
+    }
 }
 
 // Export instance

@@ -19,11 +19,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const impersonatedType = sessionStorage.getItem('impersonatedUserType');
     const impersonatedId = sessionStorage.getItem('impersonatedUser');
     const isImpersonatedStudent = impersonatedType === 'student' && impersonatedId;
+    const isAdmin = storedRole === 'admin';
 
-    if (storedRole !== 'student' && !isImpersonatedStudent) {
+    // Allow access if: student user, impersonated student, or admin
+    if (storedRole !== 'student' && !isImpersonatedStudent && !isAdmin) {
         alert('Access denied. Redirecting to login page.');
         window.location.href = '../index.html';
         return;
+    }
+
+    // Add admin navigation bar if accessed by admin
+    if (isAdmin && !isImpersonatedStudent) {
+        addAdminNavigationBar();
+        // Hide apply button for admin view
+        const applyButtons = document.querySelectorAll('[data-bs-target="#apply_now_modal"]');
+        applyButtons.forEach(btn => {
+            btn.style.display = 'none';
+        });
     }
 
     studentIdForApply = storedRole === 'student' ? storedStudentId : impersonatedId;
@@ -38,18 +50,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadInternship(internshipId);
 
-    if (studentIdForApply) {
+    if (studentIdForApply && !isAdmin) {
         loadStudentDocuments(studentIdForApply);
         populateStudentSummary();
+    } else if (isAdmin) {
+        document.getElementById('documentHelper').textContent = 'Admin view mode - Application features disabled.';
     } else {
         document.getElementById('documentHelper').textContent = 'Login to attach your documents.';
     }
 
     const applicationForm = document.getElementById('application-form');
-    if (applicationForm) {
+    if (applicationForm && !isAdmin) {
         applicationForm.addEventListener('submit', submitApplication);
     }
 });
+
+// Add admin navigation bar at the top of the page
+function addAdminNavigationBar() {
+    const adminNav = document.createElement('div');
+    adminNav.className = 'alert alert-info mb-0 rounded-0 border-0';
+    adminNav.style.cssText = 'position: sticky; top: 0; z-index: 1030; background: #0d6efd !important; color: white;';
+    adminNav.innerHTML = `
+        <div class="container-fluid d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <i class="ph-arrow-left me-2" style="cursor: pointer;" onclick="window.history.back()"></i>
+                <span><strong>Admin View:</strong> Viewing internship details (Admin Mode - Read Only)</span>
+            </div>
+            <div>
+                <a href="../admin/admin-internships.html" class="btn btn-sm btn-light me-2">
+                    <i class="ph-arrow-left me-1"></i>Back to Internships
+                </a>
+                <a href="../admin/admin-dashboard.html" class="btn btn-sm btn-light">
+                    <i class="ph-house me-1"></i>Admin Dashboard
+                </a>
+            </div>
+        </div>
+    `;
+    document.body.insertBefore(adminNav, document.body.firstChild);
+}
 
 function showDetailAlert(message, state = 'danger') {
     const alertEl = document.getElementById('detail-alert');
