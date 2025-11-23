@@ -81,6 +81,63 @@ class APIService {
     // ==================== ADMIN APIs ====================
 
     /**
+     * Get admin dashboard statistics
+     */
+    async getAdminDashboardStats() {
+        return this.request('/index.php?entity=admin&resource=dashboard&action=stats');
+    }
+
+    /**
+     * Get admin activity feed
+     */
+    async getAdminActivityFeed(limit = 10) {
+        return this.request(`/index.php?entity=admin&resource=dashboard&action=activity&limit=${limit}`);
+    }
+
+    /**
+     * Get all students (admin)
+     */
+    async getStudents() {
+        return this.request('/index.php?entity=admin&resource=students');
+    }
+
+    /**
+     * Get student details (admin)
+     */
+    async getStudentDetails(studentId) {
+        return this.request(`/index.php?entity=admin&resource=students&id=${studentId}`);
+    }
+
+    /**
+     * Create a new student (admin)
+     */
+    async createStudent(studentData) {
+        return this.request('/index.php?entity=admin&resource=students&action=add', {
+            method: 'POST',
+            body: JSON.stringify(studentData)
+        });
+    }
+
+    /**
+     * Update student (admin)
+     */
+    async updateStudent(studentId, studentData) {
+        return this.request(`/index.php?entity=admin&resource=students&action=update&id=${studentId}`, {
+            method: 'POST',
+            body: JSON.stringify(studentData)
+        });
+    }
+
+    /**
+     * Delete student (admin)
+     */
+    async deleteStudent(studentId) {
+        return this.request(`/index.php?entity=admin&resource=students&action=delete&id=${studentId}`, {
+            method: 'POST'
+        });
+    }
+
+    /**
      * Create a new company
      */
     async createCompany(companyData) {
@@ -98,12 +155,98 @@ class APIService {
     }
 
     /**
+     * Get company details (admin)
+     */
+    async getCompanyDetails(companyId) {
+        return this.request(`/index.php?entity=admin&resource=companies&id=${companyId}`);
+    }
+
+    /**
+     * Update company (admin)
+     */
+    async updateCompany(companyId, companyData) {
+        return this.request(`/index.php?entity=admin&resource=companies&action=update&id=${companyId}`, {
+            method: 'POST',
+            body: JSON.stringify(companyData)
+        });
+    }
+
+    /**
+     * Delete company (admin)
+     */
+    async deleteCompany(companyId) {
+        return this.request(`/index.php?entity=admin&resource=companies&action=delete&id=${companyId}`, {
+            method: 'POST'
+        });
+    }
+
+    /**
+     * Get all internships (admin)
+     */
+    async getAllInternships() {
+        return this.request('/index.php?entity=admin&resource=internships');
+    }
+
+    /**
+     * Get all applications (admin)
+     */
+    async getAllApplications() {
+        return this.request('/index.php?entity=admin&resource=applications');
+    }
+
+    /**
+     * Get application details (admin)
+     */
+    async getApplicationDetails(applicationId) {
+        return this.request(`/index.php?entity=admin&resource=applications&id=${applicationId}`);
+    }
+
+    /**
+     * Get all terms
+     */
+    async getTerms() {
+        return this.request('/index.php?entity=admin&resource=terms');
+    }
+
+    /**
      * Create a new term
      */
     async createTerm(termData) {
         return this.request('/index.php?entity=admin&resource=terms&action=add', {
             method: 'POST',
             body: JSON.stringify(termData)
+        });
+    }
+
+    /**
+     * Update term
+     */
+    async updateTerm(termId, termData) {
+        return this.request(`/index.php?entity=admin&resource=terms&action=update&id=${termId}`, {
+            method: 'POST',
+            body: JSON.stringify(termData)
+        });
+    }
+
+    /**
+     * Delete term
+     */
+    async deleteTerm(termId) {
+        return this.request(`/index.php?entity=admin&resource=terms&action=delete&id=${termId}`, {
+            method: 'POST'
+        });
+    }
+
+    /**
+     * Generate report
+     */
+    async generateReport(reportType, params = {}) {
+        return this.request('/index.php?entity=admin&resource=reports', {
+            method: 'POST',
+            body: JSON.stringify({
+                type: reportType,
+                params: params
+            })
         });
     }
 

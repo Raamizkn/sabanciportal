@@ -66,7 +66,8 @@ function delete_term($term_id) {
 // --- Student Management --- //
 function get_all_students() {
     global $students;
-    return $students;
+    // Return as array of values (not associative array)
+    return array_values($students);
 }
 function add_new_student($data) {
     global $students;
@@ -145,7 +146,8 @@ function impersonate_student($student_id) {
 // --- Company Management --- //
 function get_all_companies() {
     global $companies;
-    return $companies;
+    // Return as array of values (not associative array)
+    return array_values($companies);
 }
 function add_new_company($data) {
     global $db;
@@ -239,7 +241,8 @@ function impersonate_company($company_id) {
 // --- Internship Management (Admin) --- //
 function get_all_internships_admin() {
     global $internships;
-    return $internships;
+    // Return as array of values (not associative array)
+    return array_values($internships);
 }
 function get_internship_info_admin($internship_id) {
     global $internships;
@@ -344,20 +347,132 @@ function reject_application($application_id) {
     return ['error' => 'Application not found.'];
 }
 
+// --- Dashboard Stats --- //
+function get_admin_dashboard_stats() {
+    global $db;
+    requireRole(ROLE_ADMIN);
+    
+    try {
+        // Get counts from database
+        $stats = [];
+        
+        // Total students
+        $stmt = $db->query("SELECT COUNT(*) as count FROM students WHERE is_active = 1");
+        $stats['total_students'] = (int)$stmt->fetch()['count'];
+        
+        // Total companies
+        $stmt = $db->query("SELECT COUNT(*) as count FROM companies WHERE is_active = 1");
+        $stats['total_companies'] = (int)$stmt->fetch()['count'];
+        
+        // Total internships
+        $stmt = $db->query("SELECT COUNT(*) as count FROM internships WHERE status != 'Deleted'");
+        $stats['total_internships'] = (int)$stmt->fetch()['count'];
+        
+        // Total applications
+        $stmt = $db->query("SELECT COUNT(*) as count FROM applications");
+        $stats['total_applications'] = (int)$stmt->fetch()['count'];
+        
+        // Pending applications
+        $stmt = $db->query("SELECT COUNT(*) as count FROM applications WHERE status IN ('Pending', 'Pending Review', 'Under Review')");
+        $stats['pending_applications'] = (int)$stmt->fetch()['count'];
+        
+        // Approved/Finalized applications
+        $stmt = $db->query("SELECT COUNT(*) as count FROM applications WHERE status IN ('Approved_By_Company', 'Confirmed_By_Student')");
+        $stats['finalized_applications'] = (int)$stmt->fetch()['count'];
+        
+        return $stats;
+    } catch(PDOException $e) {
+        return ['error' => 'Failed to fetch dashboard stats: ' . $e->getMessage()];
+    }
+}
+
+function get_admin_activity_feed($limit = 10) {
+    global $db;
+    requireRole(ROLE_ADMIN);
+    
+    try {
+        $activities = array();
+        $limitInt = (int)$limit;
+        
+        $query1 = "SELECT a.*, s.name as student_name, i.position as internship_position, c.name as company_name FROM applications a LEFT JOIN students s ON a.student_id = s.id LEFT JOIN internships i ON a.internship_id = i.id LEFT JOIN companies c ON i.company_id = c.id ORDER BY a.created_at DESC LIMIT " . $limitInt;
+        $stmt = $db->query($query1);
+        $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($applications as $app) {
+            $msg = $app['student_name'] . ' applied for ' . $app['internship_position'] . ' at ' . $app['company_name'];
+            $activities[] = array(
+                'type' => 'application',
+                'timestamp' => $app['created_at'],
+                'message' => $msg,
+                'status' => $app['status']
+            );
+        }
+        
+        $query2 = "SELECT i.*, c.name as company_name FROM internships i LEFT JOIN companies c ON i.company_id = c.id WHERE i.status != 'Deleted' ORDER BY i.created_at DESC LIMIT 5";
+        $stmt = $db->query($query2);
+        $internships = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($internships as $internship) {
+            $pos = isset($internship['position']) ? $internship['position'] : 'internship';
+            $ts = isset($internship['created_at']) ? $internship['created_at'] : date('Y-m-d H:i:s');
+            $cn = isset($internship['company_name']) ? $internship['company_name'] : 'Unknown Company';
+            $msg = $cn . ' posted a new ' . $pos . ' position';
+            $activities[] = array(
+                'type' => 'internship',
+                'timestamp' => $ts,
+                'message' => $msg,
+                'status' => isset($internship['status']) ? $internship['status'] : 'Active'
+            );
+        }
+        
+        usort($activities, function($a, $b) {
+            $tsA = isset($a['timestamp']) ? strtotime($a['timestamp']) : 0;
+            $tsB = isset($b['timestamp']) ? strtotime($b['timestamp']) : 0;
+            return $tsB - $tsA;
+        });
+        
+        return array_slice($activities, 0, $limitInt);
+    } catch(PDOException $e) {
+        return array('error' => 'Failed to fetch activity feed: ' . $e->getMessage());
+    }
+}
+
 // --- Reports --- //
 function generate_report($report_type, $params) {
-    // This is a mock implementation.
-    $report_data = [
-        'report_type' => $report_type,
-        'generated_on' => date('Y-m-d H:i:s'),
-        'params' => $params,
-        'data' => [
-            ['metric' => 'Total Applications', 'value' => 150],
-            ['metric' => 'Approved Internships', 'value' => 75],
-            ['metric' => 'Pending Applications', 'value' => 25]
-        ]
-    ];
-    return ['status' => 'success', 'report' => $report_data];
+    global $db;
+    requireRole(ROLE_ADMIN);
+    
+    try {
+        $report_data = [
+            'report_type' => $report_type,
+            'generated_on' => date('Y-m-d H:i:s'),
+            'params' => $params,
+            'data' => []
+        ];
+        
+        switch($report_type) {
+            case 'applications':
+                $stmt = $db->query("SELECT COUNT(*) as count FROM applications");
+                $report_data['data'][] = ['metric' => 'Total Applications', 'value' => (int)$stmt->fetch()['count']];
+                
+                $stmt = $db->query("SELECT COUNT(*) as count FROM applications WHERE status IN ('Approved_By_Company', 'Confirmed_By_Student')");
+                $report_data['data'][] = ['metric' => 'Approved Internships', 'value' => (int)$stmt->fetch()['count']];
+                
+                $stmt = $db->query("SELECT COUNT(*) as count FROM applications WHERE status IN ('Pending', 'Pending Review', 'Under Review')");
+                $report_data['data'][] = ['metric' => 'Pending Applications', 'value' => (int)$stmt->fetch()['count']];
+                break;
+            default:
+                $report_data['data'] = [
+                    ['metric' => 'Total Applications', 'value' => 0],
+                    ['metric' => 'Approved Internships', 'value' => 0],
+                    ['metric' => 'Pending Applications', 'value' => 0]
+                ];
+        }
+        
+        return ['status' => 'success', 'report' => $report_data];
+    } catch(PDOException $e) {
+        return ['error' => 'Failed to generate report: ' . $e->getMessage()];
+    }
 }
 
 // --- Evaluations --- //

@@ -122,6 +122,47 @@ elseif ($entity === 'admin') {
             }
             break;
         
+        case 'dashboard':
+            if ($method === 'GET') {
+                if ($action === 'stats') {
+                    $response = get_admin_dashboard_stats();
+                } elseif ($action === 'activity') {
+                    $limit = $_GET['limit'] ?? 10;
+                    $response = get_admin_activity_feed((int)$limit);
+                }
+            }
+            break;
+        
+        case 'applications':
+            if ($method === 'GET') {
+                if ($id !== null) {
+                    $response = get_application_details_admin($id);
+                } else {
+                    // Get all applications for admin
+                    global $applications;
+                    $response = array_values($applications);
+                }
+            }
+            break;
+        
+        case 'internships':
+            if ($method === 'GET') {
+                if ($id !== null) {
+                    $response = get_internship_info_admin($id);
+                } else {
+                    $response = get_all_internships_admin();
+                }
+            }
+            break;
+        
+        case 'reports':
+            if ($method === 'GET' || $method === 'POST') {
+                $report_type = $_GET['type'] ?? $input['type'] ?? 'applications';
+                $params = $_GET['params'] ?? $input['params'] ?? [];
+                $response = generate_report($report_type, $params);
+            }
+            break;
+        
         // Add more admin resources here as needed...
     }
 
