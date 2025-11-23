@@ -419,32 +419,46 @@
 
 		function getActionButtons(application) {
 			let buttons = '';
-			if (application.status === 'Offered') {
-				buttons += `<button class="btn btn-success confirm-offer-btn" data-application-id="${application.application_id}"><i class="ph-check-circle me-2"></i>Confirm Acceptance</button>`;
+			const normalizedStatus = normalizeStatusForDetail(application.status);
+			
+			// Show confirm button if status is Accepted
+			if (normalizedStatus === 'Accepted') {
+				buttons += `<button class="btn btn-success confirm-application-btn" data-application-id="${application.application_id}"><i class="ph-check-circle me-2"></i>Confirm Acceptance</button>`;
 			}
 
-			const withdrawable_statuses = ['Pending Review', 'Under Review', 'Shortlisted', 'Offered'];
-			if (withdrawable_statuses.includes(application.status)) {
+			// Allow withdrawal if not finalized, rejected, or already withdrawn
+			const finalStatuses = ['Finalized', 'Rejected', 'Withdrawn', 'Confirmed'];
+			if (!finalStatuses.includes(normalizedStatus)) {
 				buttons += `<button class="btn btn-danger withdraw-btn mt-2" data-application-id="${application.application_id}"><i class="ph-x-circle me-2"></i>Withdraw Application</button>`;
 			}
 			return buttons;
 		}
+		
+		function normalizeStatusForDetail(status) {
+			if (!status) return 'Pending Review';
+			const map = {
+				'Pending': 'Pending Review',
+				'Confirmed_By_Student': 'Confirmed',
+				'Approved_By_Company': 'Finalized'
+			};
+			return map[status] || status;
+		}
 
 		function addEventListeners(applicationId) {
-			const confirmBtn = document.querySelector('.confirm-offer-btn');
+			const confirmBtn = document.querySelector('.confirm-application-btn');
 			if(confirmBtn) {
 				confirmBtn.addEventListener('click', async () => {
-					if (confirm('Are you sure you want to confirm this internship offer? This action cannot be undone.')) {
+					if (confirm('Confirm your acceptance of this internship offer? The company will then be able to finalize the placement.')) {
 						try {
-							const result = await api.confirmOffer(applicationId);
-							if (result.message) {
-								alert('Offer confirmed! Congratulations!');
+							const result = await api.confirmApplication(applicationId);
+							if (result.status === 'success' || result.message) {
+								alert(result.message || 'Application confirmed! Company can now finalize.');
 								loadApplicationDetails(applicationId); // Refresh details
 							} else {
 								alert('Error: ' + (result.error || 'Unknown error'));
 							}
 						} catch (error) {
-							alert('An error occurred while confirming the offer.');
+							alert('An error occurred while confirming the application.');
 						}
 					}
 				});

@@ -1,4 +1,5 @@
-const FINALIZED_STATUS_SET = new Set(['Approved_By_Company', 'Confirmed_By_Student']);
+// Finalized statuses - only 'Approved_By_Company' represents finalized (after student confirms and company finalizes)
+const FINALIZED_STATUS_SET = new Set(['Approved_By_Company', 'Finalized']);
 
 let currentCompanyId = null;
 let finalizedApplications = [];
@@ -21,7 +22,8 @@ function formatStatusLabel(status) {
         return 'Unknown';
     }
     const map = {
-        'Approved_By_Company': 'Finalize Placement',
+        'Approved_By_Company': 'Finalized',
+        'Finalized': 'Finalized',
         'Confirmed_By_Student': 'Confirmed By Student',
         'Rejected_By_Company': 'Rejected (Internal)',
         'Pending': 'Pending Review'
@@ -31,10 +33,10 @@ function formatStatusLabel(status) {
 
 function renderStatusBadge(status) {
     let badgeClass = 'badge bg-secondary bg-opacity-20 text-secondary';
-    if (status === 'Confirmed_By_Student') {
+    if (status === 'Approved_By_Company' || status === 'Finalized') {
         badgeClass = 'badge bg-success bg-opacity-20 text-success';
-    } else if (status === 'Approved_By_Company') {
-        badgeClass = 'badge bg-primary bg-opacity-20 text-primary';
+    } else if (status === 'Confirmed_By_Student') {
+        badgeClass = 'badge bg-info bg-opacity-20 text-info';
     }
     return `<span class="${badgeClass}">${formatStatusLabel(status)}</span>`;
 }
@@ -53,7 +55,14 @@ function splitTimeline(range) {
 async function loadFinalizedApplications(companyId) {
     try {
         const applications = await api.getCompanyApplications(companyId);
-        finalizedApplications = applications.filter(app => FINALIZED_STATUS_SET.has(app.status));
+        // Filter for finalized applications - status should be 'Approved_By_Company' (database value)
+        finalizedApplications = applications.filter(app => {
+            const status = app.status || '';
+            // Check both database value and normalized value
+            return status === 'Approved_By_Company' || 
+                   status === 'Finalized' ||
+                   FINALIZED_STATUS_SET.has(status);
+        });
         populateFinalizedTable(finalizedApplications);
     } catch (error) {
         console.error('Failed to load finalized applications:', error);

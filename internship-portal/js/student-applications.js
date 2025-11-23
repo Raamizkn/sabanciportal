@@ -158,16 +158,29 @@ function getActionButtons(application) {
     // Always show a view button
     buttons += `<a href="student-application-detail.html?id=${application.application_id}" class="btn btn-sm btn-icon btn-light view-button" data-bs-popup="tooltip" title="View Details"><i class="ph-eye"></i></a>`;
 
-    if (application.status === 'Offered') {
-        buttons += `<button class="btn btn-sm btn-icon btn-light confirm-offer-btn ms-1" data-application-id="${application.application_id}" data-bs-popup="tooltip" title="Confirm Offer"><i class="ph-check-circle text-success"></i></button>`;
+    // Show confirm button if status is Accepted
+    const normalizedStatus = normalizeStatusForStudent(application.status);
+    if (normalizedStatus === 'Accepted') {
+        buttons += `<button class="btn btn-sm btn-icon btn-light confirm-application-btn ms-1" data-application-id="${application.application_id}" data-bs-popup="tooltip" title="Confirm Acceptance"><i class="ph-check-circle text-success"></i></button>`;
     }
 
-    const withdrawable_statuses = ['Pending Review', 'Under Review', 'Shortlisted', 'Offered'];
-    if (withdrawable_statuses.includes(application.status) || application.status === 'Pending') {
+    // Allow withdrawal if not finalized, rejected, or already withdrawn
+    const finalStatuses = ['Finalized', 'Rejected', 'Withdrawn', 'Confirmed'];
+    if (!finalStatuses.includes(normalizedStatus)) {
         buttons += `<button class="btn btn-sm btn-icon btn-light withdraw-btn ms-1" data-application-id="${application.application_id}" data-bs-popup="tooltip" title="Withdraw Application"><i class="ph-x-circle text-danger"></i></button>`;
     }
 
     return buttons;
+}
+
+function normalizeStatusForStudent(status) {
+    if (!status) return 'Pending Review';
+    const map = {
+        'Pending': 'Pending Review',
+        'Confirmed_By_Student': 'Confirmed',
+        'Approved_By_Company': 'Finalized'
+    };
+    return map[status] || status;
 }
 
 function addEventListeners() {
@@ -191,21 +204,21 @@ function addEventListeners() {
         });
     });
 
-    // Confirm offer buttons
-    document.querySelectorAll('.confirm-offer-btn').forEach(button => {
+    // Confirm application buttons (when company accepts)
+    document.querySelectorAll('.confirm-application-btn').forEach(button => {
         button.addEventListener('click', async (e) => {
             const appId = e.currentTarget.getAttribute('data-application-id');
-            if (confirm('Are you sure you want to confirm this internship offer? This action cannot be undone.')) {
+            if (confirm('Confirm your acceptance of this internship offer? The company will then be able to finalize the placement.')) {
                 try {
-                    const result = await api.confirmOffer(appId);
+                    const result = await api.confirmApplication(appId);
                     if (result.error) {
                         alert('Error: ' + result.error);
                         return;
                     }
-                    alert(result.message || 'Offer confirmed!');
+                    alert(result.message || 'Application confirmed! Company can now finalize.');
                     loadStudentApplications(localStorage.getItem('userId'));
                 } catch (error) {
-                    alert('An error occurred while confirming the offer.');
+                    alert('An error occurred while confirming the application.');
                 }
             }
         });

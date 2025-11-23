@@ -376,9 +376,8 @@
 								<!-- Add application questions/answers if applicable -->
 							</div>
 							<div class="modal-footer justify-content-between">
-								<div>
-									<button type="button" class="btn btn-outline-success"><i class="ph-check-circle me-2"></i>Accept</button>
-									<button type="button" class="btn btn-outline-danger ms-1"><i class="ph-x-circle me-2"></i>Reject</button>
+								<div id="application-action-buttons">
+									<!-- Action buttons will be dynamically added here -->
 								</div>
 								<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
 							</div>
@@ -442,43 +441,6 @@
 				</div>
 				<!-- /view student profile modal -->
 
-				<!-- Update Status Modal -->
-				<div id="update_status_modal" class="modal fade" tabindex="-1">
-					<div class="modal-dialog">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h5 class="modal-title">Update Application Status</h5>
-								<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-							</div>
-							<div class="modal-body">
-								<input type="hidden" id="updateApplicationId">
-								<div class="mb-3">
-									<label for="applicationStatusSelect" class="form-label">Status</label>
-                                    <select class="form-select" id="applicationStatusSelect">
-                                        <option value="Pending Review">Pending Review</option>
-                                        <option value="Under Review">Under Review</option>
-                                        <option value="Shortlisted">Shortlisted</option>
-                                        <option value="Interview Scheduled">Interview Scheduled</option>
-                                        <option value="Offered">Offered</option>
-                                        <option value="Rejected">Rejected</option>
-                                        <option value="Rejected_By_Company">Rejected (Internal)</option>
-                                        <option value="Approved_By_Company">Finalize Placement</option>
-                                    </select>
-                                </div>
-								<div class="mb-3">
-									<label for="offerDetailsInput" class="form-label">Offer Details / Notes</label>
-									<textarea class="form-control" id="offerDetailsInput" rows="3" placeholder="Share offer terms, start date, stipend or next steps"></textarea>
-									<div class="form-text">Students will see these details when the status is set to Offered.</div>
-								</div>
-							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-link" data-bs-dismiss="modal">Cancel</button>
-								<button type="button" class="btn btn-primary" id="saveStatusBtn">Save Changes</button>
-							</div>
-						</div>
-					</div>
-				</div>
-				<!-- /update status modal -->
 
 			</div>
 			<!-- /content area -->
@@ -519,6 +481,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const modalTitle = viewApplicationModal.querySelector('.modal-title');
         const modalBody = viewApplicationModal.querySelector('.modal-body');
+        const actionButtonsContainer = document.getElementById('application-action-buttons');
 
         modalTitle.textContent = `Application for ${app.internship_position}`;
         modalBody.innerHTML = `
@@ -533,11 +496,11 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="mb-3">
                 <h6 class="fw-semibold mb-1">Application Details</h6>
                 <p class="mb-0"><strong>Applied on:</strong> ${new Date(app.applied_date).toLocaleDateString()}</p>
-                <p class="mb-0"><strong>Status:</strong> ${app.status}</p>
+                <p class="mb-0"><strong>Status:</strong> <span class="badge bg-secondary">${app.status || 'Pending Review'}</span></p>
             </div>
             <div class="mb-3">
                 <h6>Cover Letter</h6>
-                <p>${app.cover_letter || 'No cover letter provided.'}</p>
+                <p style="white-space: pre-wrap;">${app.cover_letter || 'No cover letter provided.'}</p>
             </div>
             ${app.offer_details ? `<div class="alert alert-info">${app.offer_details}</div>` : ''}
             <div class="mb-1">
@@ -550,60 +513,135 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         renderApplicationDocuments(app.documents || []);
+        
+        // Set up action buttons based on current status
+        setupApplicationActionButtons(app, actionButtonsContainer);
     });
-
-    // Modal handler for updating status
-    const updateStatusModal = document.getElementById('update_status_modal');
-    updateStatusModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const applicationId = button.getAttribute('data-application-id');
-        const currentStatus = button.getAttribute('data-current-status');
-        const encodedApp = button.getAttribute('data-application');
-
-        const applicationIdInput = updateStatusModal.querySelector('#updateApplicationId');
-        const statusSelect = updateStatusModal.querySelector('#applicationStatusSelect');
-        const offerInput = updateStatusModal.querySelector('#offerDetailsInput');
-
-        applicationIdInput.value = applicationId;
-        statusSelect.value = currentStatus;
-        if (offerInput) {
-            if (encodedApp) {
-                try {
-                    const app = JSON.parse(decodeURIComponent(encodedApp));
-                    offerInput.value = app.offer_details || '';
-                } catch (err) {
-                    offerInput.value = '';
-                }
-            } else {
-                offerInput.value = '';
-            }
+    
+    function setupApplicationActionButtons(app, container) {
+        const status = normalizeStatus(app.status);
+        container.innerHTML = '';
+        
+        // Store application ID for button handlers
+        container.setAttribute('data-application-id', app.application_id);
+        
+        if (status === 'Pending Review' || status === 'Pending') {
+            // Can accept or reject
+            container.innerHTML = `
+                <button type="button" class="btn btn-success accept-application-btn" data-application-id="${app.application_id}">
+                    <i class="ph-check-circle me-2"></i>Accept
+                </button>
+                <button type="button" class="btn btn-danger reject-application-btn ms-2" data-application-id="${app.application_id}">
+                    <i class="ph-x-circle me-2"></i>Reject
+                </button>
+            `;
+        } else if (status === 'Confirmed' || status === 'Confirmed_By_Student') {
+            // Can finalize
+            container.innerHTML = `
+                <button type="button" class="btn btn-primary finalize-application-btn" data-application-id="${app.application_id}">
+                    <i class="ph-check me-2"></i>Finalize Placement
+                </button>
+            `;
+        } else if (status === 'Accepted') {
+            // Waiting for student confirmation
+            container.innerHTML = `
+                <span class="text-muted">Waiting for student to confirm acceptance...</span>
+            `;
+        } else if (status === 'Finalized' || status === 'Rejected' || status === 'Withdrawn') {
+            // Final statuses - no actions
+            container.innerHTML = `
+                <span class="text-muted">This application is ${status.toLowerCase()}.</span>
+            `;
         }
-    });
-
-    // Handler for submitting status update
-    const saveStatusBtn = document.getElementById('saveStatusBtn');
-    saveStatusBtn.addEventListener('click', async () => {
-        const applicationId = document.getElementById('updateApplicationId').value;
-        const newStatus = document.getElementById('applicationStatusSelect').value;
-        const offerDetails = document.getElementById('offerDetailsInput').value.trim();
-
-        try {
-            const result = await api.updateApplicationStatus(applicationId, newStatus, offerDetails || null);
-            if (!result.error) {
-                alert('Status updated successfully!');
-                if (typeof loadApplications === 'function' && window.currentCompanyId) {
-                    loadApplications(window.currentCompanyId);
+        
+        // Attach event listeners
+        attachActionButtonListeners();
+    }
+    
+    function normalizeStatus(status) {
+        if (!status) return 'Pending Review';
+        const map = {
+            'Pending': 'Pending Review',
+            'Confirmed_By_Student': 'Confirmed',
+            'Approved_By_Company': 'Finalized'
+        };
+        return map[status] || status;
+    }
+    
+    function attachActionButtonListeners() {
+        // Accept button
+        document.querySelectorAll('.accept-application-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const appId = this.getAttribute('data-application-id');
+                if (confirm('Are you sure you want to accept this application? The student will be notified and can confirm the acceptance.')) {
+                    try {
+                        const result = await api.acceptApplication(appId);
+                        if (result.status === 'success') {
+                            alert('Application accepted successfully!');
+                            const modalInstance = bootstrap.Modal.getInstance(document.getElementById('view_application_modal'));
+                            modalInstance.hide();
+                            if (typeof loadApplications === 'function' && window.currentCompanyId) {
+                                loadApplications(window.currentCompanyId);
+                            }
+                        } else {
+                            alert('Error: ' + (result.error || 'Failed to accept application'));
+                        }
+                    } catch (error) {
+                        alert('An error occurred: ' + error.message);
+                    }
                 }
-                const modalInstance = bootstrap.Modal.getInstance(updateStatusModal);
-                modalInstance.hide();
-            } else {
-                alert('Failed to update status: ' + result.error);
-            }
-        } catch (error) {
-            console.error('Error updating status:', error);
-            alert('An error occurred while updating the status.');
-        }
-    });
+            });
+        });
+        
+        // Reject button
+        document.querySelectorAll('.reject-application-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const appId = this.getAttribute('data-application-id');
+                if (confirm('Are you sure you want to reject this application? This action cannot be undone.')) {
+                    try {
+                        const result = await api.rejectApplication(appId);
+                        if (result.status === 'success') {
+                            alert('Application rejected.');
+                            const modalInstance = bootstrap.Modal.getInstance(document.getElementById('view_application_modal'));
+                            modalInstance.hide();
+                            if (typeof loadApplications === 'function' && window.currentCompanyId) {
+                                loadApplications(window.currentCompanyId);
+                            }
+                        } else {
+                            alert('Error: ' + (result.error || 'Failed to reject application'));
+                        }
+                    } catch (error) {
+                        alert('An error occurred: ' + error.message);
+                    }
+                }
+            });
+        });
+        
+        // Finalize button
+        document.querySelectorAll('.finalize-application-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const appId = this.getAttribute('data-application-id');
+                if (confirm('Finalize this placement? This will complete the application process.')) {
+                    try {
+                        const result = await api.finalizeApplication(appId);
+                        if (result.status === 'success') {
+                            alert('Application finalized successfully!');
+                            const modalInstance = bootstrap.Modal.getInstance(document.getElementById('view_application_modal'));
+                            modalInstance.hide();
+                            if (typeof loadApplications === 'function' && window.currentCompanyId) {
+                                loadApplications(window.currentCompanyId);
+                            }
+                        } else {
+                            alert('Error: ' + (result.error || 'Failed to finalize application'));
+                        }
+                    } catch (error) {
+                        alert('An error occurred: ' + error.message);
+                    }
+                }
+            });
+        });
+    }
+
 		// Initialize DataTable for applications
 	var applicationsTable = $('#applicationsTable').DataTable({
 		autoWidth: false,

@@ -49,9 +49,15 @@ function get_primary_resume($documents) {
 
 function normalize_status($status) {
     if (!$status) {
-        return 'Unknown';
+        return 'Pending Review';
     }
-    return $status === 'Pending' ? 'Pending Review' : $status;
+    // Normalize status for display/logic - keep database values intact
+    $map = array(
+        'Pending' => 'Pending Review',
+        'Approved_By_Company' => 'Finalized', // For display purposes
+        'Confirmed_By_Student' => 'Confirmed' // For display purposes
+    );
+    return isset($map[$status]) ? $map[$status] : $status;
 }
 
 function generate_application_code(PDO $db) {
@@ -396,15 +402,13 @@ if ($entity === 'applications') {
                 echo json_encode(['error' => 'Failed to withdraw application: ' . $e->getMessage()]);
             }
         }
-        elseif ($id !== null && $action === 'confirm_offer') {
-            // Require student role
+        elseif ($id !== null && ($action === 'confirm_offer' || $action === 'confirm')) {
             requireRole(ROLE_STUDENT);
             
             try {
-                // Fetch application from database
                 $stmt = $db->prepare("SELECT * FROM applications WHERE application_id = ? AND student_id = ?");
                 $stmt->execute([$id, getCurrentUserId()]);
-                $application = $stmt->fetch();
+                $application = $stmt->fetch(PDO::FETCH_ASSOC);
                 
                 if (!$application) {
                     http_response_code(404);
@@ -412,30 +416,36 @@ if ($entity === 'applications') {
                     exit;
                 }
                 
-                if ($application['status'] === 'Offered') {
-                    // Update status to Confirmed_By_Student
+                // Check raw database status, not normalized
+                $rawStatus = $application['status'];
+                $currentStatus = normalize_status($rawStatus);
+                
+                // Student can confirm if status is 'Accepted' (check both raw and normalized)
+                if ($rawStatus === 'Accepted' || $currentStatus === 'Accepted') {
+                    // Use 'Confirmed_By_Student' which exists in the ENUM
                     $stmt = $db->prepare("UPDATE applications SET status = 'Confirmed_By_Student', status_updated_date = NOW() WHERE application_id = ?");
                     $stmt->execute([$id]);
                     
-                    // Fetch updated application
                     $stmt = $db->prepare("SELECT * FROM applications WHERE application_id = ?");
                     $stmt->execute([$id]);
-                    $updated_application = $stmt->fetch();
-                    
+                    $updated_application = $stmt->fetch(PDO::FETCH_ASSOC);
                     $updated_application['status'] = normalize_status($updated_application['status']);
-                    echo json_encode(['status' => 'success', 'message' => "Application {$id} offer confirmed successfully by student.", 'application' => $updated_application]);
+                    echo json_encode([
+                        'status' => 'success', 
+                        'message' => "Application confirmed successfully. Company can now finalize.",
+                        'application' => $updated_application
+                    ]);
                 } else {
                     http_response_code(400);
-                    echo json_encode(['error' => "Application {$id} cannot be confirmed. Status must be 'Offered'. Current status: {$application['status']}."]);
+                    echo json_encode(['error' => "Application cannot be confirmed. Status must be 'Accepted'. Current status: '{$currentStatus}'."]);
                 }
             } catch(PDOException $e) {
                 http_response_code(500);
-                echo json_encode(['error' => 'Failed to confirm offer: ' . $e->getMessage()]);
+                echo json_encode(['error' => 'Failed to confirm application: ' . $e->getMessage()]);
             }
         }
-        // Company actions on applications: e.g. offer, reject
-        elseif ($id !== null && $action === 'update_status_company') { // Example: ?entity=applications&id=APP001&action=update_status_company
-            // Require company role
+        // Company actions on applications: accept, reject, finalize
+        elseif ($id !== null && $action === 'update_status_company') {
             requireRole(ROLE_COMPANY);
             
             if (!isset($input['status'])) {
@@ -444,19 +454,66 @@ if ($entity === 'applications') {
                 exit;
             }
             
-            // Add more validation for allowed status transitions by company
-            $allowed_statuses = ['Pending Review','Under Review','Shortlisted','Interview Scheduled','Offered','Rejected','Rejected_By_Company','Approved_By_Company'];
-            if (!in_array($input['status'], $allowed_statuses)){
-                http_response_code(400);
-                echo json_encode(['error' => "Invalid status '{$input['status']}' for company update."]);
-                exit;
-            }
-            
             try {
-                // Update in database
+                // Get current application status
+                $stmt = $db->prepare("SELECT a.*, i.company_id FROM applications a JOIN internships i ON a.internship_id = i.id WHERE a.application_id = ?");
+                $stmt->execute([$id]);
+                $application = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if (!$application) {
+                    http_response_code(404);
+                    echo json_encode(['error' => "Application {$id} not found."]);
+                    exit;
+                }
+                
+                // Verify company owns this internship
+                if ($application['company_id'] != getCurrentUserId()) {
+                    http_response_code(403);
+                    echo json_encode(['error' => "Access denied. You don't own this internship."]);
+                    exit;
+                }
+                
+                $currentStatus = normalize_status($application['status']);
+                $newStatus = $input['status'];
+                
+                // Define valid status transitions for company
+                // Note: Using database ENUM values: 'Confirmed_By_Student' and 'Approved_By_Company' (finalized)
+                $validTransitions = array(
+                    'Pending Review' => array('Accepted', 'Rejected'),
+                    'Pending' => array('Accepted', 'Rejected'),
+                    'Accepted' => array(), // Company cannot change Accepted - student must confirm
+                    'Confirmed' => array('Approved_By_Company'), // Company can finalize after student confirms
+                    'Confirmed_By_Student' => array('Approved_By_Company'), // Company can finalize after student confirms
+                    'Rejected' => array(), // Rejected is final
+                    'Approved_By_Company' => array(), // Finalized is final
+                    'Withdrawn' => array() // Withdrawn is final
+                );
+                
+                // Check if transition is valid
+                $allowedNextStatuses = isset($validTransitions[$currentStatus]) ? $validTransitions[$currentStatus] : array();
+                
+                // Map display statuses to database ENUM values
+                $statusMap = array(
+                    'Confirmed' => 'Confirmed_By_Student',
+                    'Finalized' => 'Approved_By_Company'
+                );
+                $dbStatus = isset($statusMap[$newStatus]) ? $statusMap[$newStatus] : $newStatus;
+                
+                // Check normalized status for validation
+                $normalizedNewStatus = isset($statusMap[$newStatus]) ? $newStatus : $dbStatus;
+                if (!in_array($normalizedNewStatus, $allowedNextStatuses) && !in_array($dbStatus, $allowedNextStatuses)) {
+                    http_response_code(400);
+                    $allowedStr = !empty($allowedNextStatuses) ? implode(', ', $allowedNextStatuses) : 'none (this status is final)';
+                    echo json_encode([
+                        'error' => "Invalid status transition. Current status: '{$currentStatus}'. Allowed next statuses: {$allowedStr}."
+                    ]);
+                    exit;
+                }
+                
+                // Update in database using ENUM value
                 $stmt = $db->prepare("UPDATE applications SET status = ?, offer_details = ?, status_updated_date = NOW() WHERE application_id = ?");
                 $stmt->execute([
-                    $input['status'],
+                    $dbStatus,
                     $input['offer_details'] ?? null,
                     $id
                 ]);
@@ -464,19 +521,148 @@ if ($entity === 'applications') {
                 // Fetch updated application
                 $stmt = $db->prepare("SELECT * FROM applications WHERE application_id = ?");
                 $stmt->execute([$id]);
-                $updated_application = $stmt->fetch();
+                $updated_application = $stmt->fetch(PDO::FETCH_ASSOC);
                 
-                if (!$updated_application) {
+                $updated_application['status'] = normalize_status($updated_application['status']);
+                echo json_encode([
+                    'status' => 'success', 
+                    'message' => "Application {$id} status updated to {$newStatus}.",
+                    'application' => $updated_application
+                ]);
+            } catch(PDOException $e) {
+                http_response_code(500);
+                echo json_encode(['error' => 'Failed to update application: ' . $e->getMessage()]);
+            }
+        }
+        // Company accept action (shortcut)
+        elseif ($id !== null && $action === 'accept') {
+            requireRole(ROLE_COMPANY);
+            
+            try {
+                $stmt = $db->prepare("SELECT a.*, i.company_id FROM applications a JOIN internships i ON a.internship_id = i.id WHERE a.application_id = ?");
+                $stmt->execute([$id]);
+                $application = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if (!$application) {
                     http_response_code(404);
                     echo json_encode(['error' => "Application {$id} not found."]);
                     exit;
                 }
                 
-                $updated_application['status'] = normalize_status($updated_application['status']);
-                echo json_encode(['status' => 'success', 'message' => "Application {$id} status updated to {$input['status']} by company.", 'application' => $updated_application]);
+                if ($application['company_id'] != getCurrentUserId()) {
+                    http_response_code(403);
+                    echo json_encode(['error' => "Access denied."]);
+                    exit;
+                }
+                
+                $currentStatus = normalize_status($application['status']);
+                if (!in_array($currentStatus, array('Pending Review', 'Pending'))) {
+                    http_response_code(400);
+                    echo json_encode(['error' => "Can only accept applications with status 'Pending Review'. Current status: '{$currentStatus}'."]);
+                    exit;
+                }
+                
+                $stmt = $db->prepare("UPDATE applications SET status = 'Accepted', status_updated_date = NOW() WHERE application_id = ?");
+                $stmt->execute([$id]);
+                
+                $stmt = $db->prepare("SELECT * FROM applications WHERE application_id = ?");
+                $stmt->execute([$id]);
+                $updated = $stmt->fetch(PDO::FETCH_ASSOC);
+                $updated['status'] = normalize_status($updated['status']);
+                
+                echo json_encode(['status' => 'success', 'message' => 'Application accepted successfully.', 'application' => $updated]);
             } catch(PDOException $e) {
                 http_response_code(500);
-                echo json_encode(['error' => 'Failed to update application: ' . $e->getMessage()]);
+                echo json_encode(['error' => 'Failed to accept application: ' . $e->getMessage()]);
+            }
+        }
+        // Company reject action (shortcut)
+        elseif ($id !== null && $action === 'reject') {
+            requireRole(ROLE_COMPANY);
+            
+            try {
+                $stmt = $db->prepare("SELECT a.*, i.company_id FROM applications a JOIN internships i ON a.internship_id = i.id WHERE a.application_id = ?");
+                $stmt->execute([$id]);
+                $application = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if (!$application) {
+                    http_response_code(404);
+                    echo json_encode(['error' => "Application {$id} not found."]);
+                    exit;
+                }
+                
+                if ($application['company_id'] != getCurrentUserId()) {
+                    http_response_code(403);
+                    echo json_encode(['error' => "Access denied."]);
+                    exit;
+                }
+                
+                $currentStatus = normalize_status($application['status']);
+                if (!in_array($currentStatus, array('Pending Review', 'Pending'))) {
+                    http_response_code(400);
+                    echo json_encode(['error' => "Can only reject applications with status 'Pending Review'. Current status: '{$currentStatus}'."]);
+                    exit;
+                }
+                
+                $stmt = $db->prepare("UPDATE applications SET status = 'Rejected', status_updated_date = NOW() WHERE application_id = ?");
+                $stmt->execute([$id]);
+                
+                $stmt = $db->prepare("SELECT * FROM applications WHERE application_id = ?");
+                $stmt->execute([$id]);
+                $updated = $stmt->fetch(PDO::FETCH_ASSOC);
+                $updated['status'] = normalize_status($updated['status']);
+                
+                echo json_encode(['status' => 'success', 'message' => 'Application rejected.', 'application' => $updated]);
+            } catch(PDOException $e) {
+                http_response_code(500);
+                echo json_encode(['error' => 'Failed to reject application: ' . $e->getMessage()]);
+            }
+        }
+        // Company finalize action
+        elseif ($id !== null && $action === 'finalize') {
+            requireRole(ROLE_COMPANY);
+            
+            try {
+                $stmt = $db->prepare("SELECT a.*, i.company_id FROM applications a JOIN internships i ON a.internship_id = i.id WHERE a.application_id = ?");
+                $stmt->execute([$id]);
+                $application = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if (!$application) {
+                    http_response_code(404);
+                    echo json_encode(['error' => "Application {$id} not found."]);
+                    exit;
+                }
+                
+                if ($application['company_id'] != getCurrentUserId()) {
+                    http_response_code(403);
+                    echo json_encode(['error' => "Access denied."]);
+                    exit;
+                }
+                
+                // Check raw database status
+                $rawStatus = $application['status'];
+                $currentStatus = normalize_status($rawStatus);
+                
+                // Can finalize if status is 'Confirmed_By_Student' (database value) or normalized 'Confirmed'
+                if ($rawStatus !== 'Confirmed_By_Student' && $currentStatus !== 'Confirmed') {
+                    http_response_code(400);
+                    echo json_encode(['error' => "Can only finalize applications with status 'Confirmed'. Current status: '{$currentStatus}'."]);
+                    exit;
+                }
+                
+                // Use 'Approved_By_Company' which exists in the ENUM (represents finalized)
+                $stmt = $db->prepare("UPDATE applications SET status = 'Approved_By_Company', status_updated_date = NOW() WHERE application_id = ?");
+                $stmt->execute([$id]);
+                
+                $stmt = $db->prepare("SELECT * FROM applications WHERE application_id = ?");
+                $stmt->execute([$id]);
+                $updated = $stmt->fetch(PDO::FETCH_ASSOC);
+                $updated['status'] = normalize_status($updated['status']);
+                
+                echo json_encode(['status' => 'success', 'message' => 'Application finalized successfully.', 'application' => $updated]);
+            } catch(PDOException $e) {
+                http_response_code(500);
+                echo json_encode(['error' => 'Failed to finalize application: ' . $e->getMessage()]);
             }
         }
         else {

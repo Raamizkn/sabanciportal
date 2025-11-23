@@ -298,7 +298,7 @@ class APIService {
     }
 
     /**
-     * Update application status
+     * Update application status (company)
      */
     async updateApplicationStatus(applicationId, status, offerDetails = null) {
         return this.request(`/index.php?entity=applications&id=${applicationId}&action=update_status_company`, {
@@ -307,6 +307,42 @@ class APIService {
                 status: status,
                 offer_details: offerDetails
             })
+        });
+    }
+
+    /**
+     * Accept application (company) - shortcut for Accept action
+     */
+    async acceptApplication(applicationId) {
+        return this.request(`/index.php?entity=applications&id=${applicationId}&action=accept`, {
+            method: 'POST'
+        });
+    }
+
+    /**
+     * Reject application (company) - shortcut for Reject action
+     */
+    async rejectApplication(applicationId) {
+        return this.request(`/index.php?entity=applications&id=${applicationId}&action=reject`, {
+            method: 'POST'
+        });
+    }
+
+    /**
+     * Finalize application (company) - after student confirms
+     */
+    async finalizeApplication(applicationId) {
+        return this.request(`/index.php?entity=applications&id=${applicationId}&action=finalize`, {
+            method: 'POST'
+        });
+    }
+
+    /**
+     * Confirm application (student) - after company accepts
+     */
+    async confirmApplication(applicationId) {
+        return this.request(`/index.php?entity=applications&id=${applicationId}&action=confirm`, {
+            method: 'POST'
         });
     }
 

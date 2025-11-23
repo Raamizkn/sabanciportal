@@ -215,9 +215,6 @@ function buildActionsCell(app, encodedApp) {
                 <a href="#" class="dropdown-item view-application" data-bs-toggle="modal" data-bs-target="#view_application_modal" data-application='${encodedApp}'>
                     <i class="ph-eye me-2"></i>View Application
                 </a>
-                <a href="#" class="dropdown-item update-status" data-bs-toggle="modal" data-bs-target="#update_status_modal" data-application-id="${app.application_id}" data-current-status="${app.status}" data-application='${encodedApp}'>
-                    <i class="ph-pencil me-2"></i>Update Status
-                </a>
                 <div class="dropdown-divider"></div>
                 ${resumeLink}
             </div>
