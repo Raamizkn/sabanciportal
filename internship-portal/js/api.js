@@ -277,6 +277,13 @@ class APIService {
     }
 
     /**
+     * Get internship details by ID
+     */
+    async getInternshipDetails(internshipId) {
+        return this.request(`/index.php?entity=internships&id=${internshipId}`);
+    }
+
+    /**
      * Create new internship
      */
     async createInternship(companyId, internshipData) {

@@ -334,6 +334,7 @@
 	<!-- Modals can be kept for actions if needed -->
 
 	<script src="../js/api.js"></script>
+	<script src="../js/modal-utils.js"></script>
 	<script>
 		document.addEventListener('DOMContentLoaded', () => {
 			const urlParams = new URLSearchParams(window.location.search);
@@ -345,8 +346,9 @@
             const isAdmin = userRole === 'admin';
             
             if (userRole !== 'student' && !isBeingImpersonated && !isAdmin) {
-                alert('Access denied. Redirecting to login page.');
-                window.location.href = '../index.html';
+                showAlertModal('Access Denied', 'You must be logged in as a Student.', 'error', () => {
+                    window.location.href = '../index.html';
+                });
                 return;
             }
 
@@ -356,7 +358,7 @@
 			}
 
 			if (!applicationId) {
-				document.body.innerHTML = '<div class="alert alert-danger m-5">Application ID not found in URL.</div>';
+				showAlertModal('Error', 'Application ID not found in URL.', 'error');
 				return;
 			}
 
@@ -448,38 +450,56 @@
 			const confirmBtn = document.querySelector('.confirm-application-btn');
 			if(confirmBtn) {
 				confirmBtn.addEventListener('click', async () => {
-					if (confirm('Confirm your acceptance of this internship offer? The company will then be able to finalize the placement.')) {
-						try {
-							const result = await api.confirmApplication(applicationId);
-							if (result.status === 'success' || result.message) {
-								alert(result.message || 'Application confirmed! Company can now finalize.');
-								loadApplicationDetails(applicationId); // Refresh details
-							} else {
-								alert('Error: ' + (result.error || 'Unknown error'));
+				showConfirmModal(
+					'Confirm Acceptance',
+					'Confirm your acceptance of this internship offer? The company will then be able to finalize the placement.',
+					'Confirm',
+					'Cancel',
+					async (confirmed) => {
+						if (confirmed) {
+							try {
+								const result = await api.confirmApplication(applicationId);
+								if (result.status === 'success' || result.message) {
+									showAlertModal('Success', result.message || 'Application confirmed! Company can now finalize.', 'success', () => {
+										loadApplicationDetails(applicationId); // Refresh details
+									});
+								} else {
+									showAlertModal('Error', result.error || 'Unknown error', 'error');
+								}
+							} catch (error) {
+								showAlertModal('Error', 'An error occurred while confirming the application.', 'error');
 							}
-						} catch (error) {
-							alert('An error occurred while confirming the application.');
 						}
 					}
+				);
 				});
 			}
 
 			const withdrawBtn = document.querySelector('.withdraw-btn');
 			if(withdrawBtn) {
 				withdrawBtn.addEventListener('click', async () => {
-					if (confirm('Are you sure you want to withdraw this application?')) {
-						try {
-							const result = await api.withdrawApplication(applicationId);
-							if (result.message) {
-								alert('Application withdrawn.');
-								loadApplicationDetails(applicationId); // Refresh details
-							} else {
-								alert('Error: ' + (result.error || 'Unknown error'));
+					showConfirmModal(
+						'Withdraw Application',
+						'Are you sure you want to withdraw this application?',
+						'Withdraw',
+						'Cancel',
+						async (confirmed) => {
+							if (confirmed) {
+								try {
+									const result = await api.withdrawApplication(applicationId);
+									if (result.message || result.status === 'success') {
+										showAlertModal('Application Withdrawn', 'Your application has been withdrawn.', 'info', () => {
+											loadApplicationDetails(applicationId); // Refresh details
+										});
+									} else {
+										showAlertModal('Error', result.error || 'Unknown error', 'error');
+									}
+								} catch (error) {
+									showAlertModal('Error', 'An error occurred while withdrawing the application.', 'error');
+								}
 							}
-						} catch (error) {
-							alert('An error occurred while withdrawing the application.');
 						}
-					}
+					);
 				});
 			}
 		}

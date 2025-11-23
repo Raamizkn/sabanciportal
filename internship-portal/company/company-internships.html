@@ -30,6 +30,8 @@
 	
 	<!-- API Service -->
 	<script src="../js/api.js"></script>
+	<!-- Modal Utilities -->
+	<script src="../js/modal-utils.js"></script>
 	<!-- /API Service -->
 	
 	<!-- Custom style for proper scrolling -->
@@ -681,11 +683,12 @@
 			const userRole = localStorage.getItem('userRole');
 			const userId = localStorage.getItem('userId');
 			
-			if (userRole !== 'company') {
-				alert('Access denied. Redirecting to login page.');
+		if (userRole !== 'company') {
+			showAlertModal('Access Denied', 'You must be logged in as a Company.', 'error', () => {
 				window.location.href = '../index.html';
-				return;
-			}
+			});
+			return;
+		}
 
 			// Handle create internship form submission
 			const submitBtn = document.getElementById('submitInternshipBtn');
@@ -716,18 +719,19 @@
 
 				// Backend returns the internship object directly with id if successful
 				if (data && data.id) {
-					alert('Internship posted successfully!');
-					// Close modal
-					const modal = bootstrap.Modal.getInstance(document.getElementById('new_internship_modal'));
-					if (modal) modal.hide();
-					// Reload page to show new internship
-					location.reload();
+					showAlertModal('Success', 'Internship posted successfully!', 'success', () => {
+						// Close modal
+						const modal = bootstrap.Modal.getInstance(document.getElementById('new_internship_modal'));
+						if (modal) modal.hide();
+						// Reload page to show new internship
+						location.reload();
+					});
 				} else {
-					alert(data.error || 'Failed to post internship. Please try again.');
+					showAlertModal('Error', data.error || 'Failed to post internship. Please try again.', 'error');
 				}
 			} catch (error) {
 				console.error('Error creating internship:', error);
-				alert('An error occurred. Please try again.');
+				showAlertModal('Error', 'An error occurred. Please try again.', 'error');
 			}
 				});
 			}
@@ -801,12 +805,97 @@
 			return col;
 		}
 
-		function viewDetails(id) {
-			alert('View details for internship ID: ' + id);
+		async function viewDetails(id) {
+			try {
+				const internship = await api.getInternshipDetails(id);
+				populateViewDetailsModal(internship);
+				const modal = new bootstrap.Modal(document.getElementById('view_details_modal'));
+				modal.show();
+			} catch (error) {
+				console.error('Failed to load internship details:', error);
+				showAlertModal('Error', 'Failed to load internship details. Please try again.', 'error');
+			}
+		}
+
+		function populateViewDetailsModal(internship) {
+			const modal = document.getElementById('view_details_modal');
+			if (!modal) return;
+
+			// Update modal title
+			const titleEl = modal.querySelector('.modal-title');
+			if (titleEl) {
+				titleEl.textContent = internship.position || internship.title || 'Internship Details';
+			}
+
+			// Get company info if available
+			const company = internship.company || {};
+			
+			// Populate modal body
+			const modalBody = modal.querySelector('.modal-body');
+			if (modalBody) {
+				modalBody.innerHTML = `
+					<div class="mb-4 text-center">
+						<img src="${company.logo || '../bs5/template/assets/images/demo/logos/2.svg'}" class="rounded-circle mb-2" width="80" height="80" alt="Company Logo" onerror="this.src='../bs5/template/assets/images/demo/logos/2.svg'">
+						<h5 class="mb-0">${company.name || 'Company'}</h5>
+						<span class="text-muted">${company.industry || 'Industry'}</span>
+					</div>
+
+					<div class="mb-4">
+						<h4 class="mb-1">${internship.position || internship.title || 'Internship'}</h4>
+						<p class="text-muted">
+							<i class="ph-map-pin me-1"></i> ${internship.location || 'Location not specified'}
+							${internship.type ? ` <span class="ms-2"><i class="ph-clock me-1"></i> ${internship.type}</span>` : ''}
+						</p>
+					</div>
+
+					<div class="card card-body mb-3">
+						<h6 class="fw-semibold mb-2">Description</h6>
+						<p class="mb-0" style="white-space: pre-wrap;">${internship.description || 'No description provided.'}</p>
+					</div>
+
+					<div class="row mb-3">
+						<div class="col-md-6">
+							<div class="card card-body">
+								<h6 class="fw-semibold mb-2">Duration</h6>
+								<p class="mb-0"><i class="ph-calendar me-1"></i> ${internship.dates || 'Not specified'}</p>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="card card-body">
+								<h6 class="fw-semibold mb-2">Application Deadline</h6>
+								<p class="mb-0"><i class="ph-calendar-check me-1"></i> ${internship.application_deadline ? new Date(internship.application_deadline).toLocaleDateString() : 'Not specified'}</p>
+							</div>
+						</div>
+					</div>
+
+					${internship.requirements ? `
+					<div class="card card-body mb-3">
+						<h6 class="fw-semibold mb-2">Requirements</h6>
+						<p class="mb-0" style="white-space: pre-wrap;">${internship.requirements}</p>
+					</div>
+					` : ''}
+
+					${internship.salary ? `
+					<div class="card card-body mb-3">
+						<h6 class="fw-semibold mb-2">Compensation</h6>
+						<p class="mb-0"><i class="ph-currency-circle-dollar me-1"></i> ${internship.salary}</p>
+					</div>
+					` : ''}
+
+					<div class="card card-body">
+						<h6 class="fw-semibold mb-2">Company Information</h6>
+						<p class="mb-1"><strong>Industry:</strong> ${company.industry || 'Not specified'}</p>
+						${company.website ? `<p class="mb-1"><strong>Website:</strong> <a href="${company.website}" target="_blank">${company.website}</a></p>` : ''}
+						${company.address ? `<p class="mb-1"><strong>Address:</strong> ${company.address}</p>` : ''}
+						${company.phone ? `<p class="mb-0"><strong>Phone:</strong> ${company.phone}</p>` : ''}
+					</div>
+				`;
+			}
 		}
 
 		function editInternship(id) {
-			alert('Edit internship ID: ' + id);
+			// TODO: Implement edit functionality
+			showAlertModal('Coming Soon', 'Edit functionality will be available soon.', 'info');
 		}
 	</script>
 

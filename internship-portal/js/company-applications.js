@@ -11,16 +11,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const isImpersonatedCompany = impersonatedType === 'company' && impersonatedId;
 
     if (userRole !== 'company' && !isImpersonatedCompany) {
-        alert('Access Denied. You must be logged in as a Company.');
-        window.location.href = '../index.html';
+        showAlertModal('Access Denied', 'You must be logged in as a Company.', 'error', () => {
+            window.location.href = '../index.html';
+        });
         return;
     }
 
     currentCompanyId = userRole === 'company' ? storedCompanyId : impersonatedId;
 
     if (!currentCompanyId) {
-        alert('Company ID not found. Please log in again.');
-        window.location.href = '../index.html';
+        showAlertModal('Error', 'Company ID not found. Please log in again.', 'error', () => {
+            window.location.href = '../index.html';
+        });
         return;
     }
 

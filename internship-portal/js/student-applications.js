@@ -188,19 +188,28 @@ function addEventListeners() {
     document.querySelectorAll('.withdraw-btn').forEach(button => {
         button.addEventListener('click', async (e) => {
             const appId = e.currentTarget.getAttribute('data-application-id');
-            if (confirm('Are you sure you want to withdraw this application?')) {
-                try {
-                    const result = await api.withdrawApplication(appId);
-                    if (result.error) {
-                        alert('Error: ' + result.error);
-                        return;
+            showConfirmModal(
+                'Withdraw Application',
+                'Are you sure you want to withdraw this application?',
+                'Withdraw',
+                'Cancel',
+                async (confirmed) => {
+                    if (confirmed) {
+                        try {
+                            const result = await api.withdrawApplication(appId);
+                            if (result.error) {
+                                showAlertModal('Error', result.error, 'error');
+                                return;
+                            }
+                            showAlertModal('Application Withdrawn', result.message || 'Your application has been withdrawn.', 'info', () => {
+                                loadStudentApplications(localStorage.getItem('userId'));
+                            });
+                        } catch (error) {
+                            showAlertModal('Error', 'An error occurred while withdrawing the application.', 'error');
+                        }
                     }
-                    alert(result.message || 'Application withdrawn.');
-                    loadStudentApplications(localStorage.getItem('userId'));
-                } catch (error) {
-                    alert('An error occurred while withdrawing the application.');
                 }
-            }
+            );
         });
     });
 
@@ -208,19 +217,28 @@ function addEventListeners() {
     document.querySelectorAll('.confirm-application-btn').forEach(button => {
         button.addEventListener('click', async (e) => {
             const appId = e.currentTarget.getAttribute('data-application-id');
-            if (confirm('Confirm your acceptance of this internship offer? The company will then be able to finalize the placement.')) {
-                try {
-                    const result = await api.confirmApplication(appId);
-                    if (result.error) {
-                        alert('Error: ' + result.error);
-                        return;
+            showConfirmModal(
+                'Confirm Acceptance',
+                'Confirm your acceptance of this internship offer? The company will then be able to finalize the placement.',
+                'Confirm',
+                'Cancel',
+                async (confirmed) => {
+                    if (confirmed) {
+                        try {
+                            const result = await api.confirmApplication(appId);
+                            if (result.error) {
+                                showAlertModal('Error', result.error, 'error');
+                                return;
+                            }
+                            showAlertModal('Success', result.message || 'Application confirmed! Company can now finalize.', 'success', () => {
+                                loadStudentApplications(localStorage.getItem('userId'));
+                            });
+                        } catch (error) {
+                            showAlertModal('Error', 'An error occurred while confirming the application.', 'error');
+                        }
                     }
-                    alert(result.message || 'Application confirmed! Company can now finalize.');
-                    loadStudentApplications(localStorage.getItem('userId'));
-                } catch (error) {
-                    alert('An error occurred while confirming the application.');
                 }
-            }
+            );
         });
     });
 }
