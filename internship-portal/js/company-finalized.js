@@ -1,5 +1,5 @@
-// Finalized statuses - only 'Approved_By_Company' represents finalized (after student confirms and company finalizes)
-const FINALIZED_STATUS_SET = new Set(['Approved_By_Company', 'Finalized']);
+// Finalized statuses - include database value since we can't ALTER ENUM
+const FINALIZED_STATUS_SET = new Set(['Finalized', 'Approved_By_Company']);
 
 let currentCompanyId = null;
 let finalizedApplications = [];
@@ -23,21 +23,20 @@ function formatStatusLabel(status) {
     if (!status) {
         return 'Unknown';
     }
+    // Map database values to clean display names
     const map = {
         'Approved_By_Company': 'Finalized',
-        'Finalized': 'Finalized',
-        'Confirmed_By_Student': 'Confirmed By Student',
-        'Rejected_By_Company': 'Rejected (Internal)',
-        'Pending': 'Pending Review'
+        'Confirmed_By_Student': 'Confirmed'
     };
-    return map[status] || status.replace(/_/g, ' ');
+    return map[status] || status;
 }
 
 function renderStatusBadge(status) {
     let badgeClass = 'badge bg-secondary bg-opacity-20 text-secondary';
-    if (status === 'Approved_By_Company' || status === 'Finalized') {
+    // Check both display and database values
+    if (status === 'Finalized' || status === 'Approved_By_Company') {
         badgeClass = 'badge bg-success bg-opacity-20 text-success';
-    } else if (status === 'Confirmed_By_Student') {
+    } else if (status === 'Confirmed' || status === 'Confirmed_By_Student') {
         badgeClass = 'badge bg-info bg-opacity-20 text-info';
     }
     return `<span class="${badgeClass}">${formatStatusLabel(status)}</span>`;
@@ -57,13 +56,10 @@ function splitTimeline(range) {
 async function loadFinalizedApplications(companyId) {
     try {
         const applications = await api.getCompanyApplications(companyId);
-        // Filter for finalized applications - status should be 'Approved_By_Company' (database value)
+        // Filter for finalized applications - include database value
         finalizedApplications = applications.filter(app => {
             const status = app.status || '';
-            // Check both database value and normalized value
-            return status === 'Approved_By_Company' || 
-                   status === 'Finalized' ||
-                   FINALIZED_STATUS_SET.has(status);
+            return status === 'Finalized' || status === 'Approved_By_Company';
         });
         populateFinalizedTable(finalizedApplications);
     } catch (error) {

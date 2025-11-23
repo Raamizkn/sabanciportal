@@ -324,7 +324,7 @@
 						<tbody id="applicationsTableBody">
 							<!-- Applications will be loaded dynamically -->
 						</tbody>
-								<td><span class="badge bg-warning bg-opacity-10 text-warning">Pending Review</span></td>
+								<td><span class="badge bg-warning bg-opacity-10 text-warning">Pending</span></td>
 								<td class="text-center">
 									<div class="dropdown">
 										<a href="#" class="text-body" data-bs-toggle="dropdown">
@@ -470,7 +470,7 @@
 				const row = document.createElement('tr');
 				const studentPic = app.student_profile_pic || `../bs5/template/assets/images/demo/users/face${(index % 4) + 1}.jpg`;
 				const companyLogo = app.company_logo || '../bs5/template/assets/images/demo/logos/1.svg';
-				const statusBadge = getStatusBadge(app.status || 'Pending Review');
+				const statusBadge = getStatusBadge(app.status || 'Pending');
 				
 				// Extract IDs - handle both application_id (string) and id (number)
 				const applicationId = app.application_id || app.id;
@@ -523,16 +523,20 @@
 
 		function getStatusBadge(status) {
 			let badgeClass = 'badge bg-secondary bg-opacity-20 text-secondary';
-			if (['Approved_By_Company', 'Confirmed_By_Student'].includes(status)) {
+			if (status === 'Finalized') {
 				badgeClass = 'badge bg-success bg-opacity-20 text-success';
-			} else if (['Pending', 'Pending Review', 'Under Review'].includes(status)) {
+			} else if (status === 'Pending') {
 				badgeClass = 'badge bg-warning bg-opacity-20 text-warning';
-			} else if (status && status.startsWith('Rejected')) {
+			} else if (status === 'Rejected') {
 				badgeClass = 'badge bg-danger bg-opacity-20 text-danger';
-			} else if (status === 'Offered') {
+			} else if (status === 'Accepted') {
+				badgeClass = 'badge bg-success bg-opacity-20 text-success';
+			} else if (status === 'Confirmed') {
 				badgeClass = 'badge bg-info bg-opacity-20 text-info';
+			} else if (status === 'Withdrawn') {
+				badgeClass = 'badge bg-secondary bg-opacity-20 text-secondary';
 			}
-			return `<span class="${badgeClass}">${status || 'Pending Review'}</span>`;
+			return `<span class="${badgeClass}">${status || 'Pending'}</span>`;
 		}
 	</script>
 </body>

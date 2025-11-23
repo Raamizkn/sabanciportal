@@ -158,9 +158,9 @@ function renderStaticApplications(applications) {
 function getStatusBadge(status) {
     let badgeClass = 'bg-secondary bg-opacity-20 text-secondary'; // Default
     const normalized = formatStatusLabel(status);
-    if (['Offered', 'Accepted', 'Confirmed By Student'].includes(normalized)) {
+    if (['Accepted', 'Confirmed'].includes(normalized)) {
         badgeClass = 'bg-success bg-opacity-20 text-success';
-    } else if (['Pending Review', 'Under Review'].includes(normalized)) {
+    } else if (normalized === 'Pending' || status === 'Pending') {
         badgeClass = 'bg-warning bg-opacity-20 text-warning';
     } else if (normalized.startsWith('Rejected')) {
         badgeClass = 'bg-danger bg-opacity-20 text-danger';
@@ -174,14 +174,12 @@ function formatStatusLabel(status) {
     if (!status) {
         return 'Unknown';
     }
+    // Map database values to clean display names
     const map = {
-        'Pending': 'Pending Review',
-        'Pending Review': 'Pending Review',
-        'Rejected_By_Company': 'Rejected (Internal)',
-        'Approved_By_Company': 'Finalize Placement',
-        'Confirmed_By_Student': 'Confirmed By Student'
+        'Confirmed_By_Student': 'Confirmed',
+        'Approved_By_Company': 'Finalized'
     };
-    return map[status] || status.replace(/_/g, ' ');
+    return map[status] || status;
 }
 
 function resolveProfileImage(path) {

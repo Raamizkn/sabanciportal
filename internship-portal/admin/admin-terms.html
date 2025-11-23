@@ -663,9 +663,9 @@
 						return;
 					}
 					
-					alert('Term deleted successfully!');
-					const modal = bootstrap.Modal.getInstance(document.getElementById('delete_term_modal'));
-					modal.hide();
+				alert('Term deleted successfully!');
+				const modal = bootstrap.Modal.getInstance(document.getElementById('delete_term_modal'));
+				modal.hide();
 					await loadTerms();
 				} catch (error) {
 					alert('An error occurred while deleting the term.');

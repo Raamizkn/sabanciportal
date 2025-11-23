@@ -336,7 +336,7 @@
 									<i class="ph-clock fs-2"></i>
 								</div>
 								<h4 class="mb-0 fw-bold" id="dashboardPendingApplications">0</h4>
-								<div class="opacity-75 fs-sm">Pending Review</div>
+								<div class="opacity-75 fs-sm">Pending</div>
 							</div>
 
 							<div class="col-xl-2 col-sm-4 col-6">
@@ -584,29 +584,25 @@
 		}
 
 		function getStatusBadgeForDashboard(status) {
-			if (!status) return '<span class="badge bg-secondary">Pending Review</span>';
+			if (!status) return '<span class="badge bg-secondary">Pending</span>';
 			
 			const normalizedStatus = normalizeStatusForDashboard(status);
 			let badgeClass = 'bg-secondary';
 			
-			switch (normalizedStatus) {
-				case 'Pending Review':
+			switch (status) {
 				case 'Pending':
-					badgeClass = 'bg-secondary';
+					badgeClass = 'bg-warning text-dark';
 					break;
 				case 'Accepted':
 					badgeClass = 'bg-success';
 					break;
 				case 'Confirmed':
-				case 'Confirmed_By_Student':
 					badgeClass = 'bg-info';
 					break;
 				case 'Finalized':
-				case 'Approved_By_Company':
 					badgeClass = 'bg-success';
 					break;
 				case 'Rejected':
-				case 'Rejected_By_Company':
 					badgeClass = 'bg-danger';
 					break;
 				case 'Withdrawn':
@@ -614,17 +610,13 @@
 					break;
 			}
 			
-			return `<span class="badge ${badgeClass}">${normalizedStatus}</span>`;
+			return `<span class="badge ${badgeClass}">${status}</span>`;
 		}
 
 		function normalizeStatusForDashboard(status) {
-			if (!status) return 'Pending Review';
-			const map = {
-				'Pending': 'Pending Review',
-				'Confirmed_By_Student': 'Confirmed',
-				'Approved_By_Company': 'Finalized'
-			};
-			return map[status] || status;
+			if (!status) return 'Pending';
+			// Statuses are now clean - no normalization needed
+			return status;
 		}
 
 		function updateDashboardStatusCards(applications) {
@@ -638,16 +630,18 @@
 			};
 
 			applications.forEach(app => {
-				const status = app.status;
-				if (['Pending', 'Pending Review', 'Under Review'].includes(status)) {
+				const status = app.status; // Clean status name
+				
+				// Check clean status names
+				if (status === 'Pending') {
 					statusCounts.pending++;
 				} else if (status === 'Accepted') {
 					statusCounts.accepted++;
-				} else if (status === 'Confirmed_By_Student') {
+				} else if (status === 'Confirmed') {
 					statusCounts.confirmed++;
-				} else if (status === 'Approved_By_Company') {
+				} else if (status === 'Finalized') {
 					statusCounts.finalized++;
-				} else if (['Rejected', 'Rejected_By_Company'].includes(status)) {
+				} else if (status === 'Rejected') {
 					statusCounts.rejected++;
 				}
 			});

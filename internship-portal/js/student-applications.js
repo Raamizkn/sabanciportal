@@ -146,23 +146,17 @@ function formatStatusLabel(status) {
     if (!status) {
         return 'Unknown';
     }
-    const map = {
-        'Pending': 'Pending Review',
-        'Pending Review': 'Pending Review',
-        'Rejected_By_Company': 'Rejected by Company',
-        'Approved_By_Company': 'Finalized by Company'
-    };
-    return map[status] || status.replace(/_/g, ' ');
+    // Statuses are now clean - return as-is
+    return status;
 }
 
 function getStatusBadge(status) {
-    if (!status) return '<span class="badge bg-secondary">Pending Review</span>';
+    if (!status) return '<span class="badge bg-secondary">Pending</span>';
     
-    const normalizedStatus = normalizeStatusForStudent(status);
     let badgeClass = 'bg-secondary';
     
-    switch (normalizedStatus) {
-        case 'Pending Review':
+    // Handle 6 clean statuses
+    switch (status) {
         case 'Pending':
             badgeClass = 'bg-warning text-dark';
             break;
@@ -170,29 +164,22 @@ function getStatusBadge(status) {
             badgeClass = 'bg-success';
             break;
         case 'Confirmed':
-        case 'Confirmed_By_Student':
             badgeClass = 'bg-info';
             break;
         case 'Finalized':
-        case 'Approved_By_Company':
             badgeClass = 'bg-success';
             break;
         case 'Rejected':
-        case 'Rejected_By_Company':
             badgeClass = 'bg-danger';
             break;
         case 'Withdrawn':
             badgeClass = 'bg-secondary';
             break;
-        case 'Shortlisted':
-        case 'Interview Scheduled':
-            badgeClass = 'bg-primary';
-            break;
         default:
             badgeClass = 'bg-secondary';
     }
     
-    return `<span class="badge ${badgeClass}">${normalizedStatus}</span>`;
+    return `<span class="badge ${badgeClass}">${status}</span>`;
 }
 
 function getActionButtons(application) {
@@ -202,14 +189,13 @@ function getActionButtons(application) {
     buttons += `<a href="student-application-detail.html?id=${application.application_id}" class="btn btn-sm btn-icon btn-light view-button" data-bs-popup="tooltip" title="View Details"><i class="ph-eye"></i></a>`;
 
     // Show confirm button if status is Accepted
-    const normalizedStatus = normalizeStatusForStudent(application.status);
-    if (normalizedStatus === 'Accepted') {
+    if (application.status === 'Accepted') {
         buttons += `<button class="btn btn-sm btn-icon btn-light confirm-application-btn ms-1" data-application-id="${application.application_id}" data-bs-popup="tooltip" title="Confirm Acceptance"><i class="ph-check-circle text-success"></i></button>`;
     }
 
     // Allow withdrawal if not finalized, rejected, or already withdrawn
     const finalStatuses = ['Finalized', 'Rejected', 'Withdrawn', 'Confirmed'];
-    if (!finalStatuses.includes(normalizedStatus)) {
+    if (!finalStatuses.includes(status)) {
         buttons += `<button class="btn btn-sm btn-icon btn-light withdraw-btn ms-1" data-application-id="${application.application_id}" data-bs-popup="tooltip" title="Withdraw Application"><i class="ph-x-circle text-danger"></i></button>`;
     }
 
@@ -217,9 +203,10 @@ function getActionButtons(application) {
 }
 
 function normalizeStatusForStudent(status) {
-    if (!status) return 'Pending Review';
+    if (!status) return 'Pending';
+    // Map database values to clean display names
+    // Since we can't ALTER ENUM, map database values for display
     const map = {
-        'Pending': 'Pending Review',
         'Confirmed_By_Student': 'Confirmed',
         'Approved_By_Company': 'Finalized'
     };
@@ -297,18 +284,21 @@ function updateStatusCards(applications) {
     };
 
     applications.forEach(app => {
-        const status = app.status;
-        if (['Pending', 'Pending Review', 'Under Review'].includes(status)) {
+        const status = app.status; // This is the database status value (6 core statuses after migration)
+        
+        // Check database values directly (all intermediate statuses consolidated to 6 core)
+        if (status === 'Pending') {
             statusCounts.pending++;
         } else if (status === 'Accepted') {
             statusCounts.accepted++;
-        } else if (status === 'Confirmed_By_Student') {
+        } else if (status === 'Confirmed') {
             statusCounts.confirmed++;
-        } else if (status === 'Approved_By_Company') {
+        } else if (status === 'Finalized') {
             statusCounts.finalized++;
-        } else if (['Rejected', 'Rejected_By_Company'].includes(status)) {
+        } else if (status === 'Rejected') {
             statusCounts.rejected++;
         }
+        // Note: Withdrawn applications are not counted in status cards
     });
 
     setCount('studentTotalApplicationsCount', statusCounts.total);

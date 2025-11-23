@@ -674,12 +674,12 @@
 			const userRole = localStorage.getItem('userRole');
 			const userId = localStorage.getItem('userId');
 			
-		if (userRole !== 'company') {
+			if (userRole !== 'company') {
 			showAlertModal('Access Denied', 'You must be logged in as a Company.', 'error', () => {
 				window.location.href = '../index.html';
 			});
-			return;
-		}
+				return;
+			}
 
 			// Handle create/edit internship form submission
 			const submitBtn = document.getElementById('submitInternshipBtn');
@@ -708,7 +708,7 @@
 						department: document.getElementById('department').value
 					};
 
-					try {
+			try {
 						let data;
 						if (isEditMode) {
 							data = await api.updateInternship(editId, internshipData);
@@ -716,24 +716,24 @@
 							data = await api.createInternship(userId, internshipData);
 						}
 
-						// Backend returns the internship object directly with id if successful
-						if (data && data.id) {
+				// Backend returns the internship object directly with id if successful
+				if (data && data.id) {
 							showAlertModal('Success', isEditMode ? 'Internship updated successfully!' : 'Internship posted successfully!', 'success', () => {
-								// Close modal
-								const modal = bootstrap.Modal.getInstance(document.getElementById('new_internship_modal'));
-								if (modal) modal.hide();
+					// Close modal
+					const modal = bootstrap.Modal.getInstance(document.getElementById('new_internship_modal'));
+					if (modal) modal.hide();
 								// Reset form
 								resetInternshipForm();
 								// Reload page to show updated internship
-								location.reload();
+					location.reload();
 							});
-						} else {
+				} else {
 							showAlertModal('Error', data.error || (isEditMode ? 'Failed to update internship. Please try again.' : 'Failed to post internship. Please try again.'), 'error');
-						}
-					} catch (error) {
+				}
+			} catch (error) {
 						console.error('Error saving internship:', error);
 						showAlertModal('Error', 'An error occurred. Please try again.', 'error');
-					}
+			}
 				});
 			}
 

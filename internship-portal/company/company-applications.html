@@ -334,7 +334,7 @@
 							<div class="col-lg-3 mb-2 mb-lg-0">
 								<select class="form-select" id="filterStatus">
 									<option value="">All Statuses</option>
-									<option value="Pending Review">Pending Review</option>
+									<option value="Pending">Pending</option>
 									<option value="Accepted">Accepted</option>
 									<option value="Rejected">Rejected</option>
 								</select>
@@ -593,7 +593,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Modal body found, rendering content...');
 
         const studentProfileImg = typeof resolveProfileImage !== 'undefined' ? resolveProfileImage(app.student_profile_pic) : (app.student_profile_pic || '../bs5/template/assets/images/demo/users/face1.jpg');
-        const statusBadge = typeof getStatusBadge !== 'undefined' ? getStatusBadge(app.status) : `<span class="badge bg-secondary">${app.status || 'Pending Review'}</span>`;
+        const statusBadge = typeof getStatusBadge !== 'undefined' ? getStatusBadge(app.status) : `<span class="badge bg-secondary">${app.status || 'Pending'}</span>`;
         
         // Build documents HTML
         let documentsHTML = '';
@@ -621,13 +621,12 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             // Fallback normalization
             const statusMap = {
-                'Pending': 'Pending Review',
-                'Confirmed_By_Student': 'Confirmed',
-                'Approved_By_Company': 'Finalized'
+                'Pending': 'Pending',
+                // Statuses are now clean - no mapping needed
             };
             normalizedStatus = statusMap[app.status] || app.status;
         }
-        const canSubmitEvaluation = normalizedStatus === 'Finalized' || app.status === 'Approved_By_Company';
+        const canSubmitEvaluation = normalizedStatus === 'Finalized' || app.status === 'Finalized' || app.status === 'Approved_By_Company';
         const evaluationHTML = canSubmitEvaluation ? `
             <hr>
             <div class="alert alert-info mb-0">
@@ -744,10 +743,25 @@ document.addEventListener('DOMContentLoaded', function() {
                                 ${evaluationHTML}
                             </div>
                         </div>
+                        
+                        <!-- Application Actions Card -->
+                        <div class="card">
+                            <div class="card-body">
+                                <div id="applicationActionButtons" class="d-flex gap-2">
+                                    <!-- Action buttons will be inserted here -->
+                                </div>
+                            </div>
+                        </div>
                     </div>
             </div>
         `;
             console.log('Modal content rendered successfully');
+            
+            // Setup action buttons after modal content is rendered
+            const actionButtonsContainer = document.getElementById('applicationActionButtons');
+            if (actionButtonsContainer) {
+                setupApplicationActionButtons(app, actionButtonsContainer);
+            }
         } catch (e) {
             console.error('Error rendering modal content:', e);
             modalBody.innerHTML = `<div class="alert alert-danger">Error loading application details: ${e.message}</div>`;
@@ -761,7 +775,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Store application ID for button handlers
         container.setAttribute('data-application-id', app.application_id);
         
-        if (status === 'Pending Review' || status === 'Pending') {
+        if (status === 'Pending' || status === 'Pending') {
             // Can accept or reject
             container.innerHTML = `
                 <button type="button" class="btn btn-success accept-application-btn" data-application-id="${app.application_id}">
@@ -772,7 +786,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </button>
             `;
         } else if (status === 'Confirmed' || status === 'Confirmed_By_Student') {
-            // Can finalize
+            // Can finalize (check both display and database values)
             container.innerHTML = `
                 <button type="button" class="btn btn-primary finalize-application-btn" data-application-id="${app.application_id}">
                     <i class="ph-check me-2"></i>Finalize Placement
@@ -783,7 +797,7 @@ document.addEventListener('DOMContentLoaded', function() {
             container.innerHTML = `
                 <span class="text-muted">Waiting for student to confirm acceptance...</span>
             `;
-        } else if (status === 'Finalized' || status === 'Rejected' || status === 'Withdrawn') {
+        } else if (status === 'Finalized' || status === 'Approved_By_Company' || status === 'Rejected' || status === 'Withdrawn') {
             // Final statuses - no actions
             container.innerHTML = `
                 <span class="text-muted">This application is ${status.toLowerCase()}.</span>
@@ -795,13 +809,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function normalizeStatusLocal(status) {
-        if (!status) return 'Pending Review';
-        const map = {
-            'Pending': 'Pending Review',
-            'Confirmed_By_Student': 'Confirmed',
-            'Approved_By_Company': 'Finalized'
-        };
-        return map[status] || status;
+        if (!status) return 'Pending';
+        // Statuses are now clean - no normalization needed
+        return status;
     }
     
     function attachActionButtonListeners() {

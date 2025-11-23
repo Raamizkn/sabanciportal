@@ -1,6 +1,6 @@
-const FINALIZED_STATUSES = ['Approved_By_Company', 'Confirmed_By_Student'];
-const PENDING_REVIEW_STATUSES = ['Pending', 'Pending Review', 'Under Review'];
-const AWAITING_STATUSES = ['Offered'];
+const FINALIZED_STATUSES = ['Finalized', 'Approved_By_Company']; // Finalized applications (database value included)
+const PENDING_STATUSES = ['Pending']; // Pending applications
+const CONFIRMED_STATUSES = ['Confirmed', 'Confirmed_By_Student']; // Student confirmed (database value included)
 
 document.addEventListener('DOMContentLoaded', function() {
     const api = new APIService();
@@ -140,16 +140,17 @@ function populatePendingTasks(applications) {
     if (!pendingTasksList) return;
     pendingTasksList.innerHTML = '';
 
-    const pendingCount = applications.filter(app => PENDING_REVIEW_STATUSES.includes(app.status)).length;
-    const awaitingCount = applications.filter(app => AWAITING_STATUSES.includes(app.status)).length;
+    const pendingCount = applications.filter(app => PENDING_STATUSES.includes(app.status)).length;
+    const confirmedCount = applications.filter(app => CONFIRMED_STATUSES.includes(app.status)).length;
     const finalizedCount = applications.filter(app => FINALIZED_STATUSES.includes(app.status)).length;
 
     if (pendingCount) {
         pendingTasksList.appendChild(createTaskItem('ph-users', `Review ${pendingCount} pending application${pendingCount === 1 ? '' : 's'}`, 'company-applications.html'));
     }
 
-    if (awaitingCount) {
-        pendingTasksList.appendChild(createTaskItem('ph-handshake', `Follow up with ${awaitingCount} student${awaitingCount === 1 ? '' : 's'} awaiting confirmation`, 'company-applications.html?status=Offered'));
+    if (confirmedCount > 0) {
+        // Show confirmed applications waiting for finalization
+        pendingTasksList.appendChild(createTaskItem('ph-check-square', `Finalize ${confirmedCount} confirmed application${confirmedCount === 1 ? '' : 's'}`, 'company-applications.html'));
     }
 
     if (finalizedCount) {
@@ -189,9 +190,9 @@ function renderStatusBadge(status) {
     const label = formatStatusLabel(status);
     if (FINALIZED_STATUSES.includes(status)) {
         badgeClass = 'badge bg-success bg-opacity-20 text-success';
-    } else if (PENDING_REVIEW_STATUSES.includes(status)) {
+    } else if (PENDING_STATUSES.includes(status)) {
         badgeClass = 'badge bg-warning bg-opacity-20 text-warning';
-    } else if (status === 'Offered') {
+    } else if (status === 'Accepted' || status === 'Confirmed' || status === 'Confirmed_By_Student') {
         badgeClass = 'badge bg-info bg-opacity-20 text-info';
     } else if (status && status.startsWith('Rejected')) {
         badgeClass = 'badge bg-danger bg-opacity-20 text-danger';
@@ -203,11 +204,6 @@ function formatStatusLabel(status) {
     if (!status) {
         return 'Unknown';
     }
-    const map = {
-        'Pending': 'Pending Review',
-        'Rejected_By_Company': 'Rejected (Internal)',
-        'Approved_By_Company': 'Finalize Placement',
-        'Confirmed_By_Student': 'Confirmed By Student'
-    };
-    return map[status] || status.replace(/_/g, ' ');
+    // Statuses are now clean - return as-is
+    return status;
 }

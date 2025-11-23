@@ -401,19 +401,23 @@
 		function getStatusBadge(status) {
 			let badgeClass = 'bg-secondary';
 			switch (status) {
-                case 'Confirmed_By_Student':
                 case 'Accepted':
                     badgeClass = 'bg-success';
                     break;
-                case 'Offered':
+                case 'Confirmed':
                     badgeClass = 'bg-info';
                     break;
-                case 'Pending Review':
-                case 'Under Review':
+                case 'Finalized':
+                    badgeClass = 'bg-success';
+                    break;
+                case 'Pending':
                     badgeClass = 'bg-warning text-dark';
                     break;
                 case 'Rejected':
                     badgeClass = 'bg-danger';
+                    break;
+                case 'Withdrawn':
+                    badgeClass = 'bg-secondary';
                     break;
             }
 			return `<span class="badge ${badgeClass} fs-lg me-2">${status}</span>`;
@@ -437,13 +441,9 @@
 		}
 		
 		function normalizeStatusForDetail(status) {
-			if (!status) return 'Pending Review';
-			const map = {
-				'Pending': 'Pending Review',
-				'Confirmed_By_Student': 'Confirmed',
-				'Approved_By_Company': 'Finalized'
-			};
-			return map[status] || status;
+			if (!status) return 'Pending';
+				// Statuses are now clean - no normalization needed
+				return status;
 		}
 
 		function addEventListeners(applicationId) {

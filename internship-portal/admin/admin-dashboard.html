@@ -1012,7 +1012,7 @@
 
 			recent.forEach(app => {
 				const row = document.createElement('tr');
-				const statusBadge = getStatusBadge(app.status || 'Pending Review');
+				const statusBadge = getStatusBadge(app.status || 'Pending');
 				
 				row.innerHTML = `
 					<td>
@@ -1038,16 +1038,20 @@
 
 		function getStatusBadge(status) {
 			let badgeClass = 'badge bg-secondary';
-			if (['Approved_By_Company', 'Confirmed_By_Student'].includes(status)) {
+			if (status === 'Finalized') {
 				badgeClass = 'badge bg-success';
-			} else if (['Pending', 'Pending Review', 'Under Review'].includes(status)) {
+			} else if (status === 'Pending') {
 				badgeClass = 'badge bg-warning text-dark';
-			} else if (status && status.startsWith('Rejected')) {
+			} else if (status === 'Rejected') {
 				badgeClass = 'badge bg-danger';
-			} else if (status === 'Offered') {
+			} else if (status === 'Accepted') {
+				badgeClass = 'badge bg-success';
+			} else if (status === 'Confirmed') {
 				badgeClass = 'badge bg-info';
+			} else if (status === 'Withdrawn') {
+				badgeClass = 'badge bg-secondary';
 			}
-			return `<span class="${badgeClass}">${status || 'Pending Review'}</span>`;
+			return `<span class="${badgeClass}">${status || 'Pending'}</span>`;
 		}
 
 		function getTimeAgo(timestamp) {

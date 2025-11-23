@@ -49,13 +49,13 @@ function get_primary_resume($documents) {
 
 function normalize_status($status) {
     if (!$status) {
-        return 'Pending Review';
+        return 'Pending';
     }
-    // Normalize status for display/logic - keep database values intact
+    // Map database values to clean display names
+    // Since we can't ALTER the ENUM, we keep database values but map for display
     $map = array(
-        'Pending' => 'Pending Review',
-        'Approved_By_Company' => 'Finalized', // For display purposes
-        'Confirmed_By_Student' => 'Confirmed' // For display purposes
+        'Confirmed_By_Student' => 'Confirmed',
+        'Approved_By_Company' => 'Finalized'
     );
     return isset($map[$status]) ? $map[$status] : $status;
 }
@@ -321,7 +321,7 @@ if ($entity === 'applications') {
 
                 $new_app_id = generate_application_code($db);
 
-                $stmt = $db->prepare("INSERT INTO applications (application_id, student_id, internship_id, status, cover_letter, applied_date) VALUES (?, ?, ?, 'Pending Review', ?, CURDATE())");
+                $stmt = $db->prepare("INSERT INTO applications (application_id, student_id, internship_id, status, cover_letter, applied_date) VALUES (?, ?, ?, 'Pending', ?, CURDATE())");
                 $stmt->execute([$new_app_id, $student_id, $input['internship_id'], $input['cover_letter'] ?? '']);
                 $newPrimaryId = $db->lastInsertId();
 
@@ -340,7 +340,7 @@ if ($entity === 'applications') {
                     'internship_id' => $input['internship_id'],
                     'company_name' => $internship['company_name'],
                     'position' => $internship['position'],
-                    'status' => 'Pending Review',
+                    'status' => 'Pending',
                     'applied_date' => date('Y-m-d'),
                     'cover_letter' => $input['cover_letter'] ?? ''
                 ];
@@ -381,7 +381,7 @@ if ($entity === 'applications') {
                     exit;
                 }
                 
-                if ($application['status'] !== 'Withdrawn' && $application['status'] !== 'Confirmed_By_Student' && $application['status'] !== 'Approved_By_Company') {
+                if ($application['status'] !== 'Withdrawn' && $application['status'] !== 'Confirmed' && $application['status'] !== 'Finalized') {
                     // Update status to Withdrawn
                     $stmt = $db->prepare("UPDATE applications SET status = 'Withdrawn', status_updated_date = NOW() WHERE application_id = ?");
                     $stmt->execute([$id]);
@@ -420,9 +420,9 @@ if ($entity === 'applications') {
                 $rawStatus = $application['status'];
                 $currentStatus = normalize_status($rawStatus);
                 
-                // Student can confirm if status is 'Accepted' (check both raw and normalized)
+                // Student can confirm if status is 'Accepted'
                 if ($rawStatus === 'Accepted' || $currentStatus === 'Accepted') {
-                    // Use 'Confirmed_By_Student' which exists in the ENUM
+                    // Use database value since we can't ALTER ENUM
                     $stmt = $db->prepare("UPDATE applications SET status = 'Confirmed_By_Student', status_updated_date = NOW() WHERE application_id = ?");
                     $stmt->execute([$id]);
                     
@@ -476,32 +476,26 @@ if ($entity === 'applications') {
                 $currentStatus = normalize_status($application['status']);
                 $newStatus = $input['status'];
                 
-                // Define valid status transitions for company
-                // Note: Using database ENUM values: 'Confirmed_By_Student' and 'Approved_By_Company' (finalized)
+                // Define valid status transitions for company (using clean status names)
                 $validTransitions = array(
-                    'Pending Review' => array('Accepted', 'Rejected'),
                     'Pending' => array('Accepted', 'Rejected'),
                     'Accepted' => array(), // Company cannot change Accepted - student must confirm
-                    'Confirmed' => array('Approved_By_Company'), // Company can finalize after student confirms
-                    'Confirmed_By_Student' => array('Approved_By_Company'), // Company can finalize after student confirms
+                    'Confirmed' => array('Finalized'), // Company can finalize after student confirms
+                    'Confirmed_By_Student' => array('Finalized'), // Database value - company can finalize
+                    'Finalized' => array(), // Finalized is final
+                    'Approved_By_Company' => array(), // Database value - finalized is final
                     'Rejected' => array(), // Rejected is final
-                    'Approved_By_Company' => array(), // Finalized is final
                     'Withdrawn' => array() // Withdrawn is final
                 );
                 
                 // Check if transition is valid
                 $allowedNextStatuses = isset($validTransitions[$currentStatus]) ? $validTransitions[$currentStatus] : array();
                 
-                // Map display statuses to database ENUM values
-                $statusMap = array(
-                    'Confirmed' => 'Confirmed_By_Student',
-                    'Finalized' => 'Approved_By_Company'
-                );
-                $dbStatus = isset($statusMap[$newStatus]) ? $statusMap[$newStatus] : $newStatus;
+                // No mapping needed - statuses are clean
+                $dbStatus = $newStatus;
                 
-                // Check normalized status for validation
-                $normalizedNewStatus = isset($statusMap[$newStatus]) ? $newStatus : $dbStatus;
-                if (!in_array($normalizedNewStatus, $allowedNextStatuses) && !in_array($dbStatus, $allowedNextStatuses)) {
+                // Check if transition is valid
+                if (!in_array($dbStatus, $allowedNextStatuses)) {
                     http_response_code(400);
                     $allowedStr = !empty($allowedNextStatuses) ? implode(', ', $allowedNextStatuses) : 'none (this status is final)';
                     echo json_encode([
@@ -556,9 +550,9 @@ if ($entity === 'applications') {
                 }
                 
                 $currentStatus = normalize_status($application['status']);
-                if (!in_array($currentStatus, array('Pending Review', 'Pending'))) {
+                if ($currentStatus !== 'Pending') {
                     http_response_code(400);
-                    echo json_encode(['error' => "Can only accept applications with status 'Pending Review'. Current status: '{$currentStatus}'."]);
+                    echo json_encode(['error' => "Can only accept applications with status 'Pending'. Current status: '{$currentStatus}'."]);
                     exit;
                 }
                 
@@ -598,9 +592,9 @@ if ($entity === 'applications') {
                 }
                 
                 $currentStatus = normalize_status($application['status']);
-                if (!in_array($currentStatus, array('Pending Review', 'Pending'))) {
+                if ($currentStatus !== 'Pending') {
                     http_response_code(400);
-                    echo json_encode(['error' => "Can only reject applications with status 'Pending Review'. Current status: '{$currentStatus}'."]);
+                    echo json_encode(['error' => "Can only reject applications with status 'Pending'. Current status: '{$currentStatus}'."]);
                     exit;
                 }
                 
@@ -639,18 +633,18 @@ if ($entity === 'applications') {
                     exit;
                 }
                 
-                // Check raw database status
-                $rawStatus = $application['status'];
-                $currentStatus = normalize_status($rawStatus);
+                // Check status
+                $currentStatus = $application['status'];
                 
-                // Can finalize if status is 'Confirmed_By_Student' (database value) or normalized 'Confirmed'
-                if ($rawStatus !== 'Confirmed_By_Student' && $currentStatus !== 'Confirmed') {
+                // Can finalize if status is 'Confirmed' (check both display and database values)
+                $rawStatus = $application['status'];
+                if ($currentStatus !== 'Confirmed' && $rawStatus !== 'Confirmed_By_Student') {
                     http_response_code(400);
                     echo json_encode(['error' => "Can only finalize applications with status 'Confirmed'. Current status: '{$currentStatus}'."]);
                     exit;
                 }
                 
-                // Use 'Approved_By_Company' which exists in the ENUM (represents finalized)
+                // Use database value since we can't ALTER ENUM
                 $stmt = $db->prepare("UPDATE applications SET status = 'Approved_By_Company', status_updated_date = NOW() WHERE application_id = ?");
                 $stmt->execute([$id]);
                 

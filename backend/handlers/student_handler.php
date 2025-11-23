@@ -143,7 +143,7 @@ function update_profile($student_id, $data) {
 function get_internships_for_student() {
     try {
         $db = student_db();
-        $stmt = $db->query("SELECT * FROM internships WHERE status IN ('Active', 'Approved_By_Company') ORDER BY posted_date DESC, created_at DESC");
+        $stmt = $db->query("SELECT * FROM internships WHERE status = 'Active' ORDER BY posted_date DESC, created_at DESC");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
         return ['error' => 'Failed to load internships: ' . $e->getMessage()];
@@ -275,13 +275,14 @@ function accept_internship_offer($student_id, $application_id) {
             return ['error' => 'Application not found or access denied'];
         }
 
-        if (!in_array($application['status'], ['Approved_By_Company', 'Offered'])) {
-            return ['error' => 'This internship offer cannot be confirmed in the current state'];
+        // Student can confirm if status is 'Accepted' (Offered is consolidated to Accepted)
+        if ($application['status'] !== 'Accepted') {
+            return ['error' => 'This internship offer cannot be confirmed. Status must be Accepted.'];
         }
 
-        $stmt = $db->prepare("UPDATE applications SET status = 'Confirmed_By_Student', status_updated_date = NOW() WHERE application_id = ?");
+        $stmt = $db->prepare("UPDATE applications SET status = 'Confirmed', status_updated_date = NOW() WHERE application_id = ?");
         $stmt->execute([$application_id]);
-        $application['status'] = 'Confirmed_By_Student';
+        $application['status'] = 'Confirmed';
 
         return ['status' => 'success', 'message' => 'Internship offer accepted', 'data' => $application];
     } catch (PDOException $e) {
