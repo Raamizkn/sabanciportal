@@ -91,7 +91,7 @@
 			<div class="navbar-collapse justify-content-center flex-lg-1 order-2 order-lg-1 collapse" id="navbar_search">
 				<div class="navbar-search flex-fill position-relative mt-2 mt-lg-0 mx-lg-3">
 					<div class="form-control-feedback form-control-feedback-start flex-grow-1">
-						<input type="text" class="form-control bg-transparent rounded-pill" placeholder="Search internships...">
+						<input type="text" id="navbar-search-input" class="form-control bg-transparent rounded-pill" placeholder="Search internships...">
 						<div class="form-control-feedback-icon">
 							<i class="ph-magnifying-glass"></i>
 						</div>
@@ -175,15 +175,11 @@
 							<i class="ph-file-text me-2"></i>
 							My documents
 						</a>
-						<a href="student-evaluations.html" class="dropdown-item">
-							<i class="ph-star me-2"></i>
-							Evaluations
-						</a>
-						<a href="student-settings.html" class="dropdown-item">
-							<i class="ph-gear me-2"></i>
-							Account settings
-						</a>
-						<div class="dropdown-divider"></div>
+					<a href="student-evaluations.html" class="dropdown-item">
+						<i class="ph-star me-2"></i>
+						Evaluations
+					</a>
+					<div class="dropdown-divider"></div>
 						<a href="../index.html" class="dropdown-item logout-link">
 							<i class="ph-sign-out me-2"></i>
 							Logout
@@ -269,19 +265,13 @@
 							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Profile</div>
 							<i class="ph-dots-three sidebar-resize-show"></i>
 						</li>
-						<li class="nav-item">
-							<a href="student-profile.html" class="nav-link">
-								<i class="ph-user-circle"></i>
-								<span>My Profile</span>
-							</a>
-						</li>
-						<li class="nav-item">
-							<a href="student-settings.html" class="nav-link">
-								<i class="ph-gear"></i>
-								<span>Account Settings</span>
-							</a>
-						</li>
-						<li class="nav-item">
+					<li class="nav-item">
+						<a href="student-profile.html" class="nav-link">
+							<i class="ph-user-circle"></i>
+							<span>My Profile</span>
+						</a>
+					</li>
+					<li class="nav-item">
 							<a href="../index.html" class="nav-link logout-link">
 								<i class="ph-sign-out"></i>
 								<span>Logout</span>
@@ -515,6 +505,19 @@
 					window.location.href = '../index.html';
 				});
 				return;
+			}
+
+			// Navbar search functionality
+			const searchInput = document.getElementById('navbar-search-input');
+			if (searchInput) {
+				searchInput.addEventListener('keypress', (e) => {
+					if (e.key === 'Enter') {
+						const searchTerm = searchInput.value.trim();
+						if (searchTerm) {
+							window.location.href = `student-internships.html?search=${encodeURIComponent(searchTerm)}`;
+						}
+					}
+				});
 			}
 
 			// Initialize tooltips

@@ -29,7 +29,131 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     loadStudentApplications(targetStudentId);
+    
+    // Add filter functionality
+    setupFilters();
 });
+
+// Store all applications for filtering
+let allApplications = [];
+
+// Setup filter functionality
+function setupFilters() {
+    const filterItems = document.querySelectorAll('[data-filter]');
+    filterItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const filterValue = item.getAttribute('data-filter');
+            filterApplications(filterValue);
+            
+            // Update active state
+            filterItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+        });
+    });
+    
+    // Add search functionality - check both navbar and page search inputs
+    const navbarSearchInput = document.getElementById('navbar-search-applications');
+    const pageSearchInput = document.querySelector('input[placeholder="Search applications..."]');
+    const searchInput = navbarSearchInput || pageSearchInput;
+    
+    if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                if (searchTerm) {
+                    searchApplications(searchTerm);
+                } else {
+                    // Reset to show all
+                    filterApplications('all');
+                }
+            }, 300);
+        });
+    }
+}
+
+function filterApplications(statusFilter) {
+    const tableBody = document.querySelector('.datatable-basic tbody');
+    if (!tableBody) return;
+    
+    // Remove any existing "no results" messages
+    const existingNoResults = tableBody.querySelector('tr[data-no-results]');
+    if (existingNoResults) {
+        existingNoResults.remove();
+    }
+    
+    const rows = Array.from(tableBody.querySelectorAll('tr')).filter(row => !row.hasAttribute('data-no-results'));
+    let visibleCount = 0;
+    
+    rows.forEach(row => {
+        const statusBadge = row.querySelector('.badge');
+        if (!statusBadge) {
+            row.style.display = 'none';
+            return;
+        }
+        
+        const rowStatus = statusBadge.textContent.trim();
+        const shouldShow = statusFilter === 'all' || rowStatus === statusFilter;
+        
+        if (shouldShow) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // Show message if no results
+    if (visibleCount === 0 && rows.length > 0) {
+        const noResultsRow = document.createElement('tr');
+        noResultsRow.setAttribute('data-no-results', 'true');
+        noResultsRow.innerHTML = `<td colspan="7" class="text-center text-muted">No applications found with status "${statusFilter}"</td>`;
+        tableBody.appendChild(noResultsRow);
+    }
+}
+
+function searchApplications(searchTerm) {
+    const tableBody = document.querySelector('.datatable-basic tbody');
+    if (!tableBody) return;
+    
+    // Remove any existing "no results" messages
+    const existingNoResults = tableBody.querySelector('tr[data-no-results]');
+    if (existingNoResults) {
+        existingNoResults.remove();
+    }
+    
+    const rows = Array.from(tableBody.querySelectorAll('tr')).filter(row => !row.hasAttribute('data-no-results'));
+    let visibleCount = 0;
+    
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        let matches = false;
+        
+        cells.forEach(cell => {
+            const text = cell.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                matches = true;
+            }
+        });
+        
+        if (matches) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // Show message if no results
+    if (visibleCount === 0 && rows.length > 0) {
+        const noResultsRow = document.createElement('tr');
+        noResultsRow.setAttribute('data-no-results', 'true');
+        noResultsRow.innerHTML = `<td colspan="7" class="text-center text-muted">No applications found matching "${searchTerm}"</td>`;
+        tableBody.appendChild(noResultsRow);
+    }
+}
 
 // Add admin navigation bar at the top of the page
 function addAdminNavigationBar() {
@@ -58,6 +182,7 @@ function addAdminNavigationBar() {
 async function loadStudentApplications(studentId) {
     try {
         const applications = await api.getStudentApplications(studentId);
+        allApplications = applications; // Store for filtering
         populateApplicationsTable(applications);
         updateStatusCards(applications);
         updateApplicationsBadge(applications.length);

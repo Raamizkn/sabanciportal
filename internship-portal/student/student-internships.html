@@ -85,7 +85,7 @@
 			<div class="navbar-collapse justify-content-center flex-lg-1 order-2 order-lg-1 collapse" id="navbar_search">
 				<div class="navbar-search flex-fill position-relative mt-2 mt-lg-0 mx-lg-3">
 					<div class="form-control-feedback form-control-feedback-start flex-grow-1">
-						<input type="text" class="form-control bg-transparent rounded-pill" placeholder="Search internships...">
+						<input type="text" id="navbar-search-input" class="form-control bg-transparent rounded-pill" placeholder="Search internships...">
 						<div class="form-control-feedback-icon">
 							<i class="ph-magnifying-glass"></i>
 						</div>
@@ -169,15 +169,11 @@
 							<i class="ph-file-text me-2"></i>
 							My documents
 						</a>
-						<a href="student-evaluations.html" class="dropdown-item">
-							<i class="ph-star me-2"></i>
-							Evaluations
-						</a>
-						<a href="student-settings.html" class="dropdown-item">
-							<i class="ph-gear me-2"></i>
-							Account settings
-						</a>
-						<div class="dropdown-divider"></div>
+					<a href="student-evaluations.html" class="dropdown-item">
+						<i class="ph-star me-2"></i>
+						Evaluations
+					</a>
+					<div class="dropdown-divider"></div>
 						<a href="../index.html" class="dropdown-item logout-link">
 							<i class="ph-sign-out me-2"></i>
 							Logout
@@ -263,19 +259,13 @@
 							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Profile</div>
 							<i class="ph-dots-three sidebar-resize-show"></i>
 						</li>
-						<li class="nav-item">
-							<a href="student-profile.html" class="nav-link">
-								<i class="ph-user-circle"></i>
-								<span>My Profile</span>
-							</a>
-						</li>
-						<li class="nav-item">
-							<a href="student-settings.html" class="nav-link">
-								<i class="ph-gear"></i>
-								<span>Account Settings</span>
-							</a>
-						</li>
-						<li class="nav-item">
+					<li class="nav-item">
+						<a href="student-profile.html" class="nav-link">
+							<i class="ph-user-circle"></i>
+							<span>My Profile</span>
+						</a>
+					</li>
+					<li class="nav-item">
 							<a href="../index.html" class="nav-link logout-link">
 								<i class="ph-sign-out"></i>
 								<span>Logout</span>
@@ -483,6 +473,36 @@
 
             // Load internships from API
             loadInternships();
+            
+            // Navbar search functionality
+            const navbarSearchInput = document.getElementById('navbar-search-input');
+            if (navbarSearchInput) {
+                navbarSearchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        const searchTerm = navbarSearchInput.value.trim();
+                        if (searchTerm) {
+                            // Set the keywords input and trigger filter
+                            const keywordsInput = document.querySelector('input[placeholder="Job title, skills, etc"]');
+                            if (keywordsInput) {
+                                keywordsInput.value = searchTerm;
+                                currentFilters.keywords = searchTerm;
+                                applyFilters();
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Check for search parameter in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlSearch = urlParams.get('search');
+            if (urlSearch) {
+                const keywordsInput = document.querySelector('input[placeholder="Job title, skills, etc"]');
+                if (keywordsInput) {
+                    keywordsInput.value = urlSearch;
+                    currentFilters.keywords = urlSearch;
+                }
+            }
 
             // Filtering functionality
             const filterSelects = document.querySelectorAll('.filter-select');
@@ -534,15 +554,28 @@
                 locationInput.addEventListener('input', () => {
                     clearTimeout(filterTimeout);
                     filterTimeout = setTimeout(() => {
-                    currentFilters.location = locationInput.value;
-                        if (locationInput.value) {
-                    applyFilters();
+                        currentFilters.location = locationInput.value.trim();
+                        if (locationInput.value.trim()) {
+                            applyFilters();
                         } else {
-                            renderPage(1);
-                            updatePagination();
+                            // Check if any other filters are active
+                            const hasActiveFilters = currentFilters.mode !== 'all' || currentFilters.keywords.trim() !== '';
+                            if (hasActiveFilters) {
+                                applyFilters();
+                            } else {
+                                renderPage(1);
+                                updatePagination();
+                            }
                         }
                     }, 300);
                 });
+            }
+            
+            // Apply filters if URL search parameter exists
+            if (urlSearch) {
+                setTimeout(() => {
+                    applyFilters();
+                }, 100);
             }
 
         });
@@ -747,13 +780,9 @@
             const keywordsInput = document.querySelector('input[placeholder="Job title, skills, etc"]');
             const locationInput = document.querySelector('input[placeholder="City, country, region"]');
             
-            // Store current filter values
-            let currentFilters = {
-                category: 'all',
-                mode: 'all',
-                keywords: keywordsInput ? keywordsInput.value : '',
-                location: locationInput ? locationInput.value : ''
-            };
+            // Update current filter values from inputs
+            currentFilters.keywords = keywordsInput ? keywordsInput.value.trim() : '';
+            currentFilters.location = locationInput ? locationInput.value.trim() : '';
 
             const filterSelects = document.querySelectorAll('.filter-select');
             filterSelects.forEach(select => {
@@ -765,7 +794,13 @@
 
             // Filter all internships
             const filteredInternships = allInternships.filter(internship => {
-                // Check mode
+                // Check category filter (if implemented)
+                if (currentFilters.category && currentFilters.category !== 'all') {
+                    // Category filtering can be added here if needed
+                    // For now, we'll skip this check
+                }
+
+                // Check mode filter
                 if (currentFilters.mode !== 'all') {
                     const locationLower = (internship.location || '').toLowerCase();
                     let internshipMode = 'in-person';
@@ -775,20 +810,20 @@
                         internshipMode = 'hybrid';
                     }
                     if (internshipMode !== currentFilters.mode) {
-                    return false;
-                    }
-                }
-
-                // Check keywords
-                if (currentFilters.keywords) {
-                    const internshipText = (internship.position + ' ' + internship.description + ' ' + internship.requirements).toLowerCase();
-                    const keywords = currentFilters.keywords.toLowerCase().split(' ');
-                    if (!keywords.every(keyword => internshipText.includes(keyword))) {
                         return false;
                     }
                 }
 
-                // Check location
+                // Check keywords filter
+                if (currentFilters.keywords) {
+                    const internshipText = ((internship.position || '') + ' ' + (internship.description || '') + ' ' + (internship.requirements || '')).toLowerCase();
+                    const keywords = currentFilters.keywords.toLowerCase().split(' ').filter(k => k.length > 0);
+                    if (keywords.length > 0 && !keywords.some(keyword => internshipText.includes(keyword))) {
+                        return false;
+                    }
+                }
+
+                // Check location filter
                 if (currentFilters.location) {
                     const locationText = (internship.location || '').toLowerCase();
                     if (!locationText.includes(currentFilters.location.toLowerCase())) {
