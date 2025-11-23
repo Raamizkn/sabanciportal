@@ -38,11 +38,46 @@ async function loadApplications(companyId) {
             return acc;
         }, {});
         populateApplicationsTable(latestApplications);
+        updateApplicationsBadge(latestApplications.length);
     } catch (error) {
         console.error('Failed to load applications:', error);
         const tableBody = document.getElementById('applicationsTableBody');
         if (tableBody) {
             tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Failed to load applications.</td></tr>';
+        }
+        updateApplicationsBadge(0);
+    }
+}
+
+function updateApplicationsBadge(count) {
+    // Update badge in sidebar navigation by ID
+    const badge = document.getElementById('applicationsBadge');
+    if (badge) {
+        badge.textContent = count;
+        // Hide badge if count is 0
+        if (count === 0) {
+            badge.style.display = 'none';
+        } else {
+            badge.style.display = '';
+        }
+    }
+    
+    // Also update by selector as fallback
+    const applicationsNavLink = document.querySelector('.nav-link[href="company-applications.html"]');
+    if (applicationsNavLink) {
+        let badgeElement = applicationsNavLink.querySelector('.badge');
+        if (!badgeElement) {
+            badgeElement = document.createElement('span');
+            badgeElement.className = 'badge bg-primary rounded-pill ms-auto';
+            badgeElement.id = 'applicationsBadge';
+            applicationsNavLink.appendChild(badgeElement);
+        }
+        badgeElement.textContent = count;
+        // Hide badge if count is 0
+        if (count === 0) {
+            badgeElement.style.display = 'none';
+        } else {
+            badgeElement.style.display = '';
         }
     }
 }
