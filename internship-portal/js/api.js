@@ -297,6 +297,16 @@ class APIService {
     }
 
     /**
+     * Update existing internship
+     */
+    async updateInternship(internshipId, internshipData) {
+        return this.request(`/index.php?entity=internships&id=${internshipId}&action=update`, {
+            method: 'POST',
+            body: JSON.stringify(internshipData)
+        });
+    }
+
+    /**
      * Get company applications
      */
     async getCompanyApplications(companyId, status = null) {

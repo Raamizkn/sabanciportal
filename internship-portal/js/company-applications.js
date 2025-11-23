@@ -210,7 +210,7 @@ function buildActionsCell(app, encodedApp) {
 
     return `
         <div class="dropdown">
-            <button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
+            <button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown" data-bs-boundary="viewport">
                 <i class="ph-dots-three-vertical"></i>
             </button>
             <div class="dropdown-menu dropdown-menu-end">

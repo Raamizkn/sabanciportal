@@ -12,7 +12,9 @@ function resolveProfileImage(path) {
         return path;
     }
     if (path.startsWith('/')) {
-        return `${API_BASE_URL}${path}`;
+        // API_BASE_URL is defined in api.js which is loaded before this file
+        const apiBase = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
+        return `${apiBase}${path}`;
     }
     return path;
 }
@@ -106,7 +108,7 @@ function populateFinalizedTable(applications) {
             <td>${renderStatusBadge(app.status)}</td>
             <td class="text-center">
                 <div class="dropdown">
-                    <button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
+                    <button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown" data-bs-boundary="viewport">
                         <i class="ph-dots-three-vertical"></i>
                     </button>
                     <div class="dropdown-menu dropdown-menu-end">
@@ -121,52 +123,152 @@ function populateFinalizedTable(applications) {
 }
 
 function renderModal(app) {
-    const studentHeading = document.getElementById('finalizedStudentHeading');
-    if (studentHeading) {
-        studentHeading.textContent = `Student: ${app.student_name || 'N/A'} (${app.student_major || 'Program N/A'})`;
-    }
-    const internshipTitle = document.getElementById('finalizedInternshipTitle');
-    if (internshipTitle) {
-        internshipTitle.textContent = app.internship_position || 'Internship';
-    }
-    const period = document.getElementById('finalizedPeriod');
-    if (period) {
-        period.textContent = app.internship_dates || '—';
-    }
-    const status = document.getElementById('finalizedStatus');
-    if (status) {
-        status.innerHTML = renderStatusBadge(app.status);
-    }
-    const offerBlock = document.getElementById('finalizedOfferDetails');
-    if (offerBlock) {
-        if (app.offer_details) {
-            offerBlock.innerHTML = `<div class="alert alert-info">${app.offer_details}</div>`;
-        } else {
-            offerBlock.innerHTML = '';
-        }
+    const modalBody = document.getElementById('finalizedModalBody');
+    if (!modalBody) return;
+
+    const studentProfileImg = resolveProfileImage(app.student_profile_pic);
+    const statusBadge = renderStatusBadge(app.status);
+    
+    // Build documents HTML
+    let documentsHTML = '';
+    if (Array.isArray(app.documents) && app.documents.length > 0) {
+        app.documents.forEach(doc => {
+            if (doc.download_url) {
+                const apiBase = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
+                const downloadUrl = doc.download_url.startsWith('http') ? doc.download_url : `${apiBase}${doc.download_url}`;
+                documentsHTML += `
+                    <a href="${downloadUrl}" target="_blank" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span>${doc.file_name || 'Document'} (${doc.document_type || 'File'})</span>
+                        <i class="ph-download-simple"></i>
+                    </a>
+                `;
+            }
+        });
+    } else {
+        documentsHTML = '<div class="text-muted">No additional documents attached.</div>';
     }
 
-    const docsContainer = document.getElementById('finalizedDocuments');
-    if (docsContainer) {
-        docsContainer.innerHTML = '';
-        if (!Array.isArray(app.documents) || !app.documents.length) {
-            docsContainer.innerHTML = '<div class="text-muted">No documents attached.</div>';
-        } else {
-            app.documents.forEach(doc => {
-                if (!doc.download_url) {
-                    return;
-                }
-                const downloadUrl = doc.download_url.startsWith('http') ? doc.download_url : `${API_BASE_URL}${doc.download_url}`;
-                const item = document.createElement('a');
-                item.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center';
-                item.href = downloadUrl;
-                item.target = '_blank';
-                item.rel = 'noopener noreferrer';
-                item.innerHTML = `<span>${doc.file_name || 'Document'} (${doc.document_type || 'File'})</span><i class="ph-download-simple"></i>`;
-                docsContainer.appendChild(item);
-            });
-        }
-    }
+    modalBody.innerHTML = `
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Student Information Card -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">Student Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3">
+                                <img src="${studentProfileImg}" class="rounded-circle" width="80" height="80" alt="Student Profile">
+                            </div>
+                            <div>
+                                <h5 class="mb-0">${app.student_name || 'N/A'}</h5>
+                                <p class="mb-0 text-muted">${app.student_major || 'N/A'}</p>
+                                <p class="mb-0"><i class="ph-envelope me-1"></i> ${app.student_email || 'N/A'}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Student ID:</dt>
+                            <dd class="col-sm-8">${app.student_id || 'N/A'}</dd>
+                            <dt class="col-sm-4">Phone:</dt>
+                            <dd class="col-sm-8">${app.student_phone || 'N/A'}</dd>
+                            <dt class="col-sm-4">GPA:</dt>
+                            <dd class="col-sm-8">${app.student_gpa || 'N/A'}</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <!-- Internship Information Card -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">Internship Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="mb-1">${app.internship_position || 'Internship'}</h5>
+                        <p class="text-muted mb-3"><i class="ph-building me-1"></i> ${app.company_name || 'Company'}</p>
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Location:</dt>
+                            <dd class="col-sm-8">${app.internship_location || 'Not specified'}</dd>
+                            <dt class="col-sm-4">Duration:</dt>
+                            <dd class="col-sm-8">${app.internship_dates || 'Not specified'}</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <!-- Cover Letter Card -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">Cover Letter</h6>
+                    </div>
+                    <div class="card-body">
+                        <p style="white-space: pre-wrap; margin-bottom: 0;">${app.cover_letter || 'No cover letter provided.'}</p>
+                    </div>
+                </div>
+
+                <!-- Documents Card -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">Attached Documents</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6 class="fw-semibold mb-2">Resume/CV</h6>
+                            ${app.resume_download_url ? `
+                                <a href="${typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : ''}${app.resume_download_url}" target="_blank" class="btn btn-outline-primary">
+                                    <i class="ph-download-simple me-2"></i>${app.resume_file_name || 'Download Resume'}
+                                </a>
+                            ` : '<p class="text-muted mb-0">No resume uploaded.</p>'}
+                        </div>
+                        <hr>
+                        <h6 class="fw-semibold mb-2">Additional Documents</h6>
+                        <div class="list-group">
+                            ${documentsHTML}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Application Status Card -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">Application Status</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            ${statusBadge}
+                        </div>
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5">Application ID:</dt>
+                            <dd class="col-sm-7">${app.application_id || 'N/A'}</dd>
+                            <dt class="col-sm-5">Applied On:</dt>
+                            <dd class="col-sm-7">${app.applied_date ? new Date(app.applied_date).toLocaleDateString() : 'N/A'}</dd>
+                            <dt class="col-sm-5">Finalized On:</dt>
+                            <dd class="col-sm-7">${app.status_updated_date ? new Date(app.status_updated_date).toLocaleDateString() : 'N/A'}</dd>
+                        </dl>
+                        ${app.offer_details ? `
+                            <hr>
+                            <h6 class="fw-semibold mb-2">Offer Details</h6>
+                            <div class="alert alert-info mb-0">${app.offer_details}</div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <!-- Evaluation Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">Evaluation</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info mb-0">
+                            Evaluation not submitted yet. <a href="company-evaluations.html?application_id=${encodeURIComponent(app.application_id)}" class="alert-link">Submit Evaluation</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 function attachModalHandler() {

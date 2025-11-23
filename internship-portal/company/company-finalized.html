@@ -44,6 +44,39 @@
 			display: flex;
 			overflow: hidden;
 		}
+		/* Ensure dropdowns can overflow modals and scrollable containers */
+		.modal .dropdown-menu {
+			position: absolute !important;
+			z-index: 1055 !important;
+		}
+		.modal-body {
+			position: relative;
+		}
+		/* Fix dropdown overflow in table-responsive containers */
+		.table-responsive {
+			overflow-x: auto;
+			overflow-y: visible;
+		}
+		.table-responsive .dropdown-menu {
+			position: absolute !important;
+			z-index: 1055 !important;
+		}
+		.card .table-responsive {
+			overflow-x: auto;
+			overflow-y: visible;
+		}
+		.card .table-responsive .dropdown-menu {
+			position: absolute !important;
+			z-index: 1055 !important;
+		}
+		/* Ensure dropdowns can overflow table cells */
+		.table td {
+			position: relative;
+		}
+		.table td .dropdown-menu {
+			position: absolute !important;
+			z-index: 1055 !important;
+		}
 	</style>
 </head>
 
@@ -141,10 +174,6 @@
 							<i class="ph-users me-2"></i>
 							Applications
 						</a>
-						<a href="company-settings.html" class="dropdown-item">
-							<i class="ph-gear me-2"></i>
-							Account settings
-						</a>
 						<div class="dropdown-divider"></div>
 						<a href="../index.html" class="dropdown-item">
 							<i class="ph-sign-out me-2"></i>
@@ -238,12 +267,6 @@
 							</a>
 						</li>
 						<li class="nav-item">
-							<a href="company-settings.html" class="nav-link">
-								<i class="ph-gear"></i>
-								<span>Account Settings</span>
-							</a>
-						</li>
-						<li class="nav-item">
 							<a href="../index.html" class="nav-link">
 								<i class="ph-sign-out"></i>
 								<span>Logout</span>
@@ -278,14 +301,14 @@
                 </div>
                 <!-- /page header -->
 
-                <!-- Finalized internships table -->
+				<!-- Finalized internships table -->
 				<div class="card">
 					<div class="card-header">
 						<h5 class="mb-0">Finalized Internships</h5>
 					</div>
 
-					<div class="table-responsive">
-						<table class="table table-striped table-hover">
+					<div class="card-body p-0">
+						<table class="table table-striped table-hover mb-0">
 							<thead>
 								<tr>
 									<th>#</th>
@@ -309,22 +332,14 @@
 
 				<!-- View Finalized Details Modal -->
 				<div id="view_finalized_details_modal" class="modal fade" tabindex="-1">
-					<div class="modal-dialog modal-lg">
+					<div class="modal-dialog modal-xl">
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title">Finalized Internship Details</h5>
 								<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 							</div>
-							<div class="modal-body">
-								<h6 class="fw-semibold" id="finalizedStudentHeading">Student</h6>
-								<p><strong>Internship:</strong> <span id="finalizedInternshipTitle">—</span></p>
-								<p><strong>Period:</strong> <span id="finalizedPeriod">—</span></p>
-								<p><strong>Status:</strong> <span id="finalizedStatus">—</span></p>
-								<div class="mb-3" id="finalizedOfferDetails"></div>
-								<hr>
-								<h6 class="fw-semibold">Attached Documents</h6>
-								<div id="finalizedDocuments" class="list-group mb-3"></div>
-								<div class="alert alert-info" id="finalizedEvaluationAlert">Evaluation not submitted yet. <a href="company-evaluations.html">Submit Evaluation</a></div>
+							<div class="modal-body" id="finalizedModalBody" style="max-height: calc(100vh - 200px); overflow-y: auto;">
+								<!-- Content will be populated dynamically -->
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>

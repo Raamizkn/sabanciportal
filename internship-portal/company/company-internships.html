@@ -148,10 +148,6 @@
 							<i class="ph-users me-2"></i>
 							Applications
 						</a>
-						<a href="company-settings.html" class="dropdown-item">
-							<i class="ph-gear me-2"></i>
-							Account settings
-						</a>
 						<div class="dropdown-divider"></div>
 						<a href="../index.html" class="dropdown-item">
 							<i class="ph-sign-out me-2"></i>
@@ -242,12 +238,6 @@
 							<a href="company-profile.html" class="nav-link">
 								<i class="ph-building"></i>
 								<span>Company Profile</span>
-							</a>
-						</li>
-						<li class="nav-item">
-							<a href="company-settings.html" class="nav-link">
-								<i class="ph-gear"></i>
-								<span>Account Settings</span>
 							</a>
 						</li>
 						<li class="nav-item">
@@ -491,17 +481,18 @@
                 </div>
                 <!-- /internship cards -->
 
-                <!-- New internship modal -->
+                <!-- New/Edit internship modal -->
                 <div id="new_internship_modal" class="modal fade" tabindex="-1">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title">Post New Internship</h5>
+                                <h5 class="modal-title" id="internshipModalTitle">Post New Internship</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
 
                             <div class="modal-body">
                                 <form id="createInternshipForm">
+                                    <input type="hidden" id="editInternshipId" value="">
                                     <div class="mb-3">
                                         <label class="form-label">Position title: *</label>
                                         <input type="text" class="form-control" placeholder="e.g. Software Developer Intern" id="position" required>
@@ -690,7 +681,7 @@
 			return;
 		}
 
-			// Handle create internship form submission
+			// Handle create/edit internship form submission
 			const submitBtn = document.getElementById('submitInternshipBtn');
 			if (submitBtn) {
 				submitBtn.addEventListener('click', async function() {
@@ -699,6 +690,9 @@
 						form.reportValidity();
 						return;
 					}
+
+					const editId = document.getElementById('editInternshipId').value;
+					const isEditMode = editId !== '';
 
 					const internshipData = {
 						position: document.getElementById('position').value,
@@ -714,25 +708,40 @@
 						department: document.getElementById('department').value
 					};
 
-			try {
-				const data = await api.createInternship(userId, internshipData);
+					try {
+						let data;
+						if (isEditMode) {
+							data = await api.updateInternship(editId, internshipData);
+						} else {
+							data = await api.createInternship(userId, internshipData);
+						}
 
-				// Backend returns the internship object directly with id if successful
-				if (data && data.id) {
-					showAlertModal('Success', 'Internship posted successfully!', 'success', () => {
-						// Close modal
-						const modal = bootstrap.Modal.getInstance(document.getElementById('new_internship_modal'));
-						if (modal) modal.hide();
-						// Reload page to show new internship
-						location.reload();
-					});
-				} else {
-					showAlertModal('Error', data.error || 'Failed to post internship. Please try again.', 'error');
-				}
-			} catch (error) {
-				console.error('Error creating internship:', error);
-				showAlertModal('Error', 'An error occurred. Please try again.', 'error');
+						// Backend returns the internship object directly with id if successful
+						if (data && data.id) {
+							showAlertModal('Success', isEditMode ? 'Internship updated successfully!' : 'Internship posted successfully!', 'success', () => {
+								// Close modal
+								const modal = bootstrap.Modal.getInstance(document.getElementById('new_internship_modal'));
+								if (modal) modal.hide();
+								// Reset form
+								resetInternshipForm();
+								// Reload page to show updated internship
+								location.reload();
+							});
+						} else {
+							showAlertModal('Error', data.error || (isEditMode ? 'Failed to update internship. Please try again.' : 'Failed to post internship. Please try again.'), 'error');
+						}
+					} catch (error) {
+						console.error('Error saving internship:', error);
+						showAlertModal('Error', 'An error occurred. Please try again.', 'error');
+					}
+				});
 			}
+
+			// Reset form when modal is closed
+			const internshipModal = document.getElementById('new_internship_modal');
+			if (internshipModal) {
+				internshipModal.addEventListener('hidden.bs.modal', function() {
+					resetInternshipForm();
 				});
 			}
 
@@ -893,9 +902,83 @@
 			}
 		}
 
-		function editInternship(id) {
-			// TODO: Implement edit functionality
-			showAlertModal('Coming Soon', 'Edit functionality will be available soon.', 'info');
+		async function editInternship(id) {
+			try {
+				const internship = await api.getInternshipDetails(id);
+				populateEditForm(internship);
+				const modal = new bootstrap.Modal(document.getElementById('new_internship_modal'));
+				modal.show();
+			} catch (error) {
+				console.error('Failed to load internship details:', error);
+				showAlertModal('Error', 'Failed to load internship details. Please try again.', 'error');
+			}
+		}
+
+		function populateEditForm(internship) {
+			// Update modal title
+			const titleEl = document.getElementById('internshipModalTitle');
+			if (titleEl) {
+				titleEl.textContent = 'Edit Internship';
+			}
+
+			// Set edit mode ID
+			document.getElementById('editInternshipId').value = internship.id;
+
+			// Populate form fields
+			document.getElementById('position').value = internship.position || internship.title || '';
+			document.getElementById('description').value = internship.description || '';
+			document.getElementById('department').value = internship.department || '';
+			document.getElementById('salary').value = internship.salary || '';
+			document.getElementById('type').value = internship.type || 'Full-time';
+			document.getElementById('application-deadline').value = internship.application_deadline || '';
+
+			// Handle location
+			const locationType = internship.location || '';
+			if (locationType === 'Remote' || locationType === 'On-site' || locationType === 'Hybrid') {
+				document.getElementById('location-type').value = locationType;
+				document.getElementById('location').value = '';
+			} else {
+				document.getElementById('location-type').value = '';
+				document.getElementById('location').value = locationType;
+			}
+
+			// Handle dates
+			if (internship.dates) {
+				const dateParts = internship.dates.split(' - ');
+				if (dateParts.length === 2) {
+					document.getElementById('start-date').value = dateParts[0].trim();
+					document.getElementById('end-date').value = dateParts[1].trim();
+				}
+			}
+
+			// Handle requirements
+			document.getElementById('requirements').value = internship.requirements || '';
+
+			// Update submit button text
+			const submitBtn = document.getElementById('submitInternshipBtn');
+			if (submitBtn) {
+				submitBtn.textContent = 'Update Internship';
+			}
+		}
+
+		function resetInternshipForm() {
+			// Reset modal title
+			const titleEl = document.getElementById('internshipModalTitle');
+			if (titleEl) {
+				titleEl.textContent = 'Post New Internship';
+			}
+
+			// Clear edit mode ID
+			document.getElementById('editInternshipId').value = '';
+
+			// Reset form
+			document.getElementById('createInternshipForm').reset();
+
+			// Reset submit button text
+			const submitBtn = document.getElementById('submitInternshipBtn');
+			if (submitBtn) {
+				submitBtn.textContent = 'Post Internship';
+			}
 		}
 	</script>
 
