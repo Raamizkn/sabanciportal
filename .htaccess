@@ -1,0 +1,10 @@
+RewriteEngine On
+
+# SimpleSAMLPHP Redirection and Protection
+
+# Redirect /saml request to simplesamlphp.../public and allow acccess
+RewriteRule ^saml/(.*)$ simplesamlphp-2.4.1/public/$1 [L,END]
+
+# Deny access to simplesamphp.*, protect simplesamlphp library from public access
+RewriteRule ^simplesamlphp.* - [R=404,L,END]
+

@@ -165,13 +165,25 @@
 								<a href="#" class="ms-auto">Forgot password?</a>
 							</div>
 
-							<div class="mb-3">
-								<button type="submit" class="btn btn-primary w-100">Sign in</button>
-							</div>
+						<div class="mb-3">
+							<button type="submit" class="btn btn-primary w-100">Sign in</button>
+						</div>
 
-							<div class="text-center">
-								<a href="#" data-bs-toggle="modal" data-bs-target="#signup_modal">Register as a new user</a>
-							</div>
+						<div class="position-relative text-center my-3">
+							<hr class="position-absolute top-50 start-0 w-100">
+							<span class="badge bg-white text-muted position-relative px-2">OR</span>
+						</div>
+
+						<div class="mb-3">
+							<a href="../backend/auth/saml_login_endpoint.php" class="btn btn-outline-primary w-100">
+								<i class="ph-lock-key me-2"></i>
+								Sign in with Sabancı SSO
+							</a>
+						</div>
+
+						<div class="text-center">
+							<a href="#" data-bs-toggle="modal" data-bs-target="#signup_modal">Register as a new user</a>
+						</div>
 						</div>
 					</div>
 					<!-- /login form -->
@@ -301,15 +313,27 @@
 							<a href="#" class="ms-auto">Forgot password?</a>
 						</div>
 
-						<div class="text-end">
-							<button type="submit" class="btn btn-primary">Sign in <i class="ph-sign-in ms-2"></i></button>
-						</div>
-					</form>
-				</div>
+					<div class="text-end">
+						<button type="submit" class="btn btn-primary">Sign in <i class="ph-sign-in ms-2"></i></button>
+					</div>
+
+					<div class="position-relative text-center my-3">
+						<hr class="position-absolute top-50 start-0 w-100">
+						<span class="badge bg-white text-muted position-relative px-2">OR</span>
+					</div>
+
+					<div class="text-center">
+						<a href="../backend/auth/saml_login_endpoint.php" class="btn btn-outline-primary">
+							<i class="ph-lock-key me-2"></i>
+							Sign in with Sabancı SSO
+						</a>
+					</div>
+				</form>
 			</div>
 		</div>
 	</div>
-	<!-- /login modal -->
+</div>
+<!-- /login modal -->
 
 	<!-- Sign up modal -->
 	<div id="signup_modal" class="modal fade" tabindex="-1">

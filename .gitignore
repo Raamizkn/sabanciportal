@@ -1,0 +1,30 @@
+# SimpleSAMLPHP Configuration (DO NOT COMMIT)
+simplesamlphp-2.4.1/config/config-local.php
+simplesamlphp-2.4.1/metadata/saml20-idp-remote-local.php
+
+# SimpleSAMLPHP Cache and Logs
+simplesamlphp-2.4.1/cache/
+simplesamlphp-2.4.1/log/
+simplesamlphp-2.4.1/data/
+
+# Sensitive Files
+backend/config/database.php
+*.cookies.txt
+
+# System Files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+npm-debug.log*
+
