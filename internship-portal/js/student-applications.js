@@ -60,10 +60,44 @@ async function loadStudentApplications(studentId) {
         const applications = await api.getStudentApplications(studentId);
         populateApplicationsTable(applications);
         updateStatusCards(applications);
+        updateApplicationsBadge(applications.length);
     } catch (error) {
         console.error('Failed to load applications:', error);
         const tableBody = document.querySelector('.datatable-basic tbody');
         tableBody.innerHTML = '<tr><td colspan="7" class="text-center">Failed to load applications.</td></tr>';
+        updateApplicationsBadge(0);
+    }
+}
+
+function updateApplicationsBadge(count) {
+    // Update badge in sidebar navigation
+    const badge = document.getElementById('studentApplicationsBadge');
+    if (badge) {
+        badge.textContent = count;
+        // Hide badge if count is 0
+        if (count === 0) {
+            badge.style.display = 'none';
+        } else {
+            badge.style.display = '';
+        }
+    }
+    
+    // Also update by selector as fallback
+    const applicationsNavLink = document.querySelector('.nav-link[href="student-applications.html"]');
+    if (applicationsNavLink) {
+        let badgeElement = applicationsNavLink.querySelector('.badge');
+        if (!badgeElement) {
+            badgeElement = document.createElement('span');
+            badgeElement.className = 'badge bg-primary rounded-pill ms-auto';
+            badgeElement.id = 'studentApplicationsBadge';
+            applicationsNavLink.appendChild(badgeElement);
+        }
+        badgeElement.textContent = count;
+        if (count === 0) {
+            badgeElement.style.display = 'none';
+        } else {
+            badgeElement.style.display = '';
+        }
     }
 }
 
@@ -122,24 +156,26 @@ function formatStatusLabel(status) {
 }
 
 function getStatusBadge(status) {
+    if (!status) return '<span class="badge bg-secondary">Pending Review</span>';
+    
+    const normalizedStatus = normalizeStatusForStudent(status);
     let badgeClass = 'bg-secondary';
-    switch (status) {
-        case 'Confirmed_By_Student':
-        case 'Approved_By_Company':
+    
+    switch (normalizedStatus) {
+        case 'Pending Review':
+        case 'Pending':
+            badgeClass = 'bg-warning text-dark';
+            break;
         case 'Accepted':
             badgeClass = 'bg-success';
             break;
-        case 'Offered':
+        case 'Confirmed':
+        case 'Confirmed_By_Student':
             badgeClass = 'bg-info';
             break;
-        case 'Pending':
-        case 'Pending Review':
-        case 'Under Review':
-            badgeClass = 'bg-warning text-dark';
-            break;
-        case 'Shortlisted':
-        case 'Interview Scheduled':
-            badgeClass = 'bg-primary';
+        case 'Finalized':
+        case 'Approved_By_Company':
+            badgeClass = 'bg-success';
             break;
         case 'Rejected':
         case 'Rejected_By_Company':
@@ -148,8 +184,15 @@ function getStatusBadge(status) {
         case 'Withdrawn':
             badgeClass = 'bg-secondary';
             break;
+        case 'Shortlisted':
+        case 'Interview Scheduled':
+            badgeClass = 'bg-primary';
+            break;
+        default:
+            badgeClass = 'bg-secondary';
     }
-    return `<span class="badge ${badgeClass}">${formatStatusLabel(status)}</span>`;
+    
+    return `<span class="badge ${badgeClass}">${normalizedStatus}</span>`;
 }
 
 function getActionButtons(application) {
@@ -246,34 +289,34 @@ function addEventListeners() {
 function updateStatusCards(applications) {
     const statusCounts = {
         total: applications.length,
-        accepted: 0,
         pending: 0,
-        rejected: 0,
-        awaiting: 0,
-        approved: 0
+        accepted: 0,
+        confirmed: 0,
+        finalized: 0,
+        rejected: 0
     };
 
     applications.forEach(app => {
         const status = app.status;
-        if (['Accepted', 'Confirmed_By_Student'].includes(status)) {
-            statusCounts.accepted++;
-        } else if (['Pending', 'Pending Review', 'Under Review'].includes(status)) {
+        if (['Pending', 'Pending Review', 'Under Review'].includes(status)) {
             statusCounts.pending++;
+        } else if (status === 'Accepted') {
+            statusCounts.accepted++;
+        } else if (status === 'Confirmed_By_Student') {
+            statusCounts.confirmed++;
+        } else if (status === 'Approved_By_Company') {
+            statusCounts.finalized++;
         } else if (['Rejected', 'Rejected_By_Company'].includes(status)) {
             statusCounts.rejected++;
-        } else if (status === 'Offered') {
-            statusCounts.awaiting++;
-        } else if (status === 'Approved_By_Company') {
-            statusCounts.approved++;
         }
     });
 
     setCount('studentTotalApplicationsCount', statusCounts.total);
-    setCount('studentAcceptedApplicationsCount', statusCounts.accepted);
     setCount('studentPendingApplicationsCount', statusCounts.pending);
+    setCount('studentAcceptedApplicationsCount', statusCounts.accepted);
+    setCount('studentConfirmedApplicationsCount', statusCounts.confirmed);
+    setCount('studentFinalizedApplicationsCount', statusCounts.finalized);
     setCount('studentRejectedApplicationsCount', statusCounts.rejected);
-    setCount('studentAwaitingApplicationsCount', statusCounts.awaiting);
-    setCount('studentApprovedApplicationsCount', statusCounts.approved);
 }
 
 function setCount(elementId, value) {

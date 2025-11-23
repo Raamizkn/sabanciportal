@@ -19,6 +19,10 @@
 	<!-- Core JS files -->
 	<script src="../bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
 	<!-- /core JS files -->
+	
+	<!-- API Service -->
+	<script src="../js/api.js"></script>
+	<script src="../js/modal-utils.js"></script>
 
 	<!-- Theme JS files -->
 	<script src="../bs5/template/assets/js/vendor/visualization/d3/d3.min.js"></script>
@@ -244,7 +248,7 @@
 							<a href="student-applications.html" class="nav-link">
 								<i class="ph-file-text"></i>
 								<span>My Applications</span>
-								<span class="badge bg-primary rounded-pill ms-auto">3</span>
+								<span class="badge bg-primary rounded-pill ms-auto" id="studentApplicationsBadge">0</span>
 							</a>
 						</li>
 						<li class="nav-item">
@@ -318,106 +322,59 @@
 					</div>
 
 					<div class="card-body border-top border-light bg-opacity-10 border-opacity-25">
-						<div class="row text-center">
+						<div class="row text-center g-3">
 							<div class="col-xl-2 col-sm-4 col-6">
-								<div class="mb-1">
-									<i class="ph-briefcase fs-3"></i>
+								<div class="bg-white bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+									<i class="ph-briefcase fs-2"></i>
 								</div>
-								<h5 class="mb-0">5</h5>
-								<div class="opacity-75">Total</div>
+								<h4 class="mb-0 fw-bold" id="dashboardTotalApplications">0</h4>
+								<div class="opacity-75 fs-sm">Total</div>
 							</div>
 
 							<div class="col-xl-2 col-sm-4 col-6">
-								<div class="mb-1">
-									<i class="ph-check-circle fs-3 text-success"></i>
+								<div class="bg-white bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+									<i class="ph-clock fs-2"></i>
 								</div>
-								<h5 class="mb-0">1</h5>
-								<div class="opacity-75">Accepted</div>
+								<h4 class="mb-0 fw-bold" id="dashboardPendingApplications">0</h4>
+								<div class="opacity-75 fs-sm">Pending Review</div>
 							</div>
 
 							<div class="col-xl-2 col-sm-4 col-6">
-								<div class="mb-1">
-									<i class="ph-clock fs-3 text-secondary"></i>
+								<div class="bg-white bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+									<i class="ph-check-circle fs-2"></i>
 								</div>
-								<h5 class="mb-0">1</h5>
-								<div class="opacity-75">Pending</div>
+								<h4 class="mb-0 fw-bold" id="dashboardAcceptedApplications">0</h4>
+								<div class="opacity-75 fs-sm">Accepted</div>
 							</div>
 
 							<div class="col-xl-2 col-sm-4 col-6">
-								<div class="mb-1">
-									<i class="ph-x-circle fs-3 text-danger"></i>
+								<div class="bg-white bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+									<i class="ph-check-square fs-2"></i>
 								</div>
-								<h5 class="mb-0">1</h5>
-								<div class="opacity-75">Rejected</div>
+								<h4 class="mb-0 fw-bold" id="dashboardConfirmedApplications">0</h4>
+								<div class="opacity-75 fs-sm">Confirmed</div>
 							</div>
 
 							<div class="col-xl-2 col-sm-4 col-6">
-								<div class="mb-1">
-									<i class="ph-hourglass fs-3 text-warning"></i>
+								<div class="bg-white bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+									<i class="ph-seal-check fs-2"></i>
 								</div>
-								<h5 class="mb-0">1</h5>
-								<div class="opacity-75">Awaiting</div>
+								<h4 class="mb-0 fw-bold" id="dashboardFinalizedApplications">0</h4>
+								<div class="opacity-75 fs-sm">Finalized</div>
 							</div>
 
 							<div class="col-xl-2 col-sm-4 col-6">
-								<div class="mb-1">
-									<i class="ph-seal-check fs-3 text-info"></i>
+								<div class="bg-white bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+									<i class="ph-x-circle fs-2"></i>
 								</div>
-								<h5 class="mb-0">1</h5>
-								<div class="opacity-75">Approved</div>
+								<h4 class="mb-0 fw-bold" id="dashboardRejectedApplications">0</h4>
+								<div class="opacity-75 fs-sm">Rejected</div>
 							</div>
 						</div>
 					</div>
 				</div>
 				<!-- /welcome widget -->
 
-				<!-- Upcoming deadlines -->
-				<div class="card">
-					<div class="card-header">
-						<h5 class="mb-0">Upcoming Deadlines</h5>
-					</div>
-
-					<div class="card-body">
-						<ul class="list-group list-group-flush">
-							<li class="list-group-item d-flex flex-wrap align-items-center py-2">
-								<a href="student-documents.html" class="d-flex align-items-center me-3">
-									<i class="ph-file-doc ph-lg me-2"></i>
-									<span>Upload insurance document</span>
-								</a>
-
-								<div class="d-flex align-items-center text-muted ms-auto">
-									<i class="ph-calendar ph-sm me-1"></i>
-									<span>Due in 2 days</span>
-								</div>
-							</li>
-
-							<li class="list-group-item d-flex flex-wrap align-items-center py-2">
-								<a href="student-documents.html" class="d-flex align-items-center me-3">
-									<i class="ph-certificate ph-lg me-2"></i>
-									<span>Complete eligibility certificate</span>
-								</a>
-
-								<div class="d-flex align-items-center text-muted ms-auto">
-									<i class="ph-calendar ph-sm me-1"></i>
-									<span>Due in 5 days</span>
-								</div>
-							</li>
-
-							<li class="list-group-item d-flex flex-wrap align-items-center py-2">
-								<a href="student-application-detail.html" class="d-flex align-items-center me-3">
-									<i class="ph-check-square ph-lg me-2"></i>
-									<span>Confirm XYZ Corporation internship</span>
-								</a>
-
-								<div class="d-flex align-items-center text-muted ms-auto">
-									<i class="ph-calendar ph-sm me-1"></i>
-									<span>Due in 1 week</span>
-								</div>
-							</li>
-						</ul>
-					</div>
-				</div>
-				<!-- /upcoming deadlines -->
 
 				<!-- My applications -->
 				<div class="card">
@@ -440,82 +397,9 @@
 									<th class="text-center">Actions</th>
 								</tr>
 							</thead>
-							<tbody>
-								<tr data-internship-id="xyz-corp-1">
-									<td>
-										<div class="d-flex align-items-center">
-											<img src="assets/images/company-logo1.png" class="rounded-circle me-2" width="32" height="32" alt="">
-											<div>XYZ Corporation</div>
-										</div>
-									</td>
-									<td>Marketing Intern</td>
-									<td>New York, USA</td>
-									<td>3 months</td>
-									<td><span class="badge bg-success">Accepted</span></td>
-									<td class="text-center">
-										<div class="d-inline-flex bg-light rounded p-1">
-											<a href="student-application-detail.html" class="btn btn-sm btn-icon btn-light view-button" data-bs-popup="tooltip" title="View Details">
-												<i class="ph-eye"></i>
-											</a>
-										</div>
-									</td>
-								</tr>
-								<tr data-internship-id="abc-tech-1">
-									<td>
-										<div class="d-flex align-items-center">
-											<img src="assets/images/company-logo2.png" class="rounded-circle me-2" width="32" height="32" alt="">
-											<div>ABC Technologies</div>
-										</div>
-									</td>
-									<td>Software Developer Intern</td>
-									<td>Remote</td>
-									<td>6 months</td>
-									<td><span class="badge bg-secondary">Pending</span></td>
-									<td class="text-center">
-										<div class="d-inline-flex bg-light rounded p-1">
-											<a href="student-application-detail.html" class="btn btn-sm btn-icon btn-light view-button" data-bs-popup="tooltip" title="View Details">
-												<i class="ph-eye"></i>
-											</a>
-										</div>
-									</td>
-								</tr>
-								<tr data-internship-id="global-ent-1">
-									<td>
-										<div class="d-flex align-items-center">
-											<img src="assets/images/company-logo3.png" class="rounded-circle me-2" width="32" height="32" alt="">
-											<div>Global Enterprises</div>
-										</div>
-									</td>
-									<td>Data Analyst Intern</td>
-									<td>London, UK</td>
-									<td>4 months</td>
-									<td><span class="badge bg-danger">Rejected</span></td>
-									<td class="text-center">
-										<div class="d-inline-flex bg-light rounded p-1">
-											<a href="student-application-detail.html" class="btn btn-sm btn-icon btn-light view-button" data-bs-popup="tooltip" title="View Details">
-												<i class="ph-eye"></i>
-											</a>
-										</div>
-									</td>
-								</tr>
-								<tr data-internship-id="tech-solutions-1">
-									<td>
-										<div class="d-flex align-items-center">
-											<img src="assets/images/company-logo4.png" class="rounded-circle me-2" width="32" height="32" alt="">
-											<div>Tech Solutions</div>
-										</div>
-									</td>
-									<td>UI/UX Design Intern</td>
-									<td>San Francisco, USA</td>
-									<td>3 months</td>
-									<td><span class="badge bg-warning text-dark">Awaiting Confirmation</span></td>
-									<td class="text-center">
-										<div class="d-inline-flex bg-light rounded p-1">
-											<a href="student-application-detail.html" class="btn btn-sm btn-icon btn-light view-button" data-bs-popup="tooltip" title="View Details">
-												<i class="ph-eye"></i>
-											</a>
-										</div>
-									</td>
+							<tbody id="dashboardApplicationsTableBody">
+								<tr>
+									<td colspan="6" class="text-center text-muted">Loading applications...</td>
 								</tr>
 							</tbody>
 						</table>
@@ -551,17 +435,17 @@
 							</div>
 						</div>
 						<div class="list-group-item d-flex align-items-center">
-							<i class="ph-hourglass ph-xl me-3 text-warning"></i>
+							<i class="ph-check-square ph-xl me-3 text-info"></i>
 							<div>
-								<div class="fw-semibold">4. Confirm Your Spot</div>
-								<span class="text-muted fs-sm">Confirm the offer to notify the company. Status becomes <span class="badge bg-warning text-dark">Awaiting Confirmation</span>.</span>
+								<div class="fw-semibold">4. Confirm Your Acceptance</div>
+								<span class="text-muted fs-sm">Confirm the offer to notify the company. Status becomes <span class="badge bg-info">Confirmed</span>.</span>
 							</div>
 						</div>
 						<div class="list-group-item d-flex align-items-center">
-							<i class="ph-seal-check ph-xl me-3 text-info"></i>
+							<i class="ph-seal-check ph-xl me-3 text-success"></i>
 							<div>
-								<div class="fw-semibold">5. Internship Approved</div>
-								<span class="text-muted fs-sm">The company confirms your placement. Final Status: <span class="badge bg-info">Approved</span>.</span>
+								<div class="fw-semibold">5. Internship Finalized</div>
+								<span class="text-muted fs-sm">The company finalizes your placement. Final Status: <span class="badge bg-success">Finalized</span>.</span>
 							</div>
 						</div>
 						<div class="list-group-item d-flex align-items-center">
@@ -611,7 +495,7 @@
 	<!-- /page content -->
 
 	<script>
-		document.addEventListener('DOMContentLoaded', () => {
+		document.addEventListener('DOMContentLoaded', async () => {
 			console.log('Student dashboard script loaded.');
 			
 			// Logout functionality
@@ -627,8 +511,10 @@
 			const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'student';
 			
 			if (userRole !== 'student' && !isBeingImpersonated) {
-				alert('Access denied. Redirecting to login page.');
-				window.location.href = '../index.html';
+				showAlertModal('Access Denied', 'Access denied. Redirecting to login page.', 'error', () => {
+					window.location.href = '../index.html';
+				});
+				return;
 			}
 
 			// Initialize tooltips
@@ -637,17 +523,181 @@
 				new bootstrap.Tooltip(tooltip);
 			});
 
-			// Load status from My Applications page if available (simple example)
-			const storedStatus = JSON.parse(localStorage.getItem('applicationStatus') || '{}');
-			currentApplicationStatus = {
-				hasConfirmedInternship: storedStatus.confirmedInternshipId != null,
-				confirmedInternshipId: storedStatus.confirmedInternshipId,
-				hasApprovedInternship: storedStatus.approvedInternshipId != null,
-				approvedInternshipId: storedStatus.approvedInternshipId
-			};
-			updateDashboardUIToReflectStatus(); // Update UI based on loaded status
-
+			// Load applications dynamically
+			const studentId = localStorage.getItem('userId');
+			if (studentId) {
+				try {
+					const applications = await api.getStudentApplications(studentId);
+					populateDashboardApplications(applications);
+					updateDashboardStatusCards(applications);
+					updateApplicationsBadge(applications.length);
+				} catch (error) {
+					console.error('Failed to load applications:', error);
+					updateApplicationsBadge(0);
+				}
+			}
 		});
+
+		function populateDashboardApplications(applications) {
+			const tableBody = document.getElementById('dashboardApplicationsTableBody');
+			if (!tableBody) return;
+
+			if (applications.length === 0) {
+				tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No applications yet. <a href="student-internships.html">Browse internships</a> to get started.</td></tr>';
+				return;
+			}
+
+			// Show only first 5 applications
+			const recentApplications = applications.slice(0, 5);
+			tableBody.innerHTML = '';
+
+			recentApplications.forEach(app => {
+				const statusBadge = getStatusBadgeForDashboard(app.status);
+				const row = document.createElement('tr');
+				row.setAttribute('data-application-id', app.application_id);
+				row.innerHTML = `
+					<td>
+						<div class="d-flex align-items-center">
+							<div>${app.company_name || 'N/A'}</div>
+						</div>
+					</td>
+					<td>${app.internship_position || 'N/A'}</td>
+					<td>${app.internship_location || 'N/A'}</td>
+					<td>${app.internship_dates || 'N/A'}</td>
+					<td>${statusBadge}</td>
+					<td class="text-center">
+						<div class="d-inline-flex bg-light rounded p-1">
+							<a href="student-application-detail.html?id=${app.application_id}" class="btn btn-sm btn-icon btn-light view-button" data-bs-popup="tooltip" title="View Details">
+								<i class="ph-eye"></i>
+							</a>
+						</div>
+					</td>
+				`;
+				tableBody.appendChild(row);
+			});
+
+			// Reinitialize tooltips for new buttons
+			const newTooltips = tableBody.querySelectorAll('[data-bs-popup="tooltip"]');
+			newTooltips.forEach(tooltip => {
+				new bootstrap.Tooltip(tooltip);
+			});
+		}
+
+		function getStatusBadgeForDashboard(status) {
+			if (!status) return '<span class="badge bg-secondary">Pending Review</span>';
+			
+			const normalizedStatus = normalizeStatusForDashboard(status);
+			let badgeClass = 'bg-secondary';
+			
+			switch (normalizedStatus) {
+				case 'Pending Review':
+				case 'Pending':
+					badgeClass = 'bg-secondary';
+					break;
+				case 'Accepted':
+					badgeClass = 'bg-success';
+					break;
+				case 'Confirmed':
+				case 'Confirmed_By_Student':
+					badgeClass = 'bg-info';
+					break;
+				case 'Finalized':
+				case 'Approved_By_Company':
+					badgeClass = 'bg-success';
+					break;
+				case 'Rejected':
+				case 'Rejected_By_Company':
+					badgeClass = 'bg-danger';
+					break;
+				case 'Withdrawn':
+					badgeClass = 'bg-secondary';
+					break;
+			}
+			
+			return `<span class="badge ${badgeClass}">${normalizedStatus}</span>`;
+		}
+
+		function normalizeStatusForDashboard(status) {
+			if (!status) return 'Pending Review';
+			const map = {
+				'Pending': 'Pending Review',
+				'Confirmed_By_Student': 'Confirmed',
+				'Approved_By_Company': 'Finalized'
+			};
+			return map[status] || status;
+		}
+
+		function updateDashboardStatusCards(applications) {
+			const statusCounts = {
+				total: applications.length,
+				pending: 0,
+				accepted: 0,
+				confirmed: 0,
+				finalized: 0,
+				rejected: 0
+			};
+
+			applications.forEach(app => {
+				const status = app.status;
+				if (['Pending', 'Pending Review', 'Under Review'].includes(status)) {
+					statusCounts.pending++;
+				} else if (status === 'Accepted') {
+					statusCounts.accepted++;
+				} else if (status === 'Confirmed_By_Student') {
+					statusCounts.confirmed++;
+				} else if (status === 'Approved_By_Company') {
+					statusCounts.finalized++;
+				} else if (['Rejected', 'Rejected_By_Company'].includes(status)) {
+					statusCounts.rejected++;
+				}
+			});
+
+			setCount('dashboardTotalApplications', statusCounts.total);
+			setCount('dashboardPendingApplications', statusCounts.pending);
+			setCount('dashboardAcceptedApplications', statusCounts.accepted);
+			setCount('dashboardConfirmedApplications', statusCounts.confirmed);
+			setCount('dashboardFinalizedApplications', statusCounts.finalized);
+			setCount('dashboardRejectedApplications', statusCounts.rejected);
+		}
+
+		function setCount(elementId, value) {
+			const el = document.getElementById(elementId);
+			if (el) {
+				el.textContent = value;
+			}
+		}
+
+		function updateApplicationsBadge(count) {
+			// Update badge in sidebar navigation
+			const badge = document.getElementById('studentApplicationsBadge');
+			if (badge) {
+				badge.textContent = count;
+				// Hide badge if count is 0
+				if (count === 0) {
+					badge.style.display = 'none';
+				} else {
+					badge.style.display = '';
+				}
+			}
+			
+			// Also update by selector as fallback
+			const applicationsNavLink = document.querySelector('.nav-link[href="student-applications.html"]');
+			if (applicationsNavLink) {
+				let badgeElement = applicationsNavLink.querySelector('.badge');
+				if (!badgeElement) {
+					badgeElement = document.createElement('span');
+					badgeElement.className = 'badge bg-primary rounded-pill ms-auto';
+					badgeElement.id = 'studentApplicationsBadge';
+					applicationsNavLink.appendChild(badgeElement);
+				}
+				badgeElement.textContent = count;
+				if (count === 0) {
+					badgeElement.style.display = 'none';
+				} else {
+					badgeElement.style.display = '';
+				}
+			}
+		}
 
 		// Application status management (shared logic - could be refactored)
 		const APPLICATION_STATUS = {
