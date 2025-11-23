@@ -1,5 +1,13 @@
 <?php
 
+// Start output buffering to catch any stray output
+ob_start();
+
+// Suppress display of errors (log them instead)
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+
 // Get the origin from the request
 $origin = $_SERVER['HTTP_ORIGIN'] ?? null;
 
@@ -194,6 +202,11 @@ else {
     } else { // No entity specified at all, default welcome
         echo json_encode(['message' => 'Welcome to the PHP Backend! Please specify an entity (e.g., /index.php?entity=internships).']);
     }
+}
+
+// End output buffering - handlers should have already output their JSON
+if (ob_get_level() > 0) {
+    ob_end_flush();
 }
 
 ?> 

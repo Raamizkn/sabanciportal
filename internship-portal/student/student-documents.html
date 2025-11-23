@@ -298,48 +298,6 @@
 			<!-- Content area -->
 			<div class="content">
 
-				<!-- Pending Uploads -->
-				<div class="card">
-					<div class="card-header">
-						<h5 class="mb-0"><i class="ph-clock me-2 text-warning"></i>Pending Uploads</h5>
-					</div>
-					<div class="table-responsive">
-						<table class="table">
-							<thead>
-								<tr>
-									<th>Document Name</th>
-									<th>Related To</th>
-									<th>Due Date</th>
-									<th class="text-center">Actions</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>Insurance Form</td>
-									<td>XYZ Corporation Internship</td>
-									<td><span class="text-danger">Aug 25, 2023 (Due in 2 days)</span></td>
-									<td class="text-center">
-										<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#upload_document">
-											<i class="ph-upload-simple me-1"></i> Upload
-										</button>
-									</td>
-								</tr>
-								<tr>
-									<td>Internship Agreement Form</td>
-									<td>XYZ Corporation Internship</td>
-									<td><span class="text-warning">Sep 01, 2023 (Due in 1 week)</span></td>
-									<td class="text-center">
-										<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#upload_document">
-											<i class="ph-upload-simple me-1"></i> Upload
-										</button>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-				<!-- /Pending Uploads -->
-
 				<!-- Uploaded Documents -->
 				<div class="card">
 					<div class="card-header">
@@ -408,36 +366,25 @@
 				</div>
 
 				<div class="modal-body">
+					<div id="upload-feedback" class="alert d-none mb-3"></div>
+					
 					<div class="mb-3">
-						<label class="form-label">Document Type</label>
-						<select class="form-select">
-							<option value="">Select document type</option>
-							<option value="personal">Personal Document</option>
-							<option value="academic">Academic Document</option>
-							<option value="internship">Internship Document</option>
-						</select>
+						<label class="form-label fw-semibold">Document Name <span class="text-danger">*</span></label>
+						<input type="text" id="document-name-input" class="form-control" placeholder="Enter document name" required>
 					</div>
 
 					<div class="mb-3">
-						<label class="form-label">Document Name</label>
-						<input type="text" class="form-control" placeholder="Enter document name">
-					</div>
-
-					<div class="mb-3">
-						<label class="form-label">File</label>
-						<input type="file" class="form-control">
-						<div class="form-text">Accepted formats: PDF, DOC, DOCX, JPG, PNG. Max file size: 5MB</div>
-					</div>
-
-					<div class="mb-3">
-						<label class="form-label">Description (Optional)</label>
-						<textarea rows="3" cols="3" class="form-control" placeholder="Enter document description"></textarea>
+						<label class="form-label fw-semibold">File <span class="text-danger">*</span></label>
+						<input type="file" id="document-file-input" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required>
+						<div class="form-text">Accepted formats: PDF, DOC, DOCX, JPG, PNG. Max file size: 2MB</div>
 					</div>
 				</div>
 
 				<div class="modal-footer">
 					<button type="button" class="btn btn-link" data-bs-dismiss="modal">Cancel</button>
-					<button type="button" class="btn btn-primary">Upload Document</button>
+					<button type="button" id="upload-document-btn" class="btn btn-primary">
+						<i class="ph-upload-simple me-2"></i>Upload Document
+					</button>
 				</div>
 			</div>
 		</div>

@@ -303,22 +303,23 @@
 							<span class="breadcrumb-item active">My Applications</span>
 						</div>
 
-						<div class="dropdown ms-auto">
-							<button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown">
-								<i class="ph-funnel me-2"></i>
-								Filter
-							</button>
-
-							<div class="dropdown-menu dropdown-menu-end">
-								<a href="#" class="dropdown-item" data-filter="all">All applications</a>
-								<a href="#" class="dropdown-item" data-filter="Pending">Pending</a>
-								<a href="#" class="dropdown-item" data-filter="Accepted">Accepted</a>
-								<a href="#" class="dropdown-item" data-filter="Confirmed">Confirmed</a>
-								<a href="#" class="dropdown-item" data-filter="Finalized">Finalized</a>
-								<a href="#" class="dropdown-item" data-filter="Rejected">Rejected</a>
-								<a href="#" class="dropdown-item" data-filter="Withdrawn">Withdrawn</a>
+					<div class="d-flex gap-2 ms-auto">
+						<div class="form-control-feedback form-control-feedback-start" style="width: 250px;">
+							<input type="text" id="applications-search" class="form-control" placeholder="Search applications...">
+							<div class="form-control-feedback-icon">
+								<i class="ph-magnifying-glass"></i>
 							</div>
 						</div>
+						<select id="applications-status-filter" class="form-select" style="width: 180px;">
+							<option value="all">All Status</option>
+							<option value="Pending">Pending</option>
+							<option value="Accepted">Accepted</option>
+							<option value="Confirmed">Confirmed</option>
+							<option value="Finalized">Finalized</option>
+							<option value="Rejected">Rejected</option>
+							<option value="Withdrawn">Withdrawn</option>
+						</select>
+					</div>
 					</div>
 				</div>
 			</div>

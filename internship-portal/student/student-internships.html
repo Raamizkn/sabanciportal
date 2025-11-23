@@ -293,81 +293,52 @@
 						<span class="text-muted fs-sm ms-3">65 available opportunities</span>
 					</div>
 					
-					<div>
-						<button type="button" class="btn btn-light" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
-							<i class="ph-funnel me-2"></i>
-							Filter Results
-						</button>
-					</div>
 				</div>
 
-				<div class="collapse" id="filterCollapse">
-					<div class="page-header-content border-top p-3">
-						<div class="row">
-							<div class="col-xl-3 col-lg-6">
-								<div class="mb-3 mb-xl-0">
-									<label class="form-label">Keywords</label>
-									<div class="form-control-feedback form-control-feedback-start">
-										<input type="text" class="form-control" placeholder="Job title, skills, etc">
-										<div class="form-control-feedback-icon">
-											<i class="ph-magnifying-glass"></i>
-										</div>
-									</div>
+				<!-- Modern Filter Bar -->
+				<div class="page-header-content border-top bg-light p-3">
+					<div class="row g-3 align-items-end">
+						<div class="col-md-4 col-lg-3">
+							<label class="form-label fw-semibold mb-2">Search</label>
+							<div class="form-control-feedback form-control-feedback-start">
+								<input type="text" id="filter-keywords" class="form-control" placeholder="Job title, skills, company...">
+								<div class="form-control-feedback-icon">
+									<i class="ph-magnifying-glass"></i>
 								</div>
 							</div>
-
-							<div class="col-xl-3 col-lg-6">
-								<div class="mb-3 mb-xl-0">
-									<label class="form-label">Location</label>
-									<div class="form-control-feedback form-control-feedback-start">
-										<input type="text" class="form-control" placeholder="City, country, region">
-										<div class="form-control-feedback-icon">
-											<i class="ph-map-pin"></i>
-										</div>
-									</div>
+						</div>
+						<div class="col-md-4 col-lg-3">
+							<label class="form-label fw-semibold mb-2">Location</label>
+							<div class="form-control-feedback form-control-feedback-start">
+								<input type="text" id="filter-location" class="form-control" placeholder="City, country, region">
+								<div class="form-control-feedback-icon">
+									<i class="ph-map-pin"></i>
 								</div>
 							</div>
-
-							<div class="col-xl-3 col-lg-6">
-								<div class="mb-3 mb-lg-0">
-									<label class="form-label">Category</label>
-									<select class="form-select filter-select" data-filter-type="category">
-										<option value="all">All Categories</option>
-										<option value="technology">Technology</option>
-										<option value="marketing">Marketing</option>
-										<option value="finance">Finance</option>
-										<option value="hr">Human Resources</option>
-										<option value="engineering">Engineering</option>
-										<option value="research">Research</option>
-										<option value="other">Other</option>
-									</select>
-								</div>
-							</div>
-
-							<div class="col-xl-3 col-lg-6">
-								<div>
-									<label class="form-label">Duration</label>
-									<select class="form-select filter-select" data-filter-type="duration">
-										<option value="all">Any duration</option>
-										<option value="1-2">1-2 months</option>
-										<option value="3-4">3-4 months</option>
-										<option value="5-6">5-6 months</option>
-										<option value="6+">6+ months</option>
-									</select>
-								</div>
-							</div>
-
-							<div class="col-xl-3 col-lg-6">
-								<div>
-									<label class="form-label">Internship Mode</label>
-									<select class="form-select filter-select" data-filter-type="mode">
-										<option value="all">All Modes</option>
-										<option value="remote">Remote</option>
-										<option value="in-person">In-Person</option>
-										<option value="hybrid">Hybrid</option>
-									</select>
-								</div>
-							</div>
+						</div>
+						<div class="col-md-4 col-lg-2">
+							<label class="form-label fw-semibold mb-2">Mode</label>
+							<select id="filter-mode" class="form-select">
+								<option value="all">All Modes</option>
+								<option value="remote">Remote</option>
+								<option value="in-person">In-Person</option>
+								<option value="hybrid">Hybrid</option>
+							</select>
+						</div>
+						<div class="col-md-6 col-lg-2">
+							<label class="form-label fw-semibold mb-2">Duration</label>
+							<select id="filter-duration" class="form-select">
+								<option value="all">Any Duration</option>
+								<option value="1-2">1-2 months</option>
+								<option value="3-4">3-4 months</option>
+								<option value="5-6">5-6 months</option>
+								<option value="6+">6+ months</option>
+							</select>
+						</div>
+						<div class="col-md-6 col-lg-2">
+							<button type="button" id="clear-filters" class="btn btn-light w-100">
+								<i class="ph-x me-1"></i>Clear
+							</button>
 						</div>
 					</div>
 				</div>
@@ -476,13 +447,13 @@
             
             // Navbar search functionality
             const navbarSearchInput = document.getElementById('navbar-search-input');
+            let urlSearch = null;
             if (navbarSearchInput) {
                 navbarSearchInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') {
                         const searchTerm = navbarSearchInput.value.trim();
                         if (searchTerm) {
-                            // Set the keywords input and trigger filter
-                            const keywordsInput = document.querySelector('input[placeholder="Job title, skills, etc"]');
+                            const keywordsInput = document.getElementById('filter-keywords');
                             if (keywordsInput) {
                                 keywordsInput.value = searchTerm;
                                 currentFilters.keywords = searchTerm;
@@ -495,84 +466,82 @@
             
             // Check for search parameter in URL
             const urlParams = new URLSearchParams(window.location.search);
-            const urlSearch = urlParams.get('search');
-            if (urlSearch) {
-                const keywordsInput = document.querySelector('input[placeholder="Job title, skills, etc"]');
-                if (keywordsInput) {
-                    keywordsInput.value = urlSearch;
-                    currentFilters.keywords = urlSearch;
-                }
-            }
+            urlSearch = urlParams.get('search');
 
-            // Filtering functionality
-            const filterSelects = document.querySelectorAll('.filter-select');
-            const keywordsInput = document.querySelector('input[placeholder="Job title, skills, etc"]');
-            const locationInput = document.querySelector('input[placeholder="City, country, region"]');
+            // Modern Filter Functionality
+            const keywordsInputEl = document.getElementById('filter-keywords');
+            const locationInputEl = document.getElementById('filter-location');
+            const modeSelectEl = document.getElementById('filter-mode');
+            const durationSelectEl = document.getElementById('filter-duration');
+            const clearFiltersBtn = document.getElementById('clear-filters');
 
-            // Store current filter values
-            let currentFilters = {
-                category: 'all',
-                mode: 'all',
+            // Initialize filter values
+            currentFilters = {
                 keywords: '',
-                location: ''
+                location: '',
+                mode: 'all',
+                duration: 'all'
             };
 
-            // Add event listeners to select elements
-            filterSelects.forEach(select => {
-                select.addEventListener('change', () => {
-                    const filterType = select.dataset.filterType;
-                    currentFilters[filterType] = select.value;
-                    // Only apply filters if not on default values
-                    if (select.value !== 'all') {
-                    applyFilters();
-                    } else {
-                        // Reset to show all with pagination
-                        renderPage(1);
-                        updatePagination();
-                    }
-                });
-            });
-
-            // Add event listeners to text inputs with debounce
+            // Debounce function
             let filterTimeout;
-            if (keywordsInput) {
-                keywordsInput.addEventListener('input', () => {
-                    clearTimeout(filterTimeout);
-                    filterTimeout = setTimeout(() => {
-                    currentFilters.keywords = keywordsInput.value;
-                        if (keywordsInput.value) {
+            function debounceFilter() {
+                clearTimeout(filterTimeout);
+                filterTimeout = setTimeout(() => {
                     applyFilters();
-                        } else {
-                            renderPage(1);
-                            updatePagination();
-                        }
-                    }, 300);
+                }, 300);
+            }
+
+            // Add event listeners
+            if (keywordsInputEl) {
+                keywordsInputEl.addEventListener('input', () => {
+                    currentFilters.keywords = keywordsInputEl.value.trim();
+                    debounceFilter();
                 });
             }
 
-            if (locationInput) {
-                locationInput.addEventListener('input', () => {
-                    clearTimeout(filterTimeout);
-                    filterTimeout = setTimeout(() => {
-                        currentFilters.location = locationInput.value.trim();
-                        if (locationInput.value.trim()) {
-                            applyFilters();
-                        } else {
-                            // Check if any other filters are active
-                            const hasActiveFilters = currentFilters.mode !== 'all' || currentFilters.keywords.trim() !== '';
-                            if (hasActiveFilters) {
-                                applyFilters();
-                            } else {
-                                renderPage(1);
-                                updatePagination();
-                            }
-                        }
-                    }, 300);
+            if (locationInputEl) {
+                locationInputEl.addEventListener('input', () => {
+                    currentFilters.location = locationInputEl.value.trim();
+                    debounceFilter();
                 });
             }
-            
+
+            if (modeSelectEl) {
+                modeSelectEl.addEventListener('change', () => {
+                    currentFilters.mode = modeSelectEl.value;
+                    applyFilters();
+                });
+            }
+
+            if (durationSelectEl) {
+                durationSelectEl.addEventListener('change', () => {
+                    currentFilters.duration = durationSelectEl.value;
+                    applyFilters();
+                });
+            }
+
+            if (clearFiltersBtn) {
+                clearFiltersBtn.addEventListener('click', () => {
+                    if (keywordsInputEl) keywordsInputEl.value = '';
+                    if (locationInputEl) locationInputEl.value = '';
+                    if (modeSelectEl) modeSelectEl.value = 'all';
+                    if (durationSelectEl) durationSelectEl.value = 'all';
+                    currentFilters = {
+                        keywords: '',
+                        location: '',
+                        mode: 'all',
+                        duration: 'all'
+                    };
+                    renderPage(1);
+                    updatePagination();
+                });
+            }
+
             // Apply filters if URL search parameter exists
-            if (urlSearch) {
+            if (urlSearch && keywordsInputEl) {
+                keywordsInputEl.value = urlSearch;
+                currentFilters.keywords = urlSearch;
                 setTimeout(() => {
                     applyFilters();
                 }, 100);
@@ -595,6 +564,14 @@
         let allInternships = [];
         let currentPage = 1;
         const itemsPerPage = 6;
+        
+        // Store current filter values (accessible to all functions)
+        let currentFilters = {
+            keywords: '',
+            location: '',
+            mode: 'all',
+            duration: 'all'
+        };
 
         function displayInternships(internships) {
             console.log('displayInternships called with:', internships);
@@ -777,27 +754,37 @@
         }
 
         function applyFilters() {
-            const keywordsInput = document.querySelector('input[placeholder="Job title, skills, etc"]');
-            const locationInput = document.querySelector('input[placeholder="City, country, region"]');
-            
-            // Update current filter values from inputs
-            currentFilters.keywords = keywordsInput ? keywordsInput.value.trim() : '';
-            currentFilters.location = locationInput ? locationInput.value.trim() : '';
+            // Update filter values from inputs
+            const keywordsInput = document.getElementById('filter-keywords');
+            const locationInput = document.getElementById('filter-location');
+            const modeSelect = document.getElementById('filter-mode');
+            const durationSelect = document.getElementById('filter-duration');
 
-            const filterSelects = document.querySelectorAll('.filter-select');
-            filterSelects.forEach(select => {
-                const filterType = select.dataset.filterType;
-                if (filterType) {
-                    currentFilters[filterType] = select.value;
-                }
-            });
+            if (keywordsInput) currentFilters.keywords = keywordsInput.value.trim();
+            if (locationInput) currentFilters.location = locationInput.value.trim();
+            if (modeSelect) currentFilters.mode = modeSelect.value;
+            if (durationSelect) currentFilters.duration = durationSelect.value;
 
             // Filter all internships
             const filteredInternships = allInternships.filter(internship => {
-                // Check category filter (if implemented)
-                if (currentFilters.category && currentFilters.category !== 'all') {
-                    // Category filtering can be added here if needed
-                    // For now, we'll skip this check
+                // Check keywords filter
+                if (currentFilters.keywords) {
+                    const searchText = ((internship.position || '') + ' ' + 
+                                      (internship.description || '') + ' ' + 
+                                      (internship.requirements || '') + ' ' +
+                                      (internship.company_name || '')).toLowerCase();
+                    const keywords = currentFilters.keywords.toLowerCase().split(' ').filter(k => k.length > 0);
+                    if (keywords.length > 0 && !keywords.some(keyword => searchText.includes(keyword))) {
+                        return false;
+                    }
+                }
+
+                // Check location filter
+                if (currentFilters.location) {
+                    const locationText = (internship.location || '').toLowerCase();
+                    if (!locationText.includes(currentFilters.location.toLowerCase())) {
+                        return false;
+                    }
                 }
 
                 // Check mode filter
@@ -814,20 +801,19 @@
                     }
                 }
 
-                // Check keywords filter
-                if (currentFilters.keywords) {
-                    const internshipText = ((internship.position || '') + ' ' + (internship.description || '') + ' ' + (internship.requirements || '')).toLowerCase();
-                    const keywords = currentFilters.keywords.toLowerCase().split(' ').filter(k => k.length > 0);
-                    if (keywords.length > 0 && !keywords.some(keyword => internshipText.includes(keyword))) {
-                        return false;
-                    }
-                }
-
-                // Check location filter
-                if (currentFilters.location) {
-                    const locationText = (internship.location || '').toLowerCase();
-                    if (!locationText.includes(currentFilters.location.toLowerCase())) {
-                        return false;
+                // Check duration filter (if dates are available)
+                if (currentFilters.duration !== 'all' && internship.dates) {
+                    // Parse duration from dates string (e.g., "2025-11-01 - 2025-11-08")
+                    const dateMatch = internship.dates.match(/(\d{4}-\d{2}-\d{2})\s*-\s*(\d{4}-\d{2}-\d{2})/);
+                    if (dateMatch) {
+                        const startDate = new Date(dateMatch[1]);
+                        const endDate = new Date(dateMatch[2]);
+                        const monthsDiff = (endDate - startDate) / (1000 * 60 * 60 * 24 * 30);
+                        
+                        if (currentFilters.duration === '1-2' && (monthsDiff < 1 || monthsDiff > 2)) return false;
+                        if (currentFilters.duration === '3-4' && (monthsDiff < 3 || monthsDiff > 4)) return false;
+                        if (currentFilters.duration === '5-6' && (monthsDiff < 5 || monthsDiff > 6)) return false;
+                        if (currentFilters.duration === '6+' && monthsDiff < 6) return false;
                     }
                 }
 
@@ -842,28 +828,34 @@
             const container = document.getElementById('internships-container');
             if (!container) return;
 
-            // Check if filters are active
-            const hasActiveFilters = filteredInternships.length !== allInternships.length;
+            // Check if any filters are active based on filter values
+            const hasActiveFilters = currentFilters.keywords !== '' || 
+                                   currentFilters.location !== '' || 
+                                   currentFilters.mode !== 'all' || 
+                                   currentFilters.duration !== 'all';
             
             if (hasActiveFilters) {
                 // Show filtered results without pagination
                 container.innerHTML = '';
-                filteredInternships.forEach(internship => {
-                    const card = createInternshipCard(internship);
-                    container.appendChild(card);
-                });
+                if (filteredInternships.length === 0) {
+                    container.innerHTML = '<div class="col-12"><div class="alert alert-info text-center">No internships match your filters. Try adjusting your search criteria.</div></div>';
+                } else {
+                    filteredInternships.forEach(internship => {
+                        const card = createInternshipCard(internship);
+                        container.appendChild(card);
+                    });
+                }
                 
                 // Hide pagination when filtering
                 const paginationContainer = document.querySelector('.pagination');
                 if (paginationContainer) {
                     paginationContainer.innerHTML = '';
                 }
-                } else {
-                // No active filters, restore pagination view
-                allInternships = filteredInternships;
+            } else {
+                // No active filters, restore pagination view with all internships
                 renderPage(1);
                 updatePagination();
-                }
+            }
         }
     </script>
 

@@ -39,44 +39,50 @@ let allApplications = [];
 
 // Setup filter functionality
 function setupFilters() {
-    const filterItems = document.querySelectorAll('[data-filter]');
-    filterItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            const filterValue = item.getAttribute('data-filter');
-            filterApplications(filterValue);
-            
-            // Update active state
-            filterItems.forEach(i => i.classList.remove('active'));
-            item.classList.add('active');
-        });
-    });
-    
-    // Add search functionality - check both navbar and page search inputs
+    const statusFilter = document.getElementById('applications-status-filter');
+    const searchInput = document.getElementById('applications-search');
     const navbarSearchInput = document.getElementById('navbar-search-applications');
-    const pageSearchInput = document.querySelector('input[placeholder="Search applications..."]');
-    const searchInput = navbarSearchInput || pageSearchInput;
     
-    if (searchInput) {
-        let searchTimeout;
-        searchInput.addEventListener('input', () => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                const searchTerm = searchInput.value.toLowerCase().trim();
-                if (searchTerm) {
-                    searchApplications(searchTerm);
-                } else {
-                    // Reset to show all
-                    filterApplications('all');
-                }
-            }, 300);
+    // Status filter
+    if (statusFilter) {
+        statusFilter.addEventListener('change', () => {
+            const status = statusFilter.value;
+            filterApplications(status);
         });
     }
+    
+    // Search functionality
+    const searchInputs = [searchInput, navbarSearchInput].filter(Boolean);
+    searchInputs.forEach(input => {
+        if (input) {
+            let searchTimeout;
+            input.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const searchTerm = input.value.toLowerCase().trim();
+                    const currentStatus = statusFilter ? statusFilter.value : 'all';
+                    if (searchTerm) {
+                        searchApplications(searchTerm, currentStatus);
+                    } else {
+                        filterApplications(currentStatus);
+                    }
+                }, 300);
+            });
+        }
+    });
 }
 
 function filterApplications(statusFilter) {
     const tableBody = document.querySelector('.datatable-basic tbody');
     if (!tableBody) return;
+    
+    const searchInput = document.getElementById('applications-search');
+    const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    
+    if (searchTerm) {
+        searchApplications(searchTerm, statusFilter);
+        return;
+    }
     
     // Remove any existing "no results" messages
     const existingNoResults = tableBody.querySelector('tr[data-no-results]');
@@ -114,7 +120,7 @@ function filterApplications(statusFilter) {
     }
 }
 
-function searchApplications(searchTerm) {
+function searchApplications(searchTerm, statusFilter = 'all') {
     const tableBody = document.querySelector('.datatable-basic tbody');
     if (!tableBody) return;
     
@@ -128,17 +134,28 @@ function searchApplications(searchTerm) {
     let visibleCount = 0;
     
     rows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        let matches = false;
+        const statusBadge = row.querySelector('.badge');
+        const rowStatus = statusBadge ? statusBadge.textContent.trim() : '';
         
-        cells.forEach(cell => {
-            const text = cell.textContent.toLowerCase();
-            if (text.includes(searchTerm)) {
-                matches = true;
-            }
-        });
+        // Check status filter first
+        const statusMatch = statusFilter === 'all' || rowStatus === statusFilter;
         
-        if (matches) {
+        // Check search term
+        let searchMatch = true;
+        if (searchTerm) {
+            const cells = row.querySelectorAll('td');
+            searchMatch = false;
+            cells.forEach(cell => {
+                const text = cell.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    searchMatch = true;
+                }
+            });
+        }
+        
+        const shouldShow = statusMatch && searchMatch;
+        
+        if (shouldShow) {
             row.style.display = '';
             visibleCount++;
         } else {
@@ -150,7 +167,8 @@ function searchApplications(searchTerm) {
     if (visibleCount === 0 && rows.length > 0) {
         const noResultsRow = document.createElement('tr');
         noResultsRow.setAttribute('data-no-results', 'true');
-        noResultsRow.innerHTML = `<td colspan="7" class="text-center text-muted">No applications found matching "${searchTerm}"</td>`;
+        const filterText = statusFilter !== 'all' ? ` with status "${statusFilter}"` : '';
+        noResultsRow.innerHTML = `<td colspan="7" class="text-center text-muted">No applications found${filterText}${searchTerm ? ` matching "${searchTerm}"` : ''}</td>`;
         tableBody.appendChild(noResultsRow);
     }
 }

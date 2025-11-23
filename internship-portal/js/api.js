@@ -45,12 +45,20 @@ class APIService {
             console.log('With credentials:', 'include');
 
             const isFormData = options.body instanceof FormData;
-            const headers = {
-                ...(options.headers || {})
-            };
-
+            const headers = {};
+            
+            // Only set headers if not FormData (browser will set Content-Type with boundary for FormData)
             if (!isFormData) {
-                headers['Content-Type'] = headers['Content-Type'] || 'application/json';
+                headers['Content-Type'] = options.headers?.['Content-Type'] || 'application/json';
+            }
+            
+            // Merge any other custom headers
+            if (options.headers) {
+                Object.keys(options.headers).forEach(key => {
+                    if (key.toLowerCase() !== 'content-type' || !isFormData) {
+                        headers[key] = options.headers[key];
+                    }
+                });
             }
 
             const fetchOptions = {
@@ -451,6 +459,26 @@ class APIService {
         return this.request('/index.php?entity=students&action=upload_resume', {
             method: 'POST',
             body: formData
+        });
+    }
+
+    /**
+     * Upload student document
+     */
+    async uploadStudentDocument(studentId, formData) {
+        return this.request(`/index.php?entity=students&id=${studentId}&action=upload_doc`, {
+            method: 'POST',
+            body: formData
+        });
+    }
+
+    /**
+     * Delete student document
+     */
+    async deleteStudentDocument(studentId, documentId) {
+        return this.request(`/index.php?entity=students&id=${studentId}&action=delete_doc`, {
+            method: 'POST',
+            body: JSON.stringify({ document_id: documentId })
         });
     }
 

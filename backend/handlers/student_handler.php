@@ -296,18 +296,125 @@ function accept_internship_offer($student_id, $application_id) {
 function get_student_documents($student_id) {
     try {
         $db = student_db();
-        $stmt = $db->prepare("SELECT document_id, document_type, file_name, file_path, file_size, upload_date, application_id
-            FROM documents
-            WHERE student_id = ?
-            ORDER BY upload_date DESC, id DESC");
+        if (!$db) {
+            return ['error' => 'Database connection failed'];
+        }
+        
+        // Check if file_content column exists (for database storage)
+        $column_exists = false;
+        try {
+            $check_stmt = $db->query("SHOW COLUMNS FROM documents LIKE 'file_content'");
+            $column_exists = $check_stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            // Column doesn't exist yet, use filesystem storage
+        }
+        
+        if ($column_exists) {
+            // Select with file_content check (but don't fetch the BLOB data)
+            $stmt = $db->prepare("SELECT document_id, document_type, file_name, file_path, file_size, upload_date, application_id,
+                CASE WHEN file_content IS NOT NULL THEN 1 ELSE 0 END as stored_in_db
+                FROM documents
+                WHERE student_id = ?
+                ORDER BY upload_date DESC, id DESC");
+        } else {
+            // Fallback: column doesn't exist yet
+            $stmt = $db->prepare("SELECT document_id, document_type, file_name, file_path, file_size, upload_date, application_id
+                FROM documents
+                WHERE student_id = ?
+                ORDER BY upload_date DESC, id DESC");
+        }
+        
+        if (!$stmt) {
+            return ['error' => 'Failed to prepare query'];
+        }
+        
         $stmt->execute([$student_id]);
         $documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($documents as &$doc) {
-            $doc['download_url'] = format_download_path($doc['file_path']);
+        
+        if ($documents === false) {
+            return ['error' => 'Failed to fetch documents'];
         }
+        
+        foreach ($documents as &$doc) {
+            // For documents stored in DB (file_content exists), file_path is NULL
+            // For documents stored in filesystem, use file_path
+            if (isset($doc['stored_in_db']) && $doc['stored_in_db']) {
+                $doc['download_url'] = null; // Will be generated via download endpoint
+            } else {
+                $doc['download_url'] = format_download_path($doc['file_path'] ?? null);
+            }
+        }
+        unset($doc); // Break reference
+        
         return $documents;
     } catch (PDOException $e) {
+        error_log('Error loading student documents: ' . $e->getMessage());
         return ['error' => 'Failed to load documents: ' . $e->getMessage()];
+    } catch (Exception $e) {
+        error_log('Unexpected error loading student documents: ' . $e->getMessage());
+        return ['error' => 'An unexpected error occurred'];
+    }
+}
+
+/**
+ * Handle document file upload (similar to resume upload).
+ */
+function handle_document_upload($student_id, $file, $document_name, $document_type = 'Other') {
+    if (!$file || $file['error'] !== UPLOAD_ERR_OK) {
+        return ['error' => 'No file uploaded or upload failed'];
+    }
+
+    $allowed_extensions = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
+    $max_size = 2 * 1024 * 1024; // 2MB (matching PHP upload_max_filesize)
+    $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+    if (!in_array($extension, $allowed_extensions)) {
+        return ['error' => 'Invalid file type. Allowed types: pdf, doc, docx, jpg, jpeg, png'];
+    }
+
+    if ($file['size'] > $max_size) {
+        return ['error' => 'File exceeds maximum size of 2MB'];
+    }
+
+    // Read file content into memory
+    $file_content = file_get_contents($file['tmp_name']);
+    if ($file_content === false) {
+        return ['error' => 'Failed to read uploaded file'];
+    }
+
+    try {
+        $db = student_db();
+        $document_id = generate_document_id();
+        
+        // Store file content directly in database (BLOB)
+        // file_path is set to NULL since we're storing in DB
+        $stmt = $db->prepare("INSERT INTO documents (document_id, student_id, document_type, file_name, file_path, file_size, file_content, upload_date)
+            VALUES (?, ?, ?, ?, NULL, ?, ?, CURDATE())");
+        $stmt->execute([
+            $document_id,
+            $student_id,
+            $document_type,
+            $document_name ?: $file['name'],
+            $file['size'],
+            $file_content  // Store binary content in database
+        ]);
+
+        $uploaded_doc = [
+            'document_id' => $document_id,
+            'student_id' => $student_id,
+            'document_type' => $document_type,
+            'file_name' => $document_name ?: $file['name'],
+            'file_size' => $file['size'],
+            'stored_in_db' => true
+        ];
+
+        return [
+            'status' => 'success',
+            'message' => 'Document uploaded successfully and stored in database',
+            'data' => $uploaded_doc
+        ];
+    } catch (PDOException $e) {
+        return ['error' => 'Failed to save document: ' . $e->getMessage()];
     }
 }
 
@@ -348,6 +455,92 @@ function upload_student_document($student_id, $file_data) {
 }
 
 /**
+ * Download a student document (serves file securely).
+ */
+function download_student_document($student_id, $document_id) {
+    try {
+        $db = student_db();
+        // Get file_content (BLOB) and file metadata
+        $stmt = $db->prepare('SELECT file_content, file_path, file_name, document_type, file_size FROM documents WHERE document_id = ? AND student_id = ?');
+        $stmt->execute([$document_id, $student_id]);
+        $document = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$document) {
+            http_response_code(404);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Document not found or access denied']);
+            exit;
+        }
+
+        // Clear any output buffers first
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        
+        $file_name = $document['file_name'] ?: 'document';
+        $file_size = $document['file_size'] ?? 0;
+        
+        // Determine MIME type from file extension
+        $extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+        $mime_types = [
+            'pdf' => 'application/pdf',
+            'doc' => 'application/msword',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png'
+        ];
+        $mime_type = $mime_types[$extension] ?? 'application/octet-stream';
+
+        // Check if file is stored in database (BLOB) or filesystem
+        if (!empty($document['file_content'])) {
+            // File stored in database as BLOB
+            $file_content = $document['file_content'];
+            $file_size = strlen($file_content);
+            
+            header('Content-Type: ' . $mime_type);
+            header('Content-Disposition: attachment; filename="' . addslashes($file_name) . '"');
+            header('Content-Length: ' . $file_size);
+            header('Cache-Control: private, max-age=0, must-revalidate');
+            header('Pragma: public');
+            
+            echo $file_content;
+            exit;
+        } elseif (!empty($document['file_path'])) {
+            // Fallback: File stored in filesystem (for backward compatibility)
+            $backend_root = dirname(__DIR__);
+            $file_path = $backend_root . '/' . ltrim($document['file_path'], '/');
+            
+            if (!file_exists($file_path)) {
+                http_response_code(404);
+                header('Content-Type: application/json');
+                echo json_encode(['error' => 'File not found on server']);
+                exit;
+            }
+            
+            header('Content-Type: ' . $mime_type);
+            header('Content-Disposition: attachment; filename="' . addslashes($file_name) . '"');
+            header('Content-Length: ' . filesize($file_path));
+            header('Cache-Control: private, max-age=0, must-revalidate');
+            header('Pragma: public');
+            
+            readfile($file_path);
+            exit;
+        } else {
+            http_response_code(404);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'File content not available']);
+            exit;
+        }
+    } catch (PDOException $e) {
+        http_response_code(500);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'Failed to download document: ' . $e->getMessage()]);
+        exit;
+    }
+}
+
+/**
  * Delete a student document.
  */
 function delete_student_document($student_id, $document_id) {
@@ -376,29 +569,6 @@ function delete_student_document($student_id, $document_id) {
     }
 }
 
-/**
- * Return download metadata for a document.
- */
-function download_student_document($student_id, $document_id) {
-    try {
-        $db = student_db();
-        $stmt = $db->prepare('SELECT file_name, file_path FROM documents WHERE document_id = ? AND student_id = ?');
-        $stmt->execute([$document_id, $student_id]);
-        $document = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$document) {
-            return ['error' => 'Document not found or access denied'];
-        }
-
-        return [
-            'status' => 'success',
-            'download_url' => format_download_path($document['file_path']),
-            'file_name' => $document['file_name']
-        ];
-    } catch (PDOException $e) {
-        return ['error' => 'Failed to load document: ' . $e->getMessage()];
-    }
-}
 
 /**
  * Legacy login helper used by the standalone student API.
@@ -443,7 +613,7 @@ function handle_resume_upload($student_id, $file) {
     }
 
     if ($file['size'] > $max_size) {
-        return ['error' => 'File exceeds maximum size of 5MB'];
+        return ['error' => 'File exceeds maximum size of 2MB'];
     }
 
     $backend_root = dirname(__DIR__);
@@ -522,6 +692,17 @@ function ensure_student_access($target_student_id) {
 // --------------------------------------------------------------------------
 if (isset($entity) && $entity === 'students') {
     global $method, $action, $id, $input;
+    
+    // Suppress any PHP warnings/errors that might output HTML
+    error_reporting(E_ALL);
+    ini_set('display_errors', 0);
+    ini_set('log_errors', 1);
+    
+    // Ensure no output before JSON
+    if (ob_get_level()) {
+        ob_clean();
+    }
+    
     requireAuth();
 
     if ($method === 'GET') {
@@ -535,11 +716,27 @@ if (isset($entity) && $entity === 'students') {
         ensure_student_access($target_student_id);
 
         if ($action === 'documents') {
-            $response = get_student_documents($target_student_id);
-            if (isset($response['error'])) {
-                http_response_code(400);
+            try {
+                $response = get_student_documents($target_student_id);
+                if (isset($response['error'])) {
+                    http_response_code(400);
+                }
+                echo json_encode($response);
+            } catch (Exception $e) {
+                http_response_code(500);
+                echo json_encode(['error' => 'Failed to load documents: ' . $e->getMessage()]);
             }
-            echo json_encode($response);
+        } elseif ($action === 'download_doc') {
+            requireRole(ROLE_STUDENT);
+            $document_id = $_GET['document_id'] ?? null;
+            if (!$document_id) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Document ID is required']);
+                exit;
+            }
+            ensure_student_access($target_student_id);
+            download_student_document($target_student_id, $document_id);
+            // download_student_document handles output and exits
         } elseif ($action === 'resume') {
             $resume = get_latest_resume($target_student_id);
             if (!$resume) {
@@ -577,6 +774,102 @@ if (isset($entity) && $entity === 'students') {
                 http_response_code(400);
             } else {
                 http_response_code(201);
+            }
+            echo json_encode($response);
+        } elseif ($action === 'upload_doc') {
+            requireRole(ROLE_STUDENT);
+            $target_student_id = $id ? (int)$id : (int)getCurrentUserId();
+            if (!$target_student_id) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Student ID is required']);
+                exit;
+            }
+            ensure_student_access($target_student_id);
+            
+            // Try to increase upload limits if possible
+            $current_max = ini_get('upload_max_filesize');
+            $current_post = ini_get('post_max_size');
+            $desired_max = '10M';
+            
+            // Convert to bytes for comparison
+            function convertToBytes($val) {
+                $val = trim($val);
+                $last = strtolower($val[strlen($val)-1]);
+                $val = (int)$val;
+                switch($last) {
+                    case 'g': $val *= 1024;
+                    case 'm': $val *= 1024;
+                    case 'k': $val *= 1024;
+                }
+                return $val;
+            }
+            
+            if (convertToBytes($current_max) < convertToBytes($desired_max)) {
+                @ini_set('upload_max_filesize', $desired_max);
+            }
+            if (convertToBytes($current_post) < convertToBytes($desired_max)) {
+                @ini_set('post_max_size', $desired_max);
+            }
+            
+            // Check if file was uploaded via FormData
+            if (isset($_FILES['file']) && is_array($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
+                // Handle actual file upload
+                $document_name = $_POST['document_name'] ?? $_FILES['file']['name'];
+                // Use 'Other' as default since 'General' is not in the ENUM
+                $document_type = $_POST['document_type'] ?? 'Other';
+                // Validate document_type against allowed ENUM values
+                $allowed_types = ['CV', 'Transcript', 'Portfolio', 'Cover Letter', 'Certificate', 'Other'];
+                if (!in_array($document_type, $allowed_types)) {
+                    $document_type = 'Other';
+                }
+                $response = handle_document_upload($target_student_id, $_FILES['file'], $document_name, $document_type);
+            } elseif (isset($_FILES['file']) && $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+                $error_messages = [
+                    UPLOAD_ERR_INI_SIZE => 'File exceeds server upload limit (' . ini_get('upload_max_filesize') . '). Please choose a smaller file.',
+                    UPLOAD_ERR_FORM_SIZE => 'File exceeds form size limit. Please choose a smaller file.',
+                    UPLOAD_ERR_PARTIAL => 'File was only partially uploaded. Please try again.',
+                    UPLOAD_ERR_NO_FILE => 'No file was uploaded. Please select a file.',
+                    UPLOAD_ERR_NO_TMP_DIR => 'Server configuration error. Please contact support.',
+                    UPLOAD_ERR_CANT_WRITE => 'Failed to save file. Please try again.',
+                    UPLOAD_ERR_EXTENSION => 'File type not allowed or upload blocked by server.'
+                ];
+                $error_msg = $error_messages[$_FILES['file']['error']] ?? 'Unknown upload error (code: ' . $_FILES['file']['error'] . ')';
+                $response = ['error' => $error_msg];
+            } elseif (!empty($input)) {
+                // Legacy JSON-based document upload (metadata only)
+                $response = upload_student_document($target_student_id, $input);
+            } else {
+                $response = ['error' => 'No file or document data provided. FILES: ' . (isset($_FILES) ? 'set' : 'not set') . ', POST: ' . (isset($_POST) ? 'set' : 'not set')];
+            }
+            
+            if (isset($response['error'])) {
+                http_response_code(400);
+            } else {
+                http_response_code(201);
+            }
+            echo json_encode($response);
+        } elseif ($action === 'delete_doc') {
+            requireRole(ROLE_STUDENT);
+            $target_student_id = $id ? (int)$id : (int)getCurrentUserId();
+            if (!$target_student_id) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Student ID is required']);
+                exit;
+            }
+            ensure_student_access($target_student_id);
+            
+            $document_id = $input['document_id'] ?? null;
+            if (!$document_id) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Document ID is required']);
+                exit;
+            }
+            
+            $response = delete_student_document($target_student_id, $document_id);
+            if (isset($response['error'])) {
+                http_response_code(400);
+            } else {
+                http_response_code(200);
             }
             echo json_encode($response);
         } else {
