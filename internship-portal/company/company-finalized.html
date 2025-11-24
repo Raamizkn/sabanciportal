@@ -44,6 +44,39 @@
 			display: flex;
 			overflow: hidden;
 		}
+		/* Ensure dropdowns can overflow modals and scrollable containers */
+		.modal .dropdown-menu {
+			position: absolute !important;
+			z-index: 1055 !important;
+		}
+		.modal-body {
+			position: relative;
+		}
+		/* Fix dropdown overflow in table-responsive containers */
+		.table-responsive {
+			overflow-x: auto;
+			overflow-y: visible;
+		}
+		.table-responsive .dropdown-menu {
+			position: absolute !important;
+			z-index: 1055 !important;
+		}
+		.card .table-responsive {
+			overflow-x: auto;
+			overflow-y: visible;
+		}
+		.card .table-responsive .dropdown-menu {
+			position: absolute !important;
+			z-index: 1055 !important;
+		}
+		/* Ensure dropdowns can overflow table cells */
+		.table td {
+			position: relative;
+		}
+		.table td .dropdown-menu {
+			position: absolute !important;
+			z-index: 1055 !important;
+		}
 	</style>
 </head>
 
@@ -141,10 +174,6 @@
 							<i class="ph-users me-2"></i>
 							Applications
 						</a>
-						<a href="company-settings.html" class="dropdown-item">
-							<i class="ph-gear me-2"></i>
-							Account settings
-						</a>
 						<div class="dropdown-divider"></div>
 						<a href="../index.html" class="dropdown-item">
 							<i class="ph-sign-out me-2"></i>
@@ -238,12 +267,6 @@
 							</a>
 						</li>
 						<li class="nav-item">
-							<a href="company-settings.html" class="nav-link">
-								<i class="ph-gear"></i>
-								<span>Account Settings</span>
-							</a>
-						</li>
-						<li class="nav-item">
 							<a href="../index.html" class="nav-link">
 								<i class="ph-sign-out"></i>
 								<span>Logout</span>
@@ -278,14 +301,14 @@
                 </div>
                 <!-- /page header -->
 
-                <!-- Finalized internships table -->
+				<!-- Finalized internships table -->
 				<div class="card">
 					<div class="card-header">
 						<h5 class="mb-0">Finalized Internships</h5>
 					</div>
 
-					<div class="table-responsive">
-						<table class="table table-striped table-hover">
+					<div class="card-body p-0">
+						<table class="table table-striped table-hover mb-0">
 							<thead>
 								<tr>
 									<th>#</th>
@@ -297,95 +320,11 @@
 									<th class="text-center">Actions</th>
 								</tr>
 							</thead>
-							<tbody>
-								<tr>
-									<td>1</td>
-									<td>
-										<div class="d-flex align-items-center">
-											<div class="me-3">
-												<img src="../bs5/template/assets/images/demo/users/face11.jpg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-											<div>
-												<a href="javascript:void(0);" class="text-body fw-semibold">John Doe</a>
-												<div class="text-muted fs-sm">Computer Science</div>
-											</div>
-										</div>
-									</td>
-									<td>Software Developer Intern</td>
-									<td>2025/06/01</td>
-									<td>2025/08/31</td>
-									<td><span class="badge bg-primary bg-opacity-20 text-primary">Ongoing</span></td>
-									<td class="text-center">
-										<div class="dropdown">
-											<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
-												<i class="ph-dots-three-vertical"></i>
-											</button>
-											<div class="dropdown-menu dropdown-menu-end">
-												<a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#view_finalized_details_modal"><i class="ph-eye me-2"></i>View Details</a>
-												<a href="company-evaluations.html" class="dropdown-item"><i class="ph-star me-2"></i>Submit Evaluation</a>
-											</div>
-										</div>
-									</td>
-								</tr>
-                                <tr>
-									<td>2</td>
-									<td>
-										<div class="d-flex align-items-center">
-											<div class="me-3">
-												<img src="../bs5/template/assets/images/demo/users/face1.jpg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-											<div>
-												<a href="javascript:void(0);" class="text-body fw-semibold">Jane Smith</a>
-												<div class="text-muted fs-sm">Marketing</div>
-											</div>
-										</div>
-									</td>
-									<td>Marketing Intern</td>
-									<td>2025/05/15</td>
-									<td>2025/11/15</td>
-									<td><span class="badge bg-primary bg-opacity-20 text-primary">Ongoing</span></td>
-									<td class="text-center">
-										<div class="dropdown">
-											<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
-												<i class="ph-dots-three-vertical"></i>
-											</button>
-											<div class="dropdown-menu dropdown-menu-end">
-												<a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#view_finalized_details_modal"><i class="ph-eye me-2"></i>View Details</a>
-												<a href="company-evaluations.html" class="dropdown-item"><i class="ph-star me-2"></i>Submit Evaluation</a>
-											</div>
-										</div>
-									</td>
-								</tr>
-                                <tr>
-									<td>3</td>
-									<td>
-										<div class="d-flex align-items-center">
-											<div class="me-3">
-												<img src="../bs5/template/assets/images/demo/users/face4.jpg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-											<div>
-												<a href="javascript:void(0);" class="text-body fw-semibold">Robert Johnson</a>
-												<div class="text-muted fs-sm">Data Science</div>
-											</div>
-										</div>
-									</td>
-									<td>Data Analyst Intern</td>
-									<td>2025/01/10</td>
-									<td>2025/05/10</td>
-									<td><span class="badge bg-success bg-opacity-20 text-success">Completed</span></td>
-									<td class="text-center">
-										<div class="dropdown">
-											<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
-												<i class="ph-dots-three-vertical"></i>
-											</button>
-											<div class="dropdown-menu dropdown-menu-end">
-												<a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#view_finalized_details_modal"><i class="ph-eye me-2"></i>View Details</a>
-												<a href="company-evaluations.html" class="dropdown-item"><i class="ph-star-half me-2"></i>View Evaluation</a>
-											</div>
-										</div>
-									</td>
-								</tr>
-							</tbody>
+						<tbody id="finalizedApplicationsBody">
+							<tr>
+								<td colspan="7" class="text-center text-muted">Loading finalized applications…</td>
+							</tr>
+						</tbody>
 						</table>
 					</div>
 				</div>
@@ -393,24 +332,14 @@
 
 				<!-- View Finalized Details Modal -->
 				<div id="view_finalized_details_modal" class="modal fade" tabindex="-1">
-					<div class="modal-dialog modal-lg">
+					<div class="modal-dialog modal-xl">
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title">Finalized Internship Details</h5>
 								<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 							</div>
-							<div class="modal-body">
-								<!-- Placeholder content - Needs JS to populate dynamically -->
-								<h6 class="fw-semibold">Student: John Doe (Computer Science)</h6>
-								<p><strong>Internship:</strong> Software Developer Intern</p>
-								<p><strong>Period:</strong> 2025/06/01 - 2025/08/31</p>
-								<p><strong>Status:</strong> Ongoing</p>
-								<hr>
-								<h6>Evaluation Status</h6>
-								<p>Evaluation not submitted yet. <a href="company-evaluations.html">Submit Evaluation</a></p>
-								<!-- Or if evaluation exists: -->
-								<!-- <p>Evaluation submitted. <a href="company-evaluations.html">View Evaluation</a></p> -->
-								<!-- Add other relevant details: supervisor, project info, etc. -->
+							<div class="modal-body" id="finalizedModalBody" style="max-height: calc(100vh - 200px); overflow-y: auto;">
+								<!-- Content will be populated dynamically -->
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
@@ -443,8 +372,11 @@
 		</div>
 		<!-- /main content -->
 
-	</div>
-	<!-- /page content -->
+</div>
+<!-- /page content -->
+
+	<script src="../js/api.js"></script>
+	<script src="../js/company-finalized.js"></script>
 
 </body>
 </html> 

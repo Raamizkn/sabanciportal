@@ -85,7 +85,7 @@
 			<div class="navbar-collapse justify-content-center flex-lg-1 order-2 order-lg-1 collapse" id="navbar_search">
 				<div class="navbar-search flex-fill position-relative mt-2 mt-lg-0 mx-lg-3">
 					<div class="form-control-feedback form-control-feedback-start flex-grow-1">
-						<input type="text" class="form-control bg-transparent rounded-pill" placeholder="Search internships...">
+						<input type="text" id="navbar-search-input" class="form-control bg-transparent rounded-pill" placeholder="Search internships...">
 						<div class="form-control-feedback-icon">
 							<i class="ph-magnifying-glass"></i>
 						</div>
@@ -169,15 +169,11 @@
 							<i class="ph-file-text me-2"></i>
 							My documents
 						</a>
-						<a href="student-evaluations.html" class="dropdown-item">
-							<i class="ph-star me-2"></i>
-							Evaluations
-						</a>
-						<a href="student-settings.html" class="dropdown-item">
-							<i class="ph-gear me-2"></i>
-							Account settings
-						</a>
-						<div class="dropdown-divider"></div>
+					<a href="student-evaluations.html" class="dropdown-item">
+						<i class="ph-star me-2"></i>
+						Evaluations
+					</a>
+					<div class="dropdown-divider"></div>
 						<a href="../index.html" class="dropdown-item logout-link">
 							<i class="ph-sign-out me-2"></i>
 							Logout
@@ -263,19 +259,13 @@
 							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Profile</div>
 							<i class="ph-dots-three sidebar-resize-show"></i>
 						</li>
-						<li class="nav-item">
-							<a href="student-profile.html" class="nav-link">
-								<i class="ph-user-circle"></i>
-								<span>My Profile</span>
-							</a>
-						</li>
-						<li class="nav-item">
-							<a href="student-settings.html" class="nav-link">
-								<i class="ph-gear"></i>
-								<span>Account Settings</span>
-							</a>
-						</li>
-						<li class="nav-item">
+					<li class="nav-item">
+						<a href="student-profile.html" class="nav-link">
+							<i class="ph-user-circle"></i>
+							<span>My Profile</span>
+						</a>
+					</li>
+					<li class="nav-item">
 							<a href="../index.html" class="nav-link logout-link">
 								<i class="ph-sign-out"></i>
 								<span>Logout</span>
@@ -303,81 +293,52 @@
 						<span class="text-muted fs-sm ms-3">65 available opportunities</span>
 					</div>
 					
-					<div>
-						<button type="button" class="btn btn-light" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
-							<i class="ph-funnel me-2"></i>
-							Filter Results
-						</button>
-					</div>
 				</div>
 
-				<div class="collapse" id="filterCollapse">
-					<div class="page-header-content border-top p-3">
-						<div class="row">
-							<div class="col-xl-3 col-lg-6">
-								<div class="mb-3 mb-xl-0">
-									<label class="form-label">Keywords</label>
-									<div class="form-control-feedback form-control-feedback-start">
-										<input type="text" class="form-control" placeholder="Job title, skills, etc">
-										<div class="form-control-feedback-icon">
-											<i class="ph-magnifying-glass"></i>
-										</div>
-									</div>
+				<!-- Modern Filter Bar -->
+				<div class="page-header-content border-top bg-light p-3">
+					<div class="row g-3 align-items-end">
+						<div class="col-md-4 col-lg-3">
+							<label class="form-label fw-semibold mb-2">Search</label>
+							<div class="form-control-feedback form-control-feedback-start">
+								<input type="text" id="filter-keywords" class="form-control" placeholder="Job title, skills, company...">
+								<div class="form-control-feedback-icon">
+									<i class="ph-magnifying-glass"></i>
 								</div>
 							</div>
-
-							<div class="col-xl-3 col-lg-6">
-								<div class="mb-3 mb-xl-0">
-									<label class="form-label">Location</label>
-									<div class="form-control-feedback form-control-feedback-start">
-										<input type="text" class="form-control" placeholder="City, country, region">
-										<div class="form-control-feedback-icon">
-											<i class="ph-map-pin"></i>
-										</div>
-									</div>
+						</div>
+						<div class="col-md-4 col-lg-3">
+							<label class="form-label fw-semibold mb-2">Location</label>
+							<div class="form-control-feedback form-control-feedback-start">
+								<input type="text" id="filter-location" class="form-control" placeholder="City, country, region">
+								<div class="form-control-feedback-icon">
+									<i class="ph-map-pin"></i>
 								</div>
 							</div>
-
-							<div class="col-xl-3 col-lg-6">
-								<div class="mb-3 mb-lg-0">
-									<label class="form-label">Category</label>
-									<select class="form-select filter-select" data-filter-type="category">
-										<option value="all">All Categories</option>
-										<option value="technology">Technology</option>
-										<option value="marketing">Marketing</option>
-										<option value="finance">Finance</option>
-										<option value="hr">Human Resources</option>
-										<option value="engineering">Engineering</option>
-										<option value="research">Research</option>
-										<option value="other">Other</option>
-									</select>
-								</div>
-							</div>
-
-							<div class="col-xl-3 col-lg-6">
-								<div>
-									<label class="form-label">Duration</label>
-									<select class="form-select filter-select" data-filter-type="duration">
-										<option value="all">Any duration</option>
-										<option value="1-2">1-2 months</option>
-										<option value="3-4">3-4 months</option>
-										<option value="5-6">5-6 months</option>
-										<option value="6+">6+ months</option>
-									</select>
-								</div>
-							</div>
-
-							<div class="col-xl-3 col-lg-6">
-								<div>
-									<label class="form-label">Internship Mode</label>
-									<select class="form-select filter-select" data-filter-type="mode">
-										<option value="all">All Modes</option>
-										<option value="remote">Remote</option>
-										<option value="in-person">In-Person</option>
-										<option value="hybrid">Hybrid</option>
-									</select>
-								</div>
-							</div>
+						</div>
+						<div class="col-md-4 col-lg-2">
+							<label class="form-label fw-semibold mb-2">Mode</label>
+							<select id="filter-mode" class="form-select">
+								<option value="all">All Modes</option>
+								<option value="remote">Remote</option>
+								<option value="in-person">In-Person</option>
+								<option value="hybrid">Hybrid</option>
+							</select>
+						</div>
+						<div class="col-md-6 col-lg-2">
+							<label class="form-label fw-semibold mb-2">Duration</label>
+							<select id="filter-duration" class="form-select">
+								<option value="all">Any Duration</option>
+								<option value="1-2">1-2 months</option>
+								<option value="3-4">3-4 months</option>
+								<option value="5-6">5-6 months</option>
+								<option value="6+">6+ months</option>
+							</select>
+						</div>
+						<div class="col-md-6 col-lg-2">
+							<button type="button" id="clear-filters" class="btn btn-light w-100">
+								<i class="ph-x me-1"></i>Clear
+							</button>
 						</div>
 					</div>
 				</div>
@@ -456,31 +417,6 @@
 	</div>
 	<!-- /page content -->
 
-	<!-- Application Modal -->
-	<div class="modal fade" id="applyModal" tabindex="-1" aria-labelledby="applyModalLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="applyModalLabel">Apply for Internship</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<input type="hidden" id="internshipIdInput">
-					<div class="mb-3">
-						<label for="coverLetterInput" class="form-label">Cover Letter (Optional)</label>
-						<textarea class="form-control" id="coverLetterInput" rows="8" placeholder="Explain why you are a good fit for this role..."></textarea>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-					<button type="button" class="btn btn-primary" id="submitApplicationBtn">Submit Application</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- /Application Modal -->
-
-
     <!-- Main functionality script -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -508,89 +444,109 @@
 
             // Load internships from API
             loadInternships();
-
-            // Filtering functionality
-            const filterSelects = document.querySelectorAll('.filter-select');
-            const keywordsInput = document.querySelector('input[placeholder="Job title, skills, etc"]');
-            const locationInput = document.querySelector('input[placeholder="City, country, region"]');
-
-            // Store current filter values
-            let currentFilters = {
-                category: 'all',
-                mode: 'all',
-                keywords: '',
-                location: ''
-            };
-
-            // Add event listeners to select elements
-            filterSelects.forEach(select => {
-                select.addEventListener('change', () => {
-                    const filterType = select.dataset.filterType;
-                    currentFilters[filterType] = select.value;
-                    // Only apply filters if not on default values
-                    if (select.value !== 'all') {
-                    applyFilters();
-                    } else {
-                        // Reset to show all with pagination
-                        renderPage(1);
-                        updatePagination();
+            
+            // Navbar search functionality
+            const navbarSearchInput = document.getElementById('navbar-search-input');
+            let urlSearch = null;
+            if (navbarSearchInput) {
+                navbarSearchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        const searchTerm = navbarSearchInput.value.trim();
+                        if (searchTerm) {
+                            const keywordsInput = document.getElementById('filter-keywords');
+                            if (keywordsInput) {
+                                keywordsInput.value = searchTerm;
+                                currentFilters.keywords = searchTerm;
+                                applyFilters();
+                            }
+                        }
                     }
                 });
-            });
+            }
+            
+            // Check for search parameter in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            urlSearch = urlParams.get('search');
 
-            // Add event listeners to text inputs with debounce
+            // Modern Filter Functionality
+            const keywordsInputEl = document.getElementById('filter-keywords');
+            const locationInputEl = document.getElementById('filter-location');
+            const modeSelectEl = document.getElementById('filter-mode');
+            const durationSelectEl = document.getElementById('filter-duration');
+            const clearFiltersBtn = document.getElementById('clear-filters');
+
+            // Initialize filter values
+            currentFilters = {
+                keywords: '',
+                location: '',
+                mode: 'all',
+                duration: 'all'
+            };
+
+            // Debounce function
             let filterTimeout;
-            if (keywordsInput) {
-                keywordsInput.addEventListener('input', () => {
-                    clearTimeout(filterTimeout);
-                    filterTimeout = setTimeout(() => {
-                    currentFilters.keywords = keywordsInput.value;
-                        if (keywordsInput.value) {
+            function debounceFilter() {
+                clearTimeout(filterTimeout);
+                filterTimeout = setTimeout(() => {
                     applyFilters();
-                        } else {
-                            renderPage(1);
-                            updatePagination();
-                        }
-                    }, 300);
+                }, 300);
+            }
+
+            // Add event listeners
+            if (keywordsInputEl) {
+                keywordsInputEl.addEventListener('input', () => {
+                    currentFilters.keywords = keywordsInputEl.value.trim();
+                    debounceFilter();
                 });
             }
 
-            if (locationInput) {
-                locationInput.addEventListener('input', () => {
-                    clearTimeout(filterTimeout);
-                    filterTimeout = setTimeout(() => {
-                    currentFilters.location = locationInput.value;
-                        if (locationInput.value) {
-                    applyFilters();
-                        } else {
-                            renderPage(1);
-                            updatePagination();
-                        }
-                    }, 300);
+            if (locationInputEl) {
+                locationInputEl.addEventListener('input', () => {
+                    currentFilters.location = locationInputEl.value.trim();
+                    debounceFilter();
                 });
             }
 
-			// Modal functionality
-			const applyModal = document.getElementById('applyModal');
-			if (applyModal) {
-				applyModal.addEventListener('show.bs.modal', function (event) {
-					// Button that triggered the modal
-					const button = event.relatedTarget;
-					// Extract info from data-bs-* attributes
-					const internshipId = button.getAttribute('data-bs-internship-id');
-					const internshipTitle = button.getAttribute('data-bs-internship-title');
+            if (modeSelectEl) {
+                modeSelectEl.addEventListener('change', () => {
+                    currentFilters.mode = modeSelectEl.value;
+                    applyFilters();
+                });
+            }
 
-					// Update the modal's content.
-					const modalTitle = applyModal.querySelector('.modal-title');
-					const internshipIdInput = applyModal.querySelector('#internshipIdInput');
+            if (durationSelectEl) {
+                durationSelectEl.addEventListener('change', () => {
+                    currentFilters.duration = durationSelectEl.value;
+                    applyFilters();
+                });
+            }
 
-					modalTitle.textContent = 'Apply for ' + internshipTitle;
-					internshipIdInput.value = internshipId;
-				});
+            if (clearFiltersBtn) {
+                clearFiltersBtn.addEventListener('click', () => {
+                    if (keywordsInputEl) keywordsInputEl.value = '';
+                    if (locationInputEl) locationInputEl.value = '';
+                    if (modeSelectEl) modeSelectEl.value = 'all';
+                    if (durationSelectEl) durationSelectEl.value = 'all';
+                    currentFilters = {
+                        keywords: '',
+                        location: '',
+                        mode: 'all',
+                        duration: 'all'
+                    };
+                    renderPage(1);
+                    updatePagination();
+                });
+            }
 
-				const submitApplicationBtn = document.getElementById('submitApplicationBtn');
-				submitApplicationBtn.addEventListener('click', submitApplication);
-			}
+            // Apply filters if URL search parameter exists
+            if (urlSearch && keywordsInputEl) {
+                keywordsInputEl.value = urlSearch;
+                currentFilters.keywords = urlSearch;
+                setTimeout(() => {
+                    applyFilters();
+                }, 100);
+            }
+
         });
 
         async function loadInternships() {
@@ -608,6 +564,14 @@
         let allInternships = [];
         let currentPage = 1;
         const itemsPerPage = 6;
+        
+        // Store current filter values (accessible to all functions)
+        let currentFilters = {
+            keywords: '',
+            location: '',
+            mode: 'all',
+            duration: 'all'
+        };
 
         function displayInternships(internships) {
             console.log('displayInternships called with:', internships);
@@ -720,16 +684,21 @@
                 col.setAttribute('data-mode', 'in-person');
             }
 
+            const companyName = (internship.company && internship.company.name) || internship.company_name || 'Company';
+            const companyIndustry = (internship.company && internship.company.industry) ? `<div class="text-muted small">${internship.company.industry}</div>` : '';
+            const logo = resolveCompanyLogo(internship.company && internship.company.logo);
+
             col.innerHTML = `
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex align-items-start mb-3">
                             <div class="me-3">
-                                <img src="../bs5/template/assets/images/demo/logos/2.svg" class="rounded" width="44" height="44" alt="">
+                                <img src="${logo}" class="rounded" width="44" height="44" alt="Company logo">
                             </div>
                             <div>
                                 <h5 class="mb-1">${internship.position || 'N/A'}</h5>
-                                <div class="text-muted">${internship.company_name || 'Company'}</div>
+                                <div class="text-muted">${companyName}</div>
+                                ${companyIndustry}
                             </div>
                         </div>
 
@@ -756,18 +725,14 @@
                         </div>
                         ` : ''}
 
-                        <div class="d-flex mt-auto">
-                            <div>
-                                <span class="text-muted">${internship.created_at ? 'Posted ' + new Date(internship.created_at).toLocaleDateString() : ''}</span>
-                            </div>
-							<button type="button" class="btn btn-primary ms-auto" 
-									data-bs-toggle="modal" 
-									data-bs-target="#applyModal" 
-									data-bs-internship-id="${internship.id}"
-									data-bs-internship-title="${internship.position}">
-								Apply Now
-							</button>
-                        </div>
+					<div class="d-flex mt-auto">
+						<div>
+							<span class="text-muted">${internship.created_at ? 'Posted ' + new Date(internship.created_at).toLocaleDateString() : ''}</span>
+						</div>
+						<a href="student-internship-detail.html?id=${encodeURIComponent(internship.id)}" class="btn btn-primary ms-auto">
+							View Details
+						</a>
+					</div>
                     </div>
                 </div>
             `;
@@ -775,57 +740,54 @@
             return col;
         }
 
-		async function submitApplication() {
-			const studentId = localStorage.getItem('userId');
-			const internshipId = document.getElementById('internshipIdInput').value;
-			const coverLetter = document.getElementById('coverLetterInput').value;
-
-			if (!studentId) {
-				alert('Please login to apply for internships.');
-				window.location.href = '../index.html';
-				return;
-			}
-
-			try {
-				const data = await api.applyForInternship(studentId, internshipId, coverLetter || '');
-
-				if (data.status === 'success') {
-					alert('Application submitted successfully!');
-					const modalInstance = bootstrap.Modal.getInstance(document.getElementById('applyModal'));
-					modalInstance.hide();
-					document.getElementById('coverLetterInput').value = ''; // Clear textarea
-				} else {
-					alert(data.error || 'Failed to submit application. Please try again.');
-				}
-			} catch (error) {
-				console.error('Error applying for internship:', error);
-				alert('An error occurred. Please try again.');
-			}
-		}
+        function resolveCompanyLogo(path) {
+            if (!path) {
+                return '../bs5/template/assets/images/demo/logos/1.svg';
+            }
+            if (path.startsWith('http')) {
+                return path;
+            }
+            if (path.startsWith('/')) {
+                return `${API_BASE_URL}${path}`;
+            }
+            return path;
+        }
 
         function applyFilters() {
-            const keywordsInput = document.querySelector('input[placeholder="Job title, skills, etc"]');
-            const locationInput = document.querySelector('input[placeholder="City, country, region"]');
-            
-            // Store current filter values
-            let currentFilters = {
-                category: 'all',
-                mode: 'all',
-                keywords: keywordsInput ? keywordsInput.value : '',
-                location: locationInput ? locationInput.value : ''
-            };
+            // Update filter values from inputs
+            const keywordsInput = document.getElementById('filter-keywords');
+            const locationInput = document.getElementById('filter-location');
+            const modeSelect = document.getElementById('filter-mode');
+            const durationSelect = document.getElementById('filter-duration');
 
-            const filterSelects = document.querySelectorAll('.filter-select');
-            filterSelects.forEach(select => {
-                const filterType = select.dataset.filterType;
-                if (filterType) {
-                    currentFilters[filterType] = select.value;
-                }
-            });
+            if (keywordsInput) currentFilters.keywords = keywordsInput.value.trim();
+            if (locationInput) currentFilters.location = locationInput.value.trim();
+            if (modeSelect) currentFilters.mode = modeSelect.value;
+            if (durationSelect) currentFilters.duration = durationSelect.value;
 
             // Filter all internships
             const filteredInternships = allInternships.filter(internship => {
-                // Check mode
+                // Check keywords filter
+                if (currentFilters.keywords) {
+                    const searchText = ((internship.position || '') + ' ' + 
+                                      (internship.description || '') + ' ' + 
+                                      (internship.requirements || '') + ' ' +
+                                      (internship.company_name || '')).toLowerCase();
+                    const keywords = currentFilters.keywords.toLowerCase().split(' ').filter(k => k.length > 0);
+                    if (keywords.length > 0 && !keywords.some(keyword => searchText.includes(keyword))) {
+                        return false;
+                    }
+                }
+
+                // Check location filter
+                if (currentFilters.location) {
+                    const locationText = (internship.location || '').toLowerCase();
+                    if (!locationText.includes(currentFilters.location.toLowerCase())) {
+                        return false;
+                    }
+                }
+
+                // Check mode filter
                 if (currentFilters.mode !== 'all') {
                     const locationLower = (internship.location || '').toLowerCase();
                     let internshipMode = 'in-person';
@@ -835,24 +797,23 @@
                         internshipMode = 'hybrid';
                     }
                     if (internshipMode !== currentFilters.mode) {
-                    return false;
-                    }
-                }
-
-                // Check keywords
-                if (currentFilters.keywords) {
-                    const internshipText = (internship.position + ' ' + internship.description + ' ' + internship.requirements).toLowerCase();
-                    const keywords = currentFilters.keywords.toLowerCase().split(' ');
-                    if (!keywords.every(keyword => internshipText.includes(keyword))) {
                         return false;
                     }
                 }
 
-                // Check location
-                if (currentFilters.location) {
-                    const locationText = (internship.location || '').toLowerCase();
-                    if (!locationText.includes(currentFilters.location.toLowerCase())) {
-                        return false;
+                // Check duration filter (if dates are available)
+                if (currentFilters.duration !== 'all' && internship.dates) {
+                    // Parse duration from dates string (e.g., "2025-11-01 - 2025-11-08")
+                    const dateMatch = internship.dates.match(/(\d{4}-\d{2}-\d{2})\s*-\s*(\d{4}-\d{2}-\d{2})/);
+                    if (dateMatch) {
+                        const startDate = new Date(dateMatch[1]);
+                        const endDate = new Date(dateMatch[2]);
+                        const monthsDiff = (endDate - startDate) / (1000 * 60 * 60 * 24 * 30);
+                        
+                        if (currentFilters.duration === '1-2' && (monthsDiff < 1 || monthsDiff > 2)) return false;
+                        if (currentFilters.duration === '3-4' && (monthsDiff < 3 || monthsDiff > 4)) return false;
+                        if (currentFilters.duration === '5-6' && (monthsDiff < 5 || monthsDiff > 6)) return false;
+                        if (currentFilters.duration === '6+' && monthsDiff < 6) return false;
                     }
                 }
 
@@ -860,35 +821,41 @@
             });
 
             // Display filtered results
-            displayFiltered_internships(filteredInternships);
+            displayFilteredInternships(filteredInternships);
         }
 
         function displayFilteredInternships(filteredInternships) {
             const container = document.getElementById('internships-container');
             if (!container) return;
 
-            // Check if filters are active
-            const hasActiveFilters = filteredInternships.length !== allInternships.length;
+            // Check if any filters are active based on filter values
+            const hasActiveFilters = currentFilters.keywords !== '' || 
+                                   currentFilters.location !== '' || 
+                                   currentFilters.mode !== 'all' || 
+                                   currentFilters.duration !== 'all';
             
             if (hasActiveFilters) {
                 // Show filtered results without pagination
                 container.innerHTML = '';
-                filteredInternships.forEach(internship => {
-                    const card = createInternshipCard(internship);
-                    container.appendChild(card);
-                });
+                if (filteredInternships.length === 0) {
+                    container.innerHTML = '<div class="col-12"><div class="alert alert-info text-center">No internships match your filters. Try adjusting your search criteria.</div></div>';
+                } else {
+                    filteredInternships.forEach(internship => {
+                        const card = createInternshipCard(internship);
+                        container.appendChild(card);
+                    });
+                }
                 
                 // Hide pagination when filtering
                 const paginationContainer = document.querySelector('.pagination');
                 if (paginationContainer) {
                     paginationContainer.innerHTML = '';
                 }
-                } else {
-                // No active filters, restore pagination view
-                allInternships = filteredInternships;
+            } else {
+                // No active filters, restore pagination view with all internships
                 renderPage(1);
                 updatePagination();
-                }
+            }
         }
     </script>
 

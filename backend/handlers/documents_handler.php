@@ -28,9 +28,9 @@ if ($entity === 'documents') {
                  exit;
             }
             // Only allow document upload for student-confirmed or company-approved applications (example rule)
-            if ($applications[$application_id_param]['status'] !== 'Confirmed_By_Student' && $applications[$application_id_param]['status'] !== 'Approved_By_Company') {
+            if ($applications[$application_id_param]['status'] !== 'Confirmed' && $applications[$application_id_param]['status'] !== 'Finalized') {
                 http_response_code(400);
-                echo json_encode(['error' => "Documents can only be uploaded for 'Confirmed_By_Student' or 'Approved_By_Company' applications. Application {$application_id_param} status is {$applications[$application_id_param]['status']}."]);
+                echo json_encode(['error' => "Documents can only be uploaded for 'Confirmed' or 'Finalized' applications. Application {$application_id_param} status is {$applications[$application_id_param]['status']}."]);
                 exit;
             }
 

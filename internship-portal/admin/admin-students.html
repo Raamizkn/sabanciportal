@@ -334,106 +334,8 @@
 									<th class="text-center">Actions</th>
 								</tr>
 							</thead>
-							<tbody>
-								<tr>
-									<td>1</td>
-									<td>
-										<div class="d-flex align-items-center">
-											<div class="me-3">
-												<img src="../bs5/template/assets/images/demo/users/face11.jpg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-											<div>
-												<a href="#" class="text-body fw-semibold">John Doe</a>
-											</div>
-										</div>
-									</td>
-									<td>john.doe@university.edu</td>
-									<td>FENS</td>
-									<td>Computer Science</td>
-									<td>2025/03/15</td>
-									<td><span class="badge bg-success bg-opacity-20 text-success">Active</span></td>
-									<td class="text-center">
-										<div class="dropdown">
-											<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
-												<i class="ph-dots-three-vertical"></i>
-											</button>
-											<div class="dropdown-menu dropdown-menu-end">
-												<a href="#" class="dropdown-item"><i class="ph-eye me-2"></i>View Profile</a>
-												<a href="#" class="dropdown-item"><i class="ph-pencil me-2"></i>Edit Account</a>
-												<a href="#" class="dropdown-item"><i class="ph-user-minus me-2"></i>Deactivate</a>
-												<a href="#" class="dropdown-item impersonate-btn" data-user-id="1" data-user-email="john.doe@university.edu" data-user-type="student" data-user-name="John Doe"><i class="ph-user-switch me-2"></i>Impersonate User</a>
-												<div class="dropdown-divider"></div>
-												<a href="#" class="dropdown-item text-danger"><i class="ph-trash me-2"></i>Delete Account</a>
-											</div>
-										</div>
-									</td>
-								</tr>
-                                <tr>
-									<td>2</td>
-									<td>
-										<div class="d-flex align-items-center">
-											<div class="me-3">
-												<img src="../bs5/template/assets/images/demo/users/face1.jpg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-											<div>
-												<a href="#" class="text-body fw-semibold">Jane Smith</a>
-											</div>
-										</div>
-									</td>
-									<td>jane.smith@school.org</td>
-									<td>FASS</td>
-									<td>Marketing</td>
-									<td>2025/03/10</td>
-									<td><span class="badge bg-secondary bg-opacity-20 text-secondary">Inactive</span></td>
-									<td class="text-center">
-										<div class="dropdown">
-											<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
-												<i class="ph-dots-three-vertical"></i>
-											</button>
-											<div class="dropdown-menu dropdown-menu-end">
-												<a href="#" class="dropdown-item"><i class="ph-eye me-2"></i>View Profile</a>
-												<a href="#" class="dropdown-item"><i class="ph-pencil me-2"></i>Edit Account</a>
-												<a href="#" class="dropdown-item"><i class="ph-user-plus me-2"></i>Activate</a>
-												<a href="#" class="dropdown-item impersonate-btn" data-user-id="2" data-user-email="jane.smith@school.org" data-user-type="student" data-user-name="Jane Smith"><i class="ph-user-switch me-2"></i>Impersonate User</a>
-												<div class="dropdown-divider"></div>
-												<a href="#" class="dropdown-item text-danger"><i class="ph-trash me-2"></i>Delete Account</a>
-											</div>
-										</div>
-									</td>
-								</tr>
-                                <tr>
-									<td>3</td>
-									<td>
-										<div class="d-flex align-items-center">
-											<div class="me-3">
-												<img src="../bs5/template/assets/images/demo/users/face3.jpg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-											<div>
-												<a href="#" class="text-body fw-semibold">Alex Johnson</a>
-											</div>
-										</div>
-									</td>
-									<td>alex.johnson@sabanciuniv.edu</td>
-									<td>FMAN</td>
-									<td>Business Administration</td>
-									<td>2025/02/22</td>
-									<td><span class="badge bg-success bg-opacity-20 text-success">Active</span></td>
-									<td class="text-center">
-										<div class="dropdown">
-											<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
-												<i class="ph-dots-three-vertical"></i>
-											</button>
-											<div class="dropdown-menu dropdown-menu-end">
-												<a href="#" class="dropdown-item"><i class="ph-eye me-2"></i>View Profile</a>
-												<a href="#" class="dropdown-item"><i class="ph-pencil me-2"></i>Edit Account</a>
-												<a href="#" class="dropdown-item"><i class="ph-user-minus me-2"></i>Deactivate</a>
-												<a href="#" class="dropdown-item impersonate-btn" data-user-id="3" data-user-email="alex.johnson@sabanciuniv.edu" data-user-type="student" data-user-name="Alex Johnson"><i class="ph-user-switch me-2"></i>Impersonate User</a>
-												<div class="dropdown-divider"></div>
-												<a href="#" class="dropdown-item text-danger"><i class="ph-trash me-2"></i>Delete Account</a>
-											</div>
-										</div>
-									</td>
-								</tr>
+							<tbody id="studentsTableBody">
+								<!-- Students will be loaded dynamically -->
 							</tbody>
 						</table>
 					</div>
@@ -539,4 +441,145 @@
 		}
 	});
 </script>
+
+	<!-- API Integration -->
+	<script src="../js/api.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', async function() {
+			// Auth check
+			const userRole = localStorage.getItem('userRole');
+			if (userRole !== 'admin') {
+				alert('Access denied. Redirecting to login page.');
+				window.location.href = '../index.html';
+				return;
+			}
+
+			await loadStudents();
+		});
+
+		async function loadStudents() {
+			try {
+				const students = await api.getStudents();
+				if (students.error) {
+					console.error('Failed to load students:', students.error);
+					document.getElementById('studentsTableBody').innerHTML = '<tr><td colspan="7" class="text-center text-muted">Failed to load students</td></tr>';
+					return;
+				}
+
+				populateStudentsTable(Array.isArray(students) ? students : []);
+			} catch (error) {
+				console.error('Error loading students:', error);
+				document.getElementById('studentsTableBody').innerHTML = '<tr><td colspan="7" class="text-center text-muted">Error loading students</td></tr>';
+			}
+		}
+
+		function populateStudentsTable(students) {
+			const tbody = document.getElementById('studentsTableBody');
+			if (!tbody) return;
+
+			tbody.innerHTML = '';
+
+			if (students.length === 0) {
+				tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No students found</td></tr>';
+				return;
+			}
+
+			students.forEach((student, index) => {
+				const row = document.createElement('tr');
+				const profilePic = student.profile_pic || `../bs5/template/assets/images/demo/users/face${(index % 4) + 1}.jpg`;
+				const isActive = student.is_active !== undefined ? student.is_active : true;
+				const statusBadge = isActive 
+					? '<span class="badge bg-success bg-opacity-20 text-success">Active</span>'
+					: '<span class="badge bg-secondary bg-opacity-20 text-secondary">Inactive</span>';
+				
+				row.innerHTML = `
+					<td>${index + 1}</td>
+					<td>
+						<div class="d-flex align-items-center">
+							<div class="me-3">
+								<img src="${profilePic}" class="rounded-circle" width="36" height="36" alt="">
+							</div>
+							<div>
+								<a href="../student/student-profile.html?id=${student.id}" class="text-body fw-semibold">${student.name || 'N/A'}</a>
+							</div>
+						</div>
+					</td>
+					<td>${student.email || 'N/A'}</td>
+					<td>${student.faculty || student.student_id || 'N/A'}</td>
+					<td>${student.major || 'N/A'}</td>
+					<td>${student.created_at ? new Date(student.created_at).toLocaleDateString() : 'N/A'}</td>
+					<td>${statusBadge}</td>
+					<td class="text-center">
+						<div class="dropdown">
+							<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
+								<i class="ph-dots-three-vertical"></i>
+							</button>
+							<div class="dropdown-menu dropdown-menu-end">
+								<a href="../student/student-profile.html?id=${student.id}" class="dropdown-item"><i class="ph-eye me-2"></i>View Profile</a>
+								<a href="#" class="dropdown-item edit-student-btn" data-student-id="${student.id}"><i class="ph-pencil me-2"></i>Edit Account</a>
+								<a href="#" class="dropdown-item toggle-active-btn" data-student-id="${student.id}" data-is-active="${isActive}">
+									<i class="ph-${isActive ? 'user-minus' : 'user-plus'} me-2"></i>${isActive ? 'Deactivate' : 'Activate'}
+								</a>
+								<a href="#" class="dropdown-item impersonate-btn" data-user-id="${student.id}" data-user-email="${student.email}" data-user-type="student" data-user-name="${student.name}"><i class="ph-user-switch me-2"></i>Impersonate User</a>
+								<div class="dropdown-divider"></div>
+								<a href="#" class="dropdown-item text-danger delete-student-btn" data-student-id="${student.id}"><i class="ph-trash me-2"></i>Delete Account</a>
+							</div>
+						</div>
+					</td>
+				`;
+				tbody.appendChild(row);
+			});
+
+			// Re-attach impersonation handlers
+			attachImpersonationHandlers();
+			attachActionHandlers();
+		}
+
+		function attachImpersonationHandlers() {
+			document.querySelectorAll('.impersonate-btn').forEach(button => {
+				button.addEventListener('click', function(e) {
+					e.preventDefault();
+					const userId = this.getAttribute('data-user-id');
+					const userEmail = this.getAttribute('data-user-email');
+					const userType = this.getAttribute('data-user-type');
+					const userName = this.getAttribute('data-user-name');
+					
+					if (confirm(`Are you sure you want to impersonate user: ${userEmail}?`)) {
+						sessionStorage.setItem('impersonatedUser', userId);
+						sessionStorage.setItem('impersonatedUserEmail', userEmail);
+						sessionStorage.setItem('impersonatedUserType', userType);
+						sessionStorage.setItem('impersonatedUserName', userName);
+						
+						if (userType === 'student') {
+							window.location.href = '../student/student-dashboard.html';
+						} else if (userType === 'company') {
+							window.location.href = '../company/company-dashboard.html';
+						}
+					}
+				});
+			});
+		}
+
+		function attachActionHandlers() {
+			document.querySelectorAll('.delete-student-btn').forEach(button => {
+				button.addEventListener('click', async function(e) {
+					e.preventDefault();
+					const studentId = this.getAttribute('data-student-id');
+					if (confirm('Are you sure you want to delete this student? This action cannot be undone.')) {
+						try {
+							const result = await api.deleteStudent(studentId);
+							if (result.error) {
+								alert('Error: ' + result.error);
+							} else {
+								alert('Student deleted successfully');
+								loadStudents();
+							}
+						} catch (error) {
+							alert('An error occurred while deleting the student.');
+						}
+					}
+				});
+			});
+		}
+	</script>
 </html> 

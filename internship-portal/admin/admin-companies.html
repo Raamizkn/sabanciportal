@@ -334,74 +334,8 @@
 									<th class="text-center">Actions</th>
 								</tr>
 							</thead>
-							<tbody>
-								<tr>
-									<td>1</td>
-									<td>
-										<div class="d-flex align-items-center">
-											<div class="me-3">
-												<img src="../bs5/template/assets/images/demo/logos/2.svg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-											<div>
-												<a href="#" class="text-body fw-semibold">XYZ Corporation</a>
-											</div>
-										</div>
-									</td>
-									<td>Technology</td>
-									<td>hr@xyzcorp.com</td>
-									<td>3</td>
-									<td>2025/01/20</td>
-									<td><span class="badge bg-success bg-opacity-20 text-success">Active</span></td>
-									<td class="text-center">
-										<div class="dropdown">
-											<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
-												<i class="ph-dots-three-vertical"></i>
-											</button>
-											<div class="dropdown-menu dropdown-menu-end">
-												<a href="#" class="dropdown-item"><i class="ph-eye me-2"></i>View Profile</a>
-												<a href="#" class="dropdown-item"><i class="ph-pencil me-2"></i>Edit Account</a>
-												<a href="#" class="dropdown-item"><i class="ph-building me-2"></i>Manage Internships</a>
-												<a href="#" class="dropdown-item"><i class="ph-user-minus me-2"></i>Deactivate</a>
-												<a href="#" class="dropdown-item impersonate-btn" data-user-id="1" data-user-email="hr@xyzcorp.com" data-user-type="company" data-user-name="XYZ Corporation"><i class="ph-user-switch me-2"></i>Impersonate User</a>
-												<div class="dropdown-divider"></div>
-												<a href="#" class="dropdown-item text-danger"><i class="ph-trash me-2"></i>Delete Account</a>
-											</div>
-										</div>
-									</td>
-								</tr>
-                                <tr>
-									<td>2</td>
-									<td>
-										<div class="d-flex align-items-center">
-											<div class="me-3">
-												<img src="../bs5/template/assets/images/demo/logos/3.svg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-											<div>
-												<a href="#" class="text-body fw-semibold">ABC Technologies</a>
-											</div>
-										</div>
-									</td>
-									<td>Finance</td>
-									<td>info@abctech.com</td>
-									<td>1</td>
-									<td>2025/04/01</td>
-									<td><span class="badge bg-warning bg-opacity-20 text-warning">Pending Approval</span></td>
-									<td class="text-center">
-										<div class="dropdown">
-											<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
-												<i class="ph-dots-three-vertical"></i>
-											</button>
-											<div class="dropdown-menu dropdown-menu-end">
-												<a href="#" class="dropdown-item"><i class="ph-eye me-2"></i>View Details</a>
-												<a href="#" class="dropdown-item"><i class="ph-check-circle me-2"></i>Approve</a>
-												<a href="#" class="dropdown-item"><i class="ph-x-circle me-2"></i>Reject</a>
-												<a href="#" class="dropdown-item impersonate-btn" data-user-id="2" data-user-email="info@abctech.com" data-user-type="company" data-user-name="ABC Technologies"><i class="ph-user-switch me-2"></i>Impersonate User</a>
-												<div class="dropdown-divider"></div>
-												<a href="#" class="dropdown-item text-danger"><i class="ph-trash me-2"></i>Delete Request</a>
-											</div>
-										</div>
-									</td>
-								</tr>
+							<tbody id="companiesTableBody">
+								<!-- Companies will be loaded dynamically -->
 							</tbody>
 						</table>
 					</div>
@@ -507,4 +441,161 @@
 		}
 	});
 </script>
+
+	<!-- API Integration -->
+	<script src="../js/api.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', async function() {
+			// Auth check
+			const userRole = localStorage.getItem('userRole');
+			if (userRole !== 'admin') {
+				alert('Access denied. Redirecting to login page.');
+				window.location.href = '../index.html';
+				return;
+			}
+
+			await loadCompanies();
+		});
+
+		async function loadCompanies() {
+			try {
+				const companies = await api.getCompanies();
+				if (companies.error) {
+					console.error('Failed to load companies:', companies.error);
+					document.getElementById('companiesTableBody').innerHTML = '<tr><td colspan="8" class="text-center text-muted">Failed to load companies</td></tr>';
+					return;
+				}
+
+				populateCompaniesTable(Array.isArray(companies) ? companies : []);
+			} catch (error) {
+				console.error('Error loading companies:', error);
+				document.getElementById('companiesTableBody').innerHTML = '<tr><td colspan="8" class="text-center text-muted">Error loading companies</td></tr>';
+			}
+		}
+
+		async function populateCompaniesTable(companies) {
+			const tbody = document.getElementById('companiesTableBody');
+			if (!tbody) return;
+
+			tbody.innerHTML = '';
+
+			if (companies.length === 0) {
+				tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No companies found</td></tr>';
+				return;
+			}
+
+			// Get internship counts for each company
+			const internshipCounts = {};
+			try {
+				const allInternships = await api.getAllInternships();
+				if (Array.isArray(allInternships)) {
+					allInternships.forEach(internship => {
+						const companyId = internship.company_id;
+						if (companyId) {
+							internshipCounts[companyId] = (internshipCounts[companyId] || 0) + 1;
+						}
+					});
+				}
+			} catch (error) {
+				console.error('Error loading internships:', error);
+			}
+
+			companies.forEach((company, index) => {
+				const row = document.createElement('tr');
+				const logo = company.logo || `../bs5/template/assets/images/demo/logos/${(index % 5) + 1}.svg`;
+				const isActive = company.is_active !== undefined ? company.is_active : true;
+				const statusBadge = isActive 
+					? '<span class="badge bg-success bg-opacity-20 text-success">Active</span>'
+					: '<span class="badge bg-secondary bg-opacity-20 text-secondary">Inactive</span>';
+				const activeInternships = internshipCounts[company.id] || 0;
+				
+				row.innerHTML = `
+					<td>${index + 1}</td>
+					<td>
+						<div class="d-flex align-items-center">
+							<div class="me-3">
+								<img src="${logo}" class="rounded-circle" width="36" height="36" alt="" onerror="this.src='../bs5/template/assets/images/demo/logos/1.svg'">
+							</div>
+							<div>
+								<a href="../company/company-profile.html?id=${company.id}" class="text-body fw-semibold">${company.name || 'N/A'}</a>
+							</div>
+						</div>
+					</td>
+					<td>${company.industry || 'N/A'}</td>
+					<td>${company.email || 'N/A'}</td>
+					<td>${activeInternships}</td>
+					<td>${company.created_at ? new Date(company.created_at).toLocaleDateString() : 'N/A'}</td>
+					<td>${statusBadge}</td>
+					<td class="text-center">
+						<div class="dropdown">
+							<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
+								<i class="ph-dots-three-vertical"></i>
+							</button>
+							<div class="dropdown-menu dropdown-menu-end">
+								<a href="../company/company-profile.html?id=${company.id}" class="dropdown-item"><i class="ph-eye me-2"></i>View Profile</a>
+								<a href="#" class="dropdown-item edit-company-btn" data-company-id="${company.id}"><i class="ph-pencil me-2"></i>Edit Account</a>
+								<a href="../company/company-internships.html?id=${company.id}" class="dropdown-item"><i class="ph-building me-2"></i>Manage Internships</a>
+								<a href="#" class="dropdown-item toggle-active-btn" data-company-id="${company.id}" data-is-active="${isActive}">
+									<i class="ph-${isActive ? 'user-minus' : 'user-plus'} me-2"></i>${isActive ? 'Deactivate' : 'Activate'}
+								</a>
+								<a href="#" class="dropdown-item impersonate-btn" data-user-id="${company.id}" data-user-email="${company.email}" data-user-type="company" data-user-name="${company.name}"><i class="ph-user-switch me-2"></i>Impersonate User</a>
+								<div class="dropdown-divider"></div>
+								<a href="#" class="dropdown-item text-danger delete-company-btn" data-company-id="${company.id}"><i class="ph-trash me-2"></i>Delete Account</a>
+							</div>
+						</div>
+					</td>
+				`;
+				tbody.appendChild(row);
+			});
+
+			// Re-attach impersonation handlers
+			attachImpersonationHandlers();
+			attachActionHandlers();
+		}
+
+		function attachImpersonationHandlers() {
+			document.querySelectorAll('.impersonate-btn').forEach(button => {
+				button.addEventListener('click', function(e) {
+					e.preventDefault();
+					const userId = this.getAttribute('data-user-id');
+					const userEmail = this.getAttribute('data-user-email');
+					const userType = this.getAttribute('data-user-type');
+					const userName = this.getAttribute('data-user-name');
+					
+					if (confirm(`Are you sure you want to impersonate user: ${userEmail}?`)) {
+						sessionStorage.setItem('impersonatedUser', userId);
+						sessionStorage.setItem('impersonatedUserEmail', userEmail);
+						sessionStorage.setItem('impersonatedUserType', userType);
+						sessionStorage.setItem('impersonatedUserName', userName);
+						
+						if (userType === 'company') {
+							window.location.href = '../company/company-dashboard.html';
+						}
+					}
+				});
+			});
+		}
+
+		function attachActionHandlers() {
+			document.querySelectorAll('.delete-company-btn').forEach(button => {
+				button.addEventListener('click', async function(e) {
+					e.preventDefault();
+					const companyId = this.getAttribute('data-company-id');
+					if (confirm('Are you sure you want to delete this company? This action cannot be undone.')) {
+						try {
+							const result = await api.deleteCompany(companyId);
+							if (result.error) {
+								alert('Error: ' + result.error);
+							} else {
+								alert('Company deleted successfully');
+								loadCompanies();
+							}
+						} catch (error) {
+							alert('An error occurred while deleting the company.');
+						}
+					}
+				});
+			});
+		}
+	</script>
 </html> 

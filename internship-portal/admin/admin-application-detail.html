@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Application Details - Admin - Sabancı University Internship Portal</title>
+
+	<!-- Path Resolver - MUST be loaded first -->
+	<script src="../js/path-resolver.js"></script>
+
+	<!-- Global stylesheets -->
+	<link href="../bs5/template/assets/fonts/inter/inter.css" rel="stylesheet" type="text/css">
+	<link href="../bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
+	<link href="../bs5/template/html/layout_1/full/assets/css/ltr/all.min.css" id="stylesheet" rel="stylesheet" type="text/css">
+	<link href="../assets/css/sabanci-theme.css" rel="stylesheet" type="text/css">
+	<!-- /global stylesheets -->
+
+	<!-- Core JS files -->
+	<script src="../bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+	<!-- /core JS files -->
+
+	<!-- Theme JS files -->
+	<script src="../bs5/template/html/layout_1/full/assets/js/app.js"></script>
+	<!-- /theme JS files -->
+	
+	<!-- Custom style for proper scrolling -->
+	<style>
+		.content-wrapper {
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+		}
+		.content {
+			flex: 1;
+			overflow-y: auto;
+			padding-bottom: 1rem;
+		}
+		.page-content {
+			height: 100vh;
+			display: flex;
+			overflow: hidden;
+		}
+	</style>
+</head>
+
+<body>
+
+	<!-- Main navbar -->
+	<div class="navbar navbar-dark navbar-expand-lg navbar-static border-bottom border-bottom-white border-opacity-10">
+		<div class="container-fluid">
+			<div class="d-flex d-lg-none me-2">
+				<button type="button" class="navbar-toggler sidebar-mobile-main-toggle rounded-pill">
+					<i class="ph-list"></i>
+				</button>
+			</div>
+
+			<div class="navbar-brand flex-1 flex-lg-0">
+				<a href="admin-dashboard.html" class="d-inline-flex align-items-center">
+					<img src="../assets/images/logo.svg" alt="Sabancı University Logo" class="h-48px me-2">
+					<span class="d-none d-lg-inline-block h6 mb-0 ms-2">Sabancı University Internship Portal</span>
+				</a>
+			</div>
+
+			<ul class="nav flex-row justify-content-end order-1 order-lg-2">
+				<li class="nav-item nav-item-dropdown-lg dropdown">
+					<a href="#" class="navbar-nav-link navbar-nav-link-icon rounded-pill" data-bs-toggle="dropdown">
+						<i class="ph-bell"></i>
+						<span class="badge bg-yellow text-black position-absolute top-0 end-0 translate-middle-top zindex-1 rounded-pill mt-1 me-1">7</span>
+					</a>
+					
+					<div class="dropdown-menu dropdown-menu-end dropdown-menu-scrollable-sm wmin-lg-350">
+						<div class="p-2">No new notifications</div>
+					</div>
+				</li>
+
+				<li class="nav-item nav-item-dropdown-lg dropdown ms-lg-2">
+					<a href="#" class="navbar-nav-link align-items-center rounded-pill p-1" data-bs-toggle="dropdown">
+						<div class="status-indicator-container">
+							<img src="../bs5/template/assets/images/demo/users/face11.jpg" class="w-32px h-32px rounded-pill" alt="">
+							<span class="status-indicator bg-success"></span>
+						</div>
+						<span class="d-none d-lg-inline-block mx-lg-2">Admin User</span>
+					</a>
+
+					<div class="dropdown-menu dropdown-menu-end">
+						<a href="admin-dashboard.html" class="dropdown-item">
+							<i class="ph-house me-2"></i>
+							Dashboard
+						</a>
+						<a href="admin-settings.html" class="dropdown-item">
+							<i class="ph-gear me-2"></i>
+							Settings
+						</a>
+						<div class="dropdown-divider"></div>
+						<a href="../index.html" class="dropdown-item logout-link">
+							<i class="ph-sign-out me-2"></i>
+							Logout
+						</a>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<!-- /main navbar -->
+
+	<!-- Page content -->
+	<div class="page-content">
+
+		<!-- Main sidebar -->
+		<div class="sidebar sidebar-dark sidebar-main sidebar-expand-lg">
+			<div class="sidebar-content">
+				<!-- Sidebar header -->
+				<div class="sidebar-section">
+					<div class="sidebar-section-body d-flex justify-content-center">
+						<h5 class="sidebar-resize-hide flex-grow-1 my-auto">Navigation</h5>
+						<div>
+							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-control sidebar-main-resize d-none d-lg-inline-flex">
+								<i class="ph-arrows-left-right"></i>
+							</button>
+							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-mobile-main-toggle d-lg-none">
+								<i class="ph-x"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+				<!-- /sidebar header -->
+
+				<!-- Main navigation -->
+				<div class="sidebar-section">
+					<ul class="nav nav-sidebar" data-nav-type="accordion">
+						<li class="nav-item">
+							<a href="admin-dashboard.html" class="nav-link">
+								<i class="ph-house"></i>
+								<span>Dashboard</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-students.html" class="nav-link">
+								<i class="ph-student"></i>
+								<span>Students</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-companies.html" class="nav-link">
+								<i class="ph-buildings"></i>
+								<span>Companies</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-internships.html" class="nav-link">
+								<i class="ph-briefcase"></i>
+								<span>Internships</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-applications.html" class="nav-link active">
+								<i class="ph-file-text"></i>
+								<span>Applications</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-reports.html" class="nav-link">
+								<i class="ph-chart-bar"></i>
+								<span>Reports</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-evaluations.html" class="nav-link">
+								<i class="ph-star"></i>
+								<span>Evaluations</span>
+							</a>
+						</li>
+						
+						<!-- Tools -->
+						<li class="nav-item-header">
+							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Tools</div>
+							<i class="ph-dots-three sidebar-resize-show"></i>
+						</li>
+						<li class="nav-item">
+							<a href="admin-email.html" class="nav-link">
+								<i class="ph-envelope"></i>
+								<span>Email Tool</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-csv-import.html" class="nav-link">
+								<i class="ph-file-csv"></i>
+								<span>CSV Import</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-settings.html" class="nav-link">
+								<i class="ph-gear"></i>
+								<span>Settings</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../index.html" class="nav-link logout-link">
+								<i class="ph-sign-out"></i>
+								<span>Logout</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<!-- /main navigation -->
+			</div>
+		</div>
+		<!-- /main sidebar -->
+
+		<!-- Main content -->
+		<div class="content-wrapper" style="overflow-y: auto;">
+
+			<!-- Content area -->
+			<div class="content">
+
+				<!-- Page header -->
+				<div class="page-header page-header-light shadow">
+					<div class="page-header-content d-lg-flex">
+						<div class="d-flex">
+							<h4 class="page-title mb-0" id="page-title">
+								Application Details - <span class="fw-normal">Loading...</span>
+							</h4>
+						</div>
+					</div>
+					<div class="page-header-content d-lg-flex border-top">
+						<div class="d-flex">
+							<div class="breadcrumb py-2">
+								<a href="admin-dashboard.html" class="breadcrumb-item"><i class="ph-house"></i></a>
+								<a href="admin-applications.html" class="breadcrumb-item">Applications</a>
+								<span class="breadcrumb-item active">Application Details</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /page header -->
+
+				<!-- Application Details Content -->
+				<div class="row">
+					<div class="col-lg-8">
+						<!-- Student Information Card -->
+						<div class="card mb-3">
+							<div class="card-header d-flex align-items-center">
+								<div>
+									<h5 class="mb-0">Student Information</h5>
+								</div>
+								<div class="ms-auto">
+									<a href="#" id="view-student-link" class="btn btn-sm btn-primary">
+										<i class="ph-user me-1"></i>View Student Profile
+									</a>
+								</div>
+							</div>
+							<div class="card-body">
+								<div class="d-flex align-items-center mb-3">
+									<img src="../bs5/template/assets/images/demo/users/face1.jpg" id="student-avatar" class="rounded-pill me-3" width="64" height="64" alt="">
+									<div>
+										<h6 class="mb-0" id="student-name">Loading...</h6>
+										<div class="text-muted" id="student-email">Loading...</div>
+										<div class="text-muted small" id="student-major">Loading...</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Internship Information Card -->
+						<div class="card mb-3">
+							<div class="card-header d-flex align-items-center">
+								<div>
+									<h5 class="mb-0" id="internship-title">Loading...</h5>
+									<span class="text-muted" id="company-name">Loading...</span>
+								</div>
+								<div class="ms-auto">
+									<a href="#" id="view-company-link" class="btn btn-sm btn-primary me-2">
+										<i class="ph-building me-1"></i>View Company
+									</a>
+									<a href="#" id="view-internship-link" class="btn btn-sm btn-light">
+										<i class="ph-eye me-1"></i>View Internship
+									</a>
+								</div>
+							</div>
+							<div class="card-body">
+								<h6>Internship Description</h6>
+								<p id="internship-description">Loading...</p>
+								
+								<hr>
+								
+								<div class="row">
+									<div class="col-md-6">
+										<strong>Location:</strong> <span id="internship-location">Loading...</span>
+									</div>
+									<div class="col-md-6">
+										<strong>Duration:</strong> <span id="internship-dates">Loading...</span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Cover Letter Card -->
+						<div class="card">
+							<div class="card-header">
+								<h6 class="mb-0">Cover Letter</h6>
+							</div>
+							<div class="card-body">
+								<p id="cover-letter" style="white-space: pre-wrap;">Loading...</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-lg-4">
+						<!-- Application Status Card -->
+						<div class="card mb-3">
+							<div class="card-header">
+								<h6 class="mb-0">Application Status</h6>
+							</div>
+							<div class="card-body">
+								<div class="d-flex align-items-center mb-3" id="status-badge-container">
+									<span class="badge bg-secondary fs-lg me-2">Loading...</span>
+								</div>
+								<dl class="row">
+									<dt class="col-sm-5">Application ID:</dt>
+									<dd class="col-sm-7" id="application-id">Loading...</dd>
+
+									<dt class="col-sm-5">Applied On:</dt>
+									<dd class="col-sm-7" id="applied-on">Loading...</dd>
+
+									<dt class="col-sm-5">Student ID:</dt>
+									<dd class="col-sm-7" id="student-id-display">Loading...</dd>
+
+									<dt class="col-sm-5">Company:</dt>
+									<dd class="col-sm-7" id="company-name-display">Loading...</dd>
+								</dl>
+							</div>
+						</div>
+
+						<!-- Quick Actions Card -->
+						<div class="card">
+							<div class="card-header">
+								<h6 class="mb-0">Quick Actions</h6>
+							</div>
+							<div class="card-body">
+								<div class="d-grid gap-2">
+									<a href="admin-applications.html" class="btn btn-light">
+										<i class="ph-arrow-left me-2"></i>Back to Applications
+									</a>
+									<a href="admin-dashboard.html" class="btn btn-outline-light">
+										<i class="ph-house me-2"></i>Admin Dashboard
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /Application Details Content -->
+
+			</div>
+			<!-- /content area -->
+
+			<!-- Footer -->
+			<div class="navbar navbar-sm navbar-footer border-top">
+				<div class="container-fluid">
+					<span>&copy; 2023 <a href="#">Sabancı University Internship Portal</a></span>
+					<ul class="nav">
+					</ul>
+				</div>
+			</div>
+			<!-- /footer -->
+
+		</div>
+		<!-- /main content -->
+
+	</div>
+	<!-- /page content -->
+
+	<script src="../js/api.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			// Auth check
+			const userRole = localStorage.getItem('userRole');
+			if (userRole !== 'admin') {
+				alert('Access denied. Redirecting to login page.');
+				window.location.href = '../index.html';
+				return;
+			}
+
+			const urlParams = new URLSearchParams(window.location.search);
+			const applicationId = urlParams.get('id');
+
+			if (!applicationId) {
+				document.body.innerHTML = '<div class="alert alert-danger m-5">Application ID not found in URL.</div>';
+				return;
+			}
+
+			loadApplicationDetails(applicationId);
+		});
+
+		async function loadApplicationDetails(applicationId) {
+			try {
+				const app = await api.getApplicationDetails(applicationId);
+
+				// Populate page with data
+				document.getElementById('page-title').innerHTML = `Application Details - <span class="fw-normal">${app.internship_position || 'Application'} at ${app.company_name || 'Company'}</span>`;
+				document.getElementById('internship-title').textContent = app.internship_position || 'N/A';
+				document.getElementById('company-name').textContent = app.company_name || 'N/A';
+				document.getElementById('company-name-display').textContent = app.company_name || 'N/A';
+				document.getElementById('internship-description').textContent = app.internship_description || 'No description provided.';
+				document.getElementById('cover-letter').textContent = app.cover_letter || 'No cover letter provided.';
+				
+				// Student information
+				document.getElementById('student-name').textContent = app.student_name || 'N/A';
+				document.getElementById('student-email').textContent = app.student_email || 'N/A';
+				document.getElementById('student-major').textContent = app.student_major || 'N/A';
+				document.getElementById('student-id-display').textContent = app.student_id || 'N/A';
+				if (app.student_profile_pic) {
+					document.getElementById('student-avatar').src = app.student_profile_pic;
+				}
+				
+				// Links
+				if (app.student_id) {
+					document.getElementById('view-student-link').href = `../student/student-profile.html?id=${app.student_id}`;
+				}
+				if (app.company_id || app.internship_company_id) {
+					const companyId = app.company_id || app.internship_company_id;
+					document.getElementById('view-company-link').href = `../company/company-profile.html?id=${companyId}`;
+				}
+				if (app.internship_id) {
+					document.getElementById('view-internship-link').href = `../student/student-internship-detail.html?id=${app.internship_id}`;
+				}
+				
+				// Status
+				const statusBadge = getStatusBadge(app.status || 'Pending');
+				document.getElementById('status-badge-container').innerHTML = statusBadge;
+				
+				// Application details
+				document.getElementById('application-id').textContent = app.application_id || applicationId || 'N/A';
+				const appliedDate = app.created_at || app.applied_date;
+				document.getElementById('applied-on').textContent = appliedDate ? new Date(appliedDate).toLocaleDateString() : 'N/A';
+				document.getElementById('internship-location').textContent = app.internship_location || app.location || 'N/A';
+				document.getElementById('internship-dates').textContent = app.internship_dates || app.dates || 'N/A';
+				
+			} catch (error) {
+				console.error('Failed to load application details:', error);
+				document.getElementById('page-title').innerHTML = '<span class="text-danger">Error loading application</span>';
+			}
+		}
+
+		function getStatusBadge(status) {
+			let badgeClass = 'badge bg-secondary bg-opacity-20 text-secondary';
+			if (status === 'Finalized') {
+				badgeClass = 'badge bg-success bg-opacity-20 text-success';
+			} else if (status === 'Pending') {
+				badgeClass = 'badge bg-warning bg-opacity-20 text-warning';
+			} else if (status === 'Rejected') {
+				badgeClass = 'badge bg-danger bg-opacity-20 text-danger';
+			} else if (status === 'Accepted') {
+				badgeClass = 'badge bg-success bg-opacity-20 text-success';
+			} else if (status === 'Confirmed') {
+				badgeClass = 'badge bg-info bg-opacity-20 text-info';
+			} else if (status === 'Withdrawn') {
+				badgeClass = 'badge bg-secondary bg-opacity-20 text-secondary';
+			}
+			return `<span class="${badgeClass} fs-lg">${status || 'Pending'}</span>`;
+		}
+	</script>
+
+	<!-- Logout Script -->
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			const logoutLinks = document.querySelectorAll('.logout-link');
+			logoutLinks.forEach(link => {
+				link.addEventListener('click', (event) => {
+					localStorage.removeItem('userRole');
+					localStorage.removeItem('userId');
+				});
+			});
+		});
+	</script>
+
+</body>
+</html>
+

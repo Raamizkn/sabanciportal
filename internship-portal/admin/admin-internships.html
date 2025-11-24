@@ -334,73 +334,8 @@
 									<th class="text-center">Actions</th>
 								</tr>
 							</thead>
-							<tbody>
-								<tr>
-									<td>1</td>
-									<td>Software Developer Intern</td>
-									<td>
-										<div class="d-flex align-items-center">
-											<div class="me-3">
-												<img src="../bs5/template/assets/images/demo/logos/2.svg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-											<div>
-												<a href="#" class="text-body fw-semibold">XYZ Corporation</a>
-											</div>
-										</div>
-									</td>
-									<td>San Francisco, CA (On-site)</td>
-									<td>2025/03/01</td>
-									<td>5</td>
-									<td><span class="badge bg-success bg-opacity-20 text-success">Active</span></td>
-									<td class="text-center">
-										<div class="dropdown">
-											<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
-												<i class="ph-dots-three-vertical"></i>
-											</button>
-											<div class="dropdown-menu dropdown-menu-end">
-												<a href="#" class="dropdown-item"><i class="ph-eye me-2"></i>View Details</a>
-												<a href="#" class="dropdown-item"><i class="ph-pencil me-2"></i>Edit Listing</a>
-												<a href="#" class="dropdown-item"><i class="ph-users me-2"></i>View Applications</a>
-												<a href="#" class="dropdown-item"><i class="ph-x-circle me-2"></i>Mark as Inactive</a>
-												<div class="dropdown-divider"></div>
-												<a href="#" class="dropdown-item text-danger"><i class="ph-trash me-2"></i>Delete Listing</a>
-											</div>
-										</div>
-									</td>
-								</tr>
-                                <tr>
-									<td>2</td>
-									<td>Marketing Intern</td>
-									<td>
-										<div class="d-flex align-items-center">
-											<div class="me-3">
-												<img src="../bs5/template/assets/images/demo/logos/2.svg" class="rounded-circle" width="36" height="36" alt="">
-											</div>
-											<div>
-												<a href="#" class="text-body fw-semibold">XYZ Corporation</a>
-											</div>
-										</div>
-									</td>
-									<td>Remote</td>
-									<td>2025/02/20</td>
-									<td>3</td>
-									<td><span class="badge bg-success bg-opacity-20 text-success">Active</span></td>
-									<td class="text-center">
-										<div class="dropdown">
-											<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
-												<i class="ph-dots-three-vertical"></i>
-											</button>
-											<div class="dropdown-menu dropdown-menu-end">
-												<a href="#" class="dropdown-item"><i class="ph-eye me-2"></i>View Details</a>
-												<a href="#" class="dropdown-item"><i class="ph-pencil me-2"></i>Edit Listing</a>
-												<a href="#" class="dropdown-item"><i class="ph-users me-2"></i>View Applications</a>
-												<a href="#" class="dropdown-item"><i class="ph-x-circle me-2"></i>Mark as Inactive</a>
-												<div class="dropdown-divider"></div>
-												<a href="#" class="dropdown-item text-danger"><i class="ph-trash me-2"></i>Delete Listing</a>
-											</div>
-										</div>
-									</td>
-								</tr>
+							<tbody id="internshipsTableBody">
+								<!-- Internships will be loaded dynamically -->
 							</tbody>
 						</table>
 					</div>
@@ -558,5 +493,126 @@
 			dataTable.search('').columns().search('').draw();
 		});
 	});
+</script>
+
+	<!-- API Integration -->
+	<script src="../js/api.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', async function() {
+			// Auth check
+			const userRole = localStorage.getItem('userRole');
+			if (userRole !== 'admin') {
+				alert('Access denied. Redirecting to login page.');
+				window.location.href = '../index.html';
+				return;
+			}
+
+			await loadInternships();
+		});
+
+		async function loadInternships() {
+			try {
+				const internships = await api.getAllInternships();
+				if (internships.error) {
+					console.error('Failed to load internships:', internships.error);
+					document.getElementById('internshipsTableBody').innerHTML = '<tr><td colspan="8" class="text-center text-muted">Failed to load internships</td></tr>';
+					return;
+				}
+
+				populateInternshipsTable(Array.isArray(internships) ? internships : []);
+			} catch (error) {
+				console.error('Error loading internships:', error);
+				document.getElementById('internshipsTableBody').innerHTML = '<tr><td colspan="8" class="text-center text-muted">Error loading internships</td></tr>';
+			}
+		}
+
+		async function populateInternshipsTable(internships) {
+			const tbody = document.getElementById('internshipsTableBody');
+			if (!tbody) return;
+
+			tbody.innerHTML = '';
+
+			if (internships.length === 0) {
+				tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No internships found</td></tr>';
+				return;
+			}
+
+			// Get application counts for each internship
+			const applicationCounts = {};
+			try {
+				const allApplications = await api.getAllApplications();
+				if (Array.isArray(allApplications)) {
+					allApplications.forEach(app => {
+						const internshipId = app.internship_id;
+						if (internshipId) {
+							applicationCounts[internshipId] = (applicationCounts[internshipId] || 0) + 1;
+						}
+					});
+				}
+			} catch (error) {
+				console.error('Error loading applications:', error);
+			}
+
+			internships.forEach((internship, index) => {
+				const row = document.createElement('tr');
+				const companyLogo = internship.company_logo || `../bs5/template/assets/images/demo/logos/${(index % 5) + 1}.svg`;
+				const companyName = internship.company_name || 'Unknown Company';
+				const status = internship.status || 'Active';
+				const statusBadge = status === 'Active' 
+					? '<span class="badge bg-success bg-opacity-20 text-success">Active</span>'
+					: '<span class="badge bg-secondary bg-opacity-20 text-secondary">' + status + '</span>';
+				const applicationCount = applicationCounts[internship.id] || 0;
+				
+				row.innerHTML = `
+					<td>${index + 1}</td>
+					<td>${internship.position || internship.title || 'N/A'}</td>
+					<td>
+						<div class="d-flex align-items-center">
+							<div class="me-3">
+								<img src="${companyLogo}" class="rounded-circle" width="36" height="36" alt="" onerror="this.src='../bs5/template/assets/images/demo/logos/1.svg'">
+							</div>
+							<div>
+								<a href="../company/company-profile.html?id=${internship.company_id}" class="text-body fw-semibold">${companyName}</a>
+							</div>
+						</div>
+					</td>
+					<td>${internship.location || 'N/A'}</td>
+					<td>${internship.created_at ? new Date(internship.created_at).toLocaleDateString() : 'N/A'}</td>
+					<td>${applicationCount}</td>
+					<td>${statusBadge}</td>
+					<td class="text-center">
+						<div class="dropdown">
+							<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
+								<i class="ph-dots-three-vertical"></i>
+							</button>
+							<div class="dropdown-menu dropdown-menu-end">
+								<a href="../student/student-internship-detail.html?id=${internship.id}" class="dropdown-item"><i class="ph-eye me-2"></i>View Details</a>
+								<a href="../company/company-internships.html?id=${internship.company_id}" class="dropdown-item"><i class="ph-pencil me-2"></i>Edit</a>
+								<a href="admin-applications.html?internship_id=${internship.id}" class="dropdown-item"><i class="ph-users me-2"></i>View Applications</a>
+								<div class="dropdown-divider"></div>
+								<a href="#" class="dropdown-item text-danger delete-internship-btn" data-internship-id="${internship.id}"><i class="ph-trash me-2"></i>Delete</a>
+							</div>
+						</div>
+					</td>
+				`;
+				tbody.appendChild(row);
+			});
+
+			// Reinitialize DataTable after populating
+			if (window.dataTable) {
+				window.dataTable.destroy();
+			}
+			window.dataTable = $('.datatable-basic').DataTable({
+				autoWidth: false,
+				dom: '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
+				language: {
+					search: '<span class="me-3">Filter:</span> <div class="form-control-feedback form-control-feedback-end flex-fill">_INPUT_<div class="form-control-feedback-icon"><i class="ph-magnifying-glass opacity-50"></i></div></div>',
+					searchPlaceholder: 'Type to filter...',
+					lengthMenu: '<span class="me-3">Show:</span> _MENU_',
+					paginate: { 'first': 'First', 'last': 'Last', 'next': document.dir == "rtl" ? '&larr;' : '&rarr;', 'previous': document.dir == "rtl" ? '&rarr;' : '&larr;' }
+				},
+				order: [[4, 'desc']]
+			});
+		}
 </script>
 </html> 

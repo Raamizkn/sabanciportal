@@ -1,5 +1,13 @@
 <?php
 
+// Start output buffering to catch any stray output
+ob_start();
+
+// Suppress display of errors (log them instead)
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+
 // Get the origin from the request
 $origin = $_SERVER['HTTP_ORIGIN'] ?? null;
 
@@ -75,6 +83,12 @@ elseif ($entity === 'applications') {
 elseif ($entity === 'documents') {
     require_once __DIR__ . '/handlers/documents_handler.php';
 }
+elseif ($entity === 'students') {
+    require_once __DIR__ . '/handlers/student_handler.php';
+}
+elseif ($entity === 'companies') {
+    require_once __DIR__ . '/handlers/company_handler.php';
+}
 elseif ($entity === 'admin') {
     require_once __DIR__ . '/handlers/admin_handler.php';
     
@@ -116,6 +130,47 @@ elseif ($entity === 'admin') {
             }
             break;
         
+        case 'dashboard':
+            if ($method === 'GET') {
+                if ($action === 'stats') {
+                    $response = get_admin_dashboard_stats();
+                } elseif ($action === 'activity') {
+                    $limit = $_GET['limit'] ?? 10;
+                    $response = get_admin_activity_feed((int)$limit);
+                }
+            }
+            break;
+        
+        case 'applications':
+            if ($method === 'GET') {
+                if ($id !== null) {
+                    $response = get_application_details_admin($id);
+                } else {
+                    // Get all applications for admin
+                    global $applications;
+                    $response = array_values($applications);
+                }
+            }
+            break;
+        
+        case 'internships':
+            if ($method === 'GET') {
+                if ($id !== null) {
+                    $response = get_internship_info_admin($id);
+                } else {
+                    $response = get_all_internships_admin();
+                }
+            }
+            break;
+        
+        case 'reports':
+            if ($method === 'GET' || $method === 'POST') {
+                $report_type = $_GET['type'] ?? $input['type'] ?? 'applications';
+                $params = $_GET['params'] ?? $input['params'] ?? [];
+                $response = generate_report($report_type, $params);
+            }
+            break;
+        
         // Add more admin resources here as needed...
     }
 
@@ -147,6 +202,11 @@ else {
     } else { // No entity specified at all, default welcome
         echo json_encode(['message' => 'Welcome to the PHP Backend! Please specify an entity (e.g., /index.php?entity=internships).']);
     }
+}
+
+// End output buffering - handlers should have already output their JSON
+if (ob_get_level() > 0) {
+    ob_end_flush();
 }
 
 ?> 

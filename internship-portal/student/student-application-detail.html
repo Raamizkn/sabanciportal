@@ -108,15 +108,11 @@
 							<i class="ph-file-text me-2"></i>
 							My documents
 						</a>
-						<a href="student-evaluations.html" class="dropdown-item">
-							<i class="ph-star me-2"></i>
-							Evaluations
-						</a>
-						<a href="student-settings.html" class="dropdown-item">
-							<i class="ph-gear me-2"></i>
-							Account settings
-						</a>
-						<div class="dropdown-divider"></div>
+					<a href="student-evaluations.html" class="dropdown-item">
+						<i class="ph-star me-2"></i>
+						Evaluations
+					</a>
+					<div class="dropdown-divider"></div>
 						<a href="../index.html" class="dropdown-item logout-link">
 							<i class="ph-sign-out me-2"></i>
 							Logout
@@ -194,19 +190,13 @@
 							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Profile</div>
 							<i class="ph-dots-three sidebar-resize-show"></i>
 						</li>
-						<li class="nav-item">
-							<a href="student-profile.html" class="nav-link">
-								<i class="ph-user-circle"></i>
-								<span>My Profile</span>
-							</a>
-						</li>
-						<li class="nav-item">
-							<a href="student-settings.html" class="nav-link">
-								<i class="ph-gear"></i>
-								<span>Account Settings</span>
-							</a>
-						</li>
-						<li class="nav-item">
+					<li class="nav-item">
+						<a href="student-profile.html" class="nav-link">
+							<i class="ph-user-circle"></i>
+							<span>My Profile</span>
+						</a>
+					</li>
+					<li class="nav-item">
 							<a href="../index.html" class="nav-link logout-link">
 								<i class="ph-sign-out"></i>
 								<span>Logout</span>
@@ -334,22 +324,31 @@
 	<!-- Modals can be kept for actions if needed -->
 
 	<script src="../js/api.js"></script>
+	<script src="../js/modal-utils.js"></script>
 	<script>
 		document.addEventListener('DOMContentLoaded', () => {
 			const urlParams = new URLSearchParams(window.location.search);
 			const applicationId = urlParams.get('id');
 
-			// Auth check
+			// Auth check - allow students, impersonated students, and admins
 			const userRole = localStorage.getItem('userRole');
             const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'student';
-            if (userRole !== 'student' && !isBeingImpersonated) {
-                alert('Access denied. Redirecting to login page.');
-                window.location.href = '../index.html';
+            const isAdmin = userRole === 'admin';
+            
+            if (userRole !== 'student' && !isBeingImpersonated && !isAdmin) {
+                showAlertModal('Access Denied', 'You must be logged in as a Student.', 'error', () => {
+                    window.location.href = '../index.html';
+                });
                 return;
             }
 
+			// Add admin navigation bar if accessed by admin
+			if (isAdmin && !isBeingImpersonated) {
+				addAdminNavigationBar();
+			}
+
 			if (!applicationId) {
-				document.body.innerHTML = '<div class="alert alert-danger m-5">Application ID not found in URL.</div>';
+				showAlertModal('Error', 'Application ID not found in URL.', 'error');
 				return;
 			}
 
@@ -392,19 +391,23 @@
 		function getStatusBadge(status) {
 			let badgeClass = 'bg-secondary';
 			switch (status) {
-                case 'Confirmed_By_Student':
                 case 'Accepted':
                     badgeClass = 'bg-success';
                     break;
-                case 'Offered':
+                case 'Confirmed':
                     badgeClass = 'bg-info';
                     break;
-                case 'Pending Review':
-                case 'Under Review':
+                case 'Finalized':
+                    badgeClass = 'bg-success';
+                    break;
+                case 'Pending':
                     badgeClass = 'bg-warning text-dark';
                     break;
                 case 'Rejected':
                     badgeClass = 'bg-danger';
+                    break;
+                case 'Withdrawn':
+                    badgeClass = 'bg-secondary';
                     break;
             }
 			return `<span class="badge ${badgeClass} fs-lg me-2">${status}</span>`;
@@ -412,55 +415,107 @@
 
 		function getActionButtons(application) {
 			let buttons = '';
-			if (application.status === 'Offered') {
-				buttons += `<button class="btn btn-success confirm-offer-btn" data-application-id="${application.application_id}"><i class="ph-check-circle me-2"></i>Confirm Acceptance</button>`;
+			const normalizedStatus = normalizeStatusForDetail(application.status);
+			
+			// Show confirm button if status is Accepted
+			if (normalizedStatus === 'Accepted') {
+				buttons += `<button class="btn btn-success confirm-application-btn" data-application-id="${application.application_id}"><i class="ph-check-circle me-2"></i>Confirm Acceptance</button>`;
 			}
 
-			const withdrawable_statuses = ['Pending Review', 'Under Review', 'Shortlisted', 'Offered'];
-			if (withdrawable_statuses.includes(application.status)) {
+			// Allow withdrawal if not finalized, rejected, or already withdrawn
+			const finalStatuses = ['Finalized', 'Rejected', 'Withdrawn', 'Confirmed'];
+			if (!finalStatuses.includes(normalizedStatus)) {
 				buttons += `<button class="btn btn-danger withdraw-btn mt-2" data-application-id="${application.application_id}"><i class="ph-x-circle me-2"></i>Withdraw Application</button>`;
 			}
 			return buttons;
 		}
+		
+		function normalizeStatusForDetail(status) {
+			if (!status) return 'Pending';
+				// Statuses are now clean - no normalization needed
+				return status;
+		}
 
 		function addEventListeners(applicationId) {
-			const confirmBtn = document.querySelector('.confirm-offer-btn');
+			const confirmBtn = document.querySelector('.confirm-application-btn');
 			if(confirmBtn) {
 				confirmBtn.addEventListener('click', async () => {
-					if (confirm('Are you sure you want to confirm this internship offer? This action cannot be undone.')) {
-						try {
-							const result = await api.confirmOffer(applicationId);
-							if (result.message) {
-								alert('Offer confirmed! Congratulations!');
-								loadApplicationDetails(applicationId); // Refresh details
-							} else {
-								alert('Error: ' + (result.error || 'Unknown error'));
+				showConfirmModal(
+					'Confirm Acceptance',
+					'Confirm your acceptance of this internship offer? The company will then be able to finalize the placement.',
+					'Confirm',
+					'Cancel',
+					async (confirmed) => {
+						if (confirmed) {
+							try {
+								const result = await api.confirmApplication(applicationId);
+								if (result.status === 'success' || result.message) {
+									showAlertModal('Success', result.message || 'Application confirmed! Company can now finalize.', 'success', () => {
+										loadApplicationDetails(applicationId); // Refresh details
+									});
+								} else {
+									showAlertModal('Error', result.error || 'Unknown error', 'error');
+								}
+							} catch (error) {
+								showAlertModal('Error', 'An error occurred while confirming the application.', 'error');
 							}
-						} catch (error) {
-							alert('An error occurred while confirming the offer.');
 						}
 					}
+				);
 				});
 			}
 
 			const withdrawBtn = document.querySelector('.withdraw-btn');
 			if(withdrawBtn) {
 				withdrawBtn.addEventListener('click', async () => {
-					if (confirm('Are you sure you want to withdraw this application?')) {
-						try {
-							const result = await api.withdrawApplication(applicationId);
-							if (result.message) {
-								alert('Application withdrawn.');
-								loadApplicationDetails(applicationId); // Refresh details
-							} else {
-								alert('Error: ' + (result.error || 'Unknown error'));
+					showConfirmModal(
+						'Withdraw Application',
+						'Are you sure you want to withdraw this application?',
+						'Withdraw',
+						'Cancel',
+						async (confirmed) => {
+							if (confirmed) {
+								try {
+									const result = await api.withdrawApplication(applicationId);
+									if (result.message || result.status === 'success') {
+										showAlertModal('Application Withdrawn', 'Your application has been withdrawn.', 'info', () => {
+											loadApplicationDetails(applicationId); // Refresh details
+										});
+									} else {
+										showAlertModal('Error', result.error || 'Unknown error', 'error');
+									}
+								} catch (error) {
+									showAlertModal('Error', 'An error occurred while withdrawing the application.', 'error');
+								}
 							}
-						} catch (error) {
-							alert('An error occurred while withdrawing the application.');
 						}
-					}
+					);
 				});
 			}
+		}
+
+		// Add admin navigation bar at the top of the page
+		function addAdminNavigationBar() {
+			const adminNav = document.createElement('div');
+			adminNav.className = 'alert alert-info mb-0 rounded-0 border-0';
+			adminNav.style.cssText = 'position: sticky; top: 0; z-index: 1030; background: #0d6efd !important; color: white;';
+			adminNav.innerHTML = `
+				<div class="container-fluid d-flex align-items-center justify-content-between">
+					<div class="d-flex align-items-center">
+						<i class="ph-arrow-left me-2" style="cursor: pointer;" onclick="window.history.back()"></i>
+						<span><strong>Admin View:</strong> Viewing application details (Admin Mode)</span>
+					</div>
+					<div>
+						<a href="../admin/admin-applications.html" class="btn btn-sm btn-light me-2">
+							<i class="ph-arrow-left me-1"></i>Back to Applications
+						</a>
+						<a href="../admin/admin-dashboard.html" class="btn btn-sm btn-light">
+							<i class="ph-house me-1"></i>Admin Dashboard
+						</a>
+					</div>
+				</div>
+			`;
+			document.body.insertBefore(adminNav, document.body.firstChild);
 		}
 
 	</script>
