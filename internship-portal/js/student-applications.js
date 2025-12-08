@@ -326,23 +326,33 @@ function getStatusBadge(status) {
 }
 
 function getActionButtons(application) {
-    let buttons = '';
+    const status = application.status;
+    const appId = application.application_id;
 
-    // Always show a view button
-    buttons += `<a href="student-application-detail.html?id=${application.application_id}" class="btn btn-sm btn-icon btn-light view-button" data-bs-popup="tooltip" title="View Details"><i class="ph-eye"></i></a>`;
+    const viewBtn = `<a href="student-application-detail.html?id=${appId}" class="btn btn-sm btn-icon btn-light view-button" data-bs-popup="tooltip" title="View Details"><i class="ph-eye"></i></a>`;
 
-    // Show confirm button if status is Accepted
-    if (application.status === 'Accepted') {
-        buttons += `<button class="btn btn-sm btn-icon btn-light confirm-application-btn ms-1" data-application-id="${application.application_id}" data-bs-popup="tooltip" title="Confirm Acceptance"><i class="ph-check-circle text-success"></i></button>`;
-    }
+    const confirmEnabled = status === 'Accepted';
+    const confirmBtn = `
+        <button class="btn btn-sm btn-icon ${confirmEnabled ? 'btn-light confirm-application-btn' : 'btn-secondary disabled'} ms-1" 
+            data-application-id="${appId}" 
+            ${confirmEnabled ? '' : 'disabled'}
+            data-bs-popup="tooltip" 
+            title="${confirmEnabled ? 'Confirm Acceptance' : 'Confirm disabled'}">
+            <i class="ph-check-circle ${confirmEnabled ? 'text-success' : 'text-muted'}"></i>
+        </button>`;
 
-    // Allow withdrawal if not finalized, rejected, or already withdrawn
     const finalStatuses = ['Finalized', 'Rejected', 'Withdrawn', 'Confirmed'];
-    if (!finalStatuses.includes(status)) {
-        buttons += `<button class="btn btn-sm btn-icon btn-light withdraw-btn ms-1" data-application-id="${application.application_id}" data-bs-popup="tooltip" title="Withdraw Application"><i class="ph-x-circle text-danger"></i></button>`;
-    }
+    const withdrawEnabled = !finalStatuses.includes(status);
+    const withdrawBtn = `
+        <button class="btn btn-sm btn-icon ${withdrawEnabled ? 'btn-light withdraw-btn' : 'btn-secondary disabled'} ms-1" 
+            data-application-id="${appId}" 
+            ${withdrawEnabled ? '' : 'disabled'}
+            data-bs-popup="tooltip" 
+            title="${withdrawEnabled ? 'Withdraw Application' : 'Withdraw disabled'}">
+            <i class="ph-x-circle ${withdrawEnabled ? 'text-danger' : 'text-muted'}"></i>
+        </button>`;
 
-    return buttons;
+    return `${viewBtn}${confirmBtn}${withdrawBtn}`;
 }
 
 function normalizeStatusForStudent(status) {
@@ -361,6 +371,10 @@ function addEventListeners() {
     document.querySelectorAll('.withdraw-btn').forEach(button => {
         button.addEventListener('click', async (e) => {
             const appId = e.currentTarget.getAttribute('data-application-id');
+            if (e.currentTarget.classList.contains('disabled')) {
+                showAlertModal('Withdraw Disabled', 'You cannot withdraw after confirmation or finalization.', 'info');
+                return;
+            }
             showConfirmModal(
                 'Withdraw Application',
                 'Are you sure you want to withdraw this application?',
@@ -390,6 +404,10 @@ function addEventListeners() {
     document.querySelectorAll('.confirm-application-btn').forEach(button => {
         button.addEventListener('click', async (e) => {
             const appId = e.currentTarget.getAttribute('data-application-id');
+            if (e.currentTarget.classList.contains('disabled')) {
+                showAlertModal('Confirm Disabled', 'You cannot confirm this application. Either it is not accepted yet or you already have a confirmed/finalized placement.', 'info');
+                return;
+            }
             showConfirmModal(
                 'Confirm Acceptance',
                 'Confirm your acceptance of this internship offer? The company will then be able to finalize the placement.',

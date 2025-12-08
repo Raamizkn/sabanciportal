@@ -595,23 +595,34 @@ document.addEventListener('DOMContentLoaded', function() {
         const studentProfileImg = typeof resolveProfileImage !== 'undefined' ? resolveProfileImage(app.student_profile_pic) : (app.student_profile_pic || '../bs5/template/assets/images/demo/users/face1.jpg');
         const statusBadge = typeof getStatusBadge !== 'undefined' ? getStatusBadge(app.status) : `<span class="badge bg-secondary">${app.status || 'Pending'}</span>`;
         
-        // Build documents HTML
-        let documentsHTML = '';
+        // Build documents HTML with resume vs additional split
+        const apiBase = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
+        let resumeHTML = '<p class="text-muted mb-0">No resume uploaded.</p>';
+        let additionalDocsHTML = '<div class="text-muted">No additional documents attached.</div>';
         if (Array.isArray(app.documents) && app.documents.length > 0) {
-            app.documents.forEach(doc => {
-                if (doc.download_url) {
-                    const apiBase = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
-                    const downloadUrl = doc.download_url.startsWith('http') ? doc.download_url : `${apiBase}${doc.download_url}`;
-                    documentsHTML += `
-                        <a href="${downloadUrl}" target="_blank" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            <span>${doc.file_name || 'Document'} (${doc.document_type || 'File'})</span>
-                            <i class="ph-download-simple"></i>
-                        </a>
-                    `;
-                }
+            const docs = app.documents.map(doc => {
+                const downloadUrl = doc.download_url
+                    ? (doc.download_url.startsWith('http') ? doc.download_url : `${apiBase}${doc.download_url}`)
+                    : null;
+                return { ...doc, resolved_url: downloadUrl };
             });
-        } else {
-            documentsHTML = '<div class="text-muted">No additional documents attached.</div>';
+            const resumeDoc = docs.find(d => (d.document_type || '').toLowerCase() === 'cv');
+            if (resumeDoc && resumeDoc.resolved_url) {
+                resumeHTML = `
+                    <a href="${resumeDoc.resolved_url}" target="_blank" class="btn btn-outline-primary">
+                        <i class="ph-download-simple me-2"></i>${resumeDoc.file_name || 'Download Resume'}
+                    </a>
+                `;
+            }
+            const others = docs.filter(d => (d.document_type || '').toLowerCase() !== 'cv' && d.resolved_url);
+            if (others.length > 0) {
+                additionalDocsHTML = others.map(doc => `
+                    <a href="${doc.resolved_url}" target="_blank" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span>${doc.file_name || 'Document'} (${doc.document_type || 'File'})</span>
+                        <i class="ph-download-simple"></i>
+                    </a>
+                `).join('');
+            }
         }
 
         // Determine if evaluation can be submitted (only for finalized applications)
@@ -699,21 +710,17 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="card-header">
                                 <h6 class="mb-0">Attached Documents</h6>
                             </div>
-                            <div class="card-body">
-            <div class="mb-3">
-                                    <h6 class="fw-semibold mb-2">Resume/CV</h6>
-                                    ${app.resume_download_url ? `
-                                        <a href="${typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : ''}${app.resume_download_url}" target="_blank" class="btn btn-outline-primary">
-                                            <i class="ph-download-simple me-2"></i>${app.resume_file_name || 'Download Resume'}
-                                        </a>
-                                    ` : '<p class="text-muted mb-0">No resume uploaded.</p>'}
-            </div>
-                                <hr>
-                                <h6 class="fw-semibold mb-2">Additional Documents</h6>
-                                <div class="list-group">
-                                    ${documentsHTML}
-            </div>
-                            </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <h6 class="fw-semibold mb-2">Resume/CV</h6>
+                                        ${resumeHTML}
+                                    </div>
+                                    <hr>
+                                    <h6 class="fw-semibold mb-2">Additional Documents</h6>
+                                    <div class="list-group">
+                                        ${additionalDocsHTML}
+                                    </div>
+                                </div>
                         </div>
                     </div>
 

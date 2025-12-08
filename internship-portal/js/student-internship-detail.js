@@ -104,7 +104,11 @@ function showDetailAlert(message, state = 'danger') {
 
 function disableApplyButton() {
     const buttons = document.querySelectorAll('[data-bs-target="#apply_now_modal"]');
-    buttons.forEach(btn => btn.setAttribute('disabled', 'disabled'));
+    buttons.forEach(btn => {
+        btn.setAttribute('disabled', 'disabled');
+        btn.classList.add('disabled');
+        btn.title = 'You cannot apply right now.';
+    });
 }
 
 async function loadInternship(internshipId) {
@@ -112,6 +116,23 @@ async function loadInternship(internshipId) {
         const internship = await api.getInternshipDetails(internshipId);
         detailInternship = internship;
         populateInternshipDetails(internship);
+
+        // Check application limits for student and gray out apply if limit reached
+        const userRole = localStorage.getItem('userRole');
+        const impersonatedType = sessionStorage.getItem('impersonatedUserType');
+        const impersonatedId = sessionStorage.getItem('impersonatedUser');
+        const studentId = userRole === 'student' ? localStorage.getItem('userId') : impersonatedId;
+        if (studentId && userRole === 'student') {
+            try {
+                const limits = await api.getStudentApplicationLimits(studentId);
+                if (limits && limits.active_limit_reached) {
+                    disableApplyButton();
+                    showDetailAlert(`Application limit reached (${limits.active_count}/3 active). Withdraw or wait for decisions to free slots.`, 'warning');
+                }
+            } catch (e) {
+                console.warn('Could not check application limits', e);
+            }
+        }
     } catch (error) {
         console.error('Failed to load internship detail:', error);
         showDetailAlert('Unable to load internship details. Please try again later.', 'danger');

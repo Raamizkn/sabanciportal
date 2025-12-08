@@ -9,7 +9,11 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../auth/auth.php';
 $db = getDB();
 
-function format_document_download_url($path) {
+function format_document_download_url($path, $document_id = null) {
+    // Prefer secure download endpoint so BLOBs (file_content) also work
+    if ($document_id) {
+        return "/index.php?entity=applications&action=download_document&document_id={$document_id}";
+    }
     if (!$path) {
         return null;
     }
@@ -20,14 +24,16 @@ function format_document_download_url($path) {
 function get_application_documents($application_primary_id) {
     global $db;
     try {
-        $stmt = $db->prepare("SELECT document_id, document_type, file_name, file_path, file_size, upload_date
+        $stmt = $db->prepare("SELECT document_id, document_type, file_name, file_path, file_size, upload_date, student_id, file_content
             FROM documents
             WHERE application_id = ?
             ORDER BY upload_date DESC, id DESC");
         $stmt->execute([$application_primary_id]);
         $documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
         foreach ($documents as &$doc) {
-            $doc['download_url'] = format_document_download_url($doc['file_path']);
+            $doc['download_url'] = format_document_download_url($doc['file_path'], $doc['document_id'] ?? null);
+            // Don't leak BLOB in listing
+            unset($doc['file_content']);
         }
         return $documents;
     } catch (PDOException $e) {
@@ -73,6 +79,100 @@ function generate_application_code(PDO $db) {
 
 if ($entity === 'applications') {
     if ($method === 'GET') {
+        if (isset($_GET['action']) && $_GET['action'] === 'download_document') {
+            // Secure document download for applications (students, companies, admins)
+            requireAuth();
+            $document_id = $_GET['document_id'] ?? null;
+            if (!$document_id) {
+                http_response_code(400);
+                echo json_encode(['error' => 'document_id is required']);
+                exit;
+            }
+
+            try {
+                $stmt = $db->prepare("
+                    SELECT d.*, a.application_id, a.student_id, i.company_id
+                    FROM documents d
+                    LEFT JOIN applications a ON d.application_id = a.id
+                    LEFT JOIN internships i ON a.internship_id = i.id
+                    WHERE d.document_id = ?
+                ");
+                $stmt->execute([$document_id]);
+                $document = $stmt->fetch(PDO::FETCH_ASSOC);
+                if (!$document) {
+                    http_response_code(404);
+                    echo json_encode(['error' => 'Document not found']);
+                    exit;
+                }
+
+                $currentUser = getCurrentUserId();
+                $role = getCurrentUserRole();
+                $ownsAsStudent = ($role === ROLE_STUDENT && $document['student_id'] == $currentUser);
+                $ownsAsCompany = ($role === ROLE_COMPANY && $document['company_id'] && $document['company_id'] == $currentUser);
+                $isAdmin = ($role === ROLE_ADMIN);
+                if (!$ownsAsStudent && !$ownsAsCompany && !$isAdmin) {
+                    http_response_code(403);
+                    echo json_encode(['error' => 'Forbidden']);
+                    exit;
+                }
+
+                // Serve file_content if present, else fallback to file_path
+                $file_name = $document['file_name'] ?: 'document';
+                $file_size = $document['file_size'] ?? 0;
+                $extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+                $mime_types = [
+                    'pdf' => 'application/pdf',
+                    'doc' => 'application/msword',
+                    'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'jpg' => 'image/jpeg',
+                    'jpeg' => 'image/jpeg',
+                    'png' => 'image/png'
+                ];
+                $mime_type = $mime_types[$extension] ?? 'application/octet-stream';
+
+                while (ob_get_level()) {
+                    ob_end_clean();
+                }
+
+                if (!empty($document['file_content'])) {
+                    $file_content = $document['file_content'];
+                    $file_size = strlen($file_content);
+                    header('Content-Type: ' . $mime_type);
+                    header('Content-Disposition: attachment; filename="' . addslashes($file_name) . '"');
+                    header('Content-Length: ' . $file_size);
+                    header('Cache-Control: private, max-age=0, must-revalidate');
+                    header('Pragma: public');
+                    echo $file_content;
+                    exit;
+                }
+
+                if (!empty($document['file_path'])) {
+                    $backend_root = dirname(__DIR__);
+                    $file_path = $backend_root . '/' . ltrim($document['file_path'], '/');
+                    if (!file_exists($file_path)) {
+                        http_response_code(404);
+                        echo json_encode(['error' => 'File not found on server']);
+                        exit;
+                    }
+                    header('Content-Type: ' . $mime_type);
+                    header('Content-Disposition: attachment; filename="' . addslashes($file_name) . '"');
+                    header('Content-Length: ' . filesize($file_path));
+                    header('Cache-Control: private, max-age=0, must-revalidate');
+                    header('Pragma: public');
+                    readfile($file_path);
+                    exit;
+                }
+
+                http_response_code(404);
+                echo json_encode(['error' => 'File content not available']);
+                exit;
+            } catch (PDOException $e) {
+                http_response_code(500);
+                echo json_encode(['error' => 'Failed to download document: ' . $e->getMessage()]);
+                exit;
+            }
+        }
+
         $company_id_param = $_GET['company_id'] ?? null;
         $internship_id_param = $_GET['internship_id'] ?? null;
 
@@ -319,6 +419,22 @@ if ($entity === 'applications') {
                     exit;
                 }
 
+                // Enforce max 3 active applications (Pending / Accepted / Confirmed)
+                $activeStmt = $db->prepare("
+                    SELECT COUNT(*) AS active_count
+                    FROM applications
+                    WHERE student_id = ?
+                      AND status NOT IN ('Rejected', 'Withdrawn', 'Approved_By_Company', 'Finalized')
+                ");
+                $activeStmt->execute([$student_id]);
+                $activeCount = (int) $activeStmt->fetchColumn();
+                if ($activeCount >= 3) {
+                    $db->rollBack();
+                    http_response_code(400);
+                    echo json_encode(['error' => 'You have reached the limit of 3 active applications. Withdraw or wait for decisions to free slots.']);
+                    exit;
+                }
+
                 $new_app_id = generate_application_code($db);
 
                 $stmt = $db->prepare("INSERT INTO applications (application_id, student_id, internship_id, status, cover_letter, applied_date) VALUES (?, ?, ?, 'Pending', ?, CURDATE())");
@@ -381,7 +497,12 @@ if ($entity === 'applications') {
                     exit;
                 }
                 
-                if ($application['status'] !== 'Withdrawn' && $application['status'] !== 'Confirmed' && $application['status'] !== 'Finalized') {
+                $rawStatus = $application['status'];
+                $normalizedStatus = normalize_status($rawStatus);
+                // Block withdraw after confirmation/finalization
+                $blockedWithdrawStatuses = array('Confirmed', 'Finalized', 'Confirmed_By_Student', 'Approved_By_Company');
+
+                if (!in_array($rawStatus, $blockedWithdrawStatuses, true) && !in_array($normalizedStatus, $blockedWithdrawStatuses, true) && $normalizedStatus !== 'Withdrawn') {
                     // Update status to Withdrawn
                     $stmt = $db->prepare("UPDATE applications SET status = 'Withdrawn', status_updated_date = NOW() WHERE application_id = ?");
                     $stmt->execute([$id]);
@@ -422,6 +543,21 @@ if ($entity === 'applications') {
                 
                 // Student can confirm if status is 'Accepted'
                 if ($rawStatus === 'Accepted' || $currentStatus === 'Accepted') {
+                    // Ensure student has no other confirmed/finalized placement
+                    $limitStmt = $db->prepare("
+                        SELECT COUNT(*) FROM applications 
+                        WHERE student_id = ? 
+                          AND application_id <> ? 
+                          AND status IN ('Confirmed_By_Student', 'Approved_By_Company', 'Finalized')
+                    ");
+                    $limitStmt->execute([getCurrentUserId(), $id]);
+                    $alreadyConfirmed = (int) $limitStmt->fetchColumn();
+                    if ($alreadyConfirmed > 0) {
+                        http_response_code(400);
+                        echo json_encode(['error' => 'You already have a confirmed or finalized internship. Withdraw or wait for rejection before confirming another.']);
+                        exit;
+                    }
+
                     // Use database value since we can't ALTER ENUM
                     $stmt = $db->prepare("UPDATE applications SET status = 'Confirmed_By_Student', status_updated_date = NOW() WHERE application_id = ?");
                     $stmt->execute([$id]);
