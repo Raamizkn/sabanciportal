@@ -262,6 +262,27 @@
 								<p id="cover-letter">Loading...</p>
 							</div>
 						</div>
+
+						<!-- Documents Card -->
+						<div class="card">
+							<div class="card-header d-flex justify-content-between align-items-center">
+								<h6 class="mb-0">Attached Documents</h6>
+								<a href="student-documents.html" class="btn btn-sm btn-outline-primary">
+									<i class="ph-upload-simple me-1"></i>Manage Documents
+								</a>
+							</div>
+							<div class="card-body">
+								<div class="mb-3">
+									<h6 class="fw-semibold mb-2">Resume/CV</h6>
+									<div id="resume-section" class="small text-muted">No resume uploaded.</div>
+								</div>
+								<hr>
+								<h6 class="fw-semibold mb-2">Additional Documents</h6>
+								<div id="additional-docs" class="list-group">
+									<span class="text-muted">No additional documents attached.</span>
+								</div>
+							</div>
+						</div>
 					</div>
 
 					<div class="col-lg-4">
@@ -376,6 +397,9 @@
 				document.getElementById('internship-location').textContent = app.internship_location;
 				document.getElementById('internship-dates').textContent = app.internship_dates;
 
+				// Documents
+				renderDocuments(app);
+
 				// Action Buttons
 				const actionContainer = document.getElementById('action-buttons');
 				actionContainer.innerHTML = getActionButtons(app) + actionContainer.innerHTML; // Prepend to keep 'Back' button
@@ -422,8 +446,8 @@
 				buttons += `<button class="btn btn-success confirm-application-btn" data-application-id="${application.application_id}"><i class="ph-check-circle me-2"></i>Confirm Acceptance</button>`;
 			}
 
-			// Allow withdrawal if not finalized, rejected, or already withdrawn
-			const finalStatuses = ['Finalized', 'Rejected', 'Withdrawn', 'Confirmed'];
+			// Allow withdrawal until finalized; block if rejected/finalized
+			const finalStatuses = ['Finalized', 'Approved_By_Company', 'Rejected'];
 			if (!finalStatuses.includes(normalizedStatus)) {
 				buttons += `<button class="btn btn-danger withdraw-btn mt-2" data-application-id="${application.application_id}"><i class="ph-x-circle me-2"></i>Withdraw Application</button>`;
 			}
@@ -491,6 +515,57 @@
 						}
 					);
 				});
+			}
+		}
+
+		function renderDocuments(app) {
+			const apiBase = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
+			const resumeSection = document.getElementById('resume-section');
+			const additionalContainer = document.getElementById('additional-docs');
+
+			// Resume
+			if (app.resume_download_url) {
+				const resumeUrl = app.resume_download_url.startsWith('http') ? app.resume_download_url : `${apiBase}${app.resume_download_url}`;
+				resumeSection.innerHTML = `
+					<a href="${resumeUrl}" target="_blank" class="btn btn-outline-primary btn-sm">
+						<i class="ph-download-simple me-1"></i>${app.resume_file_name || 'Download Resume'}
+					</a>
+				`;
+			} else {
+				resumeSection.textContent = 'No resume uploaded.';
+			}
+
+			// Additional docs
+			if (!Array.isArray(app.documents) || app.documents.length === 0) {
+				additionalContainer.innerHTML = '<span class="text-muted">No additional documents attached.</span>';
+				return;
+			}
+
+			additionalContainer.innerHTML = '';
+			app.documents
+				.filter(doc => (doc.document_type || '').toLowerCase() !== 'cv')
+				.forEach(doc => {
+					const li = document.createElement('a');
+					const url = doc.download_url
+						? (doc.download_url.startsWith('http') ? doc.download_url : `${apiBase}${doc.download_url}`)
+						: null;
+					li.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center';
+					if (url) {
+						li.href = url;
+						li.target = '_blank';
+						li.rel = 'noopener noreferrer';
+					} else {
+						li.classList.add('disabled', 'text-muted');
+					}
+					li.innerHTML = `
+						<span>${doc.file_name || 'Document'} (${doc.document_type || 'File'})</span>
+						<i class="ph-download-simple"></i>
+					`;
+					additionalContainer.appendChild(li);
+				});
+
+			if (!additionalContainer.children.length) {
+				additionalContainer.innerHTML = '<span class="text-muted">No additional documents attached.</span>';
 			}
 		}
 

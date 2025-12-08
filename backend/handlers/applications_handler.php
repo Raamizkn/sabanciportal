@@ -499,8 +499,8 @@ if ($entity === 'applications') {
                 
                 $rawStatus = $application['status'];
                 $normalizedStatus = normalize_status($rawStatus);
-                // Block withdraw after confirmation/finalization
-                $blockedWithdrawStatuses = array('Confirmed', 'Finalized', 'Confirmed_By_Student', 'Approved_By_Company');
+                // Block withdraw only after finalization or rejection
+                $blockedWithdrawStatuses = array('Finalized', 'Approved_By_Company', 'Rejected');
 
                 if (!in_array($rawStatus, $blockedWithdrawStatuses, true) && !in_array($normalizedStatus, $blockedWithdrawStatuses, true) && $normalizedStatus !== 'Withdrawn') {
                     // Update status to Withdrawn

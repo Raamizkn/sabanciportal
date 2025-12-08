@@ -341,7 +341,7 @@ function getActionButtons(application) {
             <i class="ph-check-circle ${confirmEnabled ? 'text-success' : 'text-muted'}"></i>
         </button>`;
 
-    const finalStatuses = ['Finalized', 'Rejected', 'Withdrawn', 'Confirmed'];
+    const finalStatuses = ['Finalized', 'Approved_By_Company', 'Rejected'];
     const withdrawEnabled = !finalStatuses.includes(status);
     const withdrawBtn = `
         <button class="btn btn-sm btn-icon ${withdrawEnabled ? 'btn-light withdraw-btn' : 'btn-secondary disabled'} ms-1" 

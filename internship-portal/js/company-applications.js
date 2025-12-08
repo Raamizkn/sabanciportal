@@ -202,24 +202,48 @@ function renderApplicationDocuments(documents) {
     }
     container.innerHTML = '';
 
-    if (!Array.isArray(documents) || documents.length === 0) {
-        container.innerHTML = '<div class="text-muted">No additional documents attached.</div>';
-        return;
+    const apiBase = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
+
+    let resumeHTML = '<p class="text-muted mb-0">No resume uploaded.</p>';
+    let additionalDocsHTML = '<div class="text-muted">No additional documents attached.</div>';
+
+    if (Array.isArray(documents) && documents.length > 0) {
+        const docs = documents.map(doc => {
+            const downloadUrl = doc.download_url
+                ? (doc.download_url.startsWith('http') ? doc.download_url : `${apiBase}${doc.download_url}`)
+                : null;
+            return { ...doc, resolved_url: downloadUrl };
+        });
+        const resumeDoc = docs.find(d => (d.document_type || '').toLowerCase() === 'cv');
+        if (resumeDoc && resumeDoc.resolved_url) {
+            resumeHTML = `
+                <a href="${resumeDoc.resolved_url}" target="_blank" class="btn btn-outline-primary">
+                    <i class="ph-download-simple me-2"></i>${resumeDoc.file_name || 'Download Resume'}
+                </a>
+            `;
+        }
+        const others = docs.filter(d => (d.document_type || '').toLowerCase() !== 'cv' && d.resolved_url);
+        if (others.length > 0) {
+            additionalDocsHTML = others.map(doc => `
+                <a href="${doc.resolved_url}" target="_blank" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center mb-1">
+                    <span>${doc.file_name || 'Document'} (${doc.document_type || 'File'})</span>
+                    <i class="ph-download-simple"></i>
+                </a>
+            `).join('');
+        }
     }
 
-    documents.forEach(doc => {
-        const link = document.createElement('a');
-        link.className = 'd-flex justify-content-between align-items-center list-group-item list-group-item-action mb-1';
-        link.target = '_blank';
-        link.href = doc.download_url ? `${API_BASE_URL}${doc.download_url}` : '#';
-        link.rel = 'noopener noreferrer';
-        link.textContent = `${doc.file_name || 'Document'} (${doc.document_type || 'File'})`;
-        if (!doc.download_url) {
-            link.classList.add('disabled', 'text-muted');
-            link.removeAttribute('href');
-        }
-        container.appendChild(link);
-    });
+    container.innerHTML = `
+        <div class="mb-3">
+            <h6 class="fw-semibold mb-2">Resume/CV</h6>
+            ${resumeHTML}
+        </div>
+        <hr>
+        <h6 class="fw-semibold mb-2">Additional Documents</h6>
+        <div class="list-group">
+            ${additionalDocsHTML}
+        </div>
+    `;
 }
 
 function buildStudentCell(app) {
