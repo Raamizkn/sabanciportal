@@ -15,10 +15,14 @@
 	<link href="../bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
 	<link href="../bs5/template/html/layout_1/full/assets/css/ltr/all.min.css?v=1" id="stylesheet" rel="stylesheet" type="text/css">
 	<link href="../assets/css/sabanci-theme.css" rel="stylesheet" type="text/css">
+	<!-- Quill.js Rich Text Editor -->
+	<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 	<!-- /global stylesheets -->
 
 	<!-- Core JS files -->
 	<script src="../bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+	<!-- Quill.js Rich Text Editor -->
+	<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 	<!-- /core JS files -->
 
 	<!-- Theme JS files -->
@@ -41,6 +45,18 @@
 			height: 100vh;
 			display: flex;
 			overflow: hidden;
+		}
+		/* Make Quill editor resizable */
+		#applyCoverLetter {
+			min-height: 300px;
+		}
+		#applyCoverLetter .ql-container {
+			min-height: 300px;
+			resize: vertical;
+			overflow: auto;
+		}
+		#applyCoverLetter .ql-editor {
+			min-height: 300px;
 		}
 	</style>
 </head>
@@ -375,11 +391,14 @@
 									</div>
 								</div>
 							</div>
+						</div>
 
-							<div class="col-lg-6">
+						<div class="row g-3 mt-2">
+							<div class="col-12">
 								<div class="mb-3">
 									<label class="form-label">Cover Letter (Optional)</label>
-									<textarea class="form-control" id="applyCoverLetter" rows="5" placeholder="Write a short cover letter highlighting why you're a great fit..."></textarea>
+									<div id="applyCoverLetter" style="min-height: 300px; resize: vertical; overflow: auto;"></div>
+									<small class="text-muted">Format your cover letter with bold, italic, lists, and more. You can resize the editor by dragging the bottom-right corner.</small>
 								</div>
 							</div>
 						</div>

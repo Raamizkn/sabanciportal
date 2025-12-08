@@ -418,10 +418,11 @@ class APIService {
     }
 
     /**
-     * Get student applications
+     * Get student applications (optionally filtered by term_id)
      */
-    async getStudentApplications(studentId) {
-        return this.request(`/index.php?entity=applications&student_id=${studentId}`);
+    async getStudentApplications(studentId, termId = null) {
+        const termParam = termId ? `&term_id=${termId}` : '';
+        return this.request(`/index.php?entity=applications&student_id=${studentId}${termParam}`);
     }
 
     /**
@@ -518,6 +519,87 @@ class APIService {
     async getStudentEvaluations(studentId) {
         // Note: This endpoint may need to be implemented in backend
         return this.request(`/index.php?entity=students&action=evaluations&id=${studentId}`);
+    }
+
+    // ==================== TERMS & ROUNDS APIs ====================
+
+    /**
+     * Get all terms
+     */
+    async getTerms() {
+        return this.request('/index.php?entity=admin&resource=terms');
+    }
+
+    /**
+     * Get all application rounds (optionally filtered by term_id)
+     */
+    async getRounds(termId = null) {
+        const termParam = termId ? `&term_id=${termId}` : '';
+        return this.request(`/index.php?entity=rounds${termParam}`);
+    }
+
+    /**
+     * Get specific round
+     */
+    async getRound(roundId) {
+        return this.request(`/index.php?entity=rounds&id=${roundId}`);
+    }
+
+    /**
+     * Create application round (admin only)
+     */
+    async createRound(roundData) {
+        return this.request('/index.php?entity=rounds&action=create', {
+            method: 'POST',
+            body: JSON.stringify(roundData)
+        });
+    }
+
+    /**
+     * Update application round (admin only)
+     */
+    async updateRound(roundId, roundData) {
+        return this.request(`/index.php?entity=rounds&id=${roundId}&action=update`, {
+            method: 'POST',
+            body: JSON.stringify(roundData)
+        });
+    }
+
+    /**
+     * Toggle round active status (admin only)
+     */
+    async toggleRoundActive(roundId) {
+        return this.request(`/index.php?entity=rounds&id=${roundId}&action=toggle_active`, {
+            method: 'POST'
+        });
+    }
+
+    /**
+     * Get company quota for a round
+     */
+    async getCompanyQuota(companyId, roundId) {
+        return this.request(`/index.php?entity=quotas&company_id=${companyId}&round_id=${roundId}`);
+    }
+
+    /**
+     * Set company quota for a round
+     */
+    async setCompanyQuota(companyId, roundId, quota) {
+        return this.request('/index.php?entity=quotas&action=set', {
+            method: 'POST',
+            body: JSON.stringify({
+                company_id: companyId,
+                round_id: roundId,
+                quota: quota
+            })
+        });
+    }
+
+    /**
+     * Get all quotas for a company
+     */
+    async getCompanyQuotas(companyId) {
+        return this.request(`/index.php?entity=quotas&company_id=${companyId}`);
     }
 }
 

@@ -519,10 +519,6 @@
                                             <label class="form-label">Office location (if applicable):</label>
                                             <input type="text" class="form-control" placeholder="e.g. San Francisco, CA" id="location">
                                         </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Compensation:</label>
-                                            <input type="text" class="form-control" placeholder="e.g. 4000 TL/month" id="salary">
-                                        </div>
                                     </div>
 
                                     <div class="row mb-3">
@@ -603,7 +599,6 @@
                                     <ul class="list-unstyled mb-0">
                                         <li><i class="ph-calendar me-2"></i> <strong>Duration:</strong> 3 months (Jun 1 - Aug 31, 2025)</li>
                                         <li><i class="ph-briefcase me-2"></i> <strong>Department:</strong> Engineering (Placeholder)</li>
-                                        <li><i class="ph-currency-dollar me-2"></i> <strong>Compensation:</strong> $25/hour (Placeholder - Show if applicable)</li>
                                     </ul>
                                 </div>
 
@@ -702,7 +697,6 @@
 							? `${document.getElementById('start-date').value} - ${document.getElementById('end-date').value}`
 							: '',
 						requirements: document.getElementById('requirements').value,
-						salary: document.getElementById('salary').value,
 						type: document.getElementById('type').value,
 						application_deadline: document.getElementById('application-deadline').value,
 						department: document.getElementById('department').value
@@ -884,13 +878,6 @@
 					</div>
 					` : ''}
 
-					${internship.salary ? `
-					<div class="card card-body mb-3">
-						<h6 class="fw-semibold mb-2">Compensation</h6>
-						<p class="mb-0"><i class="ph-currency-circle-dollar me-1"></i> ${internship.salary}</p>
-					</div>
-					` : ''}
-
 					<div class="card card-body">
 						<h6 class="fw-semibold mb-2">Company Information</h6>
 						<p class="mb-1"><strong>Industry:</strong> ${company.industry || 'Not specified'}</p>
@@ -928,7 +915,6 @@
 			document.getElementById('position').value = internship.position || internship.title || '';
 			document.getElementById('description').value = internship.description || '';
 			document.getElementById('department').value = internship.department || '';
-			document.getElementById('salary').value = internship.salary || '';
 			document.getElementById('type').value = internship.type || 'Full-time';
 			document.getElementById('application-deadline').value = internship.application_deadline || '';
 

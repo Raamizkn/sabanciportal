@@ -89,6 +89,12 @@ elseif ($entity === 'students') {
 elseif ($entity === 'companies') {
     require_once __DIR__ . '/handlers/company_handler.php';
 }
+elseif ($entity === 'rounds') {
+    require_once __DIR__ . '/handlers/rounds_handler.php';
+}
+elseif ($entity === 'quotas') {
+    require_once __DIR__ . '/handlers/quotas_handler.php';
+}
 elseif ($entity === 'admin') {
     require_once __DIR__ . '/handlers/admin_handler.php';
     

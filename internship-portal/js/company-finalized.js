@@ -198,7 +198,7 @@ function renderModal(app) {
                         <h6 class="mb-0">Cover Letter</h6>
                     </div>
                     <div class="card-body">
-                        <p style="white-space: pre-wrap; margin-bottom: 0;">${app.cover_letter || 'No cover letter provided.'}</p>
+                        <div style="margin-bottom: 0;">${app.cover_letter || '<p class="text-muted">No cover letter provided.</p>'}</div>
                     </div>
                 </div>
 

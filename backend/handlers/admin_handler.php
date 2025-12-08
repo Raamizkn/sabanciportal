@@ -373,11 +373,11 @@ function get_admin_dashboard_stats() {
         $stats['total_applications'] = (int)$stmt->fetch()['count'];
         
         // Pending applications
-        $stmt = $db->query("SELECT COUNT(*) as count FROM applications WHERE status = 'Pending'");
+        $stmt = $db->query("SELECT COUNT(*) as count FROM applications WHERE status IN ('Pending', 'Pending Review', 'Under Review')");
         $stats['pending_applications'] = (int)$stmt->fetch()['count'];
         
-        // Finalized applications
-        $stmt = $db->query("SELECT COUNT(*) as count FROM applications WHERE status = 'Finalized'");
+        // Approved/Finalized applications
+        $stmt = $db->query("SELECT COUNT(*) as count FROM applications WHERE status IN ('Approved_By_Company', 'Confirmed_By_Student')");
         $stats['finalized_applications'] = (int)$stmt->fetch()['count'];
         
         return $stats;
@@ -455,10 +455,10 @@ function generate_report($report_type, $params) {
                 $stmt = $db->query("SELECT COUNT(*) as count FROM applications");
                 $report_data['data'][] = ['metric' => 'Total Applications', 'value' => (int)$stmt->fetch()['count']];
                 
-                $stmt = $db->query("SELECT COUNT(*) as count FROM applications WHERE status = 'Finalized'");
+                $stmt = $db->query("SELECT COUNT(*) as count FROM applications WHERE status IN ('Approved_By_Company', 'Confirmed_By_Student')");
                 $report_data['data'][] = ['metric' => 'Approved Internships', 'value' => (int)$stmt->fetch()['count']];
                 
-                $stmt = $db->query("SELECT COUNT(*) as count FROM applications WHERE status = 'Pending'");
+                $stmt = $db->query("SELECT COUNT(*) as count FROM applications WHERE status IN ('Pending', 'Pending Review', 'Under Review')");
                 $report_data['data'][] = ['metric' => 'Pending Applications', 'value' => (int)$stmt->fetch()['count']];
                 break;
             default:

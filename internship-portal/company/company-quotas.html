@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Company Quotas - Sabancı University Internship Portal</title>
+
+	<!-- Path Resolver - MUST be loaded first -->
+	<script src="../js/path-resolver.js"></script>
+
+	<!-- Global stylesheets -->
+	<link href="../bs5/template/assets/fonts/inter/inter.css" rel="stylesheet" type="text/css">
+	<link href="../bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
+	<link href="../bs5/template/html/layout_1/full/assets/css/ltr/all.min.css?v=1" id="stylesheet" rel="stylesheet" type="text/css">
+	<link href="../assets/css/sabanci-theme.css" rel="stylesheet" type="text/css">
+	<!-- /global stylesheets -->
+
+	<!-- Core JS files -->
+	<script src="../bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+	<!-- /core JS files -->
+
+	<!-- Theme JS files -->
+	<script src="../bs5/template/html/layout_1/full/assets/js/app.js"></script>
+	<!-- /theme JS files -->
+	
+	<style>
+		.content-wrapper {
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+		}
+		.content {
+			flex: 1;
+			overflow-y: auto;
+			padding-bottom: 1rem;
+		}
+		.page-content {
+			height: 100vh;
+			display: flex;
+			overflow: hidden;
+		}
+	</style>
+</head>
+
+<body>
+
+	<!-- Main navbar -->
+	<div class="navbar navbar-dark navbar-expand-lg navbar-static border-bottom border-bottom-white border-opacity-10">
+		<div class="container-fluid">
+			<div class="d-flex d-lg-none me-2">
+				<button type="button" class="navbar-toggler sidebar-mobile-main-toggle rounded-pill">
+					<i class="ph-list"></i>
+				</button>
+			</div>
+
+			<div class="navbar-brand flex-1 flex-lg-0">
+				<a href="company-dashboard.html" class="d-inline-flex align-items-center">
+					<img src="../assets/images/logo.svg" alt="Sabancı University Logo" class="h-48px me-2">
+					<span class="d-none d-sm-inline-block h6 mb-0 ms-2">Sabancı University Internship Portal</span>
+				</a>
+			</div>
+
+			<ul class="nav flex-row justify-content-end order-1 order-lg-2">
+				<li class="nav-item nav-item-dropdown-lg dropdown">
+					<a href="#" class="navbar-nav-link navbar-nav-link-icon rounded-pill" data-bs-toggle="dropdown">
+						<i class="ph-bell"></i>
+						<span class="badge bg-yellow text-black position-absolute top-0 end-0 translate-middle-top zindex-1 rounded-pill mt-1 me-1">2</span>
+					</a>
+					<div class="dropdown-menu dropdown-menu-end dropdown-menu-scrollable-sm wmin-lg-350">
+						<div class="d-flex align-items-center border-bottom py-2 px-3">
+							<h6 class="mb-0">Notifications</h6>
+						</div>
+					</div>
+				</li>
+				<li class="nav-item nav-item-dropdown-lg dropdown ms-lg-2">
+					<a href="#" class="navbar-nav-link align-items-center rounded-pill p-1" data-bs-toggle="dropdown">
+						<div class="status-indicator-container">
+							<img src="../bs5/template/assets/images/demo/logos/2.svg" class="w-32px h-32px rounded-pill" alt="">
+							<span class="status-indicator bg-success"></span>
+						</div>
+						<span class="d-none d-lg-inline-block mx-lg-2" id="navCompanyName">Company</span>
+					</a>
+					<div class="dropdown-menu dropdown-menu-end">
+						<a href="company-profile.html" class="dropdown-item">
+							<i class="ph-building me-2"></i>
+							Company profile
+						</a>
+						<a href="../index.html" class="dropdown-item logout-link">
+							<i class="ph-sign-out me-2"></i>
+							Logout
+						</a>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<!-- /main navbar -->
+
+	<!-- Page content -->
+	<div class="page-content">
+
+		<!-- Main sidebar -->
+		<div class="sidebar sidebar-dark sidebar-main sidebar-expand-lg">
+			<div class="sidebar-content">
+				<div class="sidebar-section sidebar-resize-hide">
+					<div class="navbar-brand">
+						<img src="../assets/images/logo.svg" alt="Sabancı Üniversitesi" class="sidebar-resize-hide" style="height: 32px;">
+					</div>
+				</div>
+
+				<div class="sidebar-section">
+					<ul class="nav nav-sidebar" data-nav-type="accordion">
+						<li class="nav-item-header">
+							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Main</div>
+							<i class="ph-dots-three sidebar-resize-show"></i>
+						</li>
+						<li class="nav-item">
+							<a href="company-dashboard.html" class="nav-link">
+								<i class="ph-house"></i>
+								<span>Dashboard</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="company-internships.html" class="nav-link">
+								<i class="ph-briefcase"></i>
+								<span>My Internships</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="company-applications.html" class="nav-link">
+								<i class="ph-users"></i>
+								<span>Applications</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="company-finalized.html" class="nav-link">
+								<i class="ph-check-circle"></i>
+								<span>Finalized Interns</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="company-evaluations.html" class="nav-link">
+								<i class="ph-star"></i>
+								<span>Evaluations</span>
+							</a>
+						</li>
+						<li class="nav-item-header">
+							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Profile</div>
+							<i class="ph-dots-three sidebar-resize-show"></i>
+						</li>
+						<li class="nav-item">
+							<a href="company-profile.html" class="nav-link">
+								<i class="ph-building"></i>
+								<span>Company Profile</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="company-quotas.html" class="nav-link active">
+								<i class="ph-users-three"></i>
+								<span>Quotas</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../index.html" class="nav-link logout-link">
+								<i class="ph-sign-out"></i>
+								<span>Logout</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<!-- Main content -->
+		<div class="content-wrapper" style="overflow-y: auto;">
+			<!-- Page header -->
+			<div class="page-header page-header-light shadow">
+				<div class="page-header-content d-lg-flex">
+					<div class="d-flex">
+						<h4 class="page-title mb-0">
+							Company Quotas <span class="fw-normal">Management</span>
+						</h4>
+					</div>
+				</div>
+				<div class="page-header-content border-top">
+					<div class="breadcrumb py-2">
+						<a href="company-dashboard.html" class="breadcrumb-item"><i class="ph-house"></i></a>
+						<span class="breadcrumb-item active">Quotas</span>
+					</div>
+				</div>
+			</div>
+
+			<!-- Content area -->
+			<div class="content">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="card">
+							<div class="card-header">
+								<h5 class="mb-0">Application Round Quotas</h5>
+								<p class="text-muted mb-0 fs-sm">Configure how many students you can finalize per application round. Leave blank to use the default quota.</p>
+							</div>
+							<div class="card-body">
+								<div id="quotasContainer">
+									<div class="text-center text-muted py-4">
+										<i class="ph-spinner ph-spin ph-2x mb-2"></i>
+										<p>Loading quotas...</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="../js/api.js"></script>
+	<script src="../js/modal-utils.js"></script>
+	<script>
+		let currentCompanyId = null;
+		let allRounds = [];
+		let companyQuotas = {};
+
+		document.addEventListener('DOMContentLoaded', () => {
+			const userRole = localStorage.getItem('userRole');
+			currentCompanyId = localStorage.getItem('userId');
+
+			if (userRole !== 'company' || !currentCompanyId) {
+				alert('Access denied. Redirecting to login.');
+				window.location.href = '../index.html';
+				return;
+			}
+
+			loadRounds();
+		});
+
+		async function loadRounds() {
+			try {
+				// Load all rounds
+				const rounds = await api.getRounds();
+				allRounds = Array.isArray(rounds) ? rounds : [];
+
+				// Load company quotas
+				const quotas = await api.getCompanyQuotas(currentCompanyId);
+				companyQuotas = {};
+				if (Array.isArray(quotas)) {
+					quotas.forEach(q => {
+						companyQuotas[q.round_id] = q;
+					});
+				}
+
+				renderQuotasTable();
+			} catch (error) {
+				console.error('Failed to load quotas:', error);
+				document.getElementById('quotasContainer').innerHTML = 
+					'<div class="alert alert-danger">Failed to load quotas. Please refresh the page.</div>';
+			}
+		}
+
+		function renderQuotasTable() {
+			const container = document.getElementById('quotasContainer');
+			
+			if (allRounds.length === 0) {
+				container.innerHTML = '<div class="alert alert-info">No application rounds found.</div>';
+				return;
+			}
+
+			// Group rounds by term
+			const roundsByTerm = {};
+			allRounds.forEach(round => {
+				const termName = round.term_name || 'Unknown Term';
+				if (!roundsByTerm[termName]) {
+					roundsByTerm[termName] = [];
+				}
+				roundsByTerm[termName].push(round);
+			});
+
+			let html = '';
+			Object.keys(roundsByTerm).sort().reverse().forEach(termName => {
+				html += `
+					<div class="mb-4">
+						<h6 class="mb-3">${termName}</h6>
+						<div class="table-responsive">
+							<table class="table table-hover">
+								<thead>
+									<tr>
+										<th>Round Name</th>
+										<th>Dates</th>
+										<th>Default Quota</th>
+										<th>Your Quota</th>
+										<th>Used</th>
+										<th>Remaining</th>
+										<th>Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+				`;
+
+				roundsByTerm[termName].forEach(round => {
+					const quota = companyQuotas[round.id];
+					const effectiveQuota = quota && quota.quota_override !== null 
+						? quota.quota_override 
+						: round.default_company_quota;
+					
+					// Calculate used quota (would need API call for actual count)
+					const used = 0; // TODO: Get from API
+					const remaining = Math.max(0, effectiveQuota - used);
+
+					html += `
+						<tr>
+							<td>
+								<strong>${round.name || 'N/A'}</strong>
+								${round.is_active ? '<span class="badge bg-success ms-2">Active</span>' : '<span class="badge bg-secondary ms-2">Inactive</span>'}
+							</td>
+							<td>${round.start_date || 'N/A'} to ${round.end_date || 'N/A'}</td>
+							<td>${round.default_company_quota || 'N/A'}</td>
+							<td>
+								<input type="number" 
+									class="form-control form-control-sm" 
+									style="width: 100px;" 
+									id="quota_${round.id}" 
+									value="${quota && quota.quota_override !== null ? quota.quota_override : ''}" 
+									placeholder="${round.default_company_quota}"
+									min="0">
+							</td>
+							<td>${used}</td>
+							<td>${remaining}</td>
+							<td>
+								<button class="btn btn-sm btn-primary save-quota-btn" data-round-id="${round.id}">
+									<i class="ph-check"></i> Save
+								</button>
+							</td>
+						</tr>
+					`;
+				});
+
+				html += `
+								</tbody>
+							</table>
+						</div>
+					</div>
+				`;
+			});
+
+			container.innerHTML = html;
+
+			// Attach event listeners
+			document.querySelectorAll('.save-quota-btn').forEach(btn => {
+				btn.addEventListener('click', async (e) => {
+					const roundId = e.currentTarget.getAttribute('data-round-id');
+					const quotaInput = document.getElementById(`quota_${roundId}`);
+					const quotaValue = quotaInput.value.trim() === '' ? null : parseInt(quotaInput.value);
+
+					if (quotaValue !== null && quotaValue < 0) {
+						showAlertModal('Error', 'Quota must be a positive number', 'error');
+						return;
+					}
+
+					try {
+						const result = await api.setCompanyQuota(currentCompanyId, roundId, quotaValue);
+						if (result.status === 'success') {
+							showAlertModal('Success', 'Quota updated successfully!', 'success', () => {
+								loadRounds();
+							});
+						} else {
+							showAlertModal('Error', result.error || 'Failed to update quota', 'error');
+						}
+					} catch (error) {
+						showAlertModal('Error', 'Failed to update quota: ' + error.message, 'error');
+					}
+				});
+			});
+		}
+	</script>
+</body>
+</html>
+

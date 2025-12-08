@@ -301,7 +301,7 @@
 								<h6 class="mb-0">Cover Letter</h6>
 							</div>
 							<div class="card-body">
-								<p id="cover-letter" style="white-space: pre-wrap;">Loading...</p>
+								<div id="cover-letter">Loading...</div>
 							</div>
 						</div>
 					</div>
@@ -403,7 +403,12 @@
 				document.getElementById('company-name').textContent = app.company_name || 'N/A';
 				document.getElementById('company-name-display').textContent = app.company_name || 'N/A';
 				document.getElementById('internship-description').textContent = app.internship_description || 'No description provided.';
-				document.getElementById('cover-letter').textContent = app.cover_letter || 'No cover letter provided.';
+				const coverLetterEl = document.getElementById('cover-letter');
+				if (app.cover_letter) {
+					coverLetterEl.innerHTML = app.cover_letter;
+				} else {
+					coverLetterEl.textContent = 'No cover letter provided.';
+				}
 				
 				// Student information
 				document.getElementById('student-name').textContent = app.student_name || 'N/A';

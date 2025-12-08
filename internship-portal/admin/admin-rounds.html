@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Application Rounds Management - Sabancı University Internship Portal</title>
+
+	<!-- Path Resolver - MUST be loaded first -->
+	<script src="../js/path-resolver.js"></script>
+
+	<!-- Global stylesheets -->
+	<link href="../bs5/template/assets/fonts/inter/inter.css" rel="stylesheet" type="text/css">
+	<link href="../bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
+	<link href="../bs5/template/html/layout_1/full/assets/css/ltr/all.min.css" id="stylesheet" rel="stylesheet" type="text/css">
+	<link href="../assets/css/sabanci-theme.css" rel="stylesheet" type="text/css">
+	<!-- /global stylesheets -->
+
+	<!-- Core JS files -->
+	<script src="../bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
+	<!-- /core JS files -->
+
+	<!-- Theme JS files -->
+	<script src="../bs5/template/assets/js/vendor/tables/datatables/datatables.min.js"></script>
+	<script src="../bs5/template/html/layout_1/full/assets/js/app.js"></script>
+	<!-- /theme JS files -->
+</head>
+
+<body>
+
+	<!-- Main navbar -->
+	<div class="navbar navbar-dark navbar-expand-lg navbar-static border-bottom border-bottom-white border-opacity-10">
+		<div class="container-fluid">
+			<div class="d-flex d-lg-none me-2">
+				<button type="button" class="navbar-toggler sidebar-mobile-main-toggle rounded-pill">
+					<i class="ph-list"></i>
+				</button>
+			</div>
+
+			<div class="navbar-brand flex-1 flex-lg-0">
+				<a href="admin-dashboard.html" class="d-inline-flex align-items-center">
+					<img src="../assets/images/logo.svg" alt="Sabancı University Logo" class="h-48px me-2">
+					<span class="d-none d-lg-inline-block h6 mb-0 ms-2">Sabancı University Internship Portal</span>
+				</a>
+			</div>
+
+			<ul class="nav flex-row justify-content-end order-1 order-lg-2">
+				<li class="nav-item nav-item-dropdown-lg dropdown">
+					<a href="#" class="navbar-nav-link navbar-nav-link-icon rounded-pill" data-bs-toggle="dropdown">
+						<i class="ph-bell"></i>
+						<span class="badge bg-yellow text-black position-absolute top-0 end-0 translate-middle-top zindex-1 rounded-pill mt-1 me-1">2</span>
+					</a>
+					<div class="dropdown-menu dropdown-menu-end dropdown-menu-scrollable-sm wmin-lg-350">
+						<div class="d-flex align-items-center border-bottom py-2 px-3">
+							<h6 class="mb-0">Notifications</h6>
+						</div>
+					</div>
+				</li>
+				<li class="nav-item nav-item-dropdown-lg dropdown">
+					<a href="#" class="navbar-nav-link align-items-center rounded-pill" data-bs-toggle="dropdown">
+						<span class="d-none d-lg-inline-block">Admin</span>
+						<i class="ph-user-circle ph-lg ms-lg-2"></i>
+					</a>
+					<div class="dropdown-menu dropdown-menu-end">
+						<a href="../index.html" class="dropdown-item logout-link">
+							<i class="ph-sign-out me-2"></i>
+							Logout
+						</a>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<!-- /main navbar -->
+
+	<!-- Page content -->
+	<div class="page-content">
+
+		<!-- Main sidebar -->
+		<div class="sidebar sidebar-dark sidebar-main sidebar-expand-lg">
+			<div class="sidebar-content">
+				<div class="sidebar-section sidebar-resize-hide">
+					<div class="navbar-brand">
+						<img src="../assets/images/logo.svg" alt="Sabancı Üniversitesi" class="sidebar-resize-hide" style="height: 32px;">
+					</div>
+				</div>
+
+				<div class="sidebar-section">
+					<ul class="nav nav-sidebar" data-nav-type="accordion">
+						<li class="nav-item-header">
+							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Main</div>
+						</li>
+						<li class="nav-item">
+							<a href="admin-dashboard.html" class="nav-link">
+								<i class="ph-house"></i>
+								<span>Dashboard</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-students.html" class="nav-link">
+								<i class="ph-users"></i>
+								<span>Students</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-companies.html" class="nav-link">
+								<i class="ph-buildings"></i>
+								<span>Companies</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-internships.html" class="nav-link">
+								<i class="ph-briefcase"></i>
+								<span>Internships</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-applications.html" class="nav-link">
+								<i class="ph-file-text"></i>
+								<span>Applications</span>
+							</a>
+						</li>
+						<li class="nav-item-header">
+							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Tools</div>
+						</li>
+						<li class="nav-item">
+							<a href="admin-terms.html" class="nav-link">
+								<i class="ph-calendar"></i>
+								<span>Academic Terms</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="admin-rounds.html" class="nav-link active">
+								<i class="ph-clock-clockwise"></i>
+								<span>Application Rounds</span>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="../index.html" class="nav-link logout-link">
+								<i class="ph-sign-out"></i>
+								<span>Logout</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<!-- Main content -->
+		<div class="content-wrapper">
+			<!-- Page header -->
+			<div class="page-header page-header-light shadow">
+				<div class="page-header-content d-lg-flex">
+					<div class="d-flex">
+						<h4 class="page-title mb-0">
+							Application Rounds <span class="fw-normal">Management</span>
+						</h4>
+						<a href="#page_header" class="btn btn-light align-self-center collapsed d-lg-none border-transparent rounded-pill p-0 ms-auto" data-bs-toggle="collapse">
+							<i class="ph-caret-down collapsible-indicator ph-sm m-1"></i>
+						</a>
+					</div>
+					<div class="collapse d-lg-block my-lg-auto ms-lg-auto" id="page_header">
+						<div class="d-sm-flex align-items-center mb-3 mb-lg-0">
+							<button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#add_round_modal">
+								<i class="ph-plus me-2"></i>
+								Add New Round
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Content area -->
+			<div class="content">
+				<div class="card">
+					<div class="card-header">
+						<h5 class="mb-0">Application Rounds</h5>
+					</div>
+					<div class="card-body">
+						<div class="mb-3">
+							<label class="form-label">Filter by Term:</label>
+							<select id="term-filter" class="form-select" style="width: 300px;">
+								<option value="">All Terms</option>
+							</select>
+						</div>
+						<div class="table-responsive">
+							<table class="table table-hover datatable-responsive">
+								<thead>
+									<tr>
+										<th>Round Name</th>
+										<th>Term</th>
+										<th>Start Date</th>
+										<th>End Date</th>
+										<th>Max Apps/Student</th>
+										<th>Default Quota</th>
+										<th>Status</th>
+										<th class="text-center">Actions</th>
+									</tr>
+								</thead>
+								<tbody id="roundsTableBody">
+									<tr>
+										<td colspan="8" class="text-center text-muted">Loading rounds...</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Add Round Modal -->
+	<div id="add_round_modal" class="modal fade" tabindex="-1">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Add New Application Round</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<form id="add_round_form">
+						<div class="mb-3">
+							<label class="form-label">Term: <span class="text-danger">*</span></label>
+							<select class="form-select" id="round_term_id" required>
+								<option value="">Select Term...</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Round Name: <span class="text-danger">*</span></label>
+							<input type="text" class="form-control" id="round_name" placeholder="e.g. Round 1, Early Application Round" required>
+						</div>
+						<div class="row mb-3">
+							<div class="col-md-6">
+								<label class="form-label">Start Date: <span class="text-danger">*</span></label>
+								<input type="date" class="form-control" id="round_start_date" required>
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">End Date: <span class="text-danger">*</span></label>
+								<input type="date" class="form-control" id="round_end_date" required>
+							</div>
+						</div>
+						<div class="row mb-3">
+							<div class="col-md-6">
+								<label class="form-label">Max Applications per Student: <span class="text-danger">*</span></label>
+								<input type="number" class="form-control" id="round_max_apps" value="3" min="1" required>
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Default Company Quota: <span class="text-danger">*</span></label>
+								<input type="number" class="form-control" id="round_default_quota" value="10" min="1" required>
+							</div>
+						</div>
+						<div class="mb-3">
+							<div class="form-check form-switch">
+								<input type="checkbox" class="form-check-input" id="round_is_active" checked>
+								<label class="form-check-label" for="round_is_active">Active (Applications can be submitted)</label>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-link" data-bs-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-primary" id="save_round_btn">
+						<i class="ph-check me-2"></i>Create Round
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Edit Round Modal -->
+	<div id="edit_round_modal" class="modal fade" tabindex="-1">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Edit Application Round</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<form id="edit_round_form">
+						<input type="hidden" id="edit_round_id">
+						<div class="mb-3">
+							<label class="form-label">Term:</label>
+							<input type="text" class="form-control" id="edit_round_term_name" readonly>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Round Name: <span class="text-danger">*</span></label>
+							<input type="text" class="form-control" id="edit_round_name" required>
+						</div>
+						<div class="row mb-3">
+							<div class="col-md-6">
+								<label class="form-label">Start Date: <span class="text-danger">*</span></label>
+								<input type="date" class="form-control" id="edit_round_start_date" required>
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">End Date: <span class="text-danger">*</span></label>
+								<input type="date" class="form-control" id="edit_round_end_date" required>
+							</div>
+						</div>
+						<div class="row mb-3">
+							<div class="col-md-6">
+								<label class="form-label">Max Applications per Student: <span class="text-danger">*</span></label>
+								<input type="number" class="form-control" id="edit_round_max_apps" min="1" required>
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Default Company Quota: <span class="text-danger">*</span></label>
+								<input type="number" class="form-control" id="edit_round_default_quota" min="1" required>
+							</div>
+						</div>
+						<div class="mb-3">
+							<div class="form-check form-switch">
+								<input type="checkbox" class="form-check-input" id="edit_round_is_active">
+								<label class="form-check-label" for="edit_round_is_active">Active (Applications can be submitted)</label>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-link" data-bs-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-primary" id="update_round_btn">
+						<i class="ph-check me-2"></i>Update Round
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="../js/api.js"></script>
+	<script src="../js/modal-utils.js"></script>
+	<script>
+		let allTerms = [];
+		let allRounds = [];
+
+		document.addEventListener('DOMContentLoaded', () => {
+			const userRole = localStorage.getItem('userRole');
+			if (userRole !== 'admin') {
+				alert('Access denied. Redirecting to login.');
+				window.location.href = '../index.html';
+				return;
+			}
+
+			loadTerms();
+			loadRounds();
+
+			// Term filter
+			document.getElementById('term-filter').addEventListener('change', (e) => {
+				const termId = e.target.value;
+				filterRounds(termId);
+			});
+
+			// Save round button
+			document.getElementById('save_round_btn').addEventListener('click', createRound);
+			document.getElementById('update_round_btn').addEventListener('click', updateRound);
+		});
+
+		async function loadTerms() {
+			try {
+				const terms = await api.getTerms();
+				allTerms = Array.isArray(terms) ? terms : [];
+				
+				const termSelect = document.getElementById('round_term_id');
+				const termFilter = document.getElementById('term-filter');
+				
+				allTerms.forEach(term => {
+					const option1 = document.createElement('option');
+					option1.value = term.id;
+					option1.textContent = term.name;
+					termSelect.appendChild(option1);
+
+					const option2 = document.createElement('option');
+					option2.value = term.id;
+					option2.textContent = term.name;
+					termFilter.appendChild(option2);
+				});
+			} catch (error) {
+				console.error('Failed to load terms:', error);
+			}
+		}
+
+		async function loadRounds() {
+			try {
+				const rounds = await api.getRounds();
+				allRounds = Array.isArray(rounds) ? rounds : [];
+				renderRoundsTable(allRounds);
+			} catch (error) {
+				console.error('Failed to load rounds:', error);
+				document.getElementById('roundsTableBody').innerHTML = 
+					'<tr><td colspan="8" class="text-center text-danger">Failed to load rounds.</td></tr>';
+			}
+		}
+
+		function filterRounds(termId) {
+			if (!termId) {
+				renderRoundsTable(allRounds);
+				return;
+			}
+			const filtered = allRounds.filter(r => r.term_id == termId);
+			renderRoundsTable(filtered);
+		}
+
+		function renderRoundsTable(rounds) {
+			const tbody = document.getElementById('roundsTableBody');
+			tbody.innerHTML = '';
+
+			if (rounds.length === 0) {
+				tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No rounds found.</td></tr>';
+				return;
+			}
+
+			rounds.forEach(round => {
+				const row = document.createElement('tr');
+				const statusBadge = round.is_active 
+					? '<span class="badge bg-success">Active</span>'
+					: '<span class="badge bg-secondary">Inactive</span>';
+				
+				row.innerHTML = `
+					<td>${round.name || 'N/A'}</td>
+					<td>${round.term_name || 'N/A'}</td>
+					<td>${round.start_date || 'N/A'}</td>
+					<td>${round.end_date || 'N/A'}</td>
+					<td>${round.max_applications_per_student || 'N/A'}</td>
+					<td>${round.default_company_quota || 'N/A'}</td>
+					<td>${statusBadge}</td>
+					<td class="text-center">
+						<div class="d-inline-flex gap-1">
+							<button class="btn btn-sm btn-light edit-round-btn" data-round-id="${round.id}" title="Edit">
+								<i class="ph-pencil"></i>
+							</button>
+							<button class="btn btn-sm btn-light toggle-round-btn" data-round-id="${round.id}" data-is-active="${round.is_active}" title="${round.is_active ? 'Deactivate' : 'Activate'}">
+								<i class="ph-${round.is_active ? 'pause' : 'play'}"></i>
+							</button>
+						</div>
+					</td>
+				`;
+				tbody.appendChild(row);
+			});
+
+			// Attach event listeners
+			document.querySelectorAll('.edit-round-btn').forEach(btn => {
+				btn.addEventListener('click', (e) => {
+					const roundId = e.currentTarget.getAttribute('data-round-id');
+					openEditModal(roundId);
+				});
+			});
+
+			document.querySelectorAll('.toggle-round-btn').forEach(btn => {
+				btn.addEventListener('click', async (e) => {
+					const roundId = e.currentTarget.getAttribute('data-round-id');
+					await toggleRoundActive(roundId);
+				});
+			});
+		}
+
+		async function createRound() {
+			const form = document.getElementById('add_round_form');
+			if (!form.checkValidity()) {
+				form.reportValidity();
+				return;
+			}
+
+			const roundData = {
+				term_id: parseInt(document.getElementById('round_term_id').value),
+				name: document.getElementById('round_name').value,
+				start_date: document.getElementById('round_start_date').value,
+				end_date: document.getElementById('round_end_date').value,
+				max_applications_per_student: parseInt(document.getElementById('round_max_apps').value),
+				default_company_quota: parseInt(document.getElementById('round_default_quota').value),
+				is_active: document.getElementById('round_is_active').checked
+			};
+
+			try {
+				const result = await api.createRound(roundData);
+				if (result.status === 'success') {
+					showAlertModal('Success', 'Round created successfully!', 'success', () => {
+						bootstrap.Modal.getInstance(document.getElementById('add_round_modal')).hide();
+						form.reset();
+						loadRounds();
+					});
+				} else {
+					showAlertModal('Error', result.error || 'Failed to create round', 'error');
+				}
+			} catch (error) {
+				showAlertModal('Error', 'Failed to create round: ' + error.message, 'error');
+			}
+		}
+
+		async function openEditModal(roundId) {
+			const round = allRounds.find(r => r.id == roundId);
+			if (!round) return;
+
+			document.getElementById('edit_round_id').value = round.id;
+			document.getElementById('edit_round_term_name').value = round.term_name || '';
+			document.getElementById('edit_round_name').value = round.name || '';
+			document.getElementById('edit_round_start_date').value = round.start_date || '';
+			document.getElementById('edit_round_end_date').value = round.end_date || '';
+			document.getElementById('edit_round_max_apps').value = round.max_applications_per_student || 3;
+			document.getElementById('edit_round_default_quota').value = round.default_company_quota || 10;
+			document.getElementById('edit_round_is_active').checked = round.is_active == 1 || round.is_active === true;
+
+			new bootstrap.Modal(document.getElementById('edit_round_modal')).show();
+		}
+
+		async function updateRound() {
+			const form = document.getElementById('edit_round_form');
+			if (!form.checkValidity()) {
+				form.reportValidity();
+				return;
+			}
+
+			const roundId = document.getElementById('edit_round_id').value;
+			const roundData = {
+				name: document.getElementById('edit_round_name').value,
+				start_date: document.getElementById('edit_round_start_date').value,
+				end_date: document.getElementById('edit_round_end_date').value,
+				max_applications_per_student: parseInt(document.getElementById('edit_round_max_apps').value),
+				default_company_quota: parseInt(document.getElementById('edit_round_default_quota').value),
+				is_active: document.getElementById('edit_round_is_active').checked
+			};
+
+			try {
+				const result = await api.updateRound(roundId, roundData);
+				if (result.status === 'success') {
+					showAlertModal('Success', 'Round updated successfully!', 'success', () => {
+						bootstrap.Modal.getInstance(document.getElementById('edit_round_modal')).hide();
+						loadRounds();
+					});
+				} else {
+					showAlertModal('Error', result.error || 'Failed to update round', 'error');
+				}
+			} catch (error) {
+				showAlertModal('Error', 'Failed to update round: ' + error.message, 'error');
+			}
+		}
+
+		async function toggleRoundActive(roundId) {
+			try {
+				const result = await api.toggleRoundActive(roundId);
+				if (result.status === 'success') {
+					showAlertModal('Success', 'Round status updated!', 'success', () => {
+						loadRounds();
+					});
+				} else {
+					showAlertModal('Error', result.error || 'Failed to toggle round', 'error');
+				}
+			} catch (error) {
+				showAlertModal('Error', 'Failed to toggle round: ' + error.message, 'error');
+			}
+		}
+	</script>
+</body>
+</html>
+

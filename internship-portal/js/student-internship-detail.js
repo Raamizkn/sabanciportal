@@ -1,6 +1,7 @@
 let detailInternship = null;
 let studentIdForApply = null;
 let availableDocuments = [];
+let coverLetterEditor = null;
 
 function attachLogoutHandlers() {
     const logoutLinks = document.querySelectorAll('.logout-link');
@@ -62,6 +63,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const applicationForm = document.getElementById('application-form');
     if (applicationForm && !isAdmin) {
         applicationForm.addEventListener('submit', submitApplication);
+    }
+
+    // Initialize Quill editor for cover letter
+    const applyModal = document.getElementById('apply_now_modal');
+    if (applyModal) {
+        applyModal.addEventListener('shown.bs.modal', () => {
+            if (!coverLetterEditor) {
+                coverLetterEditor = new Quill('#applyCoverLetter', {
+                    theme: 'snow',
+                    modules: {
+                        toolbar: [
+                            [{ 'header': [1, 2, 3, false] }],
+                            ['bold', 'italic', 'underline'],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            ['link'],
+                            ['clean']
+                        ]
+                    },
+                    placeholder: 'Write a short cover letter highlighting why you\'re a great fit...'
+                });
+                
+                // Make the editor container resizable
+                const editorContainer = document.querySelector('#applyCoverLetter .ql-container');
+                if (editorContainer) {
+                    editorContainer.style.minHeight = '300px';
+                    editorContainer.style.resize = 'vertical';
+                    editorContainer.style.overflow = 'auto';
+                }
+            }
+        });
     }
 });
 
@@ -317,7 +348,7 @@ async function submitApplication(event) {
         showApplicationFeedback('Student account missing. Please log in again.', 'danger');
         return;
     }
-    const coverLetter = document.getElementById('applyCoverLetter').value;
+    const coverLetter = coverLetterEditor ? coverLetterEditor.root.innerHTML : '';
     const selectedDocIds = Array.from(document.querySelectorAll('.document-checkbox:checked')).map(input => input.value);
     const submitBtn = document.getElementById('applySubmitButton');
     submitBtn.disabled = true;
@@ -333,7 +364,9 @@ async function submitApplication(event) {
                     modalInstance?.hide();
                 }
                 showApplicationFeedback(null);
-                document.getElementById('applyCoverLetter').value = '';
+                if (coverLetterEditor) {
+                    coverLetterEditor.setContents([]);
+                }
                 document.querySelectorAll('.document-checkbox').forEach(cb => cb.checked = false);
                 showDetailAlert('Application submitted successfully.', 'success');
             }, 800);

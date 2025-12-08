@@ -7,6 +7,8 @@ global $applications, $internships, $method, $entity, $id, $action, $student_id_
 // Get database connection
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../auth/auth.php';
+require_once __DIR__ . '/rounds_handler.php';
+require_once __DIR__ . '/quotas_handler.php';
 $db = getDB();
 
 function format_document_download_url($path, $document_id = null) {
@@ -247,6 +249,14 @@ if ($entity === 'applications') {
             }
 
             try {
+                // Support term filtering
+                $term_id = $_GET['term_id'] ?? null;
+                $term_condition = $term_id ? " AND a.term_id = ?" : "";
+                $params = [$student_id_param];
+                if ($term_id) {
+                    $params[] = $term_id;
+                }
+                
                 $stmt = $db->prepare("
                     SELECT 
                         a.application_id, 
@@ -254,6 +264,10 @@ if ($entity === 'applications') {
                         a.offer_details,
                         a.applied_date as created_at, 
                         a.cover_letter,
+                        a.term_id,
+                        a.round_id,
+                        t.name as term_name,
+                        r.name as round_name,
                         i.position as internship_position, 
                         i.location as internship_location,
                         i.dates as internship_dates,
@@ -261,10 +275,12 @@ if ($entity === 'applications') {
                     FROM applications a
                     JOIN internships i ON a.internship_id = i.id
                     JOIN companies c ON i.company_id = c.id
-                    WHERE a.student_id = ?
+                    LEFT JOIN terms t ON a.term_id = t.id
+                    LEFT JOIN application_rounds r ON a.round_id = r.id
+                    WHERE a.student_id = ?{$term_condition}
                     ORDER BY a.applied_date DESC
                 ");
-                $stmt->execute([$student_id_param]);
+                $stmt->execute($params);
                 $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 foreach ($applications as &$application) {
                     $application['status'] = normalize_status($application['status']);
@@ -399,6 +415,32 @@ if ($entity === 'applications') {
             try {
                 $db->beginTransaction();
 
+                // Check for active round
+                $active_round = get_active_round();
+                if (!$active_round) {
+                    // Fallback: Check if any rounds exist at all
+                    $roundsCheck = $db->query("SELECT COUNT(*) FROM application_rounds")->fetchColumn();
+                    if ($roundsCheck > 0) {
+                        // Rounds exist but none are active - applications are closed
+                        $db->rollBack();
+                        http_response_code(403);
+                        echo json_encode(['error' => 'No active application round. Applications are currently closed. Please contact an administrator to activate an application round.']);
+                        exit;
+                    }
+                    // No rounds exist yet - allow applications without round (backward compatibility)
+                    // This allows the system to work before rounds are set up
+                    $active_round = null;
+                }
+
+                // Get term for today
+                $current_term = get_term_for_date();
+                if (!$current_term) {
+                    $db->rollBack();
+                    http_response_code(403);
+                    echo json_encode(['error' => 'No active term found.']);
+                    exit;
+                }
+
                 $stmt = $db->prepare("SELECT id, company_name, position FROM internships WHERE id = ? AND status != 'Deleted'");
                 $stmt->execute([$input['internship_id']]);
                 $internship = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -419,26 +461,41 @@ if ($entity === 'applications') {
                     exit;
                 }
 
-                // Enforce max 3 active applications (Pending / Accepted / Confirmed)
-                $activeStmt = $db->prepare("
-                    SELECT COUNT(*) AS active_count
-                    FROM applications
-                    WHERE student_id = ?
-                      AND status NOT IN ('Rejected', 'Withdrawn', 'Approved_By_Company', 'Finalized')
-                ");
-                $activeStmt->execute([$student_id]);
-                $activeCount = (int) $activeStmt->fetchColumn();
-                if ($activeCount >= 3) {
-                    $db->rollBack();
-                    http_response_code(400);
-                    echo json_encode(['error' => 'You have reached the limit of 3 active applications. Withdraw or wait for decisions to free slots.']);
-                    exit;
+                // Enforce max applications per student from active round (if round exists)
+                if ($active_round) {
+                    $activeStmt = $db->prepare("
+                        SELECT COUNT(*) AS active_count
+                        FROM applications
+                        WHERE student_id = ?
+                          AND round_id = ?
+                          AND status NOT IN ('Rejected', 'Withdrawn', 'Approved_By_Company', 'Finalized')
+                    ");
+                    $activeStmt->execute([$student_id, $active_round['id']]);
+                    $activeCount = (int) $activeStmt->fetchColumn();
+                    $maxApps = (int) $active_round['max_applications_per_student'];
+                    if ($activeCount >= $maxApps) {
+                        $db->rollBack();
+                        http_response_code(400);
+                        echo json_encode([
+                            'error' => "You have reached the limit of {$maxApps} applications for this round. Withdraw or wait for decisions to free slots.",
+                            'max_applications' => $maxApps,
+                            'current_count' => $activeCount
+                        ]);
+                        exit;
+                    }
                 }
 
                 $new_app_id = generate_application_code($db);
 
-                $stmt = $db->prepare("INSERT INTO applications (application_id, student_id, internship_id, status, cover_letter, applied_date) VALUES (?, ?, ?, 'Pending', ?, CURDATE())");
-                $stmt->execute([$new_app_id, $student_id, $input['internship_id'], $input['cover_letter'] ?? '']);
+                $stmt = $db->prepare("INSERT INTO applications (application_id, student_id, internship_id, term_id, round_id, status, cover_letter, applied_date) VALUES (?, ?, ?, ?, ?, 'Pending', ?, CURDATE())");
+                $stmt->execute([
+                    $new_app_id, 
+                    $student_id, 
+                    $input['internship_id'], 
+                    $current_term ? $current_term['id'] : null,
+                    $active_round ? $active_round['id'] : null,
+                    $input['cover_letter'] ?? ''
+                ]);
                 $newPrimaryId = $db->lastInsertId();
 
                 if (!empty($input['document_ids']) && is_array($input['document_ids'])) {
@@ -632,12 +689,35 @@ if ($entity === 'applications') {
                 
                 // Check if transition is valid
                 if (!in_array($dbStatus, $allowedNextStatuses)) {
-                    http_response_code(400);
+                http_response_code(400);
                     $allowedStr = !empty($allowedNextStatuses) ? implode(', ', $allowedNextStatuses) : 'none (this status is final)';
                     echo json_encode([
                         'error' => "Invalid status transition. Current status: '{$currentStatus}'. Allowed next statuses: {$allowedStr}."
                     ]);
-                    exit;
+                exit;
+            }
+            
+                // Check company quota when finalizing
+                if ($dbStatus === 'Approved_By_Company' || $dbStatus === 'Finalized') {
+                    if (!empty($application['round_id'])) {
+                        $effective_quota = get_effective_quota($application['company_id'], $application['round_id']);
+                        $used_quota = get_used_quota($application['company_id'], $application['round_id']);
+                        
+                        // If this application is already finalized, don't count it again
+                        if ($application['status'] === 'Approved_By_Company' || $application['status'] === 'Finalized') {
+                            $used_quota--; // Don't double-count
+                        }
+                        
+                        if ($used_quota >= $effective_quota) {
+                            http_response_code(403);
+                            echo json_encode([
+                                'error' => "Company quota reached. You have finalized {$used_quota} out of {$effective_quota} allowed placements for this round.",
+                                'quota' => $effective_quota,
+                                'used' => $used_quota
+                            ]);
+                            exit;
+                        }
+                    }
                 }
                 
                 // Update in database using ENUM value
@@ -778,6 +858,27 @@ if ($entity === 'applications') {
                     http_response_code(400);
                     echo json_encode(['error' => "Can only finalize applications with status 'Confirmed'. Current status: '{$currentStatus}'."]);
                     exit;
+                }
+                
+                // Check company quota when finalizing
+                if (!empty($application['round_id'])) {
+                    $effective_quota = get_effective_quota($application['company_id'], $application['round_id']);
+                    $used_quota = get_used_quota($application['company_id'], $application['round_id']);
+                    
+                    // If this application is already finalized, don't count it again
+                    if ($application['status'] === 'Approved_By_Company' || $application['status'] === 'Finalized') {
+                        $used_quota--; // Don't double-count
+                    }
+                    
+                    if ($used_quota >= $effective_quota) {
+                        http_response_code(403);
+                        echo json_encode([
+                            'error' => "Company quota reached. You have finalized {$used_quota} out of {$effective_quota} allowed placements for this round.",
+                            'quota' => $effective_quota,
+                            'used' => $used_quota
+                        ]);
+                        exit;
+                    }
                 }
                 
                 // Use database value since we can't ALTER ENUM

@@ -122,7 +122,7 @@ if ($entity === 'internships') {
                 }
                 
                 // Insert into database
-                $stmt = $db->prepare("INSERT INTO internships (company_id, company_name, title, position, description, location, dates, requirements, salary, type, status, application_deadline, posted_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', ?, CURDATE())");
+                $stmt = $db->prepare("INSERT INTO internships (company_id, company_name, title, position, description, location, dates, requirements, type, status, application_deadline, posted_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', ?, CURDATE())");
                 $stmt->execute([
                     $company_id,
                     $company['name'],
@@ -132,7 +132,6 @@ if ($entity === 'internships') {
                     $input['location'] ?? 'Not specified',
                     $input['dates'] ?? 'TBD',
                     $input['requirements'] ?? '',
-                    $input['salary'] ?? 'Not specified',
                     $input['type'] ?? 'Full-time',
                     $input['application_deadline'] ?? null
                 ]);
@@ -173,7 +172,7 @@ if ($entity === 'internships') {
             }
             
             // Update allowed fields
-            $allowed_fields = ['title', 'position', 'description', 'location', 'dates', 'requirements', 'salary', 'type', 'application_deadline'];
+            $allowed_fields = ['title', 'position', 'description', 'location', 'dates', 'requirements', 'type', 'application_deadline'];
             $update_fields = [];
             $update_values = [];
             
@@ -287,7 +286,7 @@ if ($entity === 'internships') {
             }
             
             // Create duplicate
-            $stmt = $db->prepare("INSERT INTO internships (company_id, company_name, title, position, description, location, dates, requirements, salary, type, status, application_deadline, posted_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Inactive', ?, CURDATE())");
+            $stmt = $db->prepare("INSERT INTO internships (company_id, company_name, title, position, description, location, dates, requirements, type, status, application_deadline, posted_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Inactive', ?, CURDATE())");
             $stmt->execute([
                 $original_internship['company_id'],
                 $original_internship['company_name'],
@@ -297,7 +296,6 @@ if ($entity === 'internships') {
                 $original_internship['location'],
                 $original_internship['dates'],
                 $original_internship['requirements'],
-                $original_internship['salary'],
                 $original_internship['type'],
                 $original_internship['application_deadline']
             ]);

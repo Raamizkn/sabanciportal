@@ -385,7 +385,12 @@
 				document.getElementById('internship-title').textContent = app.internship_position;
 				document.getElementById('company-name').textContent = app.company_name;
 				document.getElementById('internship-description').textContent = app.internship_description || 'No description provided.';
-				document.getElementById('cover-letter').textContent = app.cover_letter || 'No cover letter provided.';
+				const coverLetterEl = document.getElementById('cover-letter');
+				if (app.cover_letter) {
+					coverLetterEl.innerHTML = app.cover_letter;
+				} else {
+					coverLetterEl.textContent = 'No cover letter provided.';
+				}
 				
 				// Status Badge
 				const statusContainer = document.getElementById('status-badge-container');
