@@ -118,25 +118,29 @@ function formatFileSize(size) {
 }
 
 function resolveDownloadUrl(path, documentId) {
-    if (!path) return null;
-    if (path.startsWith('http://') || path.startsWith('https://')) {
+    const userRole = localStorage.getItem('userRole');
+    const storedStudentId = localStorage.getItem('userId');
+    const impersonatedType = sessionStorage.getItem('impersonatedUserType');
+    const impersonatedId = sessionStorage.getItem('impersonatedUser');
+    const isImpersonatedStudent = impersonatedType === 'student' && impersonatedId;
+    const studentId = userRole === 'student' ? storedStudentId : impersonatedId;
+
+    // If path is absolute, use it as-is
+    if (path && (path.startsWith('http://') || path.startsWith('https://'))) {
         return path;
     }
-    // Use download endpoint for secure file serving
-    if (documentId) {
-        const userRole = localStorage.getItem('userRole');
-        const storedStudentId = localStorage.getItem('userId');
-        const impersonatedType = sessionStorage.getItem('impersonatedUserType');
-        const impersonatedId = sessionStorage.getItem('impersonatedUser');
-        const isImpersonatedStudent = impersonatedType === 'student' && impersonatedId;
-        const studentId = userRole === 'student' ? storedStudentId : impersonatedId;
-        
-        if (studentId) {
-            return `${API_BASE_URL}/index.php?entity=students&id=${studentId}&action=download_doc&document_id=${documentId}`;
-        }
+
+    // If we have a documentId and a studentId, build the download endpoint even when path is null
+    if (documentId && studentId) {
+        return `${API_BASE_URL}/index.php?entity=students&id=${studentId}&action=download_doc&document_id=${documentId}`;
     }
-    // Fallback to direct path
-    return `${API_BASE_URL}${path}`;
+
+    // Otherwise, fall back to relative path if provided
+    if (path) {
+        return `${API_BASE_URL}${path}`;
+    }
+
+    return null;
 }
 
 // Document upload functionality
