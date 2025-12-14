@@ -241,11 +241,17 @@ if ($entity === 'applications') {
                 echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
             }
         } elseif ($student_id_param !== null) { // Get applications for a specific student: ?entity=applications&student_id=1
-            requireRole(ROLE_STUDENT);
-            if (getCurrentUserId() != $student_id_param) {
-                http_response_code(403);
-                echo json_encode(['error' => 'You are not authorized to view these applications.']);
-                exit;
+            // Allow admins to view any student's applications (for impersonation)
+            // Students can only view their own applications
+            if (hasRole(ROLE_ADMIN)) {
+                // Admin can view any student's applications
+            } else {
+                requireRole(ROLE_STUDENT);
+                if (getCurrentUserId() != $student_id_param) {
+                    http_response_code(403);
+                    echo json_encode(['error' => 'You are not authorized to view these applications.']);
+                    exit;
+                }
             }
 
             try {
@@ -291,11 +297,17 @@ if ($entity === 'applications') {
                 echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
             }
         } elseif ($company_id_param !== null) { // Get applications for a specific company
-            requireRole(ROLE_COMPANY);
-            if (getCurrentUserId() != $company_id_param) {
-                http_response_code(403);
-                echo json_encode(['error' => 'You are not authorized to view these applications.']);
-                exit;
+            // Allow admins to view any company's applications (for impersonation)
+            // Companies can only view their own applications
+            if (hasRole(ROLE_ADMIN)) {
+                // Admin can view any company's applications
+            } else {
+                requireRole(ROLE_COMPANY);
+                if (getCurrentUserId() != $company_id_param) {
+                    http_response_code(403);
+                    echo json_encode(['error' => 'You are not authorized to view these applications.']);
+                    exit;
+                }
             }
 
             try {

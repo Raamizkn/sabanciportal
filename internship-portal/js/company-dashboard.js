@@ -5,10 +5,15 @@ const CONFIRMED_STATUSES = ['Confirmed', 'Confirmed_By_Student']; // Student con
 document.addEventListener('DOMContentLoaded', function() {
     const api = new APIService();
 
-    const companyId = localStorage.getItem('userId');
-    const companyName = localStorage.getItem('userName');
+    // Check for impersonation first
+    const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'company';
+    const impersonatedUserId = sessionStorage.getItem('impersonatedUser');
+    
+    // Use impersonated user ID if impersonating, otherwise use logged-in user
+    const companyId = isBeingImpersonated ? impersonatedUserId : localStorage.getItem('userId');
+    const companyName = isBeingImpersonated ? sessionStorage.getItem('impersonatedUserName') : localStorage.getItem('userName');
 
-    if (!companyId || localStorage.getItem('userRole') !== 'company') {
+    if (!companyId || (localStorage.getItem('userRole') !== 'company' && !isBeingImpersonated)) {
         window.location.href = '../index.html';
         return;
     }

@@ -252,8 +252,9 @@
 		document.addEventListener('DOMContentLoaded', () => {
 			const userRole = localStorage.getItem('userRole');
 			const studentId = localStorage.getItem('userId');
+			const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'student';
 			
-			if (userRole !== 'student' || !studentId) {
+			if (userRole !== 'student' && !isBeingImpersonated) {
 				alert('Access denied. Redirecting to login.');
 				window.location.href = '../index.html';
 				return;
@@ -301,7 +302,7 @@
 		}
 
 		async function loadApplicationHistory() {
-			const studentId = localStorage.getItem('userId');
+			const studentId = localStorage.getItem('userId') || sessionStorage.getItem('impersonatedUser');
 			const tbody = document.getElementById('historyTableBody');
 			
 			try {
@@ -403,6 +404,48 @@
 			return `<span class="badge ${badgeClass}">${status}</span>`;
 		}
 	</script>
+
+	<!-- Impersonation Banner Script -->
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			const impersonatedUser = sessionStorage.getItem('impersonatedUser');
+			const impersonatedUserEmail = sessionStorage.getItem('impersonatedUserEmail');
+			const impersonatedUserType = sessionStorage.getItem('impersonatedUserType');
+			const impersonatedUserName = sessionStorage.getItem('impersonatedUserName');
+			
+			if (impersonatedUser && impersonatedUserEmail && impersonatedUserType === 'student') {
+				// Create and show impersonation banner
+				const banner = document.createElement('div');
+				banner.className = 'alert alert-warning alert-dismissible fade show d-flex align-items-center justify-content-between';
+				banner.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; z-index: 9999; margin: 0; border-radius: 0;';
+				banner.innerHTML = `
+					<div>
+						<i class="ph-user-switch me-2"></i>
+						<strong>Admin Impersonation Mode:</strong> Viewing as ${impersonatedUserName || impersonatedUserEmail}
+					</div>
+					<button type="button" class="btn btn-sm btn-warning" id="end-impersonation-btn">
+						<i class="ph-sign-out me-1"></i>End Impersonation
+					</button>
+				`;
+				document.body.insertBefore(banner, document.body.firstChild);
+				
+				// Add padding to body to account for fixed banner
+				document.body.style.paddingTop = '56px';
+				
+				// End impersonation handler
+				document.getElementById('end-impersonation-btn').addEventListener('click', function() {
+					sessionStorage.removeItem('impersonatedUser');
+					sessionStorage.removeItem('impersonatedUserEmail');
+					sessionStorage.removeItem('impersonatedUserType');
+					sessionStorage.removeItem('impersonatedUserName');
+					window.location.href = '../admin/admin-dashboard.html';
+				});
+			}
+		});
+	</script>
+
+	<!-- Standardized Impersonation Banner -->
+	<script src="../js/impersonation-banner.js"></script>
 </body>
 </html>
 

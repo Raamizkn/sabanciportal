@@ -103,9 +103,20 @@
 		<!-- Main sidebar -->
 		<div class="sidebar sidebar-dark sidebar-main sidebar-expand-lg">
 			<div class="sidebar-content">
-				<div class="sidebar-section sidebar-resize-hide">
-					<div class="navbar-brand">
-						<img src="../assets/images/logo.svg" alt="Sabancı Üniversitesi" class="sidebar-resize-hide" style="height: 32px;">
+				<!-- Sidebar header -->
+				<div class="sidebar-section">
+					<div class="sidebar-section-body d-flex justify-content-center">
+						<h5 class="sidebar-resize-hide flex-grow-1 my-auto">Navigation</h5>
+
+						<div>
+							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-control sidebar-main-resize d-none d-lg-inline-flex">
+								<i class="ph-arrows-left-right"></i>
+							</button>
+
+							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-mobile-main-toggle d-lg-none">
+								<i class="ph-x"></i>
+							</button>
+						</div>
 					</div>
 				</div>
 
@@ -224,9 +235,10 @@
 
 		document.addEventListener('DOMContentLoaded', () => {
 			const userRole = localStorage.getItem('userRole');
-			currentCompanyId = localStorage.getItem('userId');
+			currentCompanyId = localStorage.getItem('userId') || sessionStorage.getItem('impersonatedUser');
+			const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'company';
 
-			if (userRole !== 'company' || !currentCompanyId) {
+			if ((userRole !== 'company' && !isBeingImpersonated) || !currentCompanyId) {
 				alert('Access denied. Redirecting to login.');
 				window.location.href = '../index.html';
 				return;
@@ -373,6 +385,9 @@
 			});
 		}
 	</script>
+
+	<!-- Standardized Impersonation Banner -->
+	<script src="../js/impersonation-banner.js"></script>
 </body>
 </html>
 

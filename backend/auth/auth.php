@@ -67,9 +67,16 @@ function requireAuth() {
 
 /**
  * Require specific role
+ * Admins can bypass role checks when impersonating users
  */
 function requireRole($role) {
     requireAuth();
+    
+    // Allow admin to bypass role checks (for impersonation)
+    if (hasRole(ROLE_ADMIN)) {
+        return;
+    }
+    
     if (!hasRole($role)) {
         http_response_code(403);
         echo json_encode(['error' => 'Access denied. Required role: ' . $role]);

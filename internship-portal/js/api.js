@@ -624,6 +624,35 @@ class APIService {
     async getCompanyQuotas(companyId) {
         return this.request(`/index.php?entity=quotas&company_id=${companyId}`);
     }
+
+    // ==================== IMPERSONATION APIs ====================
+
+    /**
+     * Start impersonating a student (admin only)
+     */
+    async impersonateStudent(studentId) {
+        return this.request(`/index.php?entity=admin&resource=students&action=impersonate&id=${studentId}`, {
+            method: 'POST'
+        });
+    }
+
+    /**
+     * Start impersonating a company (admin only)
+     */
+    async impersonateCompany(companyId) {
+        return this.request(`/index.php?entity=admin&resource=companies&action=impersonate&id=${companyId}`, {
+            method: 'POST'
+        });
+    }
+
+    /**
+     * End current impersonation session (admin only)
+     */
+    async endImpersonation() {
+        return this.request('/index.php?entity=admin&action=end_impersonation', {
+            method: 'POST'
+        });
+    }
 }
 
 // Export instance

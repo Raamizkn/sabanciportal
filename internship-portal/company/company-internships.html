@@ -668,8 +668,9 @@
 			// Check authentication
 			const userRole = localStorage.getItem('userRole');
 			const userId = localStorage.getItem('userId');
+			const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'company';
 			
-			if (userRole !== 'company') {
+			if (userRole !== 'company' && !isBeingImpersonated) {
 			showAlertModal('Access Denied', 'You must be logged in as a Company.', 'error', () => {
 				window.location.href = '../index.html';
 			});
@@ -745,7 +746,7 @@
 
 		async function loadCompanyInternships() {
 		try {
-			const userId = localStorage.getItem('userId');
+			const userId = localStorage.getItem('userId') || sessionStorage.getItem('impersonatedUser');
 			const data = await api.getCompanyInternships(userId);
 			displayInternships(data);
 		} catch (error) {
@@ -968,5 +969,8 @@
 		}
 	</script>
 
+	<!-- Standardized Impersonation Banner -->
+	<script src="../js/impersonation-banner.js"></script>
+
 </body>
-</html> 
+</html>

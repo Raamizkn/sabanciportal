@@ -392,25 +392,45 @@
 		}
 		
 		// Function to impersonate a user
-		function impersonateUser(userId, userEmail, userType) {
+		async function impersonateUser(userId, userEmail, userType) {
 			// Get the user name from the button
 			const button = document.querySelector(`.impersonate-btn[data-user-id="${userId}"]`);
 			const userName = button ? button.getAttribute('data-user-name') : '';
 			
-			// Store impersonation data in session storage
-			sessionStorage.setItem('impersonatedUser', userId);
-			sessionStorage.setItem('impersonatedUserEmail', userEmail);
-			sessionStorage.setItem('impersonatedUserType', userType);
-			sessionStorage.setItem('impersonatedUserName', userName);
-			
-			// Update UI to show impersonation status
-			showImpersonationStatus(userId, userEmail, userType);
-			
-			// Redirect to appropriate dashboard based on user type
-			if (userType === 'student') {
-				window.location.href = '../student/student-dashboard.html';
-			} else if (userType === 'company') {
-				window.location.href = '../company/company-dashboard.html';
+			try {
+				// Call backend API to validate and start impersonation
+				let response;
+				if (userType === 'student') {
+					response = await api.impersonateStudent(userId);
+				} else if (userType === 'company') {
+					response = await api.impersonateCompany(userId);
+				}
+				
+				if (response && response.status === 'success') {
+					// Get the user data from the response
+					const userData = response.impersonated_user;
+					
+					// Store impersonation data in session storage
+					sessionStorage.setItem('impersonatedUser', userData.id);
+					sessionStorage.setItem('impersonatedUserEmail', userData.email);
+					sessionStorage.setItem('impersonatedUserType', userType);
+					sessionStorage.setItem('impersonatedUserName', userData.name);
+					
+					// Update UI to show impersonation status
+					showImpersonationStatus(userData.id, userData.email, userType);
+					
+					// Redirect to appropriate dashboard based on user type
+					if (userType === 'student') {
+						window.location.href = '../student/student-dashboard.html';
+					} else if (userType === 'company') {
+						window.location.href = '../company/company-dashboard.html';
+					}
+				} else {
+					alert('Failed to start impersonation: ' + (response.error || 'Unknown error'));
+				}
+			} catch (error) {
+				console.error('Impersonation error:', error);
+				alert('An error occurred while trying to impersonate the user.');
 			}
 		}
 		
@@ -537,7 +557,7 @@
 
 		function attachImpersonationHandlers() {
 			document.querySelectorAll('.impersonate-btn').forEach(button => {
-				button.addEventListener('click', function(e) {
+				button.addEventListener('click', async function(e) {
 					e.preventDefault();
 					const userId = this.getAttribute('data-user-id');
 					const userEmail = this.getAttribute('data-user-email');
@@ -545,15 +565,36 @@
 					const userName = this.getAttribute('data-user-name');
 					
 					if (confirm(`Are you sure you want to impersonate user: ${userEmail}?`)) {
-						sessionStorage.setItem('impersonatedUser', userId);
-						sessionStorage.setItem('impersonatedUserEmail', userEmail);
-						sessionStorage.setItem('impersonatedUserType', userType);
-						sessionStorage.setItem('impersonatedUserName', userName);
-						
-						if (userType === 'student') {
-							window.location.href = '../student/student-dashboard.html';
-						} else if (userType === 'company') {
-							window.location.href = '../company/company-dashboard.html';
+						try {
+							// Call backend API to validate and start impersonation
+							let response;
+							if (userType === 'student') {
+								response = await api.impersonateStudent(userId);
+							} else if (userType === 'company') {
+								response = await api.impersonateCompany(userId);
+							}
+							
+							if (response && response.status === 'success') {
+								const userData = response.impersonated_user;
+								
+								// Store impersonation data in sessionStorage
+								sessionStorage.setItem('impersonatedUser', userData.id);
+								sessionStorage.setItem('impersonatedUserEmail', userData.email);
+								sessionStorage.setItem('impersonatedUserType', userType);
+								sessionStorage.setItem('impersonatedUserName', userData.name);
+								
+								// Redirect to appropriate dashboard
+								if (userType === 'student') {
+									window.location.href = '../student/student-dashboard.html';
+								} else if (userType === 'company') {
+									window.location.href = '../company/company-dashboard.html';
+								}
+							} else {
+								alert('Failed to start impersonation: ' + (response.error || 'Unknown error'));
+							}
+						} catch (error) {
+							console.error('Impersonation error:', error);
+							alert('An error occurred while trying to impersonate the user.');
 						}
 					}
 				});

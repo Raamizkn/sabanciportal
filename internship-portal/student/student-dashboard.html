@@ -526,8 +526,8 @@
 				new bootstrap.Tooltip(tooltip);
 			});
 
-			// Load applications dynamically
-			const studentId = localStorage.getItem('userId');
+			// Load applications dynamically - use impersonated user ID if available
+			const studentId = sessionStorage.getItem('impersonatedUser') || localStorage.getItem('userId');
 			if (studentId) {
 				try {
 					const applications = await api.getStudentApplications(studentId);
@@ -991,5 +991,8 @@
 		});
 	</script>
 
+
+	<!-- Standardized Impersonation Banner -->
+	<script src="../js/impersonation-banner.js"></script>
 </body>
 </html> 

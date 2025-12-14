@@ -133,14 +133,36 @@ function get_student_details_admin($student_id) {
     return ['error' => 'Student not found'];
 }
 function impersonate_student($student_id) {
-    global $students;
-    foreach ($students as $student) {
-        if ($student['id'] == $student_id) {
-            // In a real app, this would set a special session variable.
-            return ['status' => 'success', 'message' => 'Impersonation started.', 'impersonated_user' => $student];
-        }
+    global $db;
+    
+    // Require admin role
+    requireRole(ROLE_ADMIN);
+    
+    if (!$student_id) {
+        return ['error' => 'Student ID is required.'];
     }
-    return ['error' => 'Student not found.'];
+    
+    try {
+        // Fetch student from database
+        $stmt = $db->prepare("SELECT id, name, email, student_id, major, gpa, phone, address, bio, profile_pic, is_active FROM students WHERE id = ? AND is_active = 1");
+        $stmt->execute([$student_id]);
+        $student = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$student) {
+            return ['error' => 'Student not found or inactive.'];
+        }
+        
+        // Return student data for frontend to use
+        return [
+            'status' => 'success', 
+            'message' => 'Impersonation started successfully.',
+            'impersonated_user' => $student,
+            'user_type' => 'student'
+        ];
+    } catch(PDOException $e) {
+        error_log("Impersonate student error: " . $e->getMessage());
+        return ['error' => 'Failed to impersonate student: ' . $e->getMessage()];
+    }
 }
 
 // --- Company Management --- //
@@ -229,13 +251,36 @@ function delete_company($company_id) {
     return ['error' => 'Company not found.'];
 }
 function impersonate_company($company_id) {
-    global $companies;
-    foreach ($companies as $company) {
-        if ($company['id'] == $company_id) {
-            return ['status' => 'success', 'message' => 'Impersonation started.', 'impersonated_company' => $company];
-        }
+    global $db;
+    
+    // Require admin role
+    requireRole(ROLE_ADMIN);
+    
+    if (!$company_id) {
+        return ['error' => 'Company ID is required.'];
     }
-    return ['error' => 'Company not found.'];
+    
+    try {
+        // Fetch company from database
+        $stmt = $db->prepare("SELECT id, name, email, industry, website, phone, address, description, is_active FROM companies WHERE id = ? AND is_active = 1");
+        $stmt->execute([$company_id]);
+        $company = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$company) {
+            return ['error' => 'Company not found or inactive.'];
+        }
+        
+        // Return company data for frontend to use
+        return [
+            'status' => 'success', 
+            'message' => 'Impersonation started successfully.',
+            'impersonated_user' => $company,
+            'user_type' => 'company'
+        ];
+    } catch(PDOException $e) {
+        error_log("Impersonate company error: " . $e->getMessage());
+        return ['error' => 'Failed to impersonate company: ' . $e->getMessage()];
+    }
 }
 
 // --- Internship Management (Admin) --- //
