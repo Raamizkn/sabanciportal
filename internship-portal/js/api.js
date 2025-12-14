@@ -513,11 +513,25 @@ class APIService {
     }
 
     /**
+     * Get applications for a student
+     */
+    async getApplications(studentId) {
+        return this.request(`/index.php?entity=applications&student_id=${studentId}`);
+    }
+
+    /**
      * Get student evaluations (for student view)
      */
     async getStudentEvaluations(studentId) {
         // Note: This endpoint may need to be implemented in backend
         return this.request(`/index.php?entity=students&action=evaluations&id=${studentId}`);
+    }
+
+    /**
+     * Get details of a specific student evaluation.
+     */
+    async getStudentEvaluationDetails(evaluationId) {
+        return this.request(`/index.php?entity=student_evaluations&action=details&id=${evaluationId}`);
     }
 }
 
