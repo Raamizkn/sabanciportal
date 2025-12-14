@@ -86,6 +86,52 @@ elseif ($entity === 'documents') {
 elseif ($entity === 'students') {
     require_once __DIR__ . '/handlers/student_handler.php';
 }
+elseif ($entity === 'student_evaluations') {
+    // NEW: Student evaluations (student → company)
+    require_once __DIR__ . '/handlers/student_evaluations_handler.php';
+    
+    $student_id = getCurrentUserId();
+    $response = null;
+    
+    if ($method === 'GET') {
+        if ($action === 'list') {
+            // Get all evaluations by this student
+            $response = get_student_evaluations($student_id);
+        } elseif ($action === 'pending') {
+            // Get applications pending evaluation
+            $response = get_pending_student_evaluations($student_id);
+        } elseif ($action === 'details' && $id) {
+            // Get specific evaluation details
+            $response = get_student_evaluation_details($id, $student_id);
+        } elseif ($action === 'all' && hasRole(ROLE_ADMIN)) {
+            // Admin: Get all student evaluations
+            $response = get_all_student_evaluations_admin();
+        }
+    } elseif ($method === 'POST') {
+        if ($action === 'submit') {
+            // Submit new evaluation
+            requireRole(ROLE_STUDENT);
+            $application_id = $input['application_id'] ?? null;
+            if (!$application_id) {
+                http_response_code(400);
+                echo json_encode(['error' => 'application_id required']);
+                exit;
+            }
+            $response = submit_student_evaluation($student_id, $application_id, $input);
+        }
+    }
+    
+    if ($response !== null) {
+        if (isset($response['error'])) {
+            http_response_code(400);
+        }
+        echo json_encode($response);
+    } else {
+        http_response_code(400);
+        echo json_encode(['error' => 'Invalid student evaluation action']);
+    }
+    exit;
+}
 elseif ($entity === 'companies') {
     require_once __DIR__ . '/handlers/company_handler.php';
 }

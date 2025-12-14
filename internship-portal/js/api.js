@@ -514,11 +514,34 @@ class APIService {
     }
 
     /**
+     * Get applications for a student
+     */
+    async getApplications(studentId) {
+        return this.request(`/index.php?entity=applications&student_id=${studentId}`);
+    }
+
+    /**
      * Get student evaluations (for student view)
      */
     async getStudentEvaluations(studentId) {
-        // Note: This endpoint may need to be implemented in backend
-        return this.request(`/index.php?entity=students&action=evaluations&id=${studentId}`);
+        return this.request(`/index.php?entity=student_evaluations&action=list&student_id=${studentId}`);
+    }
+
+    /**
+     * Get details of a specific student evaluation.
+     */
+    async getStudentEvaluationDetails(evaluationId, studentId) {
+        return this.request(`/index.php?entity=student_evaluations&action=details&id=${evaluationId}&student_id=${studentId}`);
+    }
+
+    /**
+     * Submit student evaluation of a company for a specific application.
+     */
+    async submitStudentEvaluation(applicationId, evaluationData) {
+        return this.request(`/index.php?entity=student_evaluations&action=submit&application_id=${applicationId}`, {
+            method: 'POST',
+            body: JSON.stringify(evaluationData)
+        });
     }
 
     // ==================== TERMS & ROUNDS APIs ====================
