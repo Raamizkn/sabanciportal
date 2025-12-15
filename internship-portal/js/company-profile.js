@@ -20,50 +20,111 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const urlCompanyId = urlParams.get('id');
 
-    // Determine which company ID to use: URL param > impersonated > stored (company only)
+    // Determine which company ID to use and viewing mode
     let companyId = null;
+    let isAdminViewMode = false; // Admin viewing (not impersonating)
     
     if (urlCompanyId) {
-        // URL parameter takes highest priority (admin or anyone viewing specific company)
+        // URL parameter - could be admin viewing OR anyone with a direct link
         companyId = urlCompanyId;
+        // If admin has URL ID and is NOT impersonating this company, it's view mode
+        if (isAdmin && (!isImpersonatedCompany || impersonatedId !== urlCompanyId)) {
+            isAdminViewMode = true;
+        }
     } else if (isImpersonatedCompany) {
-        // Impersonated company ID
+        // Admin impersonating - they can edit
         companyId = impersonatedId;
+        isAdminViewMode = false;
     } else if (userRole === 'company') {
-        // Logged in company user
+        // Logged in company user - they can edit their own profile
         companyId = storedCompanyId;
+        isAdminViewMode = false;
     }
 
-    // Allow access if: company user, impersonated company, admin with URL ID, or viewing by URL ID
-    if (userRole !== 'company' && !isImpersonatedCompany && !companyId) {
-        if (isAdmin) {
-            // Admin without company context - show helpful message
-            showProfileAlert('Please select a company from the Companies page to view their profile.', 'info');
-            return;
-        }
-        alert('Access denied. Redirecting to login page.');
-        window.location.href = '../index.html';
-        return;
-    }
-    
+    // Access check
     if (!companyId || companyId === 'undefined') {
         if (isAdmin) {
             showProfileAlert('Please select a company from the Companies page to view their profile.', 'info');
+            addAdminNavigationBar();
+        } else if (userRole !== 'company' && !isImpersonatedCompany) {
+            alert('Access denied. Redirecting to login page.');
+            window.location.href = '../index.html';
         } else {
             showProfileAlert('Unable to determine company account. Please login again.', 'danger');
         }
         return;
     }
 
+    // Add admin navigation bar if admin is viewing (not impersonating)
+    if (isAdminViewMode) {
+        addAdminNavigationBar();
+        disableEditing();
+    }
+
     loadCompanyProfile(companyId);
 
-    const saveButton = document.getElementById('saveCompanyProfile');
-    if (saveButton) {
-        saveButton.addEventListener('click', async () => {
-            await saveCompanyProfile();
-        });
+    // Only setup save button if NOT in admin view mode
+    if (!isAdminViewMode) {
+        const saveButton = document.getElementById('saveCompanyProfile');
+        if (saveButton) {
+            saveButton.addEventListener('click', async () => {
+                await saveCompanyProfile();
+            });
+        }
     }
 });
+
+// Add admin navigation bar at the top of the page
+function addAdminNavigationBar() {
+    const adminNav = document.createElement('div');
+    adminNav.id = 'admin-view-bar';
+    adminNav.style.cssText = 'position: sticky; top: 0; z-index: 1030; background: #0d6efd; color: white; padding: 10px 15px;';
+    adminNav.innerHTML = `
+        <div class="container-fluid d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <i class="ph-eye me-2"></i>
+                <span><strong>Admin View:</strong> Viewing company profile (Read-Only)</span>
+            </div>
+            <div>
+                <a href="../admin/admin-companies.html" class="btn btn-sm btn-light me-2">
+                    <i class="ph-arrow-left me-1"></i>Back to Companies
+                </a>
+                <a href="../admin/admin-dashboard.html" class="btn btn-sm btn-light">
+                    <i class="ph-house me-1"></i>Admin Dashboard
+                </a>
+            </div>
+        </div>
+    `;
+    document.body.insertBefore(adminNav, document.body.firstChild);
+}
+
+// Disable editing for admin view mode
+function disableEditing() {
+    // Hide save button
+    const saveButton = document.getElementById('saveCompanyProfile');
+    if (saveButton) {
+        saveButton.style.display = 'none';
+    }
+    
+    // Make all form inputs read-only after page loads
+    setTimeout(() => {
+        const formInputs = document.querySelectorAll('input, textarea, select');
+        formInputs.forEach(input => {
+            input.setAttribute('readonly', true);
+            input.setAttribute('disabled', true);
+            input.style.pointerEvents = 'none';
+            input.style.opacity = '0.7';
+        });
+        
+        // Hide any edit buttons
+        const editButtons = document.querySelectorAll('[data-bs-target="#edit_profile"], .edit-btn, [id*="edit"], [id*="Edit"]');
+        editButtons.forEach(btn => {
+            if (btn.id !== 'admin-view-bar') {
+                btn.style.display = 'none';
+            }
+        });
+    }, 500);
+}
 
 async function loadCompanyProfile(companyId) {
     try {

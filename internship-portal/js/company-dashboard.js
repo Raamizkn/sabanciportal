@@ -18,10 +18,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Determine company ID: URL param > impersonated > stored (company only)
     let companyId = null;
     let companyName = null;
+    let isAdminViewMode = false;
     
     if (urlCompanyId) {
         companyId = urlCompanyId;
         companyName = 'Company'; // Will be loaded from API
+        // Admin with URL ID but NOT impersonating this company = view mode
+        if (isAdmin && (!isBeingImpersonated || impersonatedUserId !== urlCompanyId)) {
+            isAdminViewMode = true;
+        }
     } else if (isBeingImpersonated) {
         companyId = impersonatedUserId;
         companyName = sessionStorage.getItem('impersonatedUserName');
@@ -39,6 +44,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         window.location.href = '../index.html';
         return;
+    }
+    
+    // Add admin view bar if in admin view mode
+    if (isAdminViewMode) {
+        addAdminViewBar();
     }
 
     const welcomeMessage = document.getElementById('dashboardWelcomeName');
@@ -234,4 +244,28 @@ function formatStatusLabel(status) {
     }
     // Statuses are now clean - return as-is
     return status;
+}
+
+// Add admin view bar at the top of the page
+function addAdminViewBar() {
+    const adminNav = document.createElement('div');
+    adminNav.id = 'admin-view-bar';
+    adminNav.style.cssText = 'position: sticky; top: 0; z-index: 1030; background: #0d6efd; color: white; padding: 10px 15px;';
+    adminNav.innerHTML = `
+        <div class="container-fluid d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="d-flex align-items-center">
+                <i class="ph-eye me-2"></i>
+                <span><strong>Admin View:</strong> Viewing company dashboard (Read-Only)</span>
+            </div>
+            <div>
+                <a href="../admin/admin-companies.html" class="btn btn-sm btn-light me-2">
+                    <i class="ph-arrow-left me-1"></i>Back to Companies
+                </a>
+                <a href="../admin/admin-dashboard.html" class="btn btn-sm btn-light">
+                    <i class="ph-house me-1"></i>Admin Dashboard
+                </a>
+            </div>
+        </div>
+    `;
+    document.body.insertBefore(adminNav, document.body.firstChild);
 }
