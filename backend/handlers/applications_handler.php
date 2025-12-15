@@ -411,11 +411,16 @@ if ($entity === 'applications') {
     elseif ($method === 'POST') {
         // Student actions: apply, withdraw, confirm_offer
         if ($action === 'apply') {
-            // Require student role
+            // Require student role (admins can bypass for impersonation)
             requireRole(ROLE_STUDENT);
             
-            // Use authenticated student's ID
-            $student_id = getCurrentUserId();
+            // For admin impersonation: allow specifying student_id in request
+            // Otherwise use authenticated user's ID
+            if (hasRole(ROLE_ADMIN) && isset($input['student_id'])) {
+                $student_id = $input['student_id'];
+            } else {
+                $student_id = getCurrentUserId();
+            }
             
             // Expected input: {"internship_id": 1, "cover_letter": "My letter"}
             if (!isset($input['internship_id'])) {

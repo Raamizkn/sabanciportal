@@ -21,6 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const impersonatedId = sessionStorage.getItem('impersonatedUser');
     const isImpersonatedStudent = impersonatedType === 'student' && impersonatedId;
     const isAdmin = storedRole === 'admin';
+    
+    // When admin is impersonating a student, treat them as the student for application purposes
+    const isActingAsStudent = storedRole === 'student' || isImpersonatedStudent;
+    const isAdminViewOnly = isAdmin && !isImpersonatedStudent;
 
     // Allow access if: student user, impersonated student, or admin
     if (storedRole !== 'student' && !isImpersonatedStudent && !isAdmin) {
@@ -29,17 +33,18 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Add admin navigation bar if accessed by admin
-    if (isAdmin && !isImpersonatedStudent) {
+    // Add admin navigation bar if accessed by admin WITHOUT impersonation
+    if (isAdminViewOnly) {
         addAdminNavigationBar();
-        // Hide apply button for admin view
+        // Hide apply button for admin view (not impersonating)
         const applyButtons = document.querySelectorAll('[data-bs-target="#apply_now_modal"]');
         applyButtons.forEach(btn => {
             btn.style.display = 'none';
         });
     }
 
-    studentIdForApply = storedRole === 'student' ? storedStudentId : impersonatedId;
+    // Set student ID: use impersonated ID if impersonating, otherwise use logged-in student ID
+    studentIdForApply = isImpersonatedStudent ? impersonatedId : storedStudentId;
     const params = new URLSearchParams(window.location.search);
     const internshipId = params.get('id');
 
@@ -51,17 +56,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadInternship(internshipId);
 
-    if (studentIdForApply && !isAdmin) {
+    // Load documents and student summary for students (including impersonated students)
+    if (studentIdForApply && isActingAsStudent) {
         loadStudentDocuments(studentIdForApply);
         populateStudentSummary();
-    } else if (isAdmin) {
+    } else if (isAdminViewOnly) {
         document.getElementById('documentHelper').textContent = 'Admin view mode - Application features disabled.';
     } else {
         document.getElementById('documentHelper').textContent = 'Login to attach your documents.';
     }
 
+    // Allow form submission for students (including impersonated students)
     const applicationForm = document.getElementById('application-form');
-    if (applicationForm && !isAdmin) {
+    if (applicationForm && isActingAsStudent) {
         applicationForm.addEventListener('submit', submitApplication);
     }
 
@@ -148,12 +155,15 @@ async function loadInternship(internshipId) {
         detailInternship = internship;
         populateInternshipDetails(internship);
 
-        // Check application limits for student and gray out apply if limit reached
+        // Check application limits for student (including impersonated students)
         const userRole = localStorage.getItem('userRole');
         const impersonatedType = sessionStorage.getItem('impersonatedUserType');
         const impersonatedId = sessionStorage.getItem('impersonatedUser');
-        const studentId = userRole === 'student' ? localStorage.getItem('userId') : impersonatedId;
-        if (studentId && userRole === 'student') {
+        const isImpersonatedStudent = impersonatedType === 'student' && impersonatedId;
+        const studentId = isImpersonatedStudent ? impersonatedId : (userRole === 'student' ? localStorage.getItem('userId') : null);
+        
+        // Check limits for students and impersonated students
+        if (studentId && (userRole === 'student' || isImpersonatedStudent)) {
             try {
                 const limits = await api.getStudentApplicationLimits(studentId);
                 if (limits && limits.active_limit_reached) {
