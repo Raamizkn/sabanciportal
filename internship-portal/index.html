@@ -175,7 +175,7 @@
 						</div>
 
 						<div class="mb-3">
-							<a href="../backend/auth/saml_login_endpoint.php" class="btn btn-outline-primary w-100">
+							<a href="#" onclick="handleSSOLogin(); return false;" class="btn btn-outline-primary w-100">
 								<i class="ph-lock-key me-2"></i>
 								Sign in with Sabancı SSO
 							</a>
@@ -323,7 +323,7 @@
 					</div>
 
 					<div class="text-center">
-						<a href="../backend/auth/saml_login_endpoint.php" class="btn btn-outline-primary">
+						<a href="#" onclick="handleSSOLogin(); return false;" class="btn btn-outline-primary">
 							<i class="ph-lock-key me-2"></i>
 							Sign in with Sabancı SSO
 						</a>
@@ -477,6 +477,29 @@
 			
 			// Fallback: try to find backend in parent directory
 			return `${protocol}//${hostname}/backend`;
+		}
+
+		// Handle SSO Login
+		function handleSSOLogin() {
+			const hostname = window.location.hostname;
+			const protocol = window.location.protocol;
+			
+			let ssoUrl;
+			
+			// If running on localhost, redirect to backend SSO endpoint
+			if (hostname === 'localhost' || hostname === '127.0.0.1') {
+				// Local development - point to backend server
+				ssoUrl = 'http://localhost:8001/auth/saml_login_endpoint.php';
+			} else if (window.location.pathname.includes('/shadowing/')) {
+				// Production server - use relative path
+				ssoUrl = `${protocol}//${hostname}/shadowing/backend/auth/saml_login_endpoint.php`;
+			} else {
+				// Fallback
+				ssoUrl = `${protocol}//${hostname}/backend/auth/saml_login_endpoint.php`;
+			}
+			
+			console.log('Redirecting to SSO:', ssoUrl);
+			window.location.href = ssoUrl;
 		}
 
 		document.addEventListener('DOMContentLoaded', function() {
