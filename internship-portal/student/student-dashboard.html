@@ -360,6 +360,14 @@
 								<h4 class="mb-0 fw-bold" id="dashboardRejectedApplications">0</h4>
 								<div class="opacity-75 fs-sm">Rejected</div>
 							</div>
+
+							<div class="col-xl-2 col-sm-4 col-6">
+								<div class="bg-white bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+									<i class="ph-list-numbers fs-2"></i>
+								</div>
+								<h4 class="mb-0 fw-bold" id="dashboardActiveApplicationsLimit">-</h4>
+								<div class="opacity-75 fs-sm" id="dashboardActiveApplicationsLimitLabel">Active / Limit</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -534,6 +542,14 @@
 					populateDashboardApplications(applications);
 					updateDashboardStatusCards(applications);
 					updateApplicationsBadge(applications.length);
+					
+					// Load application limits
+					try {
+						const limits = await api.getStudentApplicationLimits(studentId);
+						updateApplicationLimitsDisplay(limits);
+					} catch (e) {
+						console.warn('Could not load application limits:', e);
+					}
 				} catch (error) {
 					console.error('Failed to load applications:', error);
 					updateApplicationsBadge(0);
@@ -692,6 +708,40 @@
 					badgeElement.style.display = 'none';
 				} else {
 					badgeElement.style.display = '';
+				}
+			}
+		}
+
+		function updateApplicationLimitsDisplay(limits) {
+			const limitElement = document.getElementById('dashboardActiveApplicationsLimit');
+			const labelElement = document.getElementById('dashboardActiveApplicationsLimitLabel');
+			
+			if (!limitElement) return;
+			
+			if (!limits || !limits.active_round) {
+				limitElement.textContent = '-';
+				if (labelElement) labelElement.textContent = 'No Active Round';
+				return;
+			}
+			
+			const { active_count, remaining, limit_reached, active_round } = limits;
+			const max = active_round.max_applications;
+			
+			limitElement.textContent = `${active_count} / ${max}`;
+			
+			if (labelElement) {
+				if (limit_reached) {
+					labelElement.textContent = 'Limit Reached';
+					limitElement.classList.add('text-danger');
+					limitElement.classList.remove('text-warning', 'text-success');
+				} else if (remaining <= 1) {
+					labelElement.textContent = `${remaining} Remaining`;
+					limitElement.classList.add('text-warning');
+					limitElement.classList.remove('text-danger', 'text-success');
+				} else {
+					labelElement.textContent = `${remaining} Remaining`;
+					limitElement.classList.add('text-success');
+					limitElement.classList.remove('text-danger', 'text-warning');
 				}
 			}
 		}

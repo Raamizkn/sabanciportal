@@ -282,6 +282,27 @@
 					});
 				}
 
+				// For rounds without quota entries, fetch used quota individually
+				for (const round of allRounds) {
+					if (!companyQuotas[round.id]) {
+						try {
+							const quotaInfo = await api.getCompanyQuota(currentCompanyId, round.id);
+							if (quotaInfo) {
+								companyQuotas[round.id] = {
+									round_id: round.id,
+									quota_override: quotaInfo.quota_override,
+									default_quota: quotaInfo.default_quota || round.default_company_quota,
+									used_quota: quotaInfo.used_quota || 0,
+									effective_quota: quotaInfo.effective_quota || round.default_company_quota,
+									remaining_quota: quotaInfo.remaining_quota || Math.max(0, (quotaInfo.effective_quota || round.default_company_quota) - (quotaInfo.used_quota || 0))
+								};
+							}
+						} catch (e) {
+							console.warn(`Could not load quota for round ${round.id}:`, e);
+						}
+					}
+				}
+
 				renderQuotasTable();
 			} catch (error) {
 				console.error('Failed to load quotas:', error);
@@ -331,13 +352,23 @@
 
 				roundsByTerm[termName].forEach(round => {
 					const quota = companyQuotas[round.id];
-					const effectiveQuota = quota && quota.quota_override !== null 
-						? quota.quota_override 
-						: round.default_company_quota;
+					const effectiveQuota = quota && quota.effective_quota !== undefined
+						? quota.effective_quota
+						: (quota && quota.quota_override !== null 
+							? quota.quota_override 
+							: round.default_company_quota);
 					
-					// Calculate used quota (would need API call for actual count)
-					const used = 0; // TODO: Get from API
-					const remaining = Math.max(0, effectiveQuota - used);
+					const used = quota && quota.used_quota !== undefined ? quota.used_quota : 0;
+					const remaining = quota && quota.remaining_quota !== undefined 
+						? quota.remaining_quota 
+						: Math.max(0, effectiveQuota - used);
+					
+					// Determine quota status for visual indicators
+					const quotaPercentage = effectiveQuota > 0 ? (used / effectiveQuota) * 100 : 0;
+					const isNearLimit = quotaPercentage >= 80;
+					const isAtLimit = quotaPercentage >= 100;
+					const usedClass = isAtLimit ? 'text-danger fw-bold' : (isNearLimit ? 'text-warning' : 'text-muted');
+					const remainingClass = remaining === 0 ? 'text-danger fw-bold' : (remaining <= effectiveQuota * 0.2 ? 'text-warning' : 'text-success');
 
 					html += `
 						<tr>
@@ -356,8 +387,13 @@
 									placeholder="${round.default_company_quota}"
 									min="0">
 							</td>
-							<td>${used}</td>
-							<td>${remaining}</td>
+							<td>
+								<span class="${usedClass}">${used}</span>
+								${isAtLimit ? ' <span class="badge bg-danger">Full</span>' : ''}
+							</td>
+							<td>
+								<span class="${remainingClass}">${remaining}</span>
+							</td>
 							<td>
 								<button class="btn btn-sm btn-primary save-quota-btn" data-round-id="${round.id}">
 									<i class="ph-check"></i> Save

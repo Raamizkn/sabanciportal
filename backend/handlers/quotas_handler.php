@@ -18,7 +18,7 @@ if ($entity === 'quotas') {
             // Get specific company quota for a round
             try {
                 $stmt = $db->prepare("
-                    SELECT q.*, c.name as company_name, r.name as round_name
+                    SELECT q.*, c.name as company_name, r.name as round_name, r.default_company_quota
                     FROM company_round_quotas q
                     JOIN companies c ON q.company_id = c.id
                     JOIN application_rounds r ON q.round_id = r.id
@@ -28,13 +28,27 @@ if ($entity === 'quotas') {
                 $quota = $stmt->fetch(PDO::FETCH_ASSOC);
                 
                 if ($quota) {
+                    // Calculate used quota and add to response
+                    $used_quota = get_used_quota($company_id, $round_id);
+                    $effective_quota = get_effective_quota($company_id, $round_id);
+                    $quota['used_quota'] = $used_quota;
+                    $quota['effective_quota'] = $effective_quota;
+                    $quota['remaining_quota'] = max(0, $effective_quota - $used_quota);
                     echo json_encode($quota);
                 } else {
-                    // Return default quota from round
+                    // Return default quota from round with used quota
                     $stmt = $db->prepare("SELECT default_company_quota FROM application_rounds WHERE id = ?");
                     $stmt->execute([$round_id]);
                     $round = $stmt->fetch(PDO::FETCH_ASSOC);
-                    echo json_encode(['quota_override' => null, 'default_quota' => $round['default_company_quota'] ?? 10]);
+                    $default_quota = $round['default_company_quota'] ?? 10;
+                    $used_quota = get_used_quota($company_id, $round_id);
+                    echo json_encode([
+                        'quota_override' => null, 
+                        'default_quota' => $default_quota,
+                        'used_quota' => $used_quota,
+                        'effective_quota' => $default_quota,
+                        'remaining_quota' => max(0, $default_quota - $used_quota)
+                    ]);
                 }
             } catch (PDOException $e) {
                 http_response_code(500);
@@ -51,7 +65,7 @@ if ($entity === 'quotas') {
             
             try {
                 $stmt = $db->prepare("
-                    SELECT q.*, r.name as round_name, r.term_id, t.name as term_name
+                    SELECT q.*, r.name as round_name, r.term_id, r.default_company_quota, t.name as term_name
                     FROM company_round_quotas q
                     JOIN application_rounds r ON q.round_id = r.id
                     JOIN terms t ON r.term_id = t.id
@@ -60,6 +74,16 @@ if ($entity === 'quotas') {
                 ");
                 $stmt->execute([$company_id]);
                 $quotas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                // Add used quota, effective quota, and remaining quota for each quota
+                foreach ($quotas as &$quota) {
+                    $used_quota = get_used_quota($company_id, $quota['round_id']);
+                    $effective_quota = get_effective_quota($company_id, $quota['round_id']);
+                    $quota['used_quota'] = $used_quota;
+                    $quota['effective_quota'] = $effective_quota;
+                    $quota['remaining_quota'] = max(0, $effective_quota - $used_quota);
+                }
+                
                 echo json_encode($quotas);
             } catch (PDOException $e) {
                 http_response_code(500);
@@ -148,8 +172,20 @@ if ($entity === 'quotas') {
                     $stmt = $db->prepare("SELECT default_company_quota FROM application_rounds WHERE id = ?");
                     $stmt->execute([$round_id]);
                     $round = $stmt->fetch(PDO::FETCH_ASSOC);
-                    $quota_data = ['quota_override' => null, 'default_quota' => $round['default_company_quota'] ?? 10];
+                    $default_quota = $round['default_company_quota'] ?? 10;
+                    $quota_data = [
+                        'quota_override' => null, 
+                        'default_quota' => $default_quota,
+                        'effective_quota' => $default_quota
+                    ];
                 }
+                
+                // Add used quota and remaining quota
+                $used_quota = get_used_quota($company_id, $round_id);
+                $effective_quota = get_effective_quota($company_id, $round_id);
+                $quota_data['used_quota'] = $used_quota;
+                $quota_data['effective_quota'] = $effective_quota;
+                $quota_data['remaining_quota'] = max(0, $effective_quota - $used_quota);
                 
                 echo json_encode(['status' => 'success', 'message' => 'Quota updated', 'data' => $quota_data]);
             } catch (PDOException $e) {

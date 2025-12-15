@@ -434,6 +434,13 @@ class APIService {
     }
 
     /**
+     * Get student application limits for active round
+     */
+    async getStudentApplicationLimits(studentId) {
+        return this.request(`/index.php?entity=students&id=${studentId}&action=application_limits`);
+    }
+
+    /**
      * Confirm offer
      */
     async confirmOffer(applicationId) {

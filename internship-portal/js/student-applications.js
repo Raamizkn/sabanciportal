@@ -198,6 +198,14 @@ function addAdminNavigationBar() {
 }
 
 async function loadStudentApplications(studentId) {
+    // Load application limits
+    try {
+        const limits = await api.getStudentApplicationLimits(studentId);
+        updateApplicationLimitsDisplay(limits);
+    } catch (e) {
+        console.warn('Could not load application limits:', e);
+        hideApplicationLimitsDisplay();
+    }
     try {
         const applications = await api.getStudentApplications(studentId);
         allApplications = applications; // Store for filtering
@@ -474,5 +482,40 @@ function setCount(elementId, value) {
     const el = document.getElementById(elementId);
     if (el) {
         el.textContent = value;
+    }
+}
+
+function updateApplicationLimitsDisplay(limits) {
+    const alertElement = document.getElementById('applicationLimitAlert');
+    const textElement = document.getElementById('applicationLimitText');
+    
+    if (!alertElement || !textElement) return;
+    
+    if (!limits || !limits.active_round) {
+        alertElement.style.display = 'none';
+        return;
+    }
+    
+    const { active_count, remaining, limit_reached, active_round } = limits;
+    const max = active_round.max_applications;
+    
+    alertElement.style.display = 'flex';
+    
+    if (limit_reached) {
+        alertElement.className = 'alert alert-danger d-flex align-items-center mb-3';
+        textElement.innerHTML = `<strong>Application Limit Reached:</strong> You have ${active_count} active applications out of ${max} allowed for ${active_round.name}. Withdraw an application or wait for decisions to free up slots.`;
+    } else if (remaining <= 1) {
+        alertElement.className = 'alert alert-warning d-flex align-items-center mb-3';
+        textElement.innerHTML = `<strong>Application Limit:</strong> ${active_count} / ${max} applications used. Only ${remaining} slot${remaining === 1 ? '' : 's'} remaining for ${active_round.name}.`;
+    } else {
+        alertElement.className = 'alert alert-info d-flex align-items-center mb-3';
+        textElement.innerHTML = `<strong>Application Limit:</strong> ${active_count} / ${max} applications used. ${remaining} slots remaining for ${active_round.name}.`;
+    }
+}
+
+function hideApplicationLimitsDisplay() {
+    const alertElement = document.getElementById('applicationLimitAlert');
+    if (alertElement) {
+        alertElement.style.display = 'none';
     }
 }

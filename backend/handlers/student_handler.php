@@ -9,6 +9,7 @@
 
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../auth/auth.php';
+require_once __DIR__ . '/rounds_handler.php';
 
 /**
  * Shared database connection for this handler.
@@ -744,6 +745,53 @@ if (isset($entity) && $entity === 'students') {
                 echo json_encode(['error' => 'Resume not found']);
             } else {
                 echo json_encode($resume);
+            }
+        } elseif ($action === 'application_limits') {
+            try {
+                $db = student_db();
+                
+                // Get active round
+                $active_round = get_active_round();
+                
+                if (!$active_round) {
+                    // No active round - return null
+                    echo json_encode([
+                        'active_round' => null,
+                        'active_count' => 0,
+                        'remaining' => 0,
+                        'limit_reached' => false
+                    ]);
+                    exit;
+                }
+                
+                // Count active applications for this student in this round
+                $stmt = $db->prepare("
+                    SELECT COUNT(*) AS active_count
+                    FROM applications
+                    WHERE student_id = ?
+                      AND round_id = ?
+                      AND status NOT IN ('Rejected', 'Withdrawn', 'Approved_By_Company', 'Finalized')
+                ");
+                $stmt->execute([$target_student_id, $active_round['id']]);
+                $active_count = (int) $stmt->fetchColumn();
+                
+                $max_applications = (int) $active_round['max_applications_per_student'];
+                $remaining = max(0, $max_applications - $active_count);
+                $limit_reached = $active_count >= $max_applications;
+                
+                echo json_encode([
+                    'active_round' => [
+                        'id' => $active_round['id'],
+                        'name' => $active_round['name'],
+                        'max_applications' => $max_applications
+                    ],
+                    'active_count' => $active_count,
+                    'remaining' => $remaining,
+                    'limit_reached' => $limit_reached
+                ]);
+            } catch (PDOException $e) {
+                http_response_code(500);
+                echo json_encode(['error' => 'Failed to get application limits: ' . $e->getMessage()]);
             }
         } else {
             $profile = get_profile_info($target_student_id);

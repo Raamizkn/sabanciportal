@@ -88,11 +88,51 @@ Added methods:
 3. Admin can update round settings
 4. Multiple rounds can exist per term, but only one active at a time
 
+## Implementation Status
+
+### ✅ Completed
+
+1. **Backend Implementation:**
+   - ✅ Database schema (application_rounds, company_round_quotas tables)
+   - ✅ Quota enforcement in finalization flow
+   - ✅ Student application limit enforcement
+   - ✅ API endpoints for quota management
+   - ✅ API endpoint for student application limits
+
+2. **Frontend Implementation:**
+   - ✅ Company quotas page (`company-quotas.html`) with used quota display
+   - ✅ Student dashboard with application limit display
+   - ✅ Student applications page with limit alerts
+   - ✅ Internship detail page with limit checking
+
+### Active Application Definition
+
+**Active Applications** (count toward student limit):
+- Applications with status NOT IN: `Rejected`, `Withdrawn`, `Approved_By_Company`, `Finalized`
+- Includes: `Pending`, `Accepted`, `Confirmed_By_Student` (and any other non-terminal statuses)
+
+**Slot Restoration Behavior:**
+- **Rejected** → Slot freed (no longer counts toward limit)
+- **Withdrawn** → Slot freed (no longer counts toward limit)
+- **Finalized** → Slot consumed permanently (doesn't free up, but stops counting)
+
+This prevents students from confirming multiple offers and then choosing one, while allowing them to withdraw or be rejected to free up slots for new applications.
+
+### Company Quota Counting
+
+**Used Quota** counts applications with status IN:
+- `Approved_By_Company` (Finalized)
+- `Finalized`
+
+Both statuses represent finalized placements that consume company quota.
+
 ## Next Steps
 
-1. Run migration: `php backend/config/migrate_add_term_rounds_quotas.php`
-2. Create frontend pages (student history, admin rounds, company quotas)
-3. Test round activation/deactivation
-4. Test quota enforcement
-5. Test term filtering on student applications
+1. ✅ Run migration: `php backend/config/migrate_add_term_rounds_quotas.php`
+2. ✅ Create frontend pages (student history, admin rounds, company quotas)
+3. ✅ Test round activation/deactivation
+4. ✅ Test quota enforcement
+5. ✅ Test term filtering on student applications
+6. ✅ Display used quota for companies
+7. ✅ Display application limits for students
 

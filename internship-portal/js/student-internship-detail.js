@@ -166,9 +166,23 @@ async function loadInternship(internshipId) {
         if (studentId && (userRole === 'student' || isImpersonatedStudent)) {
             try {
                 const limits = await api.getStudentApplicationLimits(studentId);
-                if (limits && limits.active_limit_reached) {
-                    disableApplyButton();
-                    showDetailAlert(`Application limit reached (${limits.active_count}/3 active). Withdraw or wait for decisions to free slots.`, 'warning');
+                if (limits && limits.active_round) {
+                    const { active_count, remaining, limit_reached, active_round } = limits;
+                    const max = active_round.max_applications;
+                    
+                    if (limit_reached) {
+                        disableApplyButton();
+                        showDetailAlert(`Application limit reached: ${active_count} / ${max} applications used for ${active_round.name}. Withdraw or wait for decisions to free slots.`, 'warning');
+                    } else if (remaining <= 1) {
+                        showDetailAlert(`Application limit: ${active_count} / ${max} used. Only ${remaining} slot${remaining === 1 ? '' : 's'} remaining for ${active_round.name}.`, 'info');
+                    } else {
+                        // Show limit info but don't disable button
+                        const limitInfo = document.getElementById('applicationLimitInfo');
+                        if (limitInfo) {
+                            limitInfo.textContent = `${active_count} / ${max} applications used. ${remaining} remaining.`;
+                            limitInfo.style.display = 'block';
+                        }
+                    }
                 }
             } catch (e) {
                 console.warn('Could not check application limits', e);
