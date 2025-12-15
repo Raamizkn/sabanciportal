@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const impersonatedId = sessionStorage.getItem('impersonatedUser');
     const isImpersonatedStudent = impersonatedType === 'student' && impersonatedId;
     const isAdmin = storedRole === 'admin';
-    
+
     // When admin is impersonating a student, treat them as the student for application purposes
     const isActingAsStudent = storedRole === 'student' || isImpersonatedStudent;
     const isAdminViewOnly = isAdmin && !isImpersonatedStudent;

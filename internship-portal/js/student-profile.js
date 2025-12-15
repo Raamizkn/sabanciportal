@@ -36,25 +36,33 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Add admin navigation bar if accessed by admin
-    if (isAdmin && !isImpersonatingStudent) {
+    // Admin viewing mode (not impersonating)
+    const isAdminViewMode = isAdmin && !isImpersonatingStudent && urlStudentId;
+    
+    // Add admin navigation bar if accessed by admin (viewing, not impersonating)
+    if (isAdminViewMode) {
         addAdminNavigationBar();
+        disableEditing();
     }
 
     loadStudentProfile(targetStudentId);
-    setupResumeUpload();
+    
+    // Only setup resume upload if NOT in admin view mode
+    if (!isAdminViewMode) {
+        setupResumeUpload();
+    }
 });
 
 // Add admin navigation bar at the top of the page
 function addAdminNavigationBar() {
     const adminNav = document.createElement('div');
-    adminNav.className = 'alert alert-info mb-0 rounded-0 border-0';
-    adminNav.style.cssText = 'position: sticky; top: 0; z-index: 1030; background: #0d6efd !important; color: white;';
+    adminNav.id = 'admin-view-bar';
+    adminNav.style.cssText = 'position: sticky; top: 0; z-index: 1030; background: #0d6efd; color: white; padding: 10px 15px;';
     adminNav.innerHTML = `
         <div class="container-fluid d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center">
-                <i class="ph-arrow-left me-2" style="cursor: pointer;" onclick="window.history.back()"></i>
-                <span><strong>Admin View:</strong> Viewing student profile (Admin Mode)</span>
+                <i class="ph-eye me-2"></i>
+                <span><strong>Admin View:</strong> Viewing student profile (Read-Only)</span>
             </div>
             <div>
                 <a href="../admin/admin-students.html" class="btn btn-sm btn-light me-2">
@@ -67,6 +75,32 @@ function addAdminNavigationBar() {
         </div>
     `;
     document.body.insertBefore(adminNav, document.body.firstChild);
+}
+
+// Disable editing for admin view mode
+function disableEditing() {
+    // Hide edit profile button
+    const editButtons = document.querySelectorAll('[data-bs-target="#edit_profile"], .edit-btn');
+    editButtons.forEach(btn => {
+        btn.style.display = 'none';
+    });
+    
+    // Hide upload resume button
+    const uploadButton = document.getElementById('uploadResumeButton');
+    if (uploadButton) {
+        uploadButton.style.display = 'none';
+    }
+    
+    // Make inputs read-only after page loads
+    setTimeout(() => {
+        const formInputs = document.querySelectorAll('input, textarea, select');
+        formInputs.forEach(input => {
+            input.setAttribute('readonly', true);
+            input.setAttribute('disabled', true);
+            input.style.pointerEvents = 'none';
+            input.style.opacity = '0.7';
+        });
+    }, 500);
 }
 
 function attachLogoutHandlers() {

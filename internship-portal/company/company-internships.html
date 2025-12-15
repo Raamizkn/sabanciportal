@@ -664,6 +664,8 @@
 	<!-- /page content -->
 
 	<script>
+		let isAdminViewMode = false;
+		
 		document.addEventListener('DOMContentLoaded', function() {
 			// Check authentication
 			const userRole = localStorage.getItem('userRole');
@@ -676,17 +678,21 @@
 			const urlParams = new URLSearchParams(window.location.search);
 			const urlCompanyId = urlParams.get('id');
 			
-			// Determine which company ID to use
+			// Determine which company ID to use and if in admin view mode
 			let userId = null;
 			if (urlCompanyId) {
 				userId = urlCompanyId;
+				// Admin with URL ID but NOT impersonating this company = view mode
+				if (isAdmin && (!isBeingImpersonated || impersonatedId !== urlCompanyId)) {
+					isAdminViewMode = true;
+				}
 			} else if (isBeingImpersonated) {
 				userId = impersonatedId;
 			} else if (userRole === 'company') {
 				userId = storedUserId;
 			}
 			
-			if (!userId && userRole !== 'company' && !isBeingImpersonated) {
+			if (!userId) {
 				if (isAdmin) {
 					// Admin without company context - redirect to admin companies page
 					window.location.href = '../admin/admin-companies.html';
@@ -696,6 +702,12 @@
 					window.location.href = '../index.html';
 				});
 				return;
+			}
+			
+			// Add admin view bar if in admin view mode
+			if (isAdminViewMode) {
+				addAdminViewBar(urlCompanyId);
+				disableCompanyActions();
 			}
 
 			// Handle create/edit internship form submission
@@ -998,6 +1010,47 @@
 			if (submitBtn) {
 				submitBtn.textContent = 'Post Internship';
 			}
+		}
+		
+		// Add admin view bar at the top of the page
+		function addAdminViewBar(companyId) {
+			const adminNav = document.createElement('div');
+			adminNav.id = 'admin-view-bar';
+			adminNav.style.cssText = 'position: sticky; top: 0; z-index: 1030; background: #0d6efd; color: white; padding: 10px 15px;';
+			adminNav.innerHTML = `
+				<div class="container-fluid d-flex align-items-center justify-content-between flex-wrap gap-2">
+					<div class="d-flex align-items-center">
+						<i class="ph-eye me-2"></i>
+						<span><strong>Admin View:</strong> Viewing company internships (Read-Only)</span>
+					</div>
+					<div>
+						<a href="../admin/admin-companies.html" class="btn btn-sm btn-light me-2">
+							<i class="ph-arrow-left me-1"></i>Back to Companies
+						</a>
+						<a href="../admin/admin-dashboard.html" class="btn btn-sm btn-light">
+							<i class="ph-house me-1"></i>Admin Dashboard
+						</a>
+					</div>
+				</div>
+			`;
+			document.body.insertBefore(adminNav, document.body.firstChild);
+		}
+		
+		// Disable company actions for admin view mode
+		function disableCompanyActions() {
+			// Hide "Post New Internship" button
+			setTimeout(() => {
+				const postButton = document.querySelector('[data-bs-target="#new_internship_modal"]');
+				if (postButton) {
+					postButton.style.display = 'none';
+				}
+				
+				// Hide edit/delete buttons
+				const actionButtons = document.querySelectorAll('.edit-btn, .delete-btn, [onclick*="editInternship"]');
+				actionButtons.forEach(btn => {
+					btn.style.display = 'none';
+				});
+			}, 500);
 		}
 	</script>
 

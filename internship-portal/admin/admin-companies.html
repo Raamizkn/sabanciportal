@@ -409,21 +409,21 @@
 				if (response && response.status === 'success') {
 					// Get the user data from the response
 					const userData = response.impersonated_user;
-					
-					// Store impersonation data in session storage
+			
+			// Store impersonation data in session storage
 					sessionStorage.setItem('impersonatedUser', userData.id);
 					sessionStorage.setItem('impersonatedUserEmail', userData.email);
-					sessionStorage.setItem('impersonatedUserType', userType);
+			sessionStorage.setItem('impersonatedUserType', userType);
 					sessionStorage.setItem('impersonatedUserName', userData.name);
-					
-					// Update UI to show impersonation status
+			
+			// Update UI to show impersonation status
 					showImpersonationStatus(userData.id, userData.email, userType);
-					
-					// Redirect to appropriate dashboard based on user type
-					if (userType === 'student') {
-						window.location.href = '../student/student-dashboard.html';
-					} else if (userType === 'company') {
-						window.location.href = '../company/company-dashboard.html';
+			
+			// Redirect to appropriate dashboard based on user type
+			if (userType === 'student') {
+				window.location.href = '../student/student-dashboard.html';
+			} else if (userType === 'company') {
+				window.location.href = '../company/company-dashboard.html';
 					}
 				} else {
 					alert('Failed to start impersonation: ' + (response.error || 'Unknown error'));
@@ -598,14 +598,14 @@
 								// Store impersonation data in sessionStorage
 								sessionStorage.setItem('impersonatedUser', userData.id);
 								sessionStorage.setItem('impersonatedUserEmail', userData.email);
-								sessionStorage.setItem('impersonatedUserType', userType);
+						sessionStorage.setItem('impersonatedUserType', userType);
 								sessionStorage.setItem('impersonatedUserName', userData.name);
-								
+						
 								// Redirect to appropriate dashboard
 								if (userType === 'student') {
 									window.location.href = '../student/student-dashboard.html';
 								} else if (userType === 'company') {
-									window.location.href = '../company/company-dashboard.html';
+							window.location.href = '../company/company-dashboard.html';
 								}
 							} else {
 								alert('Failed to start impersonation: ' + (response.error || 'Unknown error'));

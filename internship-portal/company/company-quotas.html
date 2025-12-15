@@ -233,6 +233,8 @@
 		let allRounds = [];
 		let companyQuotas = {};
 
+		let isAdminViewMode = false;
+		
 		document.addEventListener('DOMContentLoaded', () => {
 			const userRole = localStorage.getItem('userRole');
 			const storedUserId = localStorage.getItem('userId');
@@ -244,9 +246,13 @@
 			const urlParams = new URLSearchParams(window.location.search);
 			const urlCompanyId = urlParams.get('id');
 			
-			// Determine which company ID to use
+			// Determine which company ID to use and admin view mode
 			if (urlCompanyId) {
 				currentCompanyId = urlCompanyId;
+				// Admin with URL ID but NOT impersonating this company = view mode
+				if (isAdmin && (!isBeingImpersonated || impersonatedId !== urlCompanyId)) {
+					isAdminViewMode = true;
+				}
 			} else if (isBeingImpersonated) {
 				currentCompanyId = impersonatedId;
 			} else if (userRole === 'company') {
@@ -264,8 +270,48 @@
 				return;
 			}
 
+			// Add admin view bar if in admin view mode
+			if (isAdminViewMode) {
+				addAdminViewBar();
+			}
+
 			loadRounds();
 		});
+		
+		// Add admin view bar at the top of the page
+		function addAdminViewBar() {
+			const adminNav = document.createElement('div');
+			adminNav.id = 'admin-view-bar';
+			adminNav.style.cssText = 'position: sticky; top: 0; z-index: 1030; background: #0d6efd; color: white; padding: 10px 15px;';
+			adminNav.innerHTML = `
+				<div class="container-fluid d-flex align-items-center justify-content-between flex-wrap gap-2">
+					<div class="d-flex align-items-center">
+						<i class="ph-eye me-2"></i>
+						<span><strong>Admin View:</strong> Viewing company quotas (Read-Only)</span>
+					</div>
+					<div>
+						<a href="../admin/admin-companies.html" class="btn btn-sm btn-light me-2">
+							<i class="ph-arrow-left me-1"></i>Back to Companies
+						</a>
+						<a href="../admin/admin-dashboard.html" class="btn btn-sm btn-light">
+							<i class="ph-house me-1"></i>Admin Dashboard
+						</a>
+					</div>
+				</div>
+			`;
+			document.body.insertBefore(adminNav, document.body.firstChild);
+			
+			// Disable quota editing for admin view
+			setTimeout(() => {
+				const editButtons = document.querySelectorAll('button, input[type="number"]');
+				editButtons.forEach(el => {
+					if (!el.closest('#admin-view-bar')) {
+						el.setAttribute('disabled', true);
+						el.style.opacity = '0.7';
+					}
+				});
+			}, 500);
+		}
 
 		async function loadRounds() {
 			try {
