@@ -8,12 +8,35 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check for impersonation first
     const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'company';
     const impersonatedUserId = sessionStorage.getItem('impersonatedUser');
+    const userRole = localStorage.getItem('userRole');
+    const isAdmin = userRole === 'admin';
     
-    // Use impersonated user ID if impersonating, otherwise use logged-in user
-    const companyId = isBeingImpersonated ? impersonatedUserId : localStorage.getItem('userId');
-    const companyName = isBeingImpersonated ? sessionStorage.getItem('impersonatedUserName') : localStorage.getItem('userName');
+    // Get company ID from URL parameter (for admin viewing)
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlCompanyId = urlParams.get('id');
+    
+    // Determine company ID: URL param > impersonated > stored (company only)
+    let companyId = null;
+    let companyName = null;
+    
+    if (urlCompanyId) {
+        companyId = urlCompanyId;
+        companyName = 'Company'; // Will be loaded from API
+    } else if (isBeingImpersonated) {
+        companyId = impersonatedUserId;
+        companyName = sessionStorage.getItem('impersonatedUserName');
+    } else if (userRole === 'company') {
+        companyId = localStorage.getItem('userId');
+        companyName = localStorage.getItem('userName');
+    }
 
-    if (!companyId || (localStorage.getItem('userRole') !== 'company' && !isBeingImpersonated)) {
+    // Access control
+    if (!companyId) {
+        if (isAdmin) {
+            // Admin without company context - redirect to admin dashboard
+            window.location.href = '../admin/admin-dashboard.html';
+            return;
+        }
         window.location.href = '../index.html';
         return;
     }

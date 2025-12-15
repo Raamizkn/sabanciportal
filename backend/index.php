@@ -198,9 +198,8 @@ elseif ($entity === 'admin') {
                 if ($id !== null) {
                     $response = get_application_details_admin($id);
                 } else {
-                    // Get all applications for admin
-                    global $applications;
-                    $response = array_values($applications);
+                    // Get all applications for admin from database
+                    $response = get_all_applications_admin();
                 }
             }
             break;
@@ -220,6 +219,19 @@ elseif ($entity === 'admin') {
                 $report_type = $_GET['type'] ?? $input['type'] ?? 'applications';
                 $params = $_GET['params'] ?? $input['params'] ?? [];
                 $response = generate_report($report_type, $params);
+            }
+            break;
+        
+        case 'evaluations':
+            if ($method === 'GET') {
+                if ($id !== null) {
+                    // Get specific evaluation details
+                    $type = $_GET['type'] ?? 'student';
+                    $response = get_evaluation_details_admin($id, $type);
+                } else {
+                    // Get all evaluations
+                    $response = get_all_evaluations_admin();
+                }
             }
             break;
         

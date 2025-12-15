@@ -6,7 +6,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>Applications - Sabancı University Internship Portal</title>
 
-	
 	<!-- Path Resolver - MUST be loaded first -->
 	<script src="../js/path-resolver.js"></script>
 
@@ -25,7 +24,6 @@
 	<!-- Theme JS files -->
 	<script src="../bs5/template/assets/js/vendor/tables/datatables/datatables.min.js"></script>
 	<script src="../bs5/template/html/layout_1/full/assets/js/app.js"></script>
-	<script src="../bs5/template/assets/demo/pages/datatables_basic.js"></script>
 	<!-- /theme JS files -->
 
 	<!-- Custom style for proper scrolling -->
@@ -70,7 +68,7 @@
 				<li class="nav-item nav-item-dropdown-lg dropdown">
 					<a href="#" class="navbar-nav-link navbar-nav-link-icon rounded-pill" data-bs-toggle="dropdown">
 						<i class="ph-bell"></i>
-						<span class="badge bg-yellow text-black position-absolute top-0 end-0 translate-middle-top zindex-1 rounded-pill mt-1 me-1">7</span>
+						<span class="badge bg-yellow text-black position-absolute top-0 end-0 translate-middle-top zindex-1 rounded-pill mt-1 me-1" id="notificationCount">0</span>
 					</a>
 					
 					<div class="dropdown-menu dropdown-menu-end dropdown-menu-scrollable-sm wmin-lg-350">
@@ -81,39 +79,6 @@
 								Mark all as read
 							</a>
 						</div>
-
-						<div class="dropdown-item d-flex py-2">
-							<div class="flex-shrink-0 me-3">
-								<div class="bg-primary bg-opacity-10 text-primary rounded-pill p-2">
-									<i class="ph-user-plus"></i>
-								</div>
-							</div>
-
-							<div class="flex-grow-1">
-								<a href="#" class="d-block fw-semibold">New company registered</a>
-								<span class="text-muted">ABC Technologies joined the program</span>
-							</div>
-							<div class="flex-shrink-0 align-self-center">
-								<span class="text-muted fs-sm">1 hour ago</span>
-							</div>
-						</div>
-
-						<div class="dropdown-item d-flex py-2">
-							<div class="flex-shrink-0 me-3">
-								<div class="bg-success bg-opacity-10 text-success rounded-pill p-2">
-									<i class="ph-check-circle"></i>
-								</div>
-							</div>
-
-							<div class="flex-grow-1">
-								<a href="#" class="d-block fw-semibold">Internship confirmed</a>
-								<span class="text-muted">John Doe confirmed Software Developer position</span>
-							</div>
-							<div class="flex-shrink-0 align-self-center">
-								<span class="text-muted fs-sm">2 hours ago</span>
-							</div>
-						</div>
-
 						<div class="text-center border-top p-2">
 							<a href="#" class="text-body">View all</a>
 						</div>
@@ -126,41 +91,22 @@
 							<img src="../bs5/template/assets/images/demo/users/face1.jpg" class="w-32px h-32px rounded-pill" alt="">
 							<span class="status-indicator bg-success"></span>
 						</div>
-						<span class="d-none d-lg-inline-block mx-lg-2">Admin User</span>
+						<span class="d-none d-lg-inline-block mx-lg-2" id="adminUserName">Admin User</span>
 					</a>
 
 					<div class="dropdown-menu dropdown-menu-end">
-						<a href="admin-profile.html" class="dropdown-item">
-							<i class="ph-user-circle me-2"></i>
-							My profile
-						</a>
 						<a href="admin-settings.html" class="dropdown-item">
 							<i class="ph-gear me-2"></i>
 							Account settings
 						</a>
 						<div class="dropdown-divider"></div>
-						<a href="../index.html" class="dropdown-item">
+						<a href="../index.html" class="dropdown-item logout-link">
 							<i class="ph-sign-out me-2"></i>
 							Logout
 						</a>
 					</div>
 				</li>
 			</ul>
-
-			<div class="navbar navbar-sm navbar-footer border-top">
-				<div class="container-fluid">
-					<span>&copy; 2023 <a href="#">Sabancı University Internship Portal</a></span>
-
-					<ul class="nav">
-						<li class="nav-item">
-							<a href="#" class="nav-link">
-								<i class="ph-sign-out"></i>
-								<span>Logout</span>
-							</a>
-						</li>
-					</ul>
-				</div>
-			</div>
 		</div>
 	</div>
 	<!-- /main navbar -->
@@ -269,7 +215,7 @@
 							</a>
 						</li>
 						<li class="nav-item">
-							<a href="../index.html" class="nav-link">
+							<a href="../index.html" class="nav-link logout-link">
 								<i class="ph-sign-out"></i>
 								<span>Logout</span>
 							</a>
@@ -291,127 +237,78 @@
 			<!-- Content area -->
 			<div class="content">
 
-                <!-- Page header -->
-                <div class="page-header">
-                    <div class="page-header-content d-lg-flex">
-                        <div class="d-flex">
-                            <h4 class="page-title mb-0">
-                                Applications <span class="fw-normal">Manage student internship applications</span>
-                            </h4>
-                        </div>
-                    </div>
-                </div>
-                <!-- /page header -->
+				<!-- Page header -->
+				<div class="page-header">
+					<div class="page-header-content d-lg-flex">
+						<div class="d-flex">
+							<h4 class="page-title mb-0">
+								Applications <span class="fw-normal">Manage student internship applications</span>
+							</h4>
+						</div>
+					</div>
+				</div>
+				<!-- /page header -->
+
+				<!-- Status Filter -->
+				<div class="card mb-3">
+					<div class="card-body py-2">
+						<div class="d-flex flex-wrap align-items-center gap-2">
+							<span class="fw-semibold me-2">Filter by Status:</span>
+							<button class="btn btn-sm btn-primary status-filter active" data-status="all">
+								All <span class="badge bg-light text-primary ms-1" id="count-all">0</span>
+							</button>
+							<button class="btn btn-sm btn-outline-warning status-filter" data-status="Pending">
+								Pending <span class="badge bg-warning text-dark ms-1" id="count-Pending">0</span>
+							</button>
+							<button class="btn btn-sm btn-outline-info status-filter" data-status="Under Review">
+								Under Review <span class="badge bg-info ms-1" id="count-Under Review">0</span>
+							</button>
+							<button class="btn btn-sm btn-outline-success status-filter" data-status="Approved_By_Company">
+								Approved by Company <span class="badge bg-success ms-1" id="count-Approved_By_Company">0</span>
+							</button>
+							<button class="btn btn-sm btn-outline-primary status-filter" data-status="Confirmed_By_Student">
+								Confirmed by Student <span class="badge bg-primary ms-1" id="count-Confirmed_By_Student">0</span>
+							</button>
+							<button class="btn btn-sm btn-outline-danger status-filter" data-status="Rejected">
+								Rejected <span class="badge bg-danger ms-1" id="count-Rejected">0</span>
+							</button>
+							<button class="btn btn-sm btn-outline-secondary status-filter" data-status="Withdrawn">
+								Withdrawn <span class="badge bg-secondary ms-1" id="count-Withdrawn">0</span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<!-- /status filter -->
 
 				<!-- Application list -->
 				<div class="card">
-					<div class="card-header">
+					<div class="card-header d-flex align-items-center">
 						<h5 class="mb-0">Internship Applications</h5>
+						<span class="badge bg-primary ms-2" id="applicationsCount">0</span>
 					</div>
 
-					<table class="table datatable-basic">
-						<thead>
-							<tr>
-								<th>#</th>
-								<th>Student Name</th>
-								<th>Internship Position</th>
-								<th>Company</th>
-								<th>Application Date</th>
-								<th>Status</th>
-								<th class="text-center">Actions</th>
-							</tr>
-						</thead>
-						<tbody id="applicationsTableBody">
-							<!-- Applications will be loaded dynamically -->
-						</tbody>
-								<td><span class="badge bg-warning bg-opacity-10 text-warning">Pending</span></td>
-								<td class="text-center">
-									<div class="dropdown">
-										<a href="#" class="text-body" data-bs-toggle="dropdown">
-											<i class="ph-list"></i>
-										</a>
-										<div class="dropdown-menu dropdown-menu-end">
-											<a href="#" class="dropdown-item">
-												<i class="ph-file-text me-2"></i>
-												View Application
-											</a>
-											<a href="admin-student-profile.html" class="dropdown-item">
-												<i class="ph-user me-2"></i>
-												View Student Profile
-											</a>
-											<a href="admin-company-profile.html" class="dropdown-item">
-												<i class="ph-buildings me-2"></i>
-												View Company Profile
-											</a>
-											<div class="dropdown-divider"></div>
-											<a href="#" class="dropdown-item">
-												<i class="ph-check-circle me-2"></i>
-												Mark as Approved
-											</a>
-											<a href="#" class="dropdown-item">
-												<i class="ph-x-circle me-2"></i>
-												Mark as Rejected
-											</a>
-										</div>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td>2</td>
-								<td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#" class="d-inline-flex align-items-center me-3">
-                                            <img src="../bs5/template/assets/images/demo/users/face2.jpg" width="32" height="32" class="rounded-pill" alt="">
-                                        </a>
-                                        <div>
-                                            <a href="admin-student-profile.html" class="text-body fw-semibold">Jane Smith</a>
-                                            <div class="text-muted fs-sm">jane.smith@university.edu</div>
-                                        </div>
-                                    </div>
-                                </td>
-								<td><a href="admin-internship-details.html">Marketing Intern</a></td>
-								<td>
-                                    <div class="d-flex align-items-center">
-                                        <a href="#" class="d-inline-block me-3">
-                                            <img src="../bs5/template/assets/images/brands/facebook.svg" class="rounded-circle" width="32" height="32" alt="">
-                                        </a>
-                                        <div>
-                                            <a href="admin-company-profile.html" class="text-body fw-semibold">ABC Technologies</a>
-                                        </div>
-                                    </div>
-                                </td>
-								<td>2025/03/10</td>
-								<td><span class="badge bg-success bg-opacity-10 text-success">Approved</span></td>
-								<td class="text-center">
-									<div class="dropdown">
-										<a href="#" class="text-body" data-bs-toggle="dropdown">
-											<i class="ph-list"></i>
-										</a>
-										<div class="dropdown-menu dropdown-menu-end">
-											<a href="#" class="dropdown-item">
-												<i class="ph-file-text me-2"></i>
-												View Application
-											</a>
-											<a href="admin-student-profile.html" class="dropdown-item">
-												<i class="ph-user me-2"></i>
-												View Student Profile
-											</a>
-											<a href="admin-company-profile.html" class="dropdown-item">
-												<i class="ph-buildings me-2"></i>
-												View Company Profile
-											</a>
-											<div class="dropdown-divider"></div>
-											<a href="#" class="dropdown-item">
-												<i class="ph-x-circle me-2"></i>
-												Mark as Rejected
-											</a>
-										</div>
-									</div>
-								</td>
-							</tr>
-							<!-- Add more application rows as needed -->
-						</tbody>
-					</table>
+					<div class="table-responsive">
+						<table class="table" id="applicationsTable">
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Student Name</th>
+									<th>Internship Position</th>
+									<th>Company</th>
+									<th>Application Date</th>
+									<th>Status</th>
+									<th class="text-center">Actions</th>
+								</tr>
+							</thead>
+							<tbody id="applicationsTableBody">
+								<tr>
+									<td colspan="7" class="text-center text-muted py-4">
+										<i class="ph-spinner ph-spin me-2"></i>Loading applications...
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 				</div>
 				<!-- /application list -->
 
@@ -424,9 +321,36 @@
 	</div>
 	<!-- /page content -->
 
+	<!-- View Application Modal -->
+	<div id="view_application_modal" class="modal fade" tabindex="-1">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Application Details</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<div id="applicationModalContent">
+						<div class="text-center py-4">
+							<i class="ph-spinner ph-spin me-2"></i>Loading...
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /view application modal -->
+
 	<!-- API Integration -->
 	<script src="../js/api.js"></script>
 	<script>
+		// Store applications data
+		let allApplications = [];
+		let currentStatusFilter = 'all';
+
 		document.addEventListener('DOMContentLoaded', async function() {
 			// Auth check
 			const userRole = localStorage.getItem('userRole');
@@ -436,108 +360,281 @@
 				return;
 			}
 
+			// Display admin name
+			const adminName = localStorage.getItem('userName');
+			if (adminName) {
+				document.getElementById('adminUserName').textContent = adminName;
+			}
+
+			// Setup logout handlers
+			document.querySelectorAll('.logout-link').forEach(link => {
+				link.addEventListener('click', () => {
+					localStorage.removeItem('userRole');
+					localStorage.removeItem('userId');
+					localStorage.removeItem('userName');
+				});
+			});
+
+			// Setup status filter buttons
+			document.querySelectorAll('.status-filter').forEach(btn => {
+				btn.addEventListener('click', function() {
+					document.querySelectorAll('.status-filter').forEach(b => {
+						b.classList.remove('active', 'btn-primary', 'btn-warning', 'btn-info', 'btn-success', 'btn-danger', 'btn-secondary');
+						b.classList.add('btn-outline-' + getStatusOutlineClass(b.dataset.status));
+					});
+					this.classList.remove('btn-outline-' + getStatusOutlineClass(this.dataset.status));
+					this.classList.add('active', 'btn-' + getStatusOutlineClass(this.dataset.status));
+					
+					currentStatusFilter = this.dataset.status;
+					renderApplicationsTable();
+				});
+			});
+
+			// Load applications
 			await loadApplications();
 		});
+
+		function getStatusOutlineClass(status) {
+			switch(status) {
+				case 'all': return 'primary';
+				case 'Pending': return 'warning';
+				case 'Under Review': return 'info';
+				case 'Approved_By_Company': return 'success';
+				case 'Confirmed_By_Student': return 'primary';
+				case 'Rejected': return 'danger';
+				case 'Withdrawn': return 'secondary';
+				default: return 'secondary';
+			}
+		}
 
 		async function loadApplications() {
 			try {
 				const applications = await api.getAllApplications();
+				
 				if (applications.error) {
 					console.error('Failed to load applications:', applications.error);
-					document.getElementById('applicationsTableBody').innerHTML = '<tr><td colspan="7" class="text-center text-muted">Failed to load applications</td></tr>';
+					document.getElementById('applicationsTableBody').innerHTML = `
+						<tr><td colspan="7" class="text-center text-danger py-4">
+							<i class="ph-warning me-2"></i>Failed to load applications: ${applications.error}
+						</td></tr>`;
 					return;
 				}
 
-				populateApplicationsTable(Array.isArray(applications) ? applications : []);
+				allApplications = Array.isArray(applications) ? applications : [];
+				updateStatusCounts();
+				renderApplicationsTable();
 			} catch (error) {
 				console.error('Error loading applications:', error);
-				document.getElementById('applicationsTableBody').innerHTML = '<tr><td colspan="7" class="text-center text-muted">Error loading applications</td></tr>';
+				document.getElementById('applicationsTableBody').innerHTML = `
+					<tr><td colspan="7" class="text-center text-danger py-4">
+						<i class="ph-warning me-2"></i>Error loading applications
+					</td></tr>`;
 			}
 		}
 
-		function populateApplicationsTable(applications) {
+		function updateStatusCounts() {
+			const counts = {
+				'all': allApplications.length,
+				'Pending': 0,
+				'Under Review': 0,
+				'Approved_By_Company': 0,
+				'Confirmed_By_Student': 0,
+				'Rejected': 0,
+				'Withdrawn': 0
+			};
+
+			allApplications.forEach(app => {
+				const status = app.status || 'Pending';
+				if (counts.hasOwnProperty(status)) {
+					counts[status]++;
+				}
+			});
+
+			// Update count badges
+			Object.keys(counts).forEach(status => {
+				const countEl = document.getElementById(`count-${status}`);
+				if (countEl) {
+					countEl.textContent = counts[status];
+				}
+			});
+
+			// Update notification badge with pending count
+			const pendingCount = counts['Pending'] + counts['Under Review'];
+			document.getElementById('notificationCount').textContent = pendingCount;
+		}
+
+		function renderApplicationsTable() {
 			const tbody = document.getElementById('applicationsTableBody');
-			if (!tbody) return;
+			
+			// Filter applications
+			let filtered = allApplications;
+			if (currentStatusFilter !== 'all') {
+				filtered = allApplications.filter(app => app.status === currentStatusFilter);
+			}
 
-			tbody.innerHTML = '';
+			document.getElementById('applicationsCount').textContent = filtered.length;
 
-			if (applications.length === 0) {
-				tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No applications found</td></tr>';
+			if (filtered.length === 0) {
+				tbody.innerHTML = `
+					<tr><td colspan="7" class="text-center text-muted py-4">
+						<i class="ph-note me-2"></i>No applications found
+					</td></tr>`;
 				return;
 			}
 
-			applications.forEach((app, index) => {
-				const row = document.createElement('tr');
+			tbody.innerHTML = filtered.map((app, index) => {
 				const studentPic = app.student_profile_pic || `../bs5/template/assets/images/demo/users/face${(index % 4) + 1}.jpg`;
-				const companyLogo = app.company_logo || '../bs5/template/assets/images/demo/logos/1.svg';
+				const companyLogo = app.company_logo || '../bs5/template/assets/images/brands/youtube.svg';
 				const statusBadge = getStatusBadge(app.status || 'Pending');
 				
-				// Extract IDs - handle both application_id (string) and id (number)
+				// Extract IDs
 				const applicationId = app.application_id || app.id;
 				const studentId = app.student_id;
 				const companyId = app.company_id || app.internship_company_id;
 				const internshipId = app.internship_id;
-				
-				row.innerHTML = `
-					<td>${index + 1}</td>
-					<td>
-						<div class="d-flex align-items-center">
-							<a href="#" class="d-inline-flex align-items-center me-3">
-								<img src="${studentPic}" width="32" height="32" class="rounded-pill" alt="" onerror="this.src='../bs5/template/assets/images/demo/users/face1.jpg'">
-							</a>
-							<div>
-								<a href="../student/student-profile.html?id=${studentId || ''}" class="text-body fw-semibold">${app.student_name || 'N/A'}</a>
-								<div class="text-muted fs-sm">${app.student_email || 'N/A'}</div>
+
+				return `
+					<tr>
+						<td>${index + 1}</td>
+						<td>
+							<div class="d-flex align-items-center">
+								<img src="${studentPic}" width="32" height="32" class="rounded-pill me-2" alt="" onerror="this.src='../bs5/template/assets/images/demo/users/face1.jpg'">
+								<div>
+									<a href="../student/student-profile.html?id=${studentId}" class="text-body fw-semibold">${app.student_name || 'N/A'}</a>
+									<div class="text-muted fs-sm">${app.student_email || ''}</div>
+								</div>
 							</div>
-						</div>
-					</td>
-					<td><a href="../student/student-internship-detail.html?id=${internshipId || ''}">${app.internship_position || app.position || 'N/A'}</a></td>
-					<td>
-						<div class="d-flex align-items-center">
-							<a href="#" class="d-inline-block me-3">
-								<img src="${companyLogo}" class="rounded-circle" width="32" height="32" alt="" onerror="this.src='../bs5/template/assets/images/demo/logos/1.svg'">
-							</a>
-							<div>
-								<a href="../company/company-profile.html?id=${companyId || ''}" class="text-body fw-semibold">${app.company_name || 'N/A'}</a>
+						</td>
+						<td>
+							<a href="../student/student-internship-detail.html?id=${internshipId}">${app.internship_position || app.position || 'N/A'}</a>
+						</td>
+						<td>
+							<div class="d-flex align-items-center">
+								<img src="${companyLogo}" class="rounded-circle me-2" width="32" height="32" alt="" onerror="this.src='../bs5/template/assets/images/brands/youtube.svg'">
+								<a href="../company/company-profile.html?id=${companyId}" class="text-body fw-semibold">${app.company_name || 'N/A'}</a>
 							</div>
-						</div>
-					</td>
-					<td>${app.created_at || app.applied_date ? new Date(app.created_at || app.applied_date).toLocaleDateString() : 'N/A'}</td>
-					<td>${statusBadge}</td>
-					<td class="text-center">
-						<div class="dropdown">
-							<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
-								<i class="ph-dots-three-vertical"></i>
-							</button>
-							<div class="dropdown-menu dropdown-menu-end">
-								<a href="admin-application-detail.html?id=${applicationId || ''}" class="dropdown-item"><i class="ph-eye me-2"></i>View Details</a>
-								<a href="../student/student-profile.html?id=${studentId || ''}" class="dropdown-item"><i class="ph-user me-2"></i>View Student</a>
-								<a href="../company/company-profile.html?id=${companyId || ''}" class="dropdown-item"><i class="ph-building me-2"></i>View Company</a>
+						</td>
+						<td>${app.created_at || app.applied_date ? new Date(app.created_at || app.applied_date).toLocaleDateString() : 'N/A'}</td>
+						<td>${statusBadge}</td>
+						<td class="text-center">
+							<div class="dropdown">
+								<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
+									<i class="ph-dots-three-vertical"></i>
+								</button>
+								<div class="dropdown-menu dropdown-menu-end">
+									<a href="#" class="dropdown-item" onclick="viewApplicationDetails('${applicationId}'); return false;">
+										<i class="ph-eye me-2"></i>View Application Details
+									</a>
+									<a href="../student/student-profile.html?id=${studentId}" class="dropdown-item">
+										<i class="ph-user me-2"></i>View Student Profile
+									</a>
+									<a href="../company/company-profile.html?id=${companyId}" class="dropdown-item">
+										<i class="ph-buildings me-2"></i>View Company Profile
+									</a>
+									<a href="../student/student-internship-detail.html?id=${internshipId}" class="dropdown-item">
+										<i class="ph-briefcase me-2"></i>View Internship
+									</a>
+								</div>
 							</div>
-						</div>
-					</td>
+						</td>
+					</tr>
 				`;
-				tbody.appendChild(row);
-			});
+			}).join('');
 		}
 
 		function getStatusBadge(status) {
-			let badgeClass = 'badge bg-secondary bg-opacity-20 text-secondary';
-			if (status === 'Finalized') {
-				badgeClass = 'badge bg-success bg-opacity-20 text-success';
-			} else if (status === 'Pending') {
-				badgeClass = 'badge bg-warning bg-opacity-20 text-warning';
-			} else if (status === 'Rejected') {
-				badgeClass = 'badge bg-danger bg-opacity-20 text-danger';
-			} else if (status === 'Accepted') {
-				badgeClass = 'badge bg-success bg-opacity-20 text-success';
-			} else if (status === 'Confirmed') {
-				badgeClass = 'badge bg-info bg-opacity-20 text-info';
-			} else if (status === 'Withdrawn') {
-				badgeClass = 'badge bg-secondary bg-opacity-20 text-secondary';
+			const statusMap = {
+				'Pending': { class: 'bg-warning bg-opacity-20 text-warning', label: 'Pending' },
+				'Under Review': { class: 'bg-info bg-opacity-20 text-info', label: 'Under Review' },
+				'Approved_By_Company': { class: 'bg-success bg-opacity-20 text-success', label: 'Approved by Company' },
+				'Confirmed_By_Student': { class: 'bg-primary bg-opacity-20 text-primary', label: 'Confirmed by Student' },
+				'Finalized': { class: 'bg-success bg-opacity-20 text-success', label: 'Finalized' },
+				'Rejected': { class: 'bg-danger bg-opacity-20 text-danger', label: 'Rejected' },
+				'Withdrawn': { class: 'bg-secondary bg-opacity-20 text-secondary', label: 'Withdrawn' }
+			};
+			
+			const statusInfo = statusMap[status] || { class: 'bg-secondary bg-opacity-20 text-secondary', label: status };
+			return `<span class="badge ${statusInfo.class}">${statusInfo.label}</span>`;
+		}
+
+		async function viewApplicationDetails(applicationId) {
+			const modal = new bootstrap.Modal(document.getElementById('view_application_modal'));
+			const contentDiv = document.getElementById('applicationModalContent');
+			
+			// Show loading
+			contentDiv.innerHTML = '<div class="text-center py-4"><i class="ph-spinner ph-spin me-2"></i>Loading...</div>';
+			modal.show();
+
+			try {
+				const response = await api.getApplicationDetails(applicationId);
+				
+				if (response.error) {
+					contentDiv.innerHTML = `<div class="alert alert-danger">${response.error}</div>`;
+					return;
+				}
+
+				const app = response;
+				const student = app.student || {};
+				const internship = app.internship || {};
+				const company = internship.company || {};
+				
+				contentDiv.innerHTML = `
+					<div class="row mb-4">
+						<div class="col-md-6">
+							<h6 class="fw-bold text-primary mb-3"><i class="ph-user me-2"></i>Student Information</h6>
+							<p class="mb-1"><strong>Name:</strong> ${student.name || app.student_name || 'N/A'}</p>
+							<p class="mb-1"><strong>Email:</strong> ${student.email || app.student_email || 'N/A'}</p>
+							<p class="mb-1"><strong>Student ID:</strong> ${student.student_id || 'N/A'}</p>
+							<p class="mb-1"><strong>Major:</strong> ${student.major || 'N/A'}</p>
+							<p class="mb-0"><strong>GPA:</strong> ${student.gpa || 'N/A'}</p>
+						</div>
+						<div class="col-md-6">
+							<h6 class="fw-bold text-primary mb-3"><i class="ph-buildings me-2"></i>Company & Internship</h6>
+							<p class="mb-1"><strong>Company:</strong> ${company.name || app.company_name || 'N/A'}</p>
+							<p class="mb-1"><strong>Position:</strong> ${internship.position || app.internship_position || 'N/A'}</p>
+							<p class="mb-1"><strong>Location:</strong> ${internship.location || 'N/A'}</p>
+							<p class="mb-0"><strong>Duration:</strong> ${internship.dates || 'N/A'}</p>
+						</div>
+					</div>
+
+					<hr>
+
+					<div class="row mb-4">
+						<div class="col-12">
+							<h6 class="fw-bold text-primary mb-3"><i class="ph-file-text me-2"></i>Application Details</h6>
+							<div class="row">
+								<div class="col-md-4">
+									<p class="mb-1"><strong>Application ID:</strong> ${app.application_id || app.id || 'N/A'}</p>
+								</div>
+								<div class="col-md-4">
+									<p class="mb-1"><strong>Applied Date:</strong> ${app.created_at || app.applied_date ? new Date(app.created_at || app.applied_date).toLocaleDateString() : 'N/A'}</p>
+								</div>
+								<div class="col-md-4">
+									<p class="mb-1"><strong>Status:</strong> ${getStatusBadge(app.status || 'Pending')}</p>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					${app.cover_letter ? `
+					<div class="mb-4">
+						<h6 class="fw-bold text-primary mb-3"><i class="ph-chat-text me-2"></i>Cover Letter</h6>
+						<div class="border rounded p-3 bg-light">
+							<p class="mb-0">${app.cover_letter}</p>
+						</div>
+					</div>
+					` : ''}
+
+					<div class="text-muted mt-3">
+						<small>Last Updated: ${app.status_updated_date ? new Date(app.status_updated_date).toLocaleString() : 'N/A'}</small>
+					</div>
+				`;
+			} catch (error) {
+				console.error('Error fetching application details:', error);
+				contentDiv.innerHTML = '<div class="alert alert-danger">Failed to load application details</div>';
 			}
-			return `<span class="${badgeClass}">${status || 'Pending'}</span>`;
 		}
 	</script>
+
 </body>
-</html> 
+</html>

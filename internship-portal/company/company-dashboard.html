@@ -430,8 +430,19 @@
 			console.log('Current userRole from localStorage:', userRole);
 			const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'company';
 			console.log('isBeingImpersonated:', isBeingImpersonated);
+			const isAdmin = userRole === 'admin';
 			
-			if (userRole !== 'company' && !isBeingImpersonated) {
+			// Get company ID from URL parameter (for admin viewing)
+			const urlParams = new URLSearchParams(window.location.search);
+			const urlCompanyId = urlParams.get('id');
+			
+			// Allow access if: company user, impersonated company, or admin with URL ID
+			if (userRole !== 'company' && !isBeingImpersonated && !urlCompanyId) {
+				if (isAdmin) {
+					console.log('Admin without company context - redirecting to admin dashboard.');
+					window.location.href = '../admin/admin-dashboard.html';
+					return;
+				}
 				console.warn('Access denied. User role is not \'company\' and not being impersonated. Redirecting...');
 				alert('Access denied. Redirecting to login page.');
 				window.location.href = '../index.html';

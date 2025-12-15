@@ -246,11 +246,11 @@ if ($entity === 'applications') {
             if (hasRole(ROLE_ADMIN)) {
                 // Admin can view any student's applications
             } else {
-                requireRole(ROLE_STUDENT);
-                if (getCurrentUserId() != $student_id_param) {
-                    http_response_code(403);
-                    echo json_encode(['error' => 'You are not authorized to view these applications.']);
-                    exit;
+            requireRole(ROLE_STUDENT);
+            if (getCurrentUserId() != $student_id_param) {
+                http_response_code(403);
+                echo json_encode(['error' => 'You are not authorized to view these applications.']);
+                exit;
                 }
             }
 
@@ -302,11 +302,11 @@ if ($entity === 'applications') {
             if (hasRole(ROLE_ADMIN)) {
                 // Admin can view any company's applications
             } else {
-                requireRole(ROLE_COMPANY);
-                if (getCurrentUserId() != $company_id_param) {
-                    http_response_code(403);
-                    echo json_encode(['error' => 'You are not authorized to view these applications.']);
-                    exit;
+            requireRole(ROLE_COMPANY);
+            if (getCurrentUserId() != $company_id_param) {
+                http_response_code(403);
+                echo json_encode(['error' => 'You are not authorized to view these applications.']);
+                exit;
                 }
             }
 
@@ -419,7 +419,7 @@ if ($entity === 'applications') {
             if (hasRole(ROLE_ADMIN) && isset($input['student_id'])) {
                 $student_id = $input['student_id'];
             } else {
-                $student_id = getCurrentUserId();
+            $student_id = getCurrentUserId();
             }
             
             // Expected input: {"internship_id": 1, "cover_letter": "My letter"}

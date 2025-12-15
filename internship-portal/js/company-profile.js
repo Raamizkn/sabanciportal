@@ -20,18 +20,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const urlCompanyId = urlParams.get('id');
 
-    // Allow access if: company user, impersonated company, admin, or viewing by URL ID
-    if (userRole !== 'company' && !isImpersonatedCompany && !isAdmin && !urlCompanyId) {
+    // Determine which company ID to use: URL param > impersonated > stored (company only)
+    let companyId = null;
+    
+    if (urlCompanyId) {
+        // URL parameter takes highest priority (admin or anyone viewing specific company)
+        companyId = urlCompanyId;
+    } else if (isImpersonatedCompany) {
+        // Impersonated company ID
+        companyId = impersonatedId;
+    } else if (userRole === 'company') {
+        // Logged in company user
+        companyId = storedCompanyId;
+    }
+
+    // Allow access if: company user, impersonated company, admin with URL ID, or viewing by URL ID
+    if (userRole !== 'company' && !isImpersonatedCompany && !companyId) {
+        if (isAdmin) {
+            // Admin without company context - show helpful message
+            showProfileAlert('Please select a company from the Companies page to view their profile.', 'info');
+            return;
+        }
         alert('Access denied. Redirecting to login page.');
         window.location.href = '../index.html';
         return;
     }
-
-    // Determine which company ID to use: URL param > impersonated > stored
-    let companyId = urlCompanyId || (userRole === 'company' ? storedCompanyId : impersonatedId);
     
     if (!companyId || companyId === 'undefined') {
-        showProfileAlert('Unable to determine company account. Please login again.', 'danger');
+        if (isAdmin) {
+            showProfileAlert('Please select a company from the Companies page to view their profile.', 'info');
+        } else {
+            showProfileAlert('Unable to determine company account. Please login again.', 'danger');
+        }
         return;
     }
 

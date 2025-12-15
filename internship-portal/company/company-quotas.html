@@ -235,10 +235,30 @@
 
 		document.addEventListener('DOMContentLoaded', () => {
 			const userRole = localStorage.getItem('userRole');
-			currentCompanyId = localStorage.getItem('userId') || sessionStorage.getItem('impersonatedUser');
+			const storedUserId = localStorage.getItem('userId');
 			const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'company';
+			const impersonatedId = sessionStorage.getItem('impersonatedUser');
+			const isAdmin = userRole === 'admin';
+			
+			// Get company ID from URL parameter (for admin viewing)
+			const urlParams = new URLSearchParams(window.location.search);
+			const urlCompanyId = urlParams.get('id');
+			
+			// Determine which company ID to use
+			if (urlCompanyId) {
+				currentCompanyId = urlCompanyId;
+			} else if (isBeingImpersonated) {
+				currentCompanyId = impersonatedId;
+			} else if (userRole === 'company') {
+				currentCompanyId = storedUserId;
+			}
 
-			if ((userRole !== 'company' && !isBeingImpersonated) || !currentCompanyId) {
+			if (!currentCompanyId) {
+				if (isAdmin) {
+					// Admin without company context - redirect to admin companies page
+					window.location.href = '../admin/admin-companies.html';
+					return;
+				}
 				alert('Access denied. Redirecting to login.');
 				window.location.href = '../index.html';
 				return;

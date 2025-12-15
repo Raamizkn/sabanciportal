@@ -667,13 +667,34 @@
 		document.addEventListener('DOMContentLoaded', function() {
 			// Check authentication
 			const userRole = localStorage.getItem('userRole');
-			const userId = localStorage.getItem('userId');
+			const storedUserId = localStorage.getItem('userId');
 			const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'company';
+			const impersonatedId = sessionStorage.getItem('impersonatedUser');
+			const isAdmin = userRole === 'admin';
 			
-			if (userRole !== 'company' && !isBeingImpersonated) {
-			showAlertModal('Access Denied', 'You must be logged in as a Company.', 'error', () => {
-				window.location.href = '../index.html';
-			});
+			// Get company ID from URL parameter (for admin viewing)
+			const urlParams = new URLSearchParams(window.location.search);
+			const urlCompanyId = urlParams.get('id');
+			
+			// Determine which company ID to use
+			let userId = null;
+			if (urlCompanyId) {
+				userId = urlCompanyId;
+			} else if (isBeingImpersonated) {
+				userId = impersonatedId;
+			} else if (userRole === 'company') {
+				userId = storedUserId;
+			}
+			
+			if (!userId && userRole !== 'company' && !isBeingImpersonated) {
+				if (isAdmin) {
+					// Admin without company context - redirect to admin companies page
+					window.location.href = '../admin/admin-companies.html';
+					return;
+				}
+				showAlertModal('Access Denied', 'You must be logged in as a Company.', 'error', () => {
+					window.location.href = '../index.html';
+				});
 				return;
 			}
 
@@ -745,13 +766,24 @@
 		});
 
 		async function loadCompanyInternships() {
-		try {
-			const userId = localStorage.getItem('userId') || sessionStorage.getItem('impersonatedUser');
-			const data = await api.getCompanyInternships(userId);
-			displayInternships(data);
-		} catch (error) {
-			console.error('Error loading internships:', error);
-		}
+			try {
+				// Determine company ID: URL param > impersonated > stored
+				const urlParams = new URLSearchParams(window.location.search);
+				const urlCompanyId = urlParams.get('id');
+				const impersonatedId = sessionStorage.getItem('impersonatedUser');
+				const storedId = localStorage.getItem('userId');
+				
+				const companyId = urlCompanyId || impersonatedId || storedId;
+				if (!companyId) {
+					console.error('No company ID available');
+					return;
+				}
+				
+				const data = await api.getCompanyInternships(companyId);
+				displayInternships(data);
+			} catch (error) {
+				console.error('Error loading internships:', error);
+			}
 		}
 
 		function displayInternships(internships) {
@@ -973,4 +1005,4 @@
 	<script src="../js/impersonation-banner.js"></script>
 
 </body>
-</html>
+</html> 

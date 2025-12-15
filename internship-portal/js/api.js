@@ -46,7 +46,7 @@ class APIService {
 
             const isFormData = options.body instanceof FormData;
             const headers = {};
-            
+
             // Only set headers if not FormData (browser will set Content-Type with boundary for FormData)
             if (!isFormData) {
                 headers['Content-Type'] = options.headers?.['Content-Type'] || 'application/json';
@@ -652,6 +652,22 @@ class APIService {
         return this.request('/index.php?entity=admin&action=end_impersonation', {
             method: 'POST'
         });
+    }
+
+    // ==================== ADMIN EVALUATION APIs ====================
+
+    /**
+     * Get all evaluations (admin)
+     */
+    async getAdminEvaluations() {
+        return this.request('/index.php?entity=admin&resource=evaluations');
+    }
+
+    /**
+     * Get evaluation details (admin)
+     */
+    async getAdminEvaluationDetails(evaluationId, type = 'student') {
+        return this.request(`/index.php?entity=admin&resource=evaluations&id=${evaluationId}&type=${type}`);
     }
 }
 

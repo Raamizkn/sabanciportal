@@ -339,37 +339,111 @@ function get_internship_applicants($internship_id) {
 }
 
 // --- Application Management (Admin) --- //
-function get_application_details_admin($application_id) {
-    global $applications, $students, $internships, $companies;
 
-    foreach ($applications as $application) {
-        if ($application['application_id'] == $application_id) {
-            // Find student details
-            foreach ($students as $student) {
-                if ($student['id'] == $application['student_id']) {
-                    $application['student'] = $student;
-                    break;
-                }
-            }
-
-            // Find internship and company details
-            foreach ($internships as $internship) {
-                if ($internship['id'] == $application['internship_id']) {
-                    // Find company details for the internship
-                    foreach ($companies as $company) {
-                        if ($company['name'] == $internship['company_name']) {
-                            $internship['company'] = $company;
-                            break;
-                        }
-                    }
-                    $application['internship'] = $internship;
-                    break;
-                }
-            }
-            return $application;
-        }
+function get_all_applications_admin() {
+    global $db;
+    requireRole(ROLE_ADMIN);
+    
+    try {
+        $stmt = $db->query("
+            SELECT 
+                a.id,
+                a.application_id,
+                a.student_id,
+                a.internship_id,
+                a.cover_letter,
+                a.status,
+                a.created_at,
+                a.status_updated_date,
+                s.name as student_name,
+                s.email as student_email,
+                s.profile_pic as student_profile_pic,
+                s.major as student_major,
+                i.position as internship_position,
+                i.company_id,
+                i.company_name,
+                i.location,
+                c.name as company_full_name,
+                c.logo as company_logo
+            FROM applications a
+            JOIN students s ON a.student_id = s.id
+            JOIN internships i ON a.internship_id = i.id
+            LEFT JOIN companies c ON i.company_id = c.id
+            ORDER BY a.created_at DESC
+        ");
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch(PDOException $e) {
+        error_log("Failed to fetch all applications: " . $e->getMessage());
+        return ['error' => 'Failed to fetch applications: ' . $e->getMessage()];
     }
-    return ['error' => 'Application not found.'];
+}
+
+function get_application_details_admin($application_id) {
+    global $db;
+    requireRole(ROLE_ADMIN);
+    
+    try {
+        $stmt = $db->prepare("
+            SELECT 
+                a.*,
+                s.name as student_name,
+                s.email as student_email,
+                s.student_id as student_number,
+                s.major as student_major,
+                s.gpa as student_gpa,
+                s.profile_pic as student_profile_pic,
+                i.position as internship_position,
+                i.company_id,
+                i.company_name,
+                i.location as internship_location,
+                i.dates as internship_dates,
+                i.description as internship_description,
+                c.name as company_full_name,
+                c.logo as company_logo,
+                c.industry as company_industry
+            FROM applications a
+            JOIN students s ON a.student_id = s.id
+            JOIN internships i ON a.internship_id = i.id
+            LEFT JOIN companies c ON i.company_id = c.id
+            WHERE a.application_id = ? OR a.id = ?
+        ");
+        $stmt->execute([$application_id, $application_id]);
+        $application = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$application) {
+            return ['error' => 'Application not found.'];
+        }
+        
+        // Structure the response with nested objects for frontend compatibility
+        $result = $application;
+        $result['student'] = [
+            'id' => $application['student_id'],
+            'name' => $application['student_name'],
+            'email' => $application['student_email'],
+            'student_id' => $application['student_number'],
+            'major' => $application['student_major'],
+            'gpa' => $application['student_gpa']
+        ];
+        $result['internship'] = [
+            'id' => $application['internship_id'],
+            'position' => $application['internship_position'],
+            'location' => $application['internship_location'],
+            'dates' => $application['internship_dates'],
+            'description' => $application['internship_description'],
+            'company' => [
+                'id' => $application['company_id'],
+                'name' => $application['company_full_name'] ?? $application['company_name'],
+                'logo' => $application['company_logo'],
+                'industry' => $application['company_industry']
+            ]
+        ];
+        
+        return $result;
+    } catch(PDOException $e) {
+        error_log("Failed to fetch application details: " . $e->getMessage());
+        return ['error' => 'Failed to fetch application details: ' . $e->getMessage()];
+    }
 }
 function approve_application($application_id) {
     global $applications;
@@ -521,8 +595,146 @@ function generate_report($report_type, $params) {
 }
 
 // --- Evaluations --- //
+
+function get_all_evaluations_admin() {
+    global $db;
+    requireRole(ROLE_ADMIN);
+    
+    try {
+        $evaluations = [];
+        
+        // Get student evaluations (student → company)
+        // Note: Using COALESCE to handle different possible column names
+        $stmt = $db->query("
+            SELECT 
+                se.evaluation_id,
+                se.student_id,
+                se.company_id,
+                se.overall_rating,
+                COALESCE(se.submitted_date, se.created_at) as date_submitted,
+                s.name as student_name,
+                s.email as student_email,
+                s.profile_pic as student_profile_pic,
+                c.name as company_name,
+                c.logo as company_logo,
+                i.position as internship_position,
+                'Student' as submitted_by,
+                'student_evaluation' as evaluation_type
+            FROM student_evaluations se
+            JOIN students s ON se.student_id = s.id
+            JOIN companies c ON se.company_id = c.id
+            JOIN applications a ON se.application_id = a.id
+            JOIN internships i ON a.internship_id = i.id
+            ORDER BY COALESCE(se.submitted_date, se.created_at) DESC
+        ");
+        $studentEvals = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($studentEvals as $eval) {
+            $evaluations[] = $eval;
+        }
+        
+        // Get company evaluations (company → student) if the table exists
+        try {
+            $stmt = $db->query("
+                SELECT 
+                    e.id as evaluation_id,
+                    e.student_id,
+                    e.company_id,
+                    e.overall_rating,
+                    COALESCE(e.submitted_at, e.created_at) as date_submitted,
+                    s.name as student_name,
+                    s.email as student_email,
+                    s.profile_pic as student_profile_pic,
+                    c.name as company_name,
+                    c.logo as company_logo,
+                    i.position as internship_position,
+                    'Company' as submitted_by,
+                    'company_evaluation' as evaluation_type
+                FROM evaluations e
+                JOIN students s ON e.student_id = s.id
+                JOIN companies c ON e.company_id = c.id
+                JOIN applications a ON e.application_id = a.id
+                JOIN internships i ON a.internship_id = i.id
+                ORDER BY COALESCE(e.submitted_at, e.created_at) DESC
+            ");
+            $companyEvals = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            foreach ($companyEvals as $eval) {
+                $evaluations[] = $eval;
+            }
+        } catch(PDOException $e) {
+            // Company evaluations table may not exist, that's OK
+            error_log("Note: evaluations table query failed: " . $e->getMessage());
+        }
+        
+        // Sort by date descending
+        usort($evaluations, function($a, $b) {
+            return strtotime($b['date_submitted'] ?? '1970-01-01') - strtotime($a['date_submitted'] ?? '1970-01-01');
+        });
+        
+        return ['status' => 'success', 'data' => $evaluations];
+    } catch(PDOException $e) {
+        error_log("Failed to fetch all evaluations: " . $e->getMessage());
+        return ['error' => 'Failed to fetch evaluations: ' . $e->getMessage()];
+    }
+}
+
+function get_evaluation_details_admin($evaluation_id, $type = 'student') {
+    global $db;
+    requireRole(ROLE_ADMIN);
+    
+    try {
+        if ($type === 'student' || $type === 'student_evaluation') {
+            $stmt = $db->prepare("
+                SELECT 
+                    se.*,
+                    s.name as student_name,
+                    s.email as student_email,
+                    c.name as company_name,
+                    i.position as internship_position,
+                    a.application_id
+                FROM student_evaluations se
+                JOIN students s ON se.student_id = s.id
+                JOIN companies c ON se.company_id = c.id
+                JOIN applications a ON se.application_id = a.id
+                JOIN internships i ON a.internship_id = i.id
+                WHERE se.evaluation_id = ?
+            ");
+            $stmt->execute([$evaluation_id]);
+        } else {
+            $stmt = $db->prepare("
+                SELECT 
+                    e.*,
+                    s.name as student_name,
+                    s.email as student_email,
+                    c.name as company_name,
+                    i.position as internship_position,
+                    a.application_id
+                FROM evaluations e
+                JOIN students s ON e.student_id = s.id
+                JOIN companies c ON e.company_id = c.id
+                JOIN applications a ON e.application_id = a.id
+                JOIN internships i ON a.internship_id = i.id
+                WHERE e.id = ?
+            ");
+            $stmt->execute([$evaluation_id]);
+        }
+        
+        $evaluation = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$evaluation) {
+            return ['error' => 'Evaluation not found'];
+        }
+        
+        return ['status' => 'success', 'data' => $evaluation];
+    } catch(PDOException $e) {
+        error_log("Failed to fetch evaluation details: " . $e->getMessage());
+        return ['error' => 'Failed to fetch evaluation details'];
+    }
+}
+
 function get_evaluation_profile($evaluation_id) {
-    // Mock implementation
+    // Legacy mock implementation - kept for backward compatibility
     $evaluation = [
         'evaluation_id' => $evaluation_id,
         'student_name' => 'John Doe',
