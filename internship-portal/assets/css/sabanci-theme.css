@@ -97,4 +97,267 @@ body {
 .navbar-brand img {
     max-height: 40px; /* Adjust as needed */
     width: auto;
+}
+
+/* --- Internship Cards --- */
+/* Make all internship cards uniform height and improve visual design */
+#internships-container.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+#internships-container > .col-xl-4,
+#internships-container > .col-md-6 {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin-bottom: 1.5rem;
+}
+
+#internships-container .col-xl-4 > .card,
+#internships-container .col-md-6 > .card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    background: #fff;
+}
+
+#internships-container .col-xl-4 > .card:hover,
+#internships-container .col-md-6 > .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    border-color: #0d6efd;
+}
+
+#internships-container .card .card-body {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 1.5rem;
+}
+
+#internships-container .card-body > .mb-3:last-of-type {
+    margin-bottom: 0 !important;
+}
+
+#internships-container .card-body .d-flex.mt-auto {
+    margin-top: auto;
+    padding-top: 1.25rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+/* Improve font visibility and typography */
+#internships-container .card h5 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.01em;
+}
+
+#internships-container .card .text-muted {
+    font-size: 0.875rem;
+    color: #6c757d !important;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+#internships-container .card p {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: #495057;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#internships-container .card ul.list-unstyled {
+    margin: 0;
+    padding: 0;
+}
+
+#internships-container .card ul.list-unstyled li {
+    font-size: 0.875rem;
+    color: #495057;
+    line-height: 1.8;
+    padding: 0.25rem 0;
+    display: flex;
+    align-items: center;
+}
+
+#internships-container .card ul.list-unstyled li i {
+    color: #6c757d;
+    margin-right: 0.5rem;
+    width: 18px;
+    text-align: center;
+}
+
+#internships-container .card .badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.4em 0.8em;
+    border-radius: 6px;
+    letter-spacing: 0.01em;
+}
+
+#internships-container .card .btn-primary {
+    font-weight: 600;
+    padding: 0.625rem 1.25rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);
+}
+
+#internships-container .card .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
+}
+
+/* Company logo styling */
+#internships-container .card img.rounded {
+    border-radius: 10px !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    border: 2px solid #f0f0f0;
+    transition: all 0.2s ease;
+}
+
+#internships-container .card:hover img.rounded {
+    border-color: #0d6efd;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+}
+
+/* Posted date styling */
+#internships-container .card .text-muted:last-child {
+    font-size: 0.8125rem;
+    color: #adb5bd !important;
+}
+
+/* Company internship cards - Improved styling */
+.company-internships-container .row,
+.company-internships-container > .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.company-internships-container .row > .col-xl-4,
+.company-internships-container .row > .col-md-6,
+.company-internships-container > .row > .col-xl-4,
+.company-internships-container > .row > .col-md-6 {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin-bottom: 1.5rem;
+}
+
+.company-internships-container .card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    background: #fff;
+}
+
+.company-internships-container .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    border-color: #0d6efd;
+}
+
+.company-internships-container .card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-bottom: 2px solid #f0f0f0;
+    padding: 1.25rem 1.5rem;
+}
+
+.company-internships-container .card-header h5 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.company-internships-container .card-body {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 1.5rem;
+}
+
+.company-internships-container .card-body .d-flex.mt-3 {
+    margin-top: auto;
+    padding-top: 1.25rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+.company-internships-container .card-body p {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: #495057;
+    margin-bottom: 1rem;
+}
+
+.company-internships-container .card-body .btn {
+    font-weight: 600;
+    padding: 0.625rem 1.25rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.company-internships-container .card-body .btn-outline-primary {
+    border-width: 2px;
+}
+
+.company-internships-container .card-body .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.company-internships-container .badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.4em 0.8em;
+    border-radius: 6px;
+}
+
+/* General row container for uniform card heights - Applied globally */
+.row > .col-xl-4 > .card,
+.row > .col-md-6 > .card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.row > .col-xl-4 > .card:hover,
+.row > .col-md-6 > .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    border-color: #0d6efd;
+}
+
+.row > .col-xl-4 > .card .card-body,
+.row > .col-md-6 > .card .card-body {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 } 

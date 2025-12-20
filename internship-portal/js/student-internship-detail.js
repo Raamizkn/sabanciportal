@@ -217,7 +217,6 @@ function populateInternshipDetails(data) {
     setText('overviewLocation', data.location || 'Not specified');
     setText('overviewSchedule', data.dates || 'TBD');
     setText('overviewDeadline', data.application_deadline || 'Not provided');
-    setText('overviewCompensation', data.salary || 'Not specified');
     setText('overviewType', data.type || 'Full-time');
     
     // Set seats left information
