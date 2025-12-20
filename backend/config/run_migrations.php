@@ -257,6 +257,27 @@ try {
         echo "   ⚠ application_rounds table does not exist yet.\n";
     }
     
+    // 7. Check and update logo column to TEXT (for base64 data URLs)
+    echo "\n7. Checking companies.logo column type...\n";
+    if (checkColumnExists($db, 'companies', 'logo')) {
+        // Check current column type
+        $stmt = $db->query("SHOW COLUMNS FROM companies WHERE Field = 'logo'");
+        $columnInfo = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($columnInfo && strpos($columnInfo['Type'], 'varchar') !== false) {
+            echo "   Updating logo column from VARCHAR to TEXT...\n";
+            if (runMigration($db, "ALTER TABLE companies MODIFY COLUMN logo TEXT", "Change logo column to TEXT")) {
+                $migrationsRun++;
+            } else {
+                $errors++;
+            }
+        } else {
+            echo "   ✓ Logo column is already TEXT or compatible type\n";
+            $migrationsSkipped++;
+        }
+    } else {
+        echo "   ⚠ Logo column does not exist\n";
+    }
+    
     // Summary
     echo "\n=== Migration Summary ===\n";
     echo "Migrations run: $migrationsRun\n";

@@ -66,7 +66,17 @@ if ($entity === 'companies') {
             $updates = [];
             $values = [];
 
+            // Handle logo upload if provided as base64 data URL
+            if (isset($input['logo']) && is_string($input['logo'])) {
+                // Store base64 data URL directly
+                // Note: Database column should be TEXT or MEDIUMTEXT to support base64 data URLs
+                // Base64 encoding increases size by ~33%, so a 2MB image becomes ~2.67MB of text
+                $updates[] = "logo = ?";
+                $values[] = $input['logo'];
+            }
+
             foreach ($allowed_fields as $field) {
+                if ($field === 'logo') continue; // Already handled above
                 if (isset($input[$field])) {
                     $updates[] = "$field = ?";
                     $values[] = $input[$field];

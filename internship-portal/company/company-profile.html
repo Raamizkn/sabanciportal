@@ -296,8 +296,10 @@
                                 <div class="fw-semibold mb-2" id="companySummaryName">Company Name</div>
                                 <div class="text-muted" id="companySummaryMeta">Industry · Location</div>
                                 <div class="d-inline-flex mt-3">
-                                    <a href="javascript:void(0);" role="button" class="btn btn-light border">Change logo</a>
+                                    <input type="file" id="companyLogoInput" accept="image/*" style="display: none;">
+                                    <button type="button" id="changeLogoBtn" class="btn btn-light border">Change logo</button>
                                 </div>
+                                <div id="logoUploadStatus" class="text-muted small mt-2" style="display: none;"></div>
                             </div>
                         </div>
 

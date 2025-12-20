@@ -71,6 +71,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 await saveCompanyProfile();
             });
         }
+
+        // Setup logo upload
+        const changeLogoBtn = document.getElementById('changeLogoBtn');
+        const logoInput = document.getElementById('companyLogoInput');
+        if (changeLogoBtn && logoInput) {
+            changeLogoBtn.addEventListener('click', () => {
+                logoInput.click();
+            });
+
+            logoInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    await uploadCompanyLogo(file);
+                }
+            });
+        }
     }
 });
 
@@ -243,4 +259,75 @@ function showProfileAlert(message, state = 'info') {
     alertEl.className = `alert alert-${state}`;
     alertEl.textContent = message;
     alertEl.classList.remove('d-none');
+}
+
+async function uploadCompanyLogo(file) {
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+        showProfileAlert('Please select an image file (JPG, PNG, etc.)', 'danger');
+        return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+        showProfileAlert('File size exceeds 2MB limit. Please choose a smaller image.', 'danger');
+        return;
+    }
+
+    const statusEl = document.getElementById('logoUploadStatus');
+    if (statusEl) {
+        statusEl.textContent = 'Uploading logo...';
+        statusEl.style.display = 'block';
+        statusEl.className = 'text-info small mt-2';
+    }
+
+    try {
+        // Convert image to base64
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const base64Data = e.target.result;
+            
+            try {
+                const response = await api.updateCompanyProfile({ logo: base64Data });
+                const company = response.company || response.data || response;
+                
+                // Update logo display
+                populateCompanyProfile(company);
+                
+                if (statusEl) {
+                    statusEl.textContent = 'Logo uploaded successfully!';
+                    statusEl.className = 'text-success small mt-2';
+                    setTimeout(() => {
+                        statusEl.style.display = 'none';
+                    }, 3000);
+                }
+                
+                showProfileAlert('Logo updated successfully.', 'success');
+                setTimeout(() => showProfileAlert(null), 3000);
+            } catch (error) {
+                console.error('Failed to upload logo:', error);
+                if (statusEl) {
+                    statusEl.textContent = 'Failed to upload logo. Please try again.';
+                    statusEl.className = 'text-danger small mt-2';
+                }
+                showProfileAlert(error.message || 'Failed to upload logo. Please try again.', 'danger');
+            }
+        };
+        
+        reader.onerror = () => {
+            if (statusEl) {
+                statusEl.textContent = 'Failed to read file. Please try again.';
+                statusEl.className = 'text-danger small mt-2';
+            }
+            showProfileAlert('Failed to read file. Please try again.', 'danger');
+        };
+        
+        reader.readAsDataURL(file);
+    } catch (error) {
+        console.error('Error uploading logo:', error);
+        if (statusEl) {
+            statusEl.style.display = 'none';
+        }
+        showProfileAlert('Failed to upload logo. Please try again.', 'danger');
+    }
 }
