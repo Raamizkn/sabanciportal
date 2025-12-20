@@ -5,13 +5,27 @@
  * Handles user login, session management, and role-based access control
  */
 
-// Configure session cookies to work across subdirectories
+// Configure session cookies to work across subdirectories with enhanced security
 if (session_status() === PHP_SESSION_NONE) {
     // Set cookie path to root so cookies work across all subdirectories
     ini_set('session.cookie_path', '/');
     // Use lax SameSite for better compatibility
     ini_set('session.cookie_samesite', 'Lax');
+    // Enhanced security: HTTP-only cookies prevent XSS attacks
+    ini_set('session.cookie_httponly', '1');
+    // Secure cookies in production (HTTPS only)
+    // Uncomment in production: ini_set('session.cookie_secure', '1');
+    // Regenerate session ID periodically to prevent session fixation
+    ini_set('session.use_strict_mode', '1');
     session_start();
+    
+    // Regenerate session ID every 30 minutes for security
+    if (!isset($_SESSION['last_regeneration'])) {
+        $_SESSION['last_regeneration'] = time();
+    } elseif (time() - $_SESSION['last_regeneration'] > 1800) {
+        session_regenerate_id(true);
+        $_SESSION['last_regeneration'] = time();
+    }
 }
 
 // User roles

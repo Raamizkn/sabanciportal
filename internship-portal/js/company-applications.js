@@ -271,7 +271,7 @@ function buildActionsCell(app, encodedApp) {
                 <i class="ph-dots-three-vertical"></i>
             </button>
             <div class="dropdown-menu dropdown-menu-end">
-                <a href="#" class="dropdown-item view-application" data-bs-toggle="modal" data-bs-target="#view_application_modal" data-application='${encodedApp}'>
+                <a href="#" class="dropdown-item view-application" data-application-id="${app.application_id || ''}">
                     <i class="ph-eye me-2"></i>View Application
                 </a>
                 <div class="dropdown-divider"></div>

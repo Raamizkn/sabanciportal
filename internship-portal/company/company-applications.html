@@ -496,82 +496,81 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Use event delegation for dynamically created dropdown items
     // Handle clicks on the link or any child elements (like icons)
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', async function(e) {
         // Check if click is on the link itself or any child element
         const viewLink = e.target.closest('.view-application');
         if (viewLink) {
             e.preventDefault();
             e.stopPropagation();
             console.log('View application clicked!', viewLink);
+            
+            // Get application_id from data attribute or encoded data
+            let applicationId = viewLink.getAttribute('data-application-id');
             const encodedApp = viewLink.getAttribute('data-application');
-            console.log('Encoded app data:', encodedApp ? 'Found' : 'Not found');
-            if (encodedApp) {
+            
+            // If no direct ID, try to extract from encoded data
+            if (!applicationId && encodedApp) {
                 try {
                     const app = JSON.parse(decodeURIComponent(encodedApp));
-                    console.log('Parsed application:', app);
-                    renderApplicationModal(app);
-                    // Use setTimeout to ensure modal content is rendered before showing
-                    setTimeout(() => {
-                        // Check if modal instance already exists
-                        let modalInstance = bootstrap.Modal.getInstance(viewApplicationModal);
-                        if (!modalInstance) {
-                            modalInstance = new bootstrap.Modal(viewApplicationModal);
-                        }
-                        modalInstance.show();
-                        
-                        // Ensure backdrop is cleaned up when modal is hidden
-                        viewApplicationModal.addEventListener('hidden.bs.modal', function cleanup() {
-                            // Remove any lingering backdrop
-                            const backdrop = document.querySelector('.modal-backdrop');
-                            if (backdrop) {
-                                backdrop.remove();
-                            }
-                            // Remove body classes that Bootstrap adds
-                            document.body.classList.remove('modal-open');
-                            document.body.style.overflow = '';
-                            document.body.style.paddingRight = '';
-                            // Remove this listener after first use
-                            viewApplicationModal.removeEventListener('hidden.bs.modal', cleanup);
-                        }, { once: true });
-                    }, 10);
-                } catch (error) {
-                    console.error('Error opening application modal:', error);
+                    applicationId = app.application_id;
+                } catch (e) {
+                    console.error('Failed to parse encoded app data:', e);
+                }
+            }
+            
+            if (!applicationId) {
+                console.error('No application_id found');
+                showAlertModal('Error', 'Application ID not found. Please try again.', 'error');
+                return false;
+            }
+            
+            // Show loading state
+            const modalBody = document.getElementById('applicationModalBody');
+            if (modalBody) {
+                modalBody.innerHTML = '<div class="text-center py-4"><i class="ph-spinner ph-spin me-2"></i>Loading application details...</div>';
+            }
+            
+            // Show modal immediately with loading state
+            let modalInstance = bootstrap.Modal.getInstance(viewApplicationModal);
+            if (!modalInstance) {
+                modalInstance = new bootstrap.Modal(viewApplicationModal);
+            }
+            modalInstance.show();
+            
+            try {
+                // Fetch fresh data from API
+                const app = await api.getApplicationDetails(applicationId);
+                console.log('Fetched application details:', app);
+                
+                if (app.error) {
+                    modalBody.innerHTML = `<div class="alert alert-danger">${app.error}</div>`;
+                    return false;
+                }
+                
+                // Render modal with fresh data
+                renderApplicationModal(app);
+            } catch (error) {
+                console.error('Error fetching application details:', error);
+                if (modalBody) {
+                    modalBody.innerHTML = `<div class="alert alert-danger">Failed to load application details: ${error.message || 'Unknown error'}</div>`;
+                } else {
                     showAlertModal('Error', 'Failed to load application details. Please try again.', 'error');
                 }
-            } else {
-                console.error('No data-application attribute found on:', viewLink);
             }
+            
             return false;
         }
     }, true); // Use capture phase to catch event before Bootstrap
     
-    // Also keep the Bootstrap modal event listener as backup
-    // This will fire if Bootstrap's data-bs-toggle handles the click
+    // Prevent Bootstrap from auto-handling the modal
+    // We handle it manually with async API call
     viewApplicationModal.addEventListener('show.bs.modal', function (event) {
-        console.log('Bootstrap modal show event fired');
+        // Prevent default Bootstrap behavior - we handle it manually
         const button = event.relatedTarget;
-        if (!button) {
-            console.log('No relatedTarget, checking if modal body is already populated...');
-            const modalBody = document.getElementById('applicationModalBody');
-            if (modalBody && modalBody.innerHTML.trim() && !modalBody.innerHTML.includes('Content will be populated')) {
-                console.log('Modal already populated, skipping');
-                return;
-            }
-            console.log('Modal not populated, but no relatedTarget found');
+        if (button && button.classList.contains('view-application')) {
+            // Modal will be populated by our click handler
+            // Just ensure we don't try to parse broken JSON
             return;
-        }
-        const encodedApp = button.getAttribute('data-application');
-        if (!encodedApp) {
-            console.log('No data-application attribute on relatedTarget');
-            return;
-        }
-        
-        try {
-            const app = JSON.parse(decodeURIComponent(encodedApp));
-            console.log('Bootstrap event: Parsed application:', app);
-            renderApplicationModal(app);
-        } catch (e) {
-            console.error('Error parsing application data:', e);
         }
     });
     

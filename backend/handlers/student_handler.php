@@ -172,9 +172,13 @@ function apply_for_internship($student_id, $internship_id, $cover_letter = '') {
             return ['error' => 'You have already applied for this internship'];
         }
 
+        // Sanitize cover letter HTML to prevent XSS
+        require_once __DIR__ . '/../config/security.php';
+        $cover_letter_sanitized = sanitize_cover_letter_html($cover_letter);
+        
         $application_id = generate_application_code();
         $stmt = $db->prepare("INSERT INTO applications (application_id, student_id, internship_id, status, cover_letter, applied_date) VALUES (?, ?, ?, 'Pending', ?, CURDATE())");
-        $stmt->execute([$application_id, $student_id, $internship_id, $cover_letter]);
+        $stmt->execute([$application_id, $student_id, $internship_id, $cover_letter_sanitized]);
 
         return [
             'status' => 'success',
@@ -187,7 +191,7 @@ function apply_for_internship($student_id, $internship_id, $cover_letter = '') {
                 'position' => $internship['position'],
                 'status' => 'Pending',
                 'applied_date' => date('Y-m-d'),
-                'cover_letter' => $cover_letter
+                'cover_letter' => $cover_letter_sanitized
             ]
         ];
     } catch (PDOException $e) {

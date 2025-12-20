@@ -446,13 +446,17 @@
 			let buttons = '';
 			const normalizedStatus = normalizeStatusForDetail(application.status);
 			
-			// Show confirm button if status is Accepted
-			if (normalizedStatus === 'Accepted') {
+			// Show confirm button ONLY if status is Accepted (not Finalized, Confirmed, etc.)
+			// Disable confirm for: Finalized, Confirmed, Rejected, Withdrawn
+			const finalStatuses = ['Finalized', 'Approved_By_Company', 'Confirmed', 'Confirmed_By_Student', 'Rejected', 'Withdrawn'];
+			if (normalizedStatus === 'Accepted' && !finalStatuses.includes(normalizedStatus)) {
 				buttons += `<button class="btn btn-success confirm-application-btn" data-application-id="${application.application_id}"><i class="ph-check-circle me-2"></i>Confirm Acceptance</button>`;
+			} else if (normalizedStatus === 'Finalized' || normalizedStatus === 'Approved_By_Company') {
+				// Show disabled button for finalized applications
+				buttons += `<button class="btn btn-success disabled" disabled title="Cannot confirm: Application already finalized"><i class="ph-check-circle me-2"></i>Confirm Acceptance</button>`;
 			}
 
 			// Allow withdrawal until finalized; block if rejected/finalized
-			const finalStatuses = ['Finalized', 'Approved_By_Company', 'Rejected'];
 			if (!finalStatuses.includes(normalizedStatus)) {
 				buttons += `<button class="btn btn-danger withdraw-btn mt-2" data-application-id="${application.application_id}"><i class="ph-x-circle me-2"></i>Withdraw Application</button>`;
 			}
@@ -469,6 +473,12 @@
 			const confirmBtn = document.querySelector('.confirm-application-btn');
 			if(confirmBtn) {
 				confirmBtn.addEventListener('click', async () => {
+				// Check if button is disabled
+				if (confirmBtn.classList.contains('disabled') || confirmBtn.hasAttribute('disabled')) {
+					const title = confirmBtn.getAttribute('title') || 'You cannot confirm this application.';
+					showAlertModal('Confirm Disabled', title, 'info');
+					return;
+				}
 				showConfirmModal(
 					'Confirm Acceptance',
 					'Confirm your acceptance of this internship offer? The company will then be able to finalize the placement.',

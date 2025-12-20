@@ -339,17 +339,27 @@ function getActionButtons(application) {
 
     const viewBtn = `<a href="student-application-detail.html?id=${appId}" class="btn btn-sm btn-icon btn-light view-button" data-bs-popup="tooltip" title="View Details"><i class="ph-eye"></i></a>`;
 
-    const confirmEnabled = status === 'Accepted';
+    // Confirm button should only be enabled for 'Accepted' status
+    // Disabled for: Finalized, Confirmed, Rejected, Withdrawn, and any other status
+    const finalStatuses = ['Finalized', 'Approved_By_Company', 'Confirmed', 'Confirmed_By_Student', 'Rejected', 'Withdrawn'];
+    const confirmEnabled = status === 'Accepted' && !finalStatuses.includes(status);
+    const confirmTitle = confirmEnabled 
+        ? 'Confirm Acceptance' 
+        : (status === 'Finalized' || status === 'Approved_By_Company' 
+            ? 'Cannot confirm: Application already finalized' 
+            : status === 'Confirmed' || status === 'Confirmed_By_Student'
+            ? 'Already confirmed'
+            : 'Confirm disabled');
+    
     const confirmBtn = `
         <button class="btn btn-sm btn-icon ${confirmEnabled ? 'btn-light confirm-application-btn' : 'btn-secondary disabled'} ms-1" 
             data-application-id="${appId}" 
             ${confirmEnabled ? '' : 'disabled'}
             data-bs-popup="tooltip" 
-            title="${confirmEnabled ? 'Confirm Acceptance' : 'Confirm disabled'}">
+            title="${confirmTitle}">
             <i class="ph-check-circle ${confirmEnabled ? 'text-success' : 'text-muted'}"></i>
         </button>`;
 
-    const finalStatuses = ['Finalized', 'Approved_By_Company', 'Rejected'];
     const withdrawEnabled = !finalStatuses.includes(status);
     const withdrawBtn = `
         <button class="btn btn-sm btn-icon ${withdrawEnabled ? 'btn-light withdraw-btn' : 'btn-secondary disabled'} ms-1" 
@@ -412,8 +422,10 @@ function addEventListeners() {
     document.querySelectorAll('.confirm-application-btn').forEach(button => {
         button.addEventListener('click', async (e) => {
             const appId = e.currentTarget.getAttribute('data-application-id');
-            if (e.currentTarget.classList.contains('disabled')) {
-                showAlertModal('Confirm Disabled', 'You cannot confirm this application. Either it is not accepted yet or you already have a confirmed/finalized placement.', 'info');
+            // Check if button is disabled
+            if (e.currentTarget.classList.contains('disabled') || e.currentTarget.hasAttribute('disabled')) {
+                const title = e.currentTarget.getAttribute('title') || 'You cannot confirm this application.';
+                showAlertModal('Confirm Disabled', title, 'info');
                 return;
             }
             showConfirmModal(
@@ -433,7 +445,9 @@ function addEventListeners() {
                                 loadStudentApplications(localStorage.getItem('userId'));
                             });
                         } catch (error) {
-                            showAlertModal('Error', 'An error occurred while confirming the application.', 'error');
+                            // Extract error message from error object
+                            const errorMessage = error.message || error.error || 'An error occurred while confirming the application.';
+                            showAlertModal('Error', errorMessage, 'error');
                         }
                     }
                 }

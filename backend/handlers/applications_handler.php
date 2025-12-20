@@ -7,6 +7,7 @@ global $applications, $internships, $method, $entity, $id, $action, $student_id_
 // Get database connection
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../auth/auth.php';
+require_once __DIR__ . '/../config/security.php';
 require_once __DIR__ . '/rounds_handler.php';
 require_once __DIR__ . '/quotas_handler.php';
 $db = getDB();
@@ -504,6 +505,9 @@ if ($entity === 'applications') {
 
                 $new_app_id = generate_application_code($db);
 
+                // Sanitize cover letter HTML to prevent XSS
+                $cover_letter = isset($input['cover_letter']) ? sanitize_cover_letter_html($input['cover_letter']) : '';
+
                 $stmt = $db->prepare("INSERT INTO applications (application_id, student_id, internship_id, term_id, round_id, status, cover_letter, applied_date) VALUES (?, ?, ?, ?, ?, 'Pending', ?, CURDATE())");
                 $stmt->execute([
                     $new_app_id, 
@@ -511,7 +515,7 @@ if ($entity === 'applications') {
                     $input['internship_id'], 
                     $current_term ? $current_term['id'] : null,
                     $active_round ? $active_round['id'] : null,
-                    $input['cover_letter'] ?? ''
+                    $cover_letter
                 ]);
                 $newPrimaryId = $db->lastInsertId();
 
@@ -532,7 +536,7 @@ if ($entity === 'applications') {
                     'position' => $internship['position'],
                     'status' => 'Pending',
                     'applied_date' => date('Y-m-d'),
-                    'cover_letter' => $input['cover_letter'] ?? ''
+                    'cover_letter' => $cover_letter
                 ];
 
                 http_response_code(201);
