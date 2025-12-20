@@ -7,6 +7,8 @@ global $internships, $method, $entity, $id, $action, $input;
 // Get database connection
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../auth/auth.php';
+require_once __DIR__ . '/quotas_handler.php';
+require_once __DIR__ . '/rounds_handler.php';
 $db = getDB();
 
 // Helper function to generate a new internship ID (mock)
@@ -43,6 +45,35 @@ function mapInternshipWithCompany($row) {
     unset($row['company_industry'], $row['company_website'], $row['company_phone'], $row['company_address'], $row['company_description'], $row['company_logo'], $row['live_company_name']);
     $row['company_name'] = $company['name'];
     $row['company'] = $company;
+    
+    // Add seats left information
+    try {
+        $active_round = get_active_round();
+        if ($active_round) {
+            $company_id = $row['company_id'];
+            $round_id = $active_round['id'];
+            $effective_quota = get_effective_quota($company_id, $round_id);
+            $used_quota = get_used_quota($company_id, $round_id);
+            $seats_left = max(0, $effective_quota - $used_quota);
+            
+            $row['seats_left'] = $seats_left;
+            $row['quota_total'] = $effective_quota;
+            $row['quota_used'] = $used_quota;
+            $row['is_full'] = ($seats_left === 0);
+        } else {
+            $row['seats_left'] = null;
+            $row['quota_total'] = null;
+            $row['quota_used'] = null;
+            $row['is_full'] = false;
+        }
+    } catch (Exception $e) {
+        // If quota calculation fails, set defaults
+        $row['seats_left'] = null;
+        $row['quota_total'] = null;
+        $row['quota_used'] = null;
+        $row['is_full'] = false;
+    }
+    
     return $row;
 }
 

@@ -141,6 +141,27 @@ elseif ($entity === 'rounds') {
 elseif ($entity === 'quotas') {
     require_once __DIR__ . '/handlers/quotas_handler.php';
 }
+elseif ($entity === 'terms') {
+    // Public endpoint for terms (students and companies can access)
+    require_once __DIR__ . '/config/database.php';
+    require_once __DIR__ . '/auth/auth.php';
+    $db = getDB();
+    
+    if ($method === 'GET') {
+        try {
+            $stmt = $db->query("SELECT * FROM terms ORDER BY start_date DESC");
+            $terms = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode($terms);
+        } catch (PDOException $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+        }
+    } else {
+        http_response_code(405);
+        echo json_encode(['error' => 'Method not allowed']);
+    }
+    exit;
+}
 elseif ($entity === 'admin') {
     require_once __DIR__ . '/handlers/admin_handler.php';
     

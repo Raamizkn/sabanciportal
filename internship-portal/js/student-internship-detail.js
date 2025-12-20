@@ -219,6 +219,20 @@ function populateInternshipDetails(data) {
     setText('overviewDeadline', data.application_deadline || 'Not provided');
     setText('overviewCompensation', data.salary || 'Not specified');
     setText('overviewType', data.type || 'Full-time');
+    
+    // Set seats left information
+    const seatsLeftEl = document.getElementById('overviewSeatsLeft');
+    if (seatsLeftEl) {
+        if (data.seats_left !== null && data.seats_left !== undefined) {
+            if (data.is_full) {
+                seatsLeftEl.innerHTML = '<span class="text-danger fw-semibold">Full - No seats available</span>';
+            } else {
+                seatsLeftEl.innerHTML = `<span class="text-success fw-semibold">${data.seats_left} seat${data.seats_left === 1 ? '' : 's'} left</span>`;
+            }
+        } else {
+            seatsLeftEl.innerHTML = '<span class="text-muted">Not available</span>';
+        }
+    }
 
     updateApplyModalHeading(data, company);
 }

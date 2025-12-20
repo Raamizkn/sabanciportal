@@ -210,10 +210,10 @@ class APIService {
     }
 
     /**
-     * Get all terms
+     * Get all terms (public endpoint - accessible by students and companies)
      */
     async getTerms() {
-        return this.request('/index.php?entity=admin&resource=terms');
+        return this.request('/index.php?entity=terms');
     }
 
     /**
@@ -554,10 +554,10 @@ class APIService {
     // ==================== TERMS & ROUNDS APIs ====================
 
     /**
-     * Get all terms
+     * Get all terms (public endpoint - accessible by students and companies)
      */
     async getTerms() {
-        return this.request('/index.php?entity=admin&resource=terms');
+        return this.request('/index.php?entity=terms');
     }
 
     /**

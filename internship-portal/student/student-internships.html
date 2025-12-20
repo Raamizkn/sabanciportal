@@ -242,6 +242,12 @@
 							</a>
 						</li>
 						<li class="nav-item">
+							<a href="student-application-history.html" class="nav-link">
+								<i class="ph-clock-counter-clockwise"></i>
+								<span>Application History</span>
+							</a>
+						</li>
+						<li class="nav-item">
 							<a href="student-documents.html" class="nav-link">
 								<i class="ph-file-doc"></i>
 								<span>Documents</span>
@@ -711,10 +717,19 @@
                                 <i class="ph-map-pin me-1"></i>
                                 ${internship.location || 'Not specified'}
                             </li>
-                            <li>
+                            <li class="mb-1">
                                 <i class="ph-calendar me-1"></i>
                                 ${internship.dates || 'Not specified'}
                             </li>
+                            ${internship.seats_left !== null && internship.seats_left !== undefined ? `
+                            <li>
+                                <i class="ph-users me-1"></i>
+                                ${internship.is_full ? 
+                                    '<span class="text-danger fw-semibold">Full - No seats available</span>' : 
+                                    `<span class="text-success fw-semibold">${internship.seats_left} seat${internship.seats_left === 1 ? '' : 's'} left</span>`
+                                }
+                            </li>
+                            ` : ''}
                         </ul>
 
                         ${internship.requirements ? `

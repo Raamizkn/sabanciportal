@@ -242,7 +242,7 @@
 		</div>
 	</div>
 
-	<script src="../js/api.js"></script>
+	<script src="../js/api.js?v=2"></script>
 	<script src="../js/modal-utils.js"></script>
 	<script>
 		let allTerms = [];
@@ -304,6 +304,11 @@
 		async function loadApplicationHistory() {
 			const studentId = localStorage.getItem('userId') || sessionStorage.getItem('impersonatedUser');
 			const tbody = document.getElementById('historyTableBody');
+			
+			if (!studentId) {
+				tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Student ID not found. Please log in again.</td></tr>';
+				return;
+			}
 			
 			try {
 				const applications = await api.getStudentApplications(studentId, currentTermId);
