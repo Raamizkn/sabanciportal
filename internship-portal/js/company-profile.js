@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Access denied. Redirecting to login page.');
             window.location.href = '../index.html';
         } else {
-            showProfileAlert('Unable to determine company account. Please login again.', 'danger');
+        showProfileAlert('Unable to determine company account. Please login again.', 'danger');
         }
         return;
     }
@@ -65,12 +65,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Only setup save button if NOT in admin view mode
     if (!isAdminViewMode) {
-        const saveButton = document.getElementById('saveCompanyProfile');
-        if (saveButton) {
-            saveButton.addEventListener('click', async () => {
-                await saveCompanyProfile();
-            });
-        }
+    const saveButton = document.getElementById('saveCompanyProfile');
+    if (saveButton) {
+        saveButton.addEventListener('click', async () => {
+            await saveCompanyProfile();
+        });
+    }
     }
 });
 
