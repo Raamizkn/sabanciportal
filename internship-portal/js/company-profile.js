@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Access denied. Redirecting to login page.');
             window.location.href = '../index.html';
         } else {
-            showProfileAlert('Unable to determine company account. Please login again.', 'danger');
+        showProfileAlert('Unable to determine company account. Please login again.', 'danger');
         }
         return;
     }

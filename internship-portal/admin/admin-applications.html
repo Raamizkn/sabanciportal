@@ -237,17 +237,17 @@
 			<!-- Content area -->
 			<div class="content">
 
-				<!-- Page header -->
-				<div class="page-header">
-					<div class="page-header-content d-lg-flex">
-						<div class="d-flex">
-							<h4 class="page-title mb-0">
-								Applications <span class="fw-normal">Manage student internship applications</span>
-							</h4>
-						</div>
-					</div>
-				</div>
-				<!-- /page header -->
+                <!-- Page header -->
+                <div class="page-header">
+                    <div class="page-header-content d-lg-flex">
+                        <div class="d-flex">
+                            <h4 class="page-title mb-0">
+                                Applications <span class="fw-normal">Manage student internship applications</span>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <!-- /page header -->
 
 				<!-- Status Filter -->
 				<div class="card mb-3">
@@ -289,25 +289,25 @@
 
 					<div class="table-responsive">
 						<table class="table" id="applicationsTable">
-							<thead>
-								<tr>
-									<th>#</th>
-									<th>Student Name</th>
-									<th>Internship Position</th>
-									<th>Company</th>
-									<th>Application Date</th>
-									<th>Status</th>
-									<th class="text-center">Actions</th>
-								</tr>
-							</thead>
-							<tbody id="applicationsTableBody">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Student Name</th>
+								<th>Internship Position</th>
+								<th>Company</th>
+								<th>Application Date</th>
+								<th>Status</th>
+								<th class="text-center">Actions</th>
+							</tr>
+						</thead>
+						<tbody id="applicationsTableBody">
 								<tr>
 									<td colspan="7" class="text-center text-muted py-4">
 										<i class="ph-spinner ph-spin me-2"></i>Loading applications...
-									</td>
-								</tr>
-							</tbody>
-						</table>
+								</td>
+							</tr>
+						</tbody>
+					</table>
 					</div>
 				</div>
 				<!-- /application list -->
@@ -492,14 +492,14 @@
 				const studentId = app.student_id;
 				const companyId = app.company_id || app.internship_company_id;
 				const internshipId = app.internship_id;
-
+				
 				return `
 					<tr>
-						<td>${index + 1}</td>
-						<td>
-							<div class="d-flex align-items-center">
+					<td>${index + 1}</td>
+					<td>
+						<div class="d-flex align-items-center">
 								<img src="${studentPic}" width="32" height="32" class="rounded-pill me-2" alt="" onerror="this.src='../bs5/template/assets/images/demo/users/face1.jpg'">
-								<div>
+							<div>
 									<a href="../student/student-profile.html?id=${studentId}" class="text-body fw-semibold">${app.student_name || 'N/A'}</a>
 									<div class="text-muted fs-sm">${app.student_email || ''}</div>
 								</div>
@@ -507,21 +507,21 @@
 						</td>
 						<td>
 							<a href="../student/student-internship-detail.html?id=${internshipId}">${app.internship_position || app.position || 'N/A'}</a>
-						</td>
-						<td>
-							<div class="d-flex align-items-center">
+					</td>
+					<td>
+						<div class="d-flex align-items-center">
 								<img src="${companyLogo}" class="rounded-circle me-2" width="32" height="32" alt="" onerror="this.src='../bs5/template/assets/images/brands/youtube.svg'">
 								<a href="../company/company-profile.html?id=${companyId}" class="text-body fw-semibold">${app.company_name || 'N/A'}</a>
-							</div>
-						</td>
-						<td>${app.created_at || app.applied_date ? new Date(app.created_at || app.applied_date).toLocaleDateString() : 'N/A'}</td>
-						<td>${statusBadge}</td>
-						<td class="text-center">
-							<div class="dropdown">
-								<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
-									<i class="ph-dots-three-vertical"></i>
-								</button>
-								<div class="dropdown-menu dropdown-menu-end">
+						</div>
+					</td>
+					<td>${app.created_at || app.applied_date ? new Date(app.created_at || app.applied_date).toLocaleDateString() : 'N/A'}</td>
+					<td>${statusBadge}</td>
+					<td class="text-center">
+						<div class="dropdown">
+							<button type="button" class="btn btn-outline-light btn-icon btn-sm text-body border-transparent rounded-pill" data-bs-toggle="dropdown">
+								<i class="ph-dots-three-vertical"></i>
+							</button>
+							<div class="dropdown-menu dropdown-menu-end">
 									<a href="#" class="dropdown-item" onclick="viewApplicationDetails('${applicationId}'); return false;">
 										<i class="ph-eye me-2"></i>View Application Details
 									</a>
@@ -535,8 +535,8 @@
 										<i class="ph-briefcase me-2"></i>View Internship
 									</a>
 								</div>
-							</div>
-						</td>
+						</div>
+					</td>
 					</tr>
 				`;
 			}).join('');
@@ -637,4 +637,4 @@
 	</script>
 
 </body>
-</html>
+</html> 

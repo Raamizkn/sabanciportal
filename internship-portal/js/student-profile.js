@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Only setup resume upload if NOT in admin view mode
     if (!isAdminViewMode) {
-        setupResumeUpload();
+    setupResumeUpload();
     }
 });
 
