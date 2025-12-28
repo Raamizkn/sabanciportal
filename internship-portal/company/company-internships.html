@@ -798,18 +798,38 @@
 		}
 		}
 
-		function displayInternships(internships) {
-			const container = document.querySelector('.row');
-			if (!container || !internships || internships.length === 0) return;
+	function displayInternships(internships) {
+		const container = document.querySelector('.row');
+		if (!container) return;
 
-			// Clear existing static content
-			container.innerHTML = '';
+		// Always clear existing static content (including hardcoded demo internships)
+		container.innerHTML = '';
 
-			internships.forEach(internship => {
-				const card = createInternshipCard(internship);
-				container.appendChild(card);
-			});
+		// If no internships, show empty state
+		if (!internships || internships.length === 0) {
+			container.innerHTML = `
+				<div class="col-12">
+					<div class="card">
+						<div class="card-body text-center py-5">
+							<i class="ph-briefcase fs-1 text-muted mb-3"></i>
+							<h5 class="mb-2">No internships yet</h5>
+							<p class="text-muted mb-4">You haven't posted any internship positions yet. Click "Post New Internship" to get started.</p>
+							<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#new_internship_modal">
+								<i class="ph-plus me-2"></i>Post New Internship
+							</button>
+						</div>
+					</div>
+				</div>
+			`;
+			return;
 		}
+
+		// Display actual internships from API
+		internships.forEach(internship => {
+			const card = createInternshipCard(internship);
+			container.appendChild(card);
+		});
+	}
 
 		function createInternshipCard(internship) {
 			const col = document.createElement('div');
