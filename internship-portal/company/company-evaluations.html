@@ -6,7 +6,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>Evaluations - Sabancı University Internship Portal</title>
 
-	
 	<!-- Path Resolver - MUST be loaded first -->
 	<script src="../js/path-resolver.js"></script>
 
@@ -24,8 +23,10 @@
 	<!-- Theme JS files -->
 	<script src="../bs5/template/assets/js/vendor/tables/datatables/datatables.min.js"></script>
 	<script src="../bs5/template/html/layout_1/full/assets/js/app.js"></script>
-	<script src="../bs5/template/assets/demo/pages/datatables_basic.js"></script>
 	<!-- /theme JS files -->
+
+	<!-- API Service -->
+	<script src="../js/api.js"></script>
 	
 	<!-- Custom style for proper scrolling -->
 	<style>
@@ -44,10 +45,39 @@
 			display: flex;
 			overflow: hidden;
 		}
+		/* Rating options below questions */
+		.rating-options {
+			display: flex;
+			gap: 1rem;
+			margin-top: 0.5rem;
+			padding: 0.75rem;
+			background: #f8f9fa;
+			border-radius: 0.375rem;
+		}
+		.rating-options .form-check {
+			margin: 0;
+		}
+		.rating-options .form-check-input:checked + .form-check-label {
+			color: #0d6efd;
+			font-weight: 600;
+		}
 	</style>
 </head>
 
 <body>
+
+	<!-- Impersonation alert placeholder -->
+	<div id="impersonation-banner" class="d-none position-relative w-100" style="z-index:1050;">
+		<div class="alert alert-warning alert-dismissible border-0 rounded-0 m-0 d-flex align-items-center">
+			<div class="flex-fill">
+				<i class="ph-user-switch me-2"></i>
+				<span class="fw-semibold">You are impersonating:</span> <span id="impersonated-user-banner">Company</span>
+			</div>
+			<div>
+				<button id="end-impersonation-banner" class="btn btn-warning btn-sm ms-3">End Impersonation</button>
+			</div>
+		</div>
+	</div>
 
 	<!-- Main navbar -->
 	<div class="navbar navbar-dark navbar-expand-lg navbar-static border-bottom border-bottom-white border-opacity-10">
@@ -81,38 +111,6 @@
 							</a>
 						</div>
 
-						<div class="dropdown-item d-flex py-2">
-							<div class="flex-shrink-0 me-3">
-								<div class="bg-success bg-opacity-10 text-success rounded-pill p-2">
-									<i class="ph-user-plus"></i>
-								</div>
-							</div>
-
-							<div class="flex-grow-1">
-								<a href="#" class="d-block fw-semibold">New application received</a>
-								<span class="text-muted">Marketing Intern position</span>
-							</div>
-							<div class="flex-shrink-0 align-self-center">
-								<span class="text-muted fs-sm">2 hours ago</span>
-							</div>
-						</div>
-
-						<div class="dropdown-item d-flex py-2">
-							<div class="flex-shrink-0 me-3">
-								<div class="bg-primary bg-opacity-10 text-primary rounded-pill p-2">
-									<i class="ph-check-circle"></i>
-								</div>
-							</div>
-
-							<div class="flex-grow-1">
-								<a href="#" class="d-block fw-semibold">Internship confirmed</a>
-								<span class="text-muted">John Doe confirmed Software Developer position</span>
-							</div>
-							<div class="flex-shrink-0 align-self-center">
-								<span class="text-muted fs-sm">1 day ago</span>
-							</div>
-						</div>
-
 						<div class="text-center border-top p-2">
 							<a href="#" class="text-body">View all</a>
 						</div>
@@ -122,10 +120,10 @@
 				<li class="nav-item nav-item-dropdown-lg dropdown ms-lg-2">
 					<a href="#" class="navbar-nav-link align-items-center rounded-pill p-1" data-bs-toggle="dropdown">
 						<div class="status-indicator-container">
-							<img src="../bs5/template/assets/images/demo/logos/2.svg" class="w-32px h-32px rounded-pill" alt="">
+							<img src="../bs5/template/assets/images/demo/logos/2.svg" class="w-32px h-32px rounded-pill" alt="" id="companyLogoNav">
 							<span class="status-indicator bg-success"></span>
 						</div>
-						<span class="d-none d-lg-inline-block mx-lg-2">XYZ Corporation</span>
+						<span class="d-none d-lg-inline-block mx-lg-2" id="companyNameNav">Company</span>
 					</a>
 
 					<div class="dropdown-menu dropdown-menu-end">
@@ -142,7 +140,7 @@
 							Applications
 						</a>
 						<div class="dropdown-divider"></div>
-						<a href="../index.html" class="dropdown-item">
+						<a href="../index.html" class="dropdown-item logout-link">
 							<i class="ph-sign-out me-2"></i>
 							Logout
 						</a>
@@ -206,7 +204,6 @@
 							<a href="company-applications.html" class="nav-link">
 								<i class="ph-users"></i>
 								<span>Applications</span>
-								<span class="badge bg-primary rounded-pill ms-auto">8</span>
 							</a>
 						</li>
 						<li class="nav-item">
@@ -234,7 +231,7 @@
 							</a>
 						</li>
 						<li class="nav-item">
-							<a href="../index.html" class="nav-link">
+							<a href="../index.html" class="nav-link logout-link">
 								<i class="ph-sign-out"></i>
 								<span>Logout</span>
 							</a>
@@ -253,450 +250,442 @@
 		<!-- Main content -->
 		<div class="content-wrapper" style="overflow-y: auto;">
 
+			<!-- Page header -->
+			<div class="page-header page-header-light shadow">
+				<div class="page-header-content d-flex justify-content-between align-items-center">
+					<div>
+						<h4 class="page-title mb-0">Student Evaluations</h4>
+						<span class="text-muted fs-sm">Evaluate students who completed internships at your company</span>
+					</div>
+					
+					<div>
+						<button type="button" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#evaluation_form">
+							<i class="ph-plus me-2"></i>
+							Submit New Evaluation
+						</button>
+					</div>
+				</div>
+
+				<div class="page-header-content border-top">
+					<div class="d-flex">
+						<div class="breadcrumb py-2">
+							<a href="company-dashboard.html" class="breadcrumb-item"><i class="ph-house"></i></a>
+							<span class="breadcrumb-item active">Evaluations</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /page header -->
+
 			<!-- Content area -->
 			<div class="content">
 
-                <!-- Page header -->
-                <div class="page-header">
-                    <div class="page-header-content d-lg-flex">
-                        <div class="d-flex">
-                            <h4 class="page-title mb-0">
-                                Evaluations <span class="fw-normal">Submit and view intern evaluations</span>
-                            </h4>
-                        </div>
-                    </div>
-                </div>
-                <!-- /page header -->
+				<!-- Evaluation form collapse -->
+				<div class="collapse mb-3" id="evaluation_form">
+					<div class="card">
+						<div class="card-header d-flex align-items-center">
+							<h5 class="mb-0">First Step to the Business World - Student Evaluation Form</h5>
+							<div class="ms-auto">
+								<button type="button" class="btn-close" data-bs-toggle="collapse" data-bs-target="#evaluation_form"></button>
+							</div>
+						</div>
 
-                <!-- Evaluation form and submitted evaluations -->
-                <div class="row">
-                    <!-- Evaluation Form -->
-                    <div class="col-lg-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Submit New Evaluation</h5>
-                            </div>
+						<div class="card-body">
+							<form id="company-evaluation-form">
+								<!-- Student Selection -->
+								<div class="alert alert-info border-0 alert-dismissible fade show mb-4">
+									<span class="fw-semibold">Before you start:</span> Please select the student you want to evaluate. Only students with completed internships can be evaluated.
+								</div>
+								
+								<div class="mb-4">
+									<label class="form-label fw-bold">Select Student to Evaluate *</label>
+									<select class="form-select" id="student-selector" required>
+										<option value="">-- Select a student --</option>
+									</select>
+									<div class="form-text">Choose from students who completed their internship at your company</div>
+								</div>
+								
+								<hr class="mb-4">
+								
+								<!-- Rating questions section -->
+								<div class="mb-4">
+									<h6 class="fw-bold mb-3">Program Experience Rating</h6>
+									<p class="text-muted small mb-3">Rate the following statements on a scale of 1 (Strongly Disagree) to 5 (Strongly Agree)</p>
+									
+									<!-- Question 1 -->
+									<div class="mb-4">
+										<label class="form-label">We were generally satisfied with the First Step to the Business World Program.*</label>
+										<div class="rating-options">
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction1" value="1" required>
+												<label class="form-check-label" for="satisfaction1">1</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction2" value="2">
+												<label class="form-check-label" for="satisfaction2">2</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction3" value="3">
+												<label class="form-check-label" for="satisfaction3">3</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction4" value="4">
+												<label class="form-check-label" for="satisfaction4">4</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction5" value="5">
+												<label class="form-check-label" for="satisfaction5">5</label>
+											</div>
+										</div>
+									</div>
 
-                            <div class="card-body">
-                                <form>
-                                    <div class="mb-3">
-                                        <label class="form-label">Select Intern:</label>
-                                        <select class="form-select">
-                                            <option value="">Select an intern</option>
-                                            <option value="john_doe">John Doe (Software Developer Intern)</option>
-                                            <option value="jane_smith">Jane Smith (Marketing Intern)</option>
-                                            <option value="robert_johnson">Robert Johnson (Data Analyst Intern) - Completed</option>
-                                        </select>
-                                    </div>
+									<!-- Question 2 -->
+									<div class="mb-4">
+										<label class="form-label">Students had a positive impact on our institution.*</label>
+										<div class="rating-options">
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="student_impact" id="impact1" value="1" required>
+												<label class="form-check-label" for="impact1">1</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="student_impact" id="impact2" value="2">
+												<label class="form-check-label" for="impact2">2</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="student_impact" id="impact3" value="3">
+												<label class="form-check-label" for="impact3">3</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="student_impact" id="impact4" value="4">
+												<label class="form-check-label" for="impact4">4</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="student_impact" id="impact5" value="5">
+												<label class="form-check-label" for="impact5">5</label>
+											</div>
+										</div>
+									</div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label">Evaluation Period:</label>
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="Start date" value="2025/06/01" readonly>
-                                            <span class="input-group-text">-</span>
-                                            <input type="text" class="form-control" placeholder="End date" value="2025/08/31" readonly>
-                                        </div>
-                                    </div>
+									<!-- Question 3 -->
+									<div class="mb-4">
+										<label class="form-label">Students' motivation and desire to learn were strong.*</label>
+										<div class="rating-options">
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="motivation" id="motivation1" value="1" required>
+												<label class="form-check-label" for="motivation1">1</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="motivation" id="motivation2" value="2">
+												<label class="form-check-label" for="motivation2">2</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="motivation" id="motivation3" value="3">
+												<label class="form-check-label" for="motivation3">3</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="motivation" id="motivation4" value="4">
+												<label class="form-check-label" for="motivation4">4</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="motivation" id="motivation5" value="5">
+												<label class="form-check-label" for="motivation5">5</label>
+											</div>
+										</div>
+									</div>
 
-                                    <!-- New evaluation questions -->
-                                    <div class="mb-3">
-                                        <label class="form-label">We were generally satisfied with the First Step to the Business World Program.*</label>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction1" value="1" required>
-                                            <label class="form-check-label" for="satisfaction1">1</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction2" value="2">
-                                            <label class="form-check-label" for="satisfaction2">2</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction3" value="3">
-                                            <label class="form-check-label" for="satisfaction3">3</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction4" value="4">
-                                            <label class="form-check-label" for="satisfaction4">4</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction5" value="5">
-                                            <label class="form-check-label" for="satisfaction5">5</label>
-                                        </div>
-                                    </div>
+									<!-- Question 4 -->
+									<div class="mb-4">
+										<label class="form-label">Students' verbal and written communication was strong.*</label>
+										<div class="rating-options">
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="communication" id="communication1" value="1" required>
+												<label class="form-check-label" for="communication1">1</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="communication" id="communication2" value="2">
+												<label class="form-check-label" for="communication2">2</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="communication" id="communication3" value="3">
+												<label class="form-check-label" for="communication3">3</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="communication" id="communication4" value="4">
+												<label class="form-check-label" for="communication4">4</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="communication" id="communication5" value="5">
+												<label class="form-check-label" for="communication5">5</label>
+											</div>
+										</div>
+									</div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label">Students had a positive impact on our institution.*</label>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="positive_impact" id="impact1" value="1" required>
-                                            <label class="form-check-label" for="impact1">1</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="positive_impact" id="impact2" value="2">
-                                            <label class="form-check-label" for="impact2">2</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="positive_impact" id="impact3" value="3">
-                                            <label class="form-check-label" for="impact3">3</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="positive_impact" id="impact4" value="4">
-                                            <label class="form-check-label" for="impact4">4</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="positive_impact" id="impact5" value="5">
-                                            <label class="form-check-label" for="impact5">5</label>
-                                        </div>
-                                    </div>
+									<!-- Question 5 -->
+									<div class="mb-4">
+										<label class="form-label">Students did the assigned work on time and completely.*</label>
+										<div class="rating-options">
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="timeliness" id="timeliness1" value="1" required>
+												<label class="form-check-label" for="timeliness1">1</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="timeliness" id="timeliness2" value="2">
+												<label class="form-check-label" for="timeliness2">2</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="timeliness" id="timeliness3" value="3">
+												<label class="form-check-label" for="timeliness3">3</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="timeliness" id="timeliness4" value="4">
+												<label class="form-check-label" for="timeliness4">4</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="timeliness" id="timeliness5" value="5">
+												<label class="form-check-label" for="timeliness5">5</label>
+											</div>
+										</div>
+									</div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label">Students' motivation and desire to learn were strong.*</label>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="motivation" id="motivation1" value="1" required>
-                                            <label class="form-check-label" for="motivation1">1</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="motivation" id="motivation2" value="2">
-                                            <label class="form-check-label" for="motivation2">2</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="motivation" id="motivation3" value="3">
-                                            <label class="form-check-label" for="motivation3">3</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="motivation" id="motivation4" value="4">
-                                            <label class="form-check-label" for="motivation4">4</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="motivation" id="motivation5" value="5">
-                                            <label class="form-check-label" for="motivation5">5</label>
-                                        </div>
-                                    </div>
+									<!-- Question 6 -->
+									<div class="mb-4">
+										<label class="form-label">Students' attitudes were positive in the difficulties they encountered.*</label>
+										<div class="rating-options">
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="positive_attitude" id="attitude1" value="1" required>
+												<label class="form-check-label" for="attitude1">1</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="positive_attitude" id="attitude2" value="2">
+												<label class="form-check-label" for="attitude2">2</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="positive_attitude" id="attitude3" value="3">
+												<label class="form-check-label" for="attitude3">3</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="positive_attitude" id="attitude4" value="4">
+												<label class="form-check-label" for="attitude4">4</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="positive_attitude" id="attitude5" value="5">
+												<label class="form-check-label" for="attitude5">5</label>
+											</div>
+										</div>
+									</div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label">Students' verbal and written communication was strong.*</label>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="communication" id="communication1" value="1" required>
-                                            <label class="form-check-label" for="communication1">1</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="communication" id="communication2" value="2">
-                                            <label class="form-check-label" for="communication2">2</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="communication" id="communication3" value="3">
-                                            <label class="form-check-label" for="communication3">3</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="communication" id="communication4" value="4">
-                                            <label class="form-check-label" for="communication4">4</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="communication" id="communication5" value="5">
-                                            <label class="form-check-label" for="communication5">5</label>
-                                        </div>
-                                    </div>
+									<!-- Question 7 -->
+									<div class="mb-4">
+										<label class="form-label">Students were good team players.*</label>
+										<div class="rating-options">
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="teamwork" id="teamwork1" value="1" required>
+												<label class="form-check-label" for="teamwork1">1</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="teamwork" id="teamwork2" value="2">
+												<label class="form-check-label" for="teamwork2">2</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="teamwork" id="teamwork3" value="3">
+												<label class="form-check-label" for="teamwork3">3</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="teamwork" id="teamwork4" value="4">
+												<label class="form-check-label" for="teamwork4">4</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="teamwork" id="teamwork5" value="5">
+												<label class="form-check-label" for="teamwork5">5</label>
+											</div>
+										</div>
+									</div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label">Students did the assigned work on time and completely.*</label>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="timeliness" id="timeliness1" value="1" required>
-                                            <label class="form-check-label" for="timeliness1">1</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="timeliness" id="timeliness2" value="2">
-                                            <label class="form-check-label" for="timeliness2">2</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="timeliness" id="timeliness3" value="3">
-                                            <label class="form-check-label" for="timeliness3">3</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="timeliness" id="timeliness4" value="4">
-                                            <label class="form-check-label" for="timeliness4">4</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="timeliness" id="timeliness5" value="5">
-                                            <label class="form-check-label" for="timeliness5">5</label>
-                                        </div>
-                                    </div>
+									<!-- Question 8 -->
+									<div class="mb-4">
+										<label class="form-label">Students easily adapted to the work culture.*</label>
+										<div class="rating-options">
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="adaptation" id="adaptation1" value="1" required>
+												<label class="form-check-label" for="adaptation1">1</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="adaptation" id="adaptation2" value="2">
+												<label class="form-check-label" for="adaptation2">2</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="adaptation" id="adaptation3" value="3">
+												<label class="form-check-label" for="adaptation3">3</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="adaptation" id="adaptation4" value="4">
+												<label class="form-check-label" for="adaptation4">4</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="adaptation" id="adaptation5" value="5">
+												<label class="form-check-label" for="adaptation5">5</label>
+											</div>
+										</div>
+									</div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label">Students' attitudes were positive in the difficulties they encountered.*</label>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="positive_attitude" id="attitude1" value="1" required>
-                                            <label class="form-check-label" for="attitude1">1</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="positive_attitude" id="attitude2" value="2">
-                                            <label class="form-check-label" for="attitude2">2</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="positive_attitude" id="attitude3" value="3">
-                                            <label class="form-check-label" for="attitude3">3</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="positive_attitude" id="attitude4" value="4">
-                                            <label class="form-check-label" for="attitude4">4</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="positive_attitude" id="attitude5" value="5">
-                                            <label class="form-check-label" for="attitude5">5</label>
-                                        </div>
-                                    </div>
+									<!-- Question 9 -->
+									<div class="mb-4">
+										<label class="form-label">Students' ability to use digital tools was strong.*</label>
+										<div class="rating-options">
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="digital_tools" id="digital1" value="1" required>
+												<label class="form-check-label" for="digital1">1</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="digital_tools" id="digital2" value="2">
+												<label class="form-check-label" for="digital2">2</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="digital_tools" id="digital3" value="3">
+												<label class="form-check-label" for="digital3">3</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="digital_tools" id="digital4" value="4">
+												<label class="form-check-label" for="digital4">4</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="digital_tools" id="digital5" value="5">
+												<label class="form-check-label" for="digital5">5</label>
+											</div>
+										</div>
+									</div>
+								</div>
+								
+								<!-- Yes/No questions -->
+								<div class="mb-4">
+									<h6 class="fw-bold mb-3">Program Feedback</h6>
+									
+									<div class="mb-4">
+										<label class="form-label">Would you like to participate in this program again?*</label>
+										<div class="rating-options">
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="participate_again" id="participate_yes" value="yes" required>
+												<label class="form-check-label" for="participate_yes">Yes</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="participate_again" id="participate_no" value="no">
+												<label class="form-check-label" for="participate_no">No</label>
+											</div>
+										</div>
+									</div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label">Students were good team players.*</label>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="teamwork" id="teamwork1" value="1" required>
-                                            <label class="form-check-label" for="teamwork1">1</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="teamwork" id="teamwork2" value="2">
-                                            <label class="form-check-label" for="teamwork2">2</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="teamwork" id="teamwork3" value="3">
-                                            <label class="form-check-label" for="teamwork3">3</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="teamwork" id="teamwork4" value="4">
-                                            <label class="form-check-label" for="teamwork4">4</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="teamwork" id="teamwork5" value="5">
-                                            <label class="form-check-label" for="teamwork5">5</label>
-                                        </div>
-                                    </div>
+									<div class="mb-4">
+										<label class="form-label">Would you recommend this program to other institutions?*</label>
+										<div class="rating-options">
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="recommend_program" id="recommend_yes" value="yes" required>
+												<label class="form-check-label" for="recommend_yes">Yes</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="recommend_program" id="recommend_no" value="no">
+												<label class="form-check-label" for="recommend_no">No</label>
+											</div>
+										</div>
+									</div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label">Students easily adapted to the work culture.*</label>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="adaptation" id="adaptation1" value="1" required>
-                                            <label class="form-check-label" for="adaptation1">1</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="adaptation" id="adaptation2" value="2">
-                                            <label class="form-check-label" for="adaptation2">2</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="adaptation" id="adaptation3" value="3">
-                                            <label class="form-check-label" for="adaptation3">3</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="adaptation" id="adaptation4" value="4">
-                                            <label class="form-check-label" for="adaptation4">4</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="adaptation" id="adaptation5" value="5">
-                                            <label class="form-check-label" for="adaptation5">5</label>
-                                        </div>
-                                    </div>
+									<div class="mb-4">
+										<label class="form-label">Would you consider the students for a long-term internship in the future?*</label>
+										<div class="rating-options">
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="future_internship" id="future_yes" value="yes" required>
+												<label class="form-check-label" for="future_yes">Yes</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="future_internship" id="future_no" value="no">
+												<label class="form-check-label" for="future_no">No</label>
+											</div>
+										</div>
+									</div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label">Students' ability to use digital tools was strong.*</label>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="digital_tools" id="digital1" value="1" required>
-                                            <label class="form-check-label" for="digital1">1</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="digital_tools" id="digital2" value="2">
-                                            <label class="form-check-label" for="digital2">2</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="digital_tools" id="digital3" value="3">
-                                            <label class="form-check-label" for="digital3">3</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="digital_tools" id="digital4" value="4">
-                                            <label class="form-check-label" for="digital4">4</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="digital_tools" id="digital5" value="5">
-                                            <label class="form-check-label" for="digital5">5</label>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Yes/No questions -->
-                                    <div class="mb-3">
-                                        <label class="form-label">Would you like to participate in this program again?*</label>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="participate_again" id="participate_yes" value="yes" required>
-                                            <label class="form-check-label" for="participate_yes">Yes</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="participate_again" id="participate_no" value="no">
-                                            <label class="form-check-label" for="participate_no">No</label>
-                                        </div>
-                                    </div>
+									<div class="mb-4">
+										<label class="form-label">Would you like to participate in our short interview to be published in GazeteSU about the First Step to the Business World Program?</label>
+										<div class="rating-options">
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="interview_interest" id="interview_yes" value="yes">
+												<label class="form-check-label" for="interview_yes">Yes</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="interview_interest" id="interview_no" value="no">
+												<label class="form-check-label" for="interview_no">No</label>
+											</div>
+										</div>
+									</div>
+								</div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label">Would you recommend this program to other institutions?*</label>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="recommend_program" id="recommend_yes" value="yes" required>
-                                            <label class="form-check-label" for="recommend_yes">Yes</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="recommend_program" id="recommend_no" value="no">
-                                            <label class="form-check-label" for="recommend_no">No</label>
-                                        </div>
-                                    </div>
+								<!-- Open-ended questions -->
+								<div class="mb-4">
+									<h6 class="fw-bold mb-3">Additional Feedback</h6>
+									
+									<div class="mb-3">
+										<label class="form-label">If you were to redesign this program, what would you do differently?</label>
+										<textarea rows="3" class="form-control" name="redesign_suggestions" placeholder="Your suggestions..."></textarea>
+									</div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label">Would you consider the students for a long-term internship in the future?*</label>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="future_internship" id="future_yes" value="yes" required>
-                                            <label class="form-check-label" for="future_yes">Yes</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="future_internship" id="future_no" value="no">
-                                            <label class="form-check-label" for="future_no">No</label>
-                                        </div>
-                                    </div>
+									<div class="mb-3">
+										<label class="form-label">Which of the following was the type of program?*</label>
+										<div class="mt-2">
+											<div class="form-check">
+												<input type="radio" class="form-check-input" name="program_type" id="type_rotation" value="rotation" required>
+												<label class="form-check-label" for="type_rotation">Rotation (student worked in multiple departments)</label>
+											</div>
+											<div class="form-check">
+												<input type="radio" class="form-check-input" name="program_type" id="type_project" value="project">
+												<label class="form-check-label" for="type_project">Project-based (student worked on specific projects)</label>
+											</div>
+											<div class="form-check">
+												<input type="radio" class="form-check-input" name="program_type" id="type_department" value="department">
+												<label class="form-check-label" for="type_department">Department-specific (student worked in a single department)</label>
+											</div>
+											<div class="form-check">
+												<input type="radio" class="form-check-input" name="program_type" id="type_hybrid" value="hybrid">
+												<label class="form-check-label" for="type_hybrid">Hybrid (combination of the above)</label>
+											</div>
+										</div>
+									</div>
+								</div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label">Would you like to participate in our short interview to be published in GazeteSU about the First Step to the Business World Program?</label>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="interview" id="interview_yes" value="yes">
-                                            <label class="form-check-label" for="interview_yes">Yes</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" class="form-check-input" name="interview" id="interview_no" value="no">
-                                            <label class="form-check-label" for="interview_no">No</label>
-                                        </div>
-                                    </div>
+								<div class="d-flex justify-content-end">
+									<button type="reset" class="btn btn-light me-2">Reset Form</button>
+									<button type="submit" class="btn btn-primary">Submit Evaluation</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+				<!-- /evaluation form collapse -->
 
-                                    <!-- Open-ended questions -->
-                                    <div class="mb-3">
-                                        <label class="form-label">If you were to redesign this program, what would you do differently?</label>
-                                        <textarea rows="3" class="form-control" name="redesign" placeholder="Your suggestions..."></textarea>
-                                    </div>
+				<!-- Previous evaluations -->
+				<div class="card">
+					<div class="card-header">
+						<h5 class="mb-0">My Evaluations</h5>
+					</div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label">Which of the following was the type of program?*</label>
-                                        <div class="form-check">
-                                            <input type="radio" class="form-check-input" name="program_type" id="type_rotation" value="rotation">
-                                            <label class="form-check-label" for="type_rotation">Rotation (student worked in multiple departments)</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input type="radio" class="form-check-input" name="program_type" id="type_project" value="project">
-                                            <label class="form-check-label" for="type_project">Project-based (student worked on specific projects)</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input type="radio" class="form-check-input" name="program_type" id="type_department" value="department">
-                                            <label class="form-check-label" for="type_department">Department-specific (student worked in a single department)</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input type="radio" class="form-check-input" name="program_type" id="type_hybrid" value="hybrid">
-                                            <label class="form-check-label" for="type_hybrid">Hybrid (combination of the above)</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="text-end">
-                                        <button type="reset" class="btn btn-light me-2">Reset Form</button>
-                                        <button type="submit" class="btn btn-primary">Submit Evaluation</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- /evaluation form -->
-
-                    <!-- Submitted Evaluations -->
-                    <div class="col-lg-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Submitted Evaluations</h5>
-                            </div>
-
-                            <div class="list-group list-group-flush border-top-0">
-                                <div class="list-group-item d-flex">
-                                    <div class="flex-fill">
-                                        <div class="fw-semibold">Robert Johnson (Data Analyst Intern)</div>
-                                        <span class="text-muted">Evaluation for period: 2025/01/10 - 2025/05/10</span>
-                                        <div>
-                                            <i class="ph-star fs-sm text-warning"></i>
-                                            <i class="ph-star fs-sm text-warning"></i>
-                                            <i class="ph-star fs-sm text-warning"></i>
-                                            <i class="ph-star fs-sm text-warning"></i>
-                                            <i class="ph-star fs-sm text-muted"></i>
-                                            <span class="ms-1">(4/5)</span>
-                                        </div>
-                                    </div>
-                                    <div class="ms-3">
-                                        <button type="button" class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#evaluation_details_modal">View Details</button>
-                                    </div>
-                                </div>
-
-                                <div class="list-group-item d-flex">
-                                    <div class="flex-fill">
-                                        <div class="fw-semibold">Sarah Lee (Project Manager Intern - Previous Term)</div>
-                                        <span class="text-muted">Evaluation for period: 2024/09/01 - 2024/12/15</span>
-                                        <div>
-                                            <i class="ph-star fs-sm text-warning"></i>
-                                            <i class="ph-star fs-sm text-warning"></i>
-                                            <i class="ph-star fs-sm text-warning"></i>
-                                            <i class="ph-star fs-sm text-warning"></i>
-                                            <i class="ph-star fs-sm text-warning"></i>
-                                            <span class="ms-1">(5/5)</span>
-                                        </div>
-                                    </div>
-                                    <div class="ms-3">
-                                        <button type="button" class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#evaluation_details_modal">View Details</button>
-                                    </div>
-                                </div>
-                                
-                                <!-- Add more submitted evaluations as needed -->
-                            </div>
-                        </div>
-                    </div>
-                    <!-- /submitted evaluations -->
-                </div>
-                <!-- /evaluation form and submitted evaluations -->
-
-                <!-- Evaluation details modal -->
-                <div id="evaluation_details_modal" class="modal fade" tabindex="-1">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Evaluation Details: Robert Johnson</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <strong>Intern:</strong> Robert Johnson (Data Analyst Intern)
-                                </div>
-                                <div class="mb-3">
-                                    <strong>Period:</strong> 2025/01/10 - 2025/05/10
-                                </div>
-                                <div class="mb-3">
-                                    <strong>Overall Performance:</strong> 
-                                    <i class="ph-star text-warning"></i>
-                                    <i class="ph-star text-warning"></i>
-                                    <i class="ph-star text-warning"></i>
-                                    <i class="ph-star text-warning"></i>
-                                    <i class="ph-star text-muted"></i> (4/5)
-                                </div>
-                                <div class="mb-3">
-                                    <strong>Strengths:</strong>
-                                    <p>Robert demonstrated strong analytical skills and attention to detail. He was quick to learn new tools and techniques, and consistently delivered high-quality work on time. He was proactive in seeking feedback and showed great initiative on his assigned projects.</p>
-                                </div>
-                                <div class="mb-3">
-                                    <strong>Areas for Improvement:</strong>
-                                    <p>While technically proficient, Robert could benefit from improving his presentation skills, particularly when explaining complex data findings to non-technical audiences. Encouraging him to participate more actively in team meetings could also help build his confidence in communication.</p>
-                                </div>
-                                <div class="mb-3">
-                                    <strong>Comments:</strong>
-                                    <p>Overall, Robert was a valuable asset to the team. He possesses a strong foundation in data analysis and a commendable work ethic. With further development in communication, he has the potential to excel in his field.</p>
-                                </div>
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- /evaluation details modal -->
+					<div class="table-responsive">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th>Student</th>
+									<th>Position</th>
+									<th>Overall Rating</th>
+									<th>Evaluation Date</th>
+									<th>Status</th>
+									<th class="text-center">Actions</th>
+								</tr>
+							</thead>
+							<tbody id="evaluationsTableBody">
+								<tr>
+									<td colspan="6" class="text-center text-muted">Loading evaluations...</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<!-- /previous evaluations -->
 
 			</div>
 			<!-- /content area -->
@@ -723,7 +712,342 @@
 	</div>
 	<!-- /page content -->
 
+	<!-- View evaluation modal -->
+	<div id="view_evaluation" class="modal fade" tabindex="-1">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Evaluation Details</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+
+				<div class="modal-body" id="evaluationModalBody">
+					<div class="text-center py-4">
+						<i class="ph-spinner ph-spin me-2"></i>Loading...
+					</div>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-link" data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /view evaluation modal -->
+
+	<!-- Main script -->
+	<script>
+		let companyId = null;
+		
+		document.addEventListener('DOMContentLoaded', async function() {
+			// Auth check
+			const userRole = localStorage.getItem('userRole');
+			const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'company';
+			
+			if (userRole !== 'company' && !isBeingImpersonated && userRole !== 'admin') {
+				alert('Access denied. Redirecting to login page.');
+				window.location.href = '../index.html';
+				return;
+			}
+			
+			// Determine company ID
+			if (isBeingImpersonated) {
+				companyId = sessionStorage.getItem('impersonatedUser');
+			} else {
+				companyId = localStorage.getItem('userId');
+			}
+			
+			if (!companyId) {
+				alert('Unable to determine company account. Please login again.');
+				window.location.href = '../index.html';
+				return;
+			}
+			
+			// Load company info
+			await loadCompanyInfo();
+			
+			// Load evaluable students for dropdown
+			await loadEvaluableStudents();
+			
+			// Load existing evaluations
+			await loadCompanyEvaluations();
+			
+			// Setup form submission
+			setupFormSubmission();
+			
+			// Setup logout handlers
+			document.querySelectorAll('.logout-link').forEach(link => {
+				link.addEventListener('click', () => {
+					localStorage.removeItem('userRole');
+					localStorage.removeItem('userId');
+				});
+			});
+		});
+		
+		async function loadCompanyInfo() {
+			try {
+				const response = await api.getCompanyProfile(companyId);
+				if (response.status === 'success' && response.company) {
+					document.getElementById('companyNameNav').textContent = response.company.name || 'Company';
+				}
+			} catch (error) {
+				console.error('Failed to load company info:', error);
+			}
+		}
+		
+		async function loadEvaluableStudents() {
+			try {
+				const response = await api.getEvaluableStudents(companyId);
+				const selector = document.getElementById('student-selector');
+				
+				if (response.error) {
+					selector.innerHTML = '<option value="">Error loading students</option>';
+					return;
+				}
+				
+				const students = response.data || [];
+				
+				if (students.length === 0) {
+					selector.innerHTML = '<option value="">No students with completed internships to evaluate</option>';
+					selector.disabled = true;
+					
+					// Show info message about needing completed internships
+					const alert = document.createElement('div');
+					alert.className = 'alert alert-info mt-2';
+					alert.innerHTML = '<i class="ph-info me-2"></i>You can only submit evaluations for students whose internships have been marked as <strong>Complete</strong>.';
+					selector.parentNode.appendChild(alert);
+					return;
+				}
+				
+				selector.innerHTML = '<option value="">-- Select a student --</option>';
+				students.forEach(student => {
+					const option = document.createElement('option');
+					option.value = student.application_id;
+					option.textContent = `${student.student_name} - ${student.position} (${student.status})`;
+					option.dataset.studentName = student.student_name;
+					option.dataset.studentEmail = student.student_email;
+					selector.appendChild(option);
+				});
+			} catch (error) {
+				console.error('Failed to load evaluable students:', error);
+			}
+		}
+		
+		async function loadCompanyEvaluations() {
+			try {
+				const response = await api.getCompanyEvaluations(companyId);
+				const tbody = document.getElementById('evaluationsTableBody');
+				
+				if (response.error) {
+					tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error: ${response.error}</td></tr>`;
+					return;
+				}
+				
+				const evaluations = response.data || [];
+				
+				if (evaluations.length === 0) {
+					tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No evaluations submitted yet.</td></tr>';
+					return;
+				}
+				
+				tbody.innerHTML = evaluations.map(eval => {
+					const rating = parseFloat(eval.overall_rating || 0).toFixed(1);
+					const date = eval.created_at ? new Date(eval.created_at).toLocaleDateString() : 'N/A';
+					
+					return `
+						<tr>
+							<td>
+								<div class="d-flex align-items-center">
+									<img src="${eval.profile_pic || '../bs5/template/assets/images/demo/users/face1.jpg'}" 
+										 class="w-32px h-32px rounded-pill me-2" alt="">
+									<div>
+										<div class="fw-semibold">${eval.student_name || 'Unknown'}</div>
+										<div class="text-muted fs-sm">${eval.student_email || ''}</div>
+									</div>
+								</div>
+							</td>
+							<td>${eval.position || 'N/A'}</td>
+							<td>
+								<div class="d-flex align-items-center">
+									<span class="me-2">${rating}</span>
+									<i class="ph-star-fill text-warning"></i>
+								</div>
+							</td>
+							<td>${date}</td>
+							<td><span class="badge bg-success">Submitted</span></td>
+							<td class="text-center">
+								<button type="button" class="btn btn-light btn-sm" onclick="viewEvaluationDetails('${eval.evaluation_id}')">
+									<i class="ph-eye me-1"></i> View
+								</button>
+							</td>
+						</tr>
+					`;
+				}).join('');
+			} catch (error) {
+				console.error('Failed to load evaluations:', error);
+				document.getElementById('evaluationsTableBody').innerHTML = 
+					'<tr><td colspan="6" class="text-center text-danger">Failed to load evaluations</td></tr>';
+			}
+		}
+		
+		function setupFormSubmission() {
+			const form = document.getElementById('company-evaluation-form');
+			form.addEventListener('submit', async function(e) {
+				e.preventDefault();
+				
+				const selector = document.getElementById('student-selector');
+				const applicationId = selector.value;
+				
+				if (!applicationId) {
+					alert('Please select a student to evaluate.');
+					selector.focus();
+					return;
+				}
+				
+				// Collect form data
+				const formData = new FormData(form);
+				const evaluationData = {
+					application_id: applicationId,
+					program_satisfaction: parseInt(formData.get('program_satisfaction')) || 0,
+					student_impact: parseInt(formData.get('student_impact')) || 0,
+					motivation: parseInt(formData.get('motivation')) || 0,
+					communication: parseInt(formData.get('communication')) || 0,
+					timeliness: parseInt(formData.get('timeliness')) || 0,
+					positive_attitude: parseInt(formData.get('positive_attitude')) || 0,
+					teamwork: parseInt(formData.get('teamwork')) || 0,
+					adaptation: parseInt(formData.get('adaptation')) || 0,
+					digital_tools: parseInt(formData.get('digital_tools')) || 0,
+					participate_again: formData.get('participate_again') || 'no',
+					recommend_program: formData.get('recommend_program') || 'no',
+					future_internship: formData.get('future_internship') || 'no',
+					interview_interest: formData.get('interview_interest') || 'no',
+					redesign_suggestions: formData.get('redesign_suggestions') || '',
+					program_type: formData.get('program_type') || ''
+				};
+				
+				try {
+					const response = await api.submitCompanyEvaluation(applicationId, evaluationData);
+					
+					if (response.status === 'success') {
+						alert('Evaluation submitted successfully!');
+						form.reset();
+						document.querySelector('[data-bs-target="#evaluation_form"]').click(); // Collapse form
+						location.reload(); // Refresh to show new evaluation
+					} else {
+						alert('Error: ' + (response.error || 'Failed to submit evaluation'));
+					}
+				} catch (error) {
+					console.error('Evaluation submission failed:', error);
+					alert('Failed to submit evaluation. Please try again.');
+				}
+			});
+		}
+		
+		async function viewEvaluationDetails(evaluationId) {
+			const modal = new bootstrap.Modal(document.getElementById('view_evaluation'));
+			const modalBody = document.getElementById('evaluationModalBody');
+			
+			modalBody.innerHTML = '<div class="text-center py-4"><i class="ph-spinner ph-spin me-2"></i>Loading...</div>';
+			modal.show();
+			
+			try {
+				const response = await api.getCompanyEvaluationDetails(evaluationId, companyId);
+				
+				if (response.error) {
+					modalBody.innerHTML = `<div class="alert alert-danger">${response.error}</div>`;
+					return;
+				}
+				
+				const eval = response.data;
+				
+				modalBody.innerHTML = `
+					<div class="mb-4">
+						<h6 class="fw-bold">${eval.student_name} - ${eval.position}</h6>
+						<p class="text-muted">Submitted on ${new Date(eval.created_at).toLocaleDateString()}</p>
+					</div>
+
+					<div class="mb-4">
+						<h6 class="fw-semibold">Program Experience Rating</h6>
+						<div class="table-responsive">
+							<table class="table table-bordered table-sm">
+								<tbody>
+									<tr>
+										<th width="70%">Program Satisfaction</th>
+										<td class="text-center">${eval.program_satisfaction || 0}/5</td>
+									</tr>
+									<tr>
+										<th>Student Impact</th>
+										<td class="text-center">${eval.student_impact || 0}/5</td>
+									</tr>
+									<tr>
+										<th>Motivation</th>
+										<td class="text-center">${eval.motivation || 0}/5</td>
+									</tr>
+									<tr>
+										<th>Communication</th>
+										<td class="text-center">${eval.communication || 0}/5</td>
+									</tr>
+									<tr>
+										<th>Timeliness</th>
+										<td class="text-center">${eval.timeliness || 0}/5</td>
+									</tr>
+									<tr>
+										<th>Positive Attitude</th>
+										<td class="text-center">${eval.positive_attitude || 0}/5</td>
+									</tr>
+									<tr>
+										<th>Teamwork</th>
+										<td class="text-center">${eval.teamwork || 0}/5</td>
+									</tr>
+									<tr>
+										<th>Adaptation</th>
+										<td class="text-center">${eval.adaptation || 0}/5</td>
+									</tr>
+									<tr>
+										<th>Digital Tools</th>
+										<td class="text-center">${eval.digital_tools || 0}/5</td>
+									</tr>
+									<tr class="table-primary">
+										<th>Overall Rating</th>
+										<td class="text-center fw-bold">${parseFloat(eval.overall_rating || 0).toFixed(1)}/5</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<div class="mb-4">
+						<h6 class="fw-semibold">Program Feedback</h6>
+						<ul class="list-unstyled">
+							<li><strong>Would participate again:</strong> ${eval.participate_again === 'yes' ? 'Yes' : 'No'}</li>
+							<li><strong>Would recommend program:</strong> ${eval.recommend_program === 'yes' ? 'Yes' : 'No'}</li>
+							<li><strong>Would consider for future internship:</strong> ${eval.future_internship === 'yes' ? 'Yes' : 'No'}</li>
+							<li><strong>Interview interest:</strong> ${eval.interview_interest === 'yes' ? 'Yes' : 'No'}</li>
+						</ul>
+					</div>
+
+					${eval.redesign_suggestions ? `
+					<div class="mb-3">
+						<h6 class="fw-semibold">Redesign Suggestions</h6>
+						<p>${eval.redesign_suggestions}</p>
+					</div>
+					` : ''}
+
+					${eval.program_type ? `
+					<div class="mb-3">
+						<h6 class="fw-semibold">Program Type</h6>
+						<p>${eval.program_type.charAt(0).toUpperCase() + eval.program_type.slice(1)}</p>
+					</div>
+					` : ''}
+				`;
+			} catch (error) {
+				console.error('Failed to load evaluation details:', error);
+				modalBody.innerHTML = '<div class="alert alert-danger">Failed to load evaluation details</div>';
+			}
+		}
+	</script>
+
 	<!-- Standardized Impersonation Banner -->
 	<script src="../js/impersonation-banner.js"></script>
 </body>
-</html> 
+</html>

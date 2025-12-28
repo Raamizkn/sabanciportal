@@ -637,7 +637,7 @@ function get_all_evaluations_admin() {
         try {
             $stmt = $db->query("
                 SELECT 
-                    e.id as evaluation_id,
+                    COALESCE(e.evaluation_id, e.id) as evaluation_id,
                     e.student_id,
                     e.company_id,
                     e.overall_rating,
@@ -685,6 +685,7 @@ function get_evaluation_details_admin($evaluation_id, $type = 'student') {
     
     try {
         if ($type === 'student' || $type === 'student_evaluation') {
+            // Student evaluations (student → company)
             $stmt = $db->prepare("
                 SELECT 
                     se.*,
@@ -702,6 +703,8 @@ function get_evaluation_details_admin($evaluation_id, $type = 'student') {
             ");
             $stmt->execute([$evaluation_id]);
         } else {
+            // Company evaluations (company → student)
+            // Try both evaluation_id and id columns
             $stmt = $db->prepare("
                 SELECT 
                     e.*,
@@ -715,9 +718,9 @@ function get_evaluation_details_admin($evaluation_id, $type = 'student') {
                 JOIN companies c ON e.company_id = c.id
                 JOIN applications a ON e.application_id = a.id
                 JOIN internships i ON a.internship_id = i.id
-                WHERE e.id = ?
+                WHERE e.evaluation_id = ? OR e.id = ?
             ");
-            $stmt->execute([$evaluation_id]);
+            $stmt->execute([$evaluation_id, $evaluation_id]);
         }
         
         $evaluation = $stmt->fetch(PDO::FETCH_ASSOC);

@@ -533,7 +533,13 @@
 				const eval = response.data;
 				
 				if (type === 'student') {
-					// Student evaluation of company
+					// Student evaluation of company (student_evaluations table)
+					const programSatisfaction = eval.program_satisfaction || 0;
+					const companyImpression = eval.institution_selection || eval.company_impression || 0;
+					const recommendProgram = eval.future_participation || eval.recommend_program || 0;
+					const recommendCompany = eval.institution_recommendation || eval.recommend_company || 0;
+					const consultantSatisfaction = eval.consultant_satisfaction || 0;
+					
 					contentDiv.innerHTML = `
 						<div class="row mb-4">
 							<div class="col-md-6">
@@ -550,76 +556,78 @@
 
 						<hr>
 
-						<h6 class="fw-bold text-primary mb-3"><i class="ph-star me-2"></i>Ratings</h6>
-						<div class="row g-3 mb-4">
-							<div class="col-md-6">
-								<div class="d-flex justify-content-between">
-									<span>Program Satisfaction:</span>
-									<strong>${eval.program_satisfaction || 0}/5</strong>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="d-flex justify-content-between">
-									<span>Future Participation:</span>
-									<strong>${eval.future_participation || 0}/5</strong>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="d-flex justify-content-between">
-									<span>Consultant Care:</span>
-									<strong>${eval.consultant_care === 'yes' ? 'Yes' : 'No'}</strong>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="d-flex justify-content-between">
-									<span>Consultant Satisfaction:</span>
-									<strong>${eval.consultant_satisfaction || 0}/5</strong>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="d-flex justify-content-between">
-									<span>Institution Selection:</span>
-									<strong>${eval.institution_selection || 0}/5</strong>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="d-flex justify-content-between">
-									<span>Institution Recommendation:</span>
-									<strong>${eval.institution_recommendation || 0}/5</strong>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="d-flex justify-content-between bg-light p-2 rounded">
-									<span class="fw-bold">Overall Rating:</span>
-									<strong class="text-primary">${parseFloat(eval.overall_rating || 0).toFixed(1)}/5</strong>
-								</div>
-							</div>
+						<h6 class="fw-bold text-primary mb-3"><i class="ph-star me-2"></i>Program Experience Ratings</h6>
+						<div class="table-responsive mb-4">
+							<table class="table table-bordered table-sm">
+								<tbody>
+									<tr>
+										<th width="70%">Program Satisfaction</th>
+										<td class="text-center">${programSatisfaction}/5</td>
+									</tr>
+									<tr>
+										<th>Company Impression</th>
+										<td class="text-center">${companyImpression}/5</td>
+									</tr>
+									<tr>
+										<th>Consultant Care</th>
+										<td class="text-center">${eval.consultant_care === 'yes' ? 'Yes' : 'No'}</td>
+									</tr>
+									${eval.consultant_care === 'yes' ? `
+									<tr>
+										<th>Consultant Satisfaction</th>
+										<td class="text-center">${consultantSatisfaction}/5</td>
+									</tr>
+									` : ''}
+									<tr>
+										<th>Recommend Program</th>
+										<td class="text-center">${recommendProgram}/5</td>
+									</tr>
+									<tr>
+										<th>Recommend Company</th>
+										<td class="text-center">${recommendCompany}/5</td>
+									</tr>
+									<tr class="table-primary">
+										<th>Overall Rating</th>
+										<td class="text-center fw-bold">${parseFloat(eval.overall_rating || 0).toFixed(1)}/5</td>
+									</tr>
+								</tbody>
+							</table>
 						</div>
 
-						<h6 class="fw-bold text-primary mb-3"><i class="ph-chat-text me-2"></i>Feedback</h6>
+						<h6 class="fw-bold text-primary mb-3"><i class="ph-chat-text me-2"></i>Additional Information</h6>
+						${eval.benefits ? `
 						<div class="mb-3">
 							<label class="form-label text-muted">Benefits:</label>
-							<p>${eval.benefits || 'None provided'}</p>
+							<ul class="mb-0">
+								${eval.benefits.split(',').map(b => `<li>${b.trim()}</li>`).join('')}
+							</ul>
 						</div>
+						` : ''}
+						${eval.department ? `
 						<div class="mb-3">
 							<label class="form-label text-muted">Department:</label>
-							<p>${eval.department || 'Not specified'}</p>
+							<p>${eval.department}</p>
 						</div>
+						` : ''}
+						${eval.problems_encountered ? `
 						<div class="mb-3">
 							<label class="form-label text-muted">Problems Encountered:</label>
-							<p>${eval.problems_encountered || 'None'}</p>
+							<p>${eval.problems_encountered}</p>
 						</div>
+						` : ''}
+						${eval.additional_feedback ? `
 						<div class="mb-3">
 							<label class="form-label text-muted">Additional Feedback:</label>
-							<p>${eval.additional_feedback || 'None'}</p>
+							<p>${eval.additional_feedback}</p>
 						</div>
+						` : ''}
 
-						<div class="text-muted mt-3">
-							<small>Submitted on: ${eval.submitted_date ? new Date(eval.submitted_date).toLocaleString() : 'N/A'}</small>
+						<div class="text-muted mt-3 border-top pt-2">
+							<small><i class="ph-calendar me-1"></i>Submitted on: ${eval.submitted_date ? new Date(eval.submitted_date).toLocaleString() : (eval.created_at ? new Date(eval.created_at).toLocaleString() : 'N/A')}</small>
 						</div>
 					`;
 				} else {
-					// Company evaluation of student
+					// Company evaluation of student (evaluations table)
 					contentDiv.innerHTML = `
 						<div class="row mb-4">
 							<div class="col-md-6">
@@ -630,57 +638,84 @@
 								<h6 class="fw-bold text-primary mb-3"><i class="ph-user me-2"></i>Student</h6>
 								<p class="mb-1"><strong>Name:</strong> ${eval.student_name || 'N/A'}</p>
 								<p class="mb-1"><strong>Email:</strong> ${eval.student_email || 'N/A'}</p>
+								<p class="mb-1"><strong>Position:</strong> ${eval.position || eval.internship_position || 'N/A'}</p>
 							</div>
 						</div>
 
 						<hr>
 
-						<h6 class="fw-bold text-primary mb-3"><i class="ph-star me-2"></i>Ratings</h6>
-						<div class="row g-3 mb-4">
-							<div class="col-md-6">
-								<div class="d-flex justify-content-between">
-									<span>Technical Skills:</span>
-									<strong>${eval.technical_skills || 0}/5</strong>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="d-flex justify-content-between">
-									<span>Communication:</span>
-									<strong>${eval.communication || 0}/5</strong>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="d-flex justify-content-between">
-									<span>Teamwork:</span>
-									<strong>${eval.teamwork || 0}/5</strong>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="d-flex justify-content-between">
-									<span>Punctuality:</span>
-									<strong>${eval.punctuality || 0}/5</strong>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="d-flex justify-content-between bg-light p-2 rounded">
-									<span class="fw-bold">Overall Rating:</span>
-									<strong class="text-primary">${parseFloat(eval.overall_rating || 0).toFixed(1)}/5</strong>
-								</div>
-							</div>
+						<h6 class="fw-bold text-primary mb-3"><i class="ph-star me-2"></i>Student Performance Ratings</h6>
+						<div class="table-responsive mb-4">
+							<table class="table table-bordered table-sm">
+								<tbody>
+									<tr>
+										<th width="70%">Program Satisfaction</th>
+										<td class="text-center">${eval.program_satisfaction || 0}/5</td>
+									</tr>
+									<tr>
+										<th>Student Impact</th>
+										<td class="text-center">${eval.student_impact || 0}/5</td>
+									</tr>
+									<tr>
+										<th>Motivation</th>
+										<td class="text-center">${eval.motivation || 0}/5</td>
+									</tr>
+									<tr>
+										<th>Communication</th>
+										<td class="text-center">${eval.communication || 0}/5</td>
+									</tr>
+									<tr>
+										<th>Timeliness</th>
+										<td class="text-center">${eval.timeliness || 0}/5</td>
+									</tr>
+									<tr>
+										<th>Positive Attitude</th>
+										<td class="text-center">${eval.positive_attitude || 0}/5</td>
+									</tr>
+									<tr>
+										<th>Teamwork</th>
+										<td class="text-center">${eval.teamwork || 0}/5</td>
+									</tr>
+									<tr>
+										<th>Adaptation</th>
+										<td class="text-center">${eval.adaptation || 0}/5</td>
+									</tr>
+									<tr>
+										<th>Digital Tools</th>
+										<td class="text-center">${eval.digital_tools || 0}/5</td>
+									</tr>
+									<tr class="table-primary">
+										<th>Overall Rating</th>
+										<td class="text-center fw-bold">${parseFloat(eval.overall_rating || 0).toFixed(1)}/5</td>
+									</tr>
+								</tbody>
+							</table>
 						</div>
 
-						<h6 class="fw-bold text-primary mb-3"><i class="ph-chat-text me-2"></i>Feedback</h6>
-						<div class="mb-3">
-							<label class="form-label text-muted">Comments:</label>
-							<p>${eval.comments || 'None provided'}</p>
-						</div>
-						<div class="mb-3">
-							<label class="form-label text-muted">Would Hire Again:</label>
-							<p>${eval.would_hire_again ? 'Yes' : 'No'}</p>
-						</div>
+						<h6 class="fw-bold text-primary mb-3"><i class="ph-chat-text me-2"></i>Program Feedback</h6>
+						<ul class="list-unstyled mb-3">
+							<li><strong>Would participate again:</strong> ${eval.participate_again === 'yes' ? 'Yes' : 'No'}</li>
+							<li><strong>Would recommend program:</strong> ${eval.recommend_program === 'yes' ? 'Yes' : 'No'}</li>
+							<li><strong>Would consider for future internship:</strong> ${eval.future_internship === 'yes' ? 'Yes' : 'No'}</li>
+							<li><strong>Interview interest:</strong> ${eval.interview_interest === 'yes' ? 'Yes' : 'No'}</li>
+						</ul>
 
-						<div class="text-muted mt-3">
-							<small>Submitted on: ${eval.submitted_at ? new Date(eval.submitted_at).toLocaleString() : 'N/A'}</small>
+						${eval.redesign_suggestions ? `
+						<div class="mb-3">
+							<label class="form-label text-muted">Redesign Suggestions:</label>
+							<p>${eval.redesign_suggestions}</p>
+						</div>
+						` : ''}
+						
+						${eval.program_type ? `
+						<div class="mb-3">
+							<label class="form-label text-muted">Program Type:</label>
+							<p>${eval.program_type.charAt(0).toUpperCase() + eval.program_type.slice(1)}</p>
+						</div>
+						` : ''}
+
+						<div class="text-muted mt-3 border-top pt-2">
+							<small><i class="ph-calendar me-1"></i>Submitted on: ${eval.created_at ? new Date(eval.created_at).toLocaleString() : 'N/A'}</small>
 						</div>
 					`;
 				}

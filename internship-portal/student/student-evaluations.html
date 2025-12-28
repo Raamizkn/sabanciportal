@@ -54,6 +54,22 @@
 			display: flex;
 			overflow: hidden;
 		}
+		/* Rating options below questions */
+		.rating-options {
+			display: flex;
+			gap: 1rem;
+			margin-top: 0.5rem;
+			padding: 0.75rem;
+			background: #f8f9fa;
+			border-radius: 0.375rem;
+		}
+		.rating-options .form-check {
+			margin: 0;
+		}
+		.rating-options .form-check-input:checked + .form-check-label {
+			color: #0d6efd;
+			font-weight: 600;
+		}
 	</style>
 </head>
 
@@ -359,135 +375,155 @@
 								<!-- Rating questions section -->
 								<div class="mb-4">
 									<h6 class="fw-bold mb-3">Program Experience Rating</h6>
-									<div class="mb-3">
+									<p class="text-muted small mb-3">Rate the following statements on a scale of 1 (Strongly Disagree) to 5 (Strongly Agree)</p>
+									
+									<!-- Question 1 -->
+									<div class="mb-4">
 										<label class="form-label">I was satisfied with the First Step to the Business World Program.*</label>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction1" value="1" required>
-											<label class="form-check-label" for="satisfaction1">1</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction2" value="2">
-											<label class="form-check-label" for="satisfaction2">2</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction3" value="3">
-											<label class="form-check-label" for="satisfaction3">3</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction4" value="4">
-											<label class="form-check-label" for="satisfaction4">4</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction5" value="5">
-											<label class="form-check-label" for="satisfaction5">5</label>
+										<div class="rating-options">
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction1" value="1" required>
+												<label class="form-check-label" for="satisfaction1">1</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction2" value="2">
+												<label class="form-check-label" for="satisfaction2">2</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction3" value="3">
+												<label class="form-check-label" for="satisfaction3">3</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction4" value="4">
+												<label class="form-check-label" for="satisfaction4">4</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction5" value="5">
+												<label class="form-check-label" for="satisfaction5">5</label>
+											</div>
 										</div>
 									</div>
 
-									<div class="mb-3">
+									<!-- Question 2 -->
+									<div class="mb-4">
 										<label class="form-label">The institution/company generally left a positive impression on me.*</label>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="company_impression" id="impression1" value="1" required>
-											<label class="form-check-label" for="impression1">1</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="company_impression" id="impression2" value="2">
-											<label class="form-check-label" for="impression2">2</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="company_impression" id="impression3" value="3">
-											<label class="form-check-label" for="impression3">3</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="company_impression" id="impression4" value="4">
-											<label class="form-check-label" for="impression4">4</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="company_impression" id="impression5" value="5">
-											<label class="form-check-label" for="impression5">5</label>
+										<div class="rating-options">
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="company_impression" id="impression1" value="1" required>
+												<label class="form-check-label" for="impression1">1</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="company_impression" id="impression2" value="2">
+												<label class="form-check-label" for="impression2">2</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="company_impression" id="impression3" value="3">
+												<label class="form-check-label" for="impression3">3</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="company_impression" id="impression4" value="4">
+												<label class="form-check-label" for="impression4">4</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="company_impression" id="impression5" value="5">
+												<label class="form-check-label" for="impression5">5</label>
+											</div>
 										</div>
 									</div>
 
-									<div class="mb-3">
+									<!-- Question 3 -->
+									<div class="mb-4">
 										<label class="form-label">Did a consultant regularly take care of you at the institution?*</label>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="consultant_care" id="consultant_yes" value="yes" required>
-											<label class="form-check-label" for="consultant_yes">Yes</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="consultant_care" id="consultant_no" value="no">
-											<label class="form-check-label" for="consultant_no">No</label>
+										<div class="rating-options">
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="consultant_care" id="consultant_yes" value="yes" required>
+												<label class="form-check-label" for="consultant_yes">Yes</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="consultant_care" id="consultant_no" value="no">
+												<label class="form-check-label" for="consultant_no">No</label>
+											</div>
 										</div>
 									</div>
 
-									<div class="mb-3 consultant-satisfaction" style="display: none;">
+									<!-- Conditional Question -->
+									<div class="mb-4 consultant-satisfaction" style="display: none;">
 										<label class="form-label">(If your answer is yes) I was satisfied with the guidance of my institution consultant.*</label>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction1" value="1">
-											<label class="form-check-label" for="consultant_satisfaction1">1</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction2" value="2">
-											<label class="form-check-label" for="consultant_satisfaction2">2</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction3" value="3">
-											<label class="form-check-label" for="consultant_satisfaction3">3</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction4" value="4">
-											<label class="form-check-label" for="consultant_satisfaction4">4</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction5" value="5">
-											<label class="form-check-label" for="consultant_satisfaction5">5</label>
+										<div class="rating-options">
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction1" value="1">
+												<label class="form-check-label" for="consultant_satisfaction1">1</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction2" value="2">
+												<label class="form-check-label" for="consultant_satisfaction2">2</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction3" value="3">
+												<label class="form-check-label" for="consultant_satisfaction3">3</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction4" value="4">
+												<label class="form-check-label" for="consultant_satisfaction4">4</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction5" value="5">
+												<label class="form-check-label" for="consultant_satisfaction5">5</label>
+											</div>
 										</div>
 									</div>
 
-									<div class="mb-3">
+									<!-- Question 4 -->
+									<div class="mb-4">
 										<label class="form-label">I would recommend the First Step to the Business World Program to other students.*</label>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program1" value="1" required>
-											<label class="form-check-label" for="recommend_program1">1</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program2" value="2">
-											<label class="form-check-label" for="recommend_program2">2</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program3" value="3">
-											<label class="form-check-label" for="recommend_program3">3</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program4" value="4">
-											<label class="form-check-label" for="recommend_program4">4</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program5" value="5">
-											<label class="form-check-label" for="recommend_program5">5</label>
+										<div class="rating-options">
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program1" value="1" required>
+												<label class="form-check-label" for="recommend_program1">1</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program2" value="2">
+												<label class="form-check-label" for="recommend_program2">2</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program3" value="3">
+												<label class="form-check-label" for="recommend_program3">3</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program4" value="4">
+												<label class="form-check-label" for="recommend_program4">4</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program5" value="5">
+												<label class="form-check-label" for="recommend_program5">5</label>
+											</div>
 										</div>
 									</div>
 
-									<div class="mb-3">
+									<!-- Question 5 -->
+									<div class="mb-4">
 										<label class="form-label">I would recommend the institution/company to other students.*</label>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company1" value="1" required>
-											<label class="form-check-label" for="recommend_company1">1</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company2" value="2">
-											<label class="form-check-label" for="recommend_company2">2</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company3" value="3">
-											<label class="form-check-label" for="recommend_company3">3</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company4" value="4">
-											<label class="form-check-label" for="recommend_company4">4</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company5" value="5">
-											<label class="form-check-label" for="recommend_company5">5</label>
+										<div class="rating-options">
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company1" value="1" required>
+												<label class="form-check-label" for="recommend_company1">1</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company2" value="2">
+												<label class="form-check-label" for="recommend_company2">2</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company3" value="3">
+												<label class="form-check-label" for="recommend_company3">3</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company4" value="4">
+												<label class="form-check-label" for="recommend_company4">4</label>
+											</div>
+											<div class="form-check form-check-inline">
+												<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company5" value="5">
+												<label class="form-check-label" for="recommend_company5">5</label>
+											</div>
 										</div>
 									</div>
 								</div>
@@ -718,48 +754,51 @@
 		async function loadApplicationsForEvaluation() {
 			const studentId = localStorage.getItem('userId') || sessionStorage.getItem('impersonatedUser');
 			console.log('Loading applications for student ID:', studentId);
-			console.log('localStorage.userId:', localStorage.getItem('userId'));
-			console.log('sessionStorage.impersonatedUser:', sessionStorage.getItem('impersonatedUser'));
 			
 			if (!studentId) {
 				console.error('No student ID found - cannot load applications');
 				return;
 			}
 			
-		try {
-			console.log('Calling api.getApplications...');
-			const response = await api.getApplications(studentId);
-			console.log('Applications response:', response);
-			// Response is already an array, not wrapped in { data: [...] }
-			const applications = Array.isArray(response) ? response : (response.data || []);
+			try {
+				console.log('Calling api.getApplications...');
+				const response = await api.getApplications(studentId);
+				console.log('Applications response:', response);
+				// Response is already an array, not wrapped in { data: [...] }
+				const applications = Array.isArray(response) ? response : (response.data || []);
 				
 				const selector = document.getElementById('application-selector');
 				if (!selector) return;
 				
-				// Clear existing options (except the first one)
+				// Clear existing options
 				selector.innerHTML = '<option value="">-- Select an application --</option>';
 				
-				// Filter applications that can be evaluated
-				// Include: Finalized (mapped from Approved_By_Company), Confirmed, Accepted
+				// IMPORTANT: Only allow evaluation of COMPLETED internships
+				// Statuses that indicate completion: Complete, Completed, Finalized
+				const completedStatuses = ['Complete', 'Completed', 'Finalized'];
 				const completedApps = applications.filter(app => 
-					app.status === 'Finalized' || 
-					app.status === 'Confirmed' || 
-					app.status === 'Accepted'
+					completedStatuses.includes(app.status)
 				);
 				
 				if (completedApps.length === 0) {
-					selector.innerHTML = '<option value="">No completed internships to evaluate</option>';
+					selector.innerHTML = '<option value="">No completed internships available for evaluation</option>';
 					selector.disabled = true;
+					
+					// Show info message about needing completed internships
+					const alert = document.createElement('div');
+					alert.className = 'alert alert-info mt-2';
+					alert.innerHTML = '<i class="ph-info me-2"></i>You can only submit evaluations for internships that have been marked as <strong>Complete</strong>.';
+					selector.parentNode.appendChild(alert);
 					return;
 				}
 				
-			// Add applications to dropdown
-			completedApps.forEach(app => {
-				const option = document.createElement('option');
-				option.value = app.application_id;
-				option.textContent = `${app.company_name} - ${app.internship_position || 'Internship'} (${app.status})`;
-				selector.appendChild(option);
-			});
+				// Add applications to dropdown
+				completedApps.forEach(app => {
+					const option = document.createElement('option');
+					option.value = app.application_id;
+					option.textContent = `${app.company_name} - ${app.internship_position || 'Internship'} (${app.status})`;
+					selector.appendChild(option);
+				});
 				
 				// Check if URL has application_id parameter
 				const urlParams = new URLSearchParams(window.location.search);
@@ -800,18 +839,22 @@
 						return;
 					}
 					
-					// Collect form data
+					// Collect form data with CORRECT field names
 					const formData = new FormData(evaluationForm);
 					const benefitsArray = Array.from(benefits).map(b => b.value);
 					
+					// Map form field names to backend expected names
 					const evaluationData = {
 						application_id: applicationId,
+						// Main ratings
 						program_satisfaction: parseInt(formData.get('program_satisfaction')) || 0,
-						future_participation: parseInt(formData.get('future_participation')) || 0,
+						company_impression: parseInt(formData.get('company_impression')) || 0, // Maps to institution_selection
+						recommend_program: parseInt(formData.get('recommend_program')) || 0,   // Maps to future_participation
+						recommend_company: parseInt(formData.get('recommend_company')) || 0,  // Maps to institution_recommendation
+						// Consultant
 						consultant_care: formData.get('consultant_care') || 'no',
 						consultant_satisfaction: parseInt(formData.get('consultant_satisfaction')) || 0,
-						institution_selection: parseInt(formData.get('institution_selection')) || 0,
-						institution_recommendation: parseInt(formData.get('institution_recommendation')) || 0,
+						// Text fields
 						benefits: benefitsArray.join(', '),
 						department: formData.get('department') || '',
 						problems: formData.get('problems') || '',
@@ -830,7 +873,7 @@
 						const result = await response.json();
 						
 						if (result.status === 'success') {
-					alert('Evaluation submitted successfully!');
+							alert('Evaluation submitted successfully!');
 							document.querySelector('[data-bs-target="#evaluation_form"]').click(); // Collapse form
 							evaluationForm.reset(); // Reset form
 							// Reload page to show new evaluation in list
@@ -903,8 +946,9 @@
 		
 	async function viewEvaluationDetails(evaluationId) {
 		try {
+			const studentId = localStorage.getItem('userId') || sessionStorage.getItem('impersonatedUser');
 			// Fetch evaluation details from backend
-			const response = await api.getStudentEvaluationDetails(evaluationId);
+			const response = await api.getStudentEvaluationDetails(evaluationId, studentId);
 			
 			if (!response || response.error) {
 				alert('Failed to load evaluation details: ' + (response?.error || 'Unknown error'));
@@ -912,6 +956,15 @@
 			}
 			
 			const evaluation = response.data || response;
+			console.log('Evaluation data:', evaluation); // Debug log
+			
+			// Get values with fallbacks for different field name conventions
+			const programSatisfaction = evaluation.program_satisfaction || 0;
+			const companyImpression = evaluation.institution_selection || evaluation.company_impression || 0;
+			const recommendProgram = evaluation.future_participation || evaluation.recommend_program || 0;
+			const recommendCompany = evaluation.institution_recommendation || evaluation.recommend_company || 0;
+			const consultantSatisfaction = evaluation.consultant_satisfaction || 0;
+			const overallRating = evaluation.overall_rating || 0;
 			
 			// Populate modal with evaluation data
 			const modal = document.getElementById('view_evaluation');
@@ -919,8 +972,8 @@
 			
 			modalBody.innerHTML = `
 				<div class="mb-3">
-					<h6 class="fw-bold">${evaluation.company_name || 'Company'} - ${evaluation.internship_position || 'Internship'}</h6>
-					<p class="text-muted">Submitted on ${new Date(evaluation.created_at).toLocaleDateString()}</p>
+					<h6 class="fw-bold">${evaluation.company_name || evaluation.company_full_name || 'Company'} - ${evaluation.position || evaluation.internship_position || 'Internship'}</h6>
+					<p class="text-muted">Submitted on ${evaluation.submitted_date ? new Date(evaluation.submitted_date).toLocaleDateString() : (evaluation.created_at ? new Date(evaluation.created_at).toLocaleDateString() : 'N/A')}</p>
 				</div>
 
 				<div class="mb-3">
@@ -930,29 +983,33 @@
 							<tbody>
 								<tr>
 									<th width="70%">I was satisfied with the First Step to the Business World Program.</th>
-									<td><div class="text-center">${evaluation.program_satisfaction || 0}/5</div></td>
+									<td><div class="text-center fw-semibold">${programSatisfaction}/5</div></td>
 								</tr>
 								<tr>
 									<th>The institution/company generally left a positive impression on me.</th>
-									<td><div class="text-center">${evaluation.institution_selection || 0}/5</div></td>
+									<td><div class="text-center fw-semibold">${companyImpression}/5</div></td>
 								</tr>
 								<tr>
 									<th>Did a consultant regularly take care of you at the institution?</th>
-									<td><div class="text-center">${evaluation.consultant_care === 'yes' ? 'Yes' : 'No'}</div></td>
+									<td><div class="text-center fw-semibold">${evaluation.consultant_care === 'yes' ? 'Yes' : 'No'}</div></td>
 								</tr>
 								${evaluation.consultant_care === 'yes' ? `
 								<tr>
 									<th>I was satisfied with the guidance of my institution consultant.</th>
-									<td><div class="text-center">${evaluation.consultant_satisfaction || 0}/5</div></td>
+									<td><div class="text-center fw-semibold">${consultantSatisfaction}/5</div></td>
 								</tr>
 								` : ''}
 								<tr>
 									<th>I would recommend the First Step to the Business World Program to other students.</th>
-									<td><div class="text-center">${evaluation.future_participation || 0}/5</div></td>
+									<td><div class="text-center fw-semibold">${recommendProgram}/5</div></td>
 								</tr>
 								<tr>
 									<th>I would recommend the institution/company to other students.</th>
-									<td><div class="text-center">${evaluation.institution_recommendation || 0}/5</div></td>
+									<td><div class="text-center fw-semibold">${recommendCompany}/5</div></td>
+								</tr>
+								<tr class="table-primary">
+									<th>Overall Rating</th>
+									<td><div class="text-center fw-bold">${parseFloat(overallRating).toFixed(1)}/5</div></td>
 								</tr>
 							</tbody>
 						</table>
@@ -975,10 +1032,10 @@
 				</div>
 				` : ''}
 
-				${evaluation.problems ? `
+				${evaluation.problems_encountered || evaluation.problems ? `
 				<div class="mb-3">
 					<h6 class="fw-semibold">Problems Encountered</h6>
-					<p>${evaluation.problems}</p>
+					<p>${evaluation.problems_encountered || evaluation.problems}</p>
 				</div>
 				` : ''}
 

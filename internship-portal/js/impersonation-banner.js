@@ -31,8 +31,11 @@
             const existingEndButton = document.getElementById('end-impersonation-banner');
             
             if (existingBanner && existingUserBanner) {
-                // Use existing inline banner
-                existingUserBanner.textContent = impersonatedUserName || impersonatedUserEmail;
+                // Use existing inline banner - show BOTH name and email
+                const displayText = impersonatedUserName && impersonatedUserEmail 
+                    ? `${impersonatedUserName} (${impersonatedUserEmail})`
+                    : impersonatedUserName || impersonatedUserEmail;
+                existingUserBanner.innerHTML = `<strong>${displayText}</strong>`;
                 existingBanner.classList.remove('d-none');
                 
                 // Attach end handler to existing button
@@ -40,13 +43,13 @@
                     existingEndButton.addEventListener('click', endImpersonation);
                 }
             } else {
-                // Create new standardized banner
-                createBanner(impersonatedUserName || impersonatedUserEmail, impersonatedUserType);
+                // Create new standardized banner with name and email
+                createBanner(impersonatedUserName, impersonatedUserType, impersonatedUserEmail);
             }
         }
     }
 
-    function createBanner(userName, userType) {
+    function createBanner(userName, userType, userEmail) {
         // Remove any existing standardized banner first
         const existingBanner = document.getElementById('impersonation-banner-standard');
         if (existingBanner) {
@@ -68,12 +71,17 @@
         const userTypeLabel = userType === 'student' ? 'Student' : 'Company';
         const icon = userType === 'student' ? 'ph-student' : 'ph-buildings';
         
+        // Show both name and email
+        const displayInfo = userName && userEmail ? `<strong>${userName}</strong> (${userEmail})` : 
+                           userName ? `<strong>${userName}</strong>` : 
+                           userEmail ? `<strong>${userEmail}</strong>` : 'Unknown User';
+        
         banner.innerHTML = `
             <div class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center">
                     <i class="${icon} me-2 fs-5"></i>
                     <strong>Admin Impersonation Mode:</strong>
-                    <span class="ms-2">Viewing as <strong>${userName}</strong> (${userTypeLabel})</span>
+                    <span class="ms-2">Viewing as ${displayInfo} - ${userTypeLabel}</span>
                 </div>
                 <button type="button" class="btn btn-sm btn-warning" id="end-impersonation-standard-btn">
                     <i class="ph-sign-out me-1"></i>End Impersonation

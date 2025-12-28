@@ -27,6 +27,7 @@ function generate_student_eval_id() {
 /**
  * Submit student evaluation
  * Student evaluates their internship experience
+ * CONSTRAINT: Only COMPLETED internships can be evaluated
  */
 function submit_student_evaluation($student_id, $application_id, $evaluation_data) {
     try {
@@ -48,6 +49,13 @@ function submit_student_evaluation($student_id, $application_id, $evaluation_dat
             return ['error' => 'Application not found or access denied'];
         }
         
+        // IMPORTANT: Only allow evaluation of COMPLETED internships
+        $allowed_statuses = ['Complete', 'Completed', 'Finalized'];
+        if (!in_array($application['status'], $allowed_statuses)) {
+            $db->rollBack();
+            return ['error' => 'Can only evaluate completed internships. Current status: ' . $application['status'] . '. The internship must be marked as Complete before evaluation.'];
+        }
+        
         // Check if evaluation already exists
         $stmt = $db->prepare("SELECT id FROM student_evaluations WHERE application_id = ? AND student_id = ?");
         $stmt->execute([$application['id'], $student_id]);
@@ -59,17 +67,32 @@ function submit_student_evaluation($student_id, $application_id, $evaluation_dat
         // Generate evaluation ID
         $eval_id = generate_student_eval_id();
         
-        // Calculate overall rating
-        $ratings = [
-            $evaluation_data['program_satisfaction'] ?? 0,
-            $evaluation_data['future_participation'] ?? 0,
-            $evaluation_data['consultant_satisfaction'] ?? 0,
-            $evaluation_data['institution_selection'] ?? 0,
-            $evaluation_data['institution_recommendation'] ?? 0
-        ];
-        $overall_rating = array_sum(array_filter($ratings)) / max(count(array_filter($ratings)), 1);
+        // Extract rating values with proper field name mapping
+        $programSatisfaction = intval($evaluation_data['program_satisfaction'] ?? 0);
+        $companyImpression = intval($evaluation_data['company_impression'] ?? $evaluation_data['institution_selection'] ?? 0);
+        $recommendProgram = intval($evaluation_data['recommend_program'] ?? $evaluation_data['future_participation'] ?? 0);
+        $recommendCompany = intval($evaluation_data['recommend_company'] ?? $evaluation_data['institution_recommendation'] ?? 0);
+        $consultantSatisfaction = intval($evaluation_data['consultant_satisfaction'] ?? 0);
+        $consultantCare = $evaluation_data['consultant_care'] ?? 'no';
         
-        // Insert evaluation
+        // Calculate overall rating from numeric fields only (1-5 scale)
+        $ratings = [
+            $programSatisfaction,
+            $companyImpression,
+            $recommendProgram,
+            $recommendCompany
+        ];
+        
+        // Only include consultant satisfaction if they answered 'yes' to having a consultant
+        if ($consultantCare === 'yes' && $consultantSatisfaction > 0) {
+            $ratings[] = $consultantSatisfaction;
+        }
+        
+        // Filter out zeros and calculate average
+        $valid_ratings = array_filter($ratings, function($r) { return $r > 0; });
+        $overall_rating = count($valid_ratings) > 0 ? array_sum($valid_ratings) / count($valid_ratings) : 0;
+        
+        // Insert evaluation with properly mapped values
         $stmt = $db->prepare("
             INSERT INTO student_evaluations (
                 evaluation_id, application_id, student_id, company_id,
@@ -85,17 +108,17 @@ function submit_student_evaluation($student_id, $application_id, $evaluation_dat
             $application['id'],
             $student_id,
             $application['company_id'],
-            $evaluation_data['program_satisfaction'] ?? 0,
-            $evaluation_data['future_participation'] ?? 0,
-            $evaluation_data['consultant_care'] ?? 'no',
-            $evaluation_data['consultant_satisfaction'] ?? 0,
-            $evaluation_data['institution_selection'] ?? 0,
-            $evaluation_data['institution_recommendation'] ?? 0,
+            $programSatisfaction,                    // program_satisfaction
+            $recommendProgram,                       // future_participation (recommend program)
+            $consultantCare,                         // consultant_care
+            $consultantSatisfaction,                 // consultant_satisfaction
+            $companyImpression,                      // institution_selection (company impression)
+            $recommendCompany,                       // institution_recommendation (recommend company)
             $evaluation_data['benefits'] ?? '',
             $evaluation_data['department'] ?? '',
             $evaluation_data['problems'] ?? '',
             $evaluation_data['additional_feedback'] ?? '',
-            $overall_rating
+            round($overall_rating, 2)
         ]);
         
         $db->commit();
