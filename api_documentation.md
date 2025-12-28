@@ -1,126 +1,193 @@
-# Sabancı Internship Portal – API Guide (November 2025)
+# API Documentation
+## Sabancı University Internship Portal
 
-This is the single source of truth for the live REST-style API that powers the internship portal. Every request is routed through `backend/index.php` using the `entity` (resource) and optional `action` (operation) query parameters.
+**Last Updated**: December 29, 2025  
+**Base URL (local dev)**: `http://localhost:8001/index.php`  
+**Base URL (production)**: `https://pro2-dev.sabanciuniv.edu/shadowing/backend/index.php`
 
-- **Base URL (local dev):** `http://localhost:8001/index.php`
-- **Auth:** Session cookies. Always `POST /?entity=auth&action=login` first, store the cookie (`-c/-b cookies.txt`).
-- **Roles:** `student`, `company`, `admin`. Each endpoint enforces role + ownership checks.
+---
 
+## Authentication
+
+All endpoints require session-based authentication. Login first to establish a session cookie.
+
+### Login
+
+**Endpoint**: `POST ?entity=auth&action=login`
+
+**Request Body**:
+```json
+{
+  "email": "student@example.com",
+  "password": "password123",
+  "role": "student"
+}
+```
+
+**Response** (200 OK):
+```json
+{
+  "success": true,
+  "user": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "student@example.com",
+    "role": "student"
+  }
+}
+```
+
+**cURL Example**:
 ```bash
 curl -X POST 'http://localhost:8001/index.php?entity=auth&action=login' \
   -H 'Content-Type: application/json' \
   -c cookies.txt \
-  -d '{"email":"company@example.com","password":"secret","role":"company"}'
+  -d '{"email":"student@example.com","password":"password123","role":"student"}'
 ```
 
-Use the same cookie jar for all subsequent calls: `curl -b cookies.txt …`.
+Use the same cookie jar for all subsequent calls: `curl -b cookies.txt ...`
 
 ---
 
-## Key Entities & Endpoints
+## Students
 
-### Students
+### Get Student Profile
+**Endpoint**: `GET ?entity=students`  
+**Response**: Student profile object
 
-| Purpose | Method/Endpoint | Notes |
-| --- | --- | --- |
-| Fetch my profile | `GET ?entity=students` | Uses authenticated student ID. Admins can pass `&id=2` to impersonate. |
-| Update profile | `POST ?entity=students&action=update` | Body can include `name`, `phone`, `major`, `gpa`, `bio`, `profile_pic`. |
-| List my documents | `GET ?entity=students&action=documents` | Returns every upload with `document_id`, `download_url`, and `application_id` linkage. |
-| Upload resume | `POST ?entity=students&action=upload_resume` | Multipart form field `resume`. Updates/inserts a `documents` row of type `CV`. |
-| List my applications | `GET ?entity=applications&student_id={id}` | Requires the student to match `{id}`. Response includes `status`, `offer_details`, `internship_*` fields. |
-| Withdraw application | `POST ?entity=applications&id=APP123&action=withdraw` | Allowed if status ∈ `Pending Review`, `Under Review`, `Shortlisted`, `Offered`. |
-| Confirm offer | `POST ?entity=applications&id=APP123&action=confirm_offer` | Allowed when status = `Offered`; transitions to `Confirmed_By_Student`. |
+### Update Student Profile
+**Endpoint**: `POST ?entity=students&action=update`  
+**Request Body**: `{ "name", "phone", "major", "gpa", "bio", "profile_pic" }`
 
-**Applying with selected documents**
-```bash
-curl -X POST '...&entity=applications&action=apply' \
-  -b cookies.txt \
-  -H 'Content-Type: application/json' \
-  -d '{
-        "internship_id": 15,
-        "cover_letter": "Excited to join the team!",
-        "document_ids": ["DOC123456", "DOC654321"]
-      }'
-```
-- The backend uses the authenticated student ID, generates a collision-safe `application_id`, saves status `Pending Review`, and links each `document_id` to the new `applications.id`.
+### Get Student Documents
+**Endpoint**: `GET ?entity=students&action=documents`  
+**Response**: Array of document objects with download URLs
 
-### Internships
+### Upload Document
+**Endpoint**: `POST ?entity=students&action=upload_doc`  
+**Request**: `multipart/form-data` with `file` and `document_type`
 
-| Purpose | Method/Endpoint | Notes |
-| --- | --- | --- |
-| List all internships | `GET ?entity=internships` | Always returns live company metadata (`company.name`, `industry`, `phone`, `address`, `logo`). |
-| Get detail | `GET ?entity=internships&id=15` | Used by `student-internship-detail.html`. |
-| Company’s postings | `GET ?entity=internships&company_id=9` | Authenticated company only. |
-| Create posting | `POST ?entity=internships&action=create` | Body requires `position` + `description`; other fields optional. Uses logged-in company ID/name. |
+### Get Student Applications
+**Endpoint**: `GET ?entity=applications&student_id=1&term_id=4`  
+**Query Parameters**: `student_id` (required), `term_id` (optional, defaults to active term)  
+**Response**: Array of application objects
 
-### Applications (Company view)
+### Apply to Internship
+**Endpoint**: `POST ?entity=applications&action=apply`  
+**Request Body**: `{ "internship_id", "cover_letter", "document_ids": [] }`  
+**Response**: Created application object  
+**Errors**: 409 if duplicate, 400 if limit reached
 
-| Purpose | Method/Endpoint | Notes |
-| --- | --- | --- |
-| List applications | `GET ?entity=applications&company_id=9` | Requires company 9 (or admin). Include `&status=Offered` to filter. Each item contains student profile fields, internship summary, `documents[]`, and `resume_download_url`. |
-| Single application | `GET ?entity=applications&id=APP115` | Authorizes student owner, company owner, or admin. Includes company + student + documents. |
-| Update status | `POST ?entity=applications&id=APP115&action=update_status_company` | Body `{ "status": "Offered", "offer_details": "Start 1 June" }`. Valid statuses: `Pending Review`, `Under Review`, `Shortlisted`, `Interview Scheduled`, `Offered`, `Rejected`, `Rejected_By_Company`, `Approved_By_Company`. |
+### Withdraw Application
+**Endpoint**: `POST ?entity=applications&id=APP123&action=withdraw`  
+**Response**: Success message
 
-When status is set to `Offered`, include `offer_details`; students see the note inside their portal. Moving to `Approved_By_Company` surfaces the application on the Finalized page. Once a student hits `confirm_offer`, the status becomes `Confirmed_By_Student`.
-
-### Companies
-
-| Purpose | Method/Endpoint | Notes |
-| --- | --- | --- |
-| Fetch profile | `GET ?entity=companies&action=get_profile&company_id=9` | Company 9 or admin. Returns `name`, `industry`, `website`, `phone`, `address`, `description`, `logo`. |
-| Update profile | `POST ?entity=companies&action=update` | Body with any editable fields above; automatically ties to logged-in company. |
+### Confirm Offer
+**Endpoint**: `POST ?entity=applications&id=APP123&action=confirm_offer`  
+**Response**: Success message  
+**Note**: Auto-withdraws other Pending/Accepted applications
 
 ---
 
-## Application Status Flow
+## Internships
 
-```
-Pending Review (default) → Under Review → Shortlisted → Interview Scheduled
-   → Offered → (student confirms) → Confirmed_By_Student
-   → Approved_By_Company (company finalizes) → Finalized dashboards
-   ↘ Rejected / Rejected_By_Company / Withdrawn (terminal)
-```
+### List Internships
+**Endpoint**: `GET ?entity=internships`  
+**Query Parameters**: `term_id` (optional), `company_id` (optional, auto-filtered for companies)  
+**Response**: Array of internship objects  
+**Note**: `seats_left` only visible to owning company
 
-- Duplicate submissions are blocked by a DB constraint on `(student_id, internship_id)` and handled as HTTP 409.
-- Every application response now normalizes the historical `Pending` label to `Pending Review` so UI badges stay consistent.
-- `documents[]` always includes `document_type`, `file_name`, `file_size`, and `download_url` (absolute path) so the frontend can build download buttons directly.
+### Get Internship Details
+**Endpoint**: `GET ?entity=internships&id=15`  
+**Response**: Single internship object
 
----
-
-## Error Handling Cheatsheet
-
-| Issue | Response |
-| --- | --- |
-| Missing auth / wrong role | `401/403` with `{ "error": "Access denied." }` |
-| Duplicate application | `409` `{ "error": "You have already applied for this internship." }` |
-| Invalid status transition | `400` `{ "error": "Invalid status 'Foo' for company update." }` |
-| DB failure | `500` `{ "error": "Failed to ..." }` (message logged server-side) |
+### Create Internship
+**Endpoint**: `POST ?entity=internships&action=create`  
+**Request Body**: `{ "position", "description", "location", "dates", "requirements", "type", "application_deadline" }`  
+**Response**: Created internship object  
+**Note**: Automatically assigned to active term
 
 ---
 
-## Testing Tips
+## Applications (Company View)
 
-1. **Login once per role.** Maintain separate cookie jars: `student_cookies.txt`, `company_cookies.txt`, `admin_cookies.txt`.
-2. **Use `?status=` filters** while testing the Company Applications grid to validate pending/offered/finalized counts.
-3. **Check document linkage** by uploading from the student Documents page, applying with selected IDs, and verifying that `GET ?entity=applications&company_id=...` returns the same downloads.
-4. **Finalization flow:**
-   - Company `POST update_status_company` → `Approved_By_Company`
-   - Student `POST confirm_offer` → `Confirmed_By_Student`
-   - Refetch Finalized page (`company-finalized.html`) to see the record with attached documents.
+### Get Company Applications
+**Endpoint**: `GET ?entity=applications&company_id=1`  
+**Query Parameters**: `company_id` (required), `term_id` (optional), `status` (optional)  
+**Response**: Array of application objects with student details and documents
 
-This document replaces all previous API specs (`COMPANY_API_SUMMARY.md`, `API_Testing_Guide.md`, etc.). Keep it updated whenever an endpoint shape changes.
+### Update Application Status
+**Endpoint**: `POST ?entity=applications&id=APP123&action=update_status_company`  
+**Request Body**: `{ "status": "Accepted", "offer_details": "..." }`  
+**Valid Statuses**: `Pending`, `Under Review`, `Accepted`, `Rejected`
 
-### Admin
+---
 
-Admin endpoints are primarily used via the web UI or Postman while impersonating. All of them require an authenticated admin session.
+## Companies
 
-| Purpose | Method/Endpoint | Notes |
-| --- | --- | --- |
-| List companies | `GET ?entity=admin&resource=companies` | Returns every company record so admins can impersonate or audit. |
-| Create company | `POST ?entity=admin&resource=companies&action=add` | Body `{ "name", "email", "industry", ... }`. Sets temporary password and inserts into `companies`. |
-| List students | `GET ?entity=admin&resource=students` | Supports `&id=` to fetch a single student. |
-| Create student | `POST ?entity=admin&resource=students&action=add` | Seeds `students` table with the provided profile. |
-| List terms | `GET ?entity=admin&resource=terms` | Used for academic planning dashboards. |
-| Create term | `POST ?entity=admin&resource=terms&action=add` | Body `{ "name", "start_date", "end_date" }`. |
+### Get Company Profile
+**Endpoint**: `GET ?entity=companies&action=get_profile&company_id=1`  
+**Response**: Company profile object
 
-Admin users can also impersonate via the UI: selecting a company or student writes `sessionStorage` keys (`impersonatedUser*`). The backend still enforces role checks, so impersonated requests go through the same company/student endpoints above.
+### Update Company Profile
+**Endpoint**: `POST ?entity=companies&action=update`  
+**Request Body**: `{ "name", "industry", "website", "phone", "address", "description", "logo" }`  
+**Note**: Logo should be base64 data URL (max 2MB)
+
+---
+
+## Terms
+
+### Get All Terms
+**Endpoint**: `GET ?entity=terms`  
+**Response**: Array of term objects
+
+### Get Active Term
+**Endpoint**: `GET ?entity=terms&action=active`  
+**Response**: Active term object
+
+---
+
+## Admin
+
+### Create Term
+**Endpoint**: `POST ?entity=admin&resource=terms&action=add`  
+**Request Body**: `{ "name", "start_date", "end_date", "max_applications_per_student", "is_active", "default_company_quota" }`
+
+### Update Term
+**Endpoint**: `POST ?entity=admin&resource=terms&action=update`  
+**Request Body**: Term object with updated fields
+
+### Delete Term
+**Endpoint**: `POST ?entity=admin&resource=terms&action=delete`  
+**Request Body**: `{ "id" }`
+
+---
+
+## Status Reference
+
+| Status | Description | Set By |
+|--------|-------------|--------|
+| `Pending` | Initial status | System |
+| `Under Review` | Company reviewing | Company |
+| `Accepted` | Company accepts | Company |
+| `Rejected` | Company rejects | Company |
+| `Confirmed` | Student confirms | Student |
+| `Withdrawn` | Student withdraws | Student |
+
+**Status Workflow**: `Pending → Under Review → Accepted → Confirmed` (final)  
+**Auto-Withdrawal**: Confirming an offer auto-withdraws other Pending/Accepted applications
+
+---
+
+## Error Responses
+
+- **401 Unauthorized**: `{ "error": "Authentication required" }`
+- **403 Forbidden**: `{ "error": "Access denied" }`
+- **400 Bad Request**: `{ "error": "Invalid request: [message]" }`
+- **404 Not Found**: `{ "error": "Resource not found" }`
+- **409 Conflict**: `{ "error": "You have already applied for this internship." }`
+
+---
+
+**For detailed request/response examples, see the full API documentation in the codebase.**

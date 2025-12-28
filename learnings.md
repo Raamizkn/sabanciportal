@@ -505,3 +505,57 @@ We now maintain only four living docs: `README.md`, `api_documentation.md`, `lea
 - Deleted: `internship-portal/student/student-settings.html`, `internship-portal/company/company-settings.html`
 
 ---
+
+## 16. Term-Based System Refactoring (December 2025)
+
+### Problem
+- Application rounds system was complex and unnecessary
+- Terms should be the supreme layer for filtering all data
+- Multiple statuses (Finalized, Approved_By_Company) were confusing
+- Seed internships appeared for companies that didn't create them
+
+### Solution
+
+**Removed Application Rounds:**
+- Dropped `application_rounds` and `company_round_quotas` tables
+- Removed `round_id` from applications table
+- Terms now directly control application limits via `max_applications_per_student`
+- Company quotas now use `default_company_quota` from terms table
+
+**Status Simplification:**
+- Removed "Finalized" and "Approved_By_Company" statuses
+- "Confirmed" is now the final state (replaces Finalized)
+- Auto-withdrawal: When student confirms, all other applications auto-withdraw
+- Status workflow: `Pending → Accepted → Confirmed` (final)
+
+**Term Activation Logic:**
+- `get_active_term()` prioritizes `is_active=1` over dates
+- Terms can be activated before their start date (admin preparation)
+- All views filter by active term automatically
+- Empty terms show appropriate empty states
+
+**Seed Internships Fix:**
+- Backend auto-filters internships by `company_id` for company users
+- Removed seed internships from setup files
+- Created cleanup migration to remove existing seed internships
+- Frontend displays empty state when no internships exist
+
+### Key Learnings
+- **Supreme Layer**: Terms should be the single source of truth for filtering
+- **Admin Control**: `is_active` flag allows admins to prepare terms in advance
+- **Status Simplification**: Fewer statuses = clearer workflow
+- **Auto-Filtering**: Backend should automatically filter by user context (company_id, term_id)
+- **Empty States**: Always handle empty data gracefully with helpful messages
+- **Seed Data**: Remove seed data from setup files to prevent confusion
+
+### Files Modified
+- `backend/handlers/terms_helper.php` - Updated `get_active_term()` to prioritize `is_active`
+- `backend/handlers/internships_handler.php` - Auto-filter by company_id for company users
+- `backend/handlers/applications_handler.php` - Removed round logic, added auto-withdrawal
+- `internship-portal/student/student-dashboard.html` - Filter by active term
+- `internship-portal/js/student-applications.js` - Filter by active term
+- `internship-portal/company/company-internships.html` - Empty state handling
+- `backend/config/migrate_remove_rounds_make_terms_supreme.sql` - Migration script
+- `backend/config/migrate_remove_seed_internships.sql` - Cleanup script
+
+---

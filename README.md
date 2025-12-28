@@ -4,14 +4,18 @@ A full-stack internship management platform connecting students, companies, and 
 
 ## Documentation Map
 
-We maintain **four** living documents only:
+We maintain **five** core documents:
 
 1. `README.md` (this file) – project overview, setup, and structure.
-2. `api_documentation.md` – definitive API reference and request samples.
-3. `COMPLETE_WORKFLOW_SUMMARY.md` – how the business flow works end to end.
+2. `PRD_AND_WORKFLOWS.md` – product requirements, expected workflows, and business logic.
+3. `API_DOCUMENTATION.md` – complete API reference with request/response payloads.
 4. `learnings.md` – architecture lessons, debugging notes, and best practices.
+5. `TESTING_DIRECTIONS.md` – how to test the system.
+6. `TEST_RESULTS.md` – confirmed test results and verification.
 
-Anything not covered by these four is either code or intentionally deleted.
+Additional documentation:
+- `SAML_*.md` – SAML SSO integration setup (for IT department)
+- `STUDENT_EVALUATIONS_IMPLEMENTATION.md` – student evaluations feature documentation
 
 ---
 
@@ -73,7 +77,7 @@ Each login stores `userRole`/`userId` locally and session cookies server-side.
 - **Dashboards:** Company dashboard cards (active internships, total apps, finalized placements) and student dashboard cards (total/pending/offered/finalized) read live API data.
 - **Resilient UI:** Company applications grid fallbacks when DataTables is slow; all modals are fed via cached JSON rather than DOM scraping.
 
-See `COMPLETE_WORKFLOW_SUMMARY.md` for the narrative version.
+See `PRD_AND_WORKFLOWS.md` for complete workflow documentation.
 
 ---
 
@@ -87,7 +91,7 @@ The API is centralized at `http://localhost:8001/index.php`. Highlights:
 - `entity=internships` – CRUD for postings (company-only). Every response includes live company metadata.
 - `entity=applications` – student lists, company lists (with `status` filter), apply/withdraw/confirm, update status.
 
-Full request/response details and sample curl commands live in `api_documentation.md`.
+Full request/response details and sample curl commands live in `API_DOCUMENTATION.md`.
 
 ---
 
@@ -116,9 +120,11 @@ sabanciportal-1/
 │   └── js/
 │       └── api.js      # shared API client
 ├── README.md
-├── api_documentation.md
-├── COMPLETE_WORKFLOW_SUMMARY.md
-└── learnings.md
+├── PRD_AND_WORKFLOWS.md
+├── API_DOCUMENTATION.md
+├── learnings.md
+├── TESTING_DIRECTIONS.md
+└── TEST_RESULTS.md
 ```
 
 ---
