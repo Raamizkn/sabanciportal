@@ -59,6 +59,10 @@
             return;
         }
 
+        // Get email from sessionStorage
+        const userEmail = sessionStorage.getItem('impersonatedUserEmail');
+        const displayName = sessionStorage.getItem('impersonatedUserName') || userName;
+
         // Create the banner
         const banner = document.createElement('div');
         banner.id = 'impersonation-banner-standard';
@@ -68,12 +72,21 @@
         const userTypeLabel = userType === 'student' ? 'Student' : 'Company';
         const icon = userType === 'student' ? 'ph-student' : 'ph-buildings';
         
+        // Show both name and email if available
+        const userInfo = displayName && userEmail 
+            ? `<strong>${displayName}</strong> (${userEmail})` 
+            : displayName 
+                ? `<strong>${displayName}</strong>` 
+                : userEmail 
+                    ? `<strong>${userEmail}</strong>` 
+                    : 'Unknown User';
+        
         banner.innerHTML = `
             <div class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center">
                     <i class="${icon} me-2 fs-5"></i>
                     <strong>Admin Impersonation Mode:</strong>
-                    <span class="ms-2">Viewing as <strong>${userName}</strong> (${userTypeLabel})</span>
+                    <span class="ms-2">Viewing as ${userInfo} - ${userTypeLabel}</span>
                 </div>
                 <button type="button" class="btn btn-sm btn-warning" id="end-impersonation-standard-btn">
                     <i class="ph-sign-out me-1"></i>End Impersonation

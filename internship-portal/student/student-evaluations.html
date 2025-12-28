@@ -6,7 +6,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>Student Evaluations - Sabancı University Internship Portal</title>
 
-	
 	<!-- Path Resolver - MUST be loaded first -->
 	<script src="../js/path-resolver.js"></script>
 
@@ -15,29 +14,16 @@
 	<link href="../bs5/template/assets/icons/phosphor/styles.min.css" rel="stylesheet" type="text/css">
 	<link href="../bs5/template/html/layout_1/full/assets/css/ltr/all.min.css?v=1" id="stylesheet" rel="stylesheet" type="text/css">
 	<link href="../assets/css/sabanci-theme.css" rel="stylesheet" type="text/css">
-	<!-- /global stylesheets -->
 
 	<!-- Core JS files -->
 	<script src="../bs5/template/assets/js/bootstrap/bootstrap.bundle.min.js"></script>
-	<!-- /core JS files -->
 
 	<!-- API Service -->
 	<script src="../js/api.js"></script>
 
 	<!-- Theme JS files -->
-	<script src="../bs5/template/assets/js/vendor/visualization/d3/d3.min.js"></script>
-	<script src="../bs5/template/assets/js/vendor/visualization/d3/d3_tooltip.js"></script>
-	<script src="../bs5/template/assets/js/vendor/tables/datatables/datatables.min.js"></script>
 	<script src="../bs5/template/html/layout_1/full/assets/js/app.js"></script>
-	<script src="../bs5/template/assets/demo/charts/pages/dashboard/streamgraph.js"></script>
-	<script src="../bs5/template/assets/demo/charts/pages/dashboard/sparklines.js"></script>
-	<script src="../bs5/template/assets/demo/charts/pages/dashboard/lines.js"></script>	
-	<script src="../bs5/template/assets/demo/charts/pages/dashboard/areas.js"></script>
-	<script src="../bs5/template/assets/demo/charts/pages/dashboard/donuts.js"></script>
-	<script src="../bs5/template/assets/demo/pages/datatables_basic.js"></script>
-	<!-- /theme JS files -->
-	
-	<!-- Custom style for proper scrolling -->
+
 	<style>
 		.content-wrapper {
 			display: flex;
@@ -54,6 +40,34 @@
 			display: flex;
 			overflow: hidden;
 		}
+		/* Rating options styling - box below question */
+		.rating-box {
+			background: #f8f9fa;
+			border: 1px solid #dee2e6;
+			border-radius: 8px;
+			padding: 12px 16px;
+			margin-top: 8px;
+			display: flex;
+			justify-content: center;
+			gap: 24px;
+		}
+		.rating-box .form-check {
+			margin: 0;
+			padding: 0;
+		}
+		.rating-box .form-check-input {
+			margin-right: 4px;
+		}
+		.rating-box .form-check-label {
+			font-weight: 500;
+		}
+		.question-block {
+			margin-bottom: 20px;
+		}
+		.question-label {
+			font-weight: 500;
+			margin-bottom: 0;
+		}
 	</style>
 </head>
 
@@ -61,19 +75,6 @@
 
 	<!-- Main navbar -->
 	<div class="navbar navbar-dark navbar-expand-lg navbar-static border-bottom border-bottom-white border-opacity-10">
-		<!-- Impersonation alert - will be shown when admin is impersonating a student -->
-		<div id="impersonation-banner" class="d-none position-relative w-100" style="z-index:1050;">
-			<div class="alert alert-warning alert-dismissible border-0 rounded-0 m-0 d-flex align-items-center">
-				<div class="flex-fill">
-					<i class="ph-user-switch me-2"></i>
-					<span class="fw-semibold">You are impersonating:</span> <span id="impersonated-user-banner">Student</span>
-				</div>
-				<div>
-					<button id="end-impersonation-banner" class="btn btn-warning btn-sm ms-3">End Impersonation</button>
-				</div>
-			</div>
-		</div>
-		
 		<div class="container-fluid">
 			<div class="d-flex d-lg-none me-2">
 				<button type="button" class="navbar-toggler sidebar-mobile-main-toggle rounded-pill">
@@ -88,206 +89,89 @@
 				</a>
 			</div>
 
-			<div class="navbar-collapse justify-content-center flex-lg-1 order-2 order-lg-1 collapse" id="navbar_search">
-				<div class="navbar-search flex-fill position-relative mt-2 mt-lg-0 mx-lg-3">
-					<div class="form-control-feedback form-control-feedback-start flex-grow-1">
-						<input type="text" class="form-control bg-transparent rounded-pill" placeholder="Search internships...">
-						<div class="form-control-feedback-icon">
-							<i class="ph-magnifying-glass"></i>
-						</div>
-					</div>
-				</div>
-			</div>
-
 			<ul class="nav flex-row justify-content-end order-1 order-lg-2">
-				<li class="nav-item nav-item-dropdown-lg dropdown">
-					<a href="#" class="navbar-nav-link navbar-nav-link-icon rounded-pill" data-bs-toggle="dropdown">
-						<i class="ph-bell"></i>
-						<span class="badge bg-yellow text-black position-absolute top-0 end-0 translate-middle-top zindex-1 rounded-pill mt-1 me-1">2</span>
-					</a>
-					
-					<div class="dropdown-menu dropdown-menu-end dropdown-menu-scrollable-sm wmin-lg-350">
-						<div class="d-flex align-items-center border-bottom py-2 px-3">
-							<h6 class="mb-0">Notifications</h6>
-							<a href="#" class="ms-auto text-body">
-								<i class="ph-check-square me-1"></i>
-								Mark all as read
-							</a>
-						</div>
-
-						<div class="dropdown-item d-flex py-2">
-							<div class="flex-shrink-0 me-3">
-								<div class="bg-success bg-opacity-10 text-success rounded-pill p-2">
-									<i class="ph-check"></i>
-								</div>
-							</div>
-
-							<div class="flex-grow-1">
-								<a href="#" class="d-block fw-semibold">Your application has been accepted</a>
-								<span class="text-muted">Marketing Intern at XYZ Corp</span>
-							</div>
-							<div class="flex-shrink-0 align-self-center">
-								<span class="text-muted fs-sm">2 hours ago</span>
-							</div>
-						</div>
-
-						<div class="dropdown-item d-flex py-2">
-							<div class="flex-shrink-0 me-3">
-								<div class="bg-primary bg-opacity-10 text-primary rounded-pill p-2">
-									<i class="ph-user-plus"></i>
-								</div>
-							</div>
-
-							<div class="flex-grow-1">
-								<a href="#" class="d-block fw-semibold">New internship posted</a>
-								<span class="text-muted">Software Developer at ABC Tech</span>
-							</div>
-							<div class="flex-shrink-0 align-self-center">
-								<span class="text-muted fs-sm">1 day ago</span>
-							</div>
-						</div>
-
-						<div class="text-center border-top p-2">
-							<a href="#" class="text-body">View all</a>
-						</div>
-					</div>
-				</li>
-
 				<li class="nav-item nav-item-dropdown-lg dropdown ms-lg-2">
 					<a href="#" class="navbar-nav-link align-items-center rounded-pill p-1" data-bs-toggle="dropdown">
 						<div class="status-indicator-container">
 							<img src="../bs5/template/assets/images/demo/users/face11.jpg" class="w-32px h-32px rounded-pill" alt="">
 							<span class="status-indicator bg-success"></span>
 						</div>
-						<span class="d-none d-lg-inline-block mx-lg-2">John Doe</span>
+						<span class="d-none d-lg-inline-block mx-lg-2" id="userName">Student</span>
 					</a>
 
 					<div class="dropdown-menu dropdown-menu-end">
 						<a href="student-profile.html" class="dropdown-item">
-							<i class="ph-user-circle me-2"></i>
-							My profile
+							<i class="ph-user-circle me-2"></i>My profile
 						</a>
 						<a href="student-applications.html" class="dropdown-item">
-							<i class="ph-briefcase me-2"></i>
-							My applications
-						</a>
-						<a href="student-documents.html" class="dropdown-item">
-							<i class="ph-file-text me-2"></i>
-							My documents
+							<i class="ph-briefcase me-2"></i>My applications
 						</a>
 						<div class="dropdown-divider"></div>
 						<a href="../index.html" class="dropdown-item logout-link">
-							<i class="ph-sign-out me-2"></i>
-							Logout
+							<i class="ph-sign-out me-2"></i>Logout
 						</a>
 					</div>
 				</li>
 			</ul>
 		</div>
 	</div>
-	<!-- /main navbar -->
 
 	<!-- Page content -->
 	<div class="page-content">
 
 		<!-- Main sidebar -->
 		<div class="sidebar sidebar-dark sidebar-main sidebar-expand-lg">
-
-			<!-- Sidebar content -->
 			<div class="sidebar-content">
-
-				<!-- Sidebar header -->
 				<div class="sidebar-section">
 					<div class="sidebar-section-body d-flex justify-content-center">
 						<h5 class="sidebar-resize-hide flex-grow-1 my-auto">Navigation</h5>
-
 						<div>
 							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-control sidebar-main-resize d-none d-lg-inline-flex">
 								<i class="ph-arrows-left-right"></i>
 							</button>
-
 							<button type="button" class="btn btn-flat-white btn-icon btn-sm rounded-pill border-transparent sidebar-mobile-main-toggle d-lg-none">
 								<i class="ph-x"></i>
 							</button>
 						</div>
 					</div>
 				</div>
-				<!-- /sidebar header -->
 
-
-				<!-- Main navigation -->
 				<div class="sidebar-section">
 					<ul class="nav nav-sidebar" data-nav-type="accordion">
-
-						<!-- Main -->
 						<li class="nav-item-header">
 							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Main</div>
 							<i class="ph-dots-three sidebar-resize-show"></i>
 						</li>
 						<li class="nav-item">
-							<a href="student-dashboard.html" class="nav-link">
-								<i class="ph-house"></i>
-								<span>Dashboard</span>
-							</a>
+							<a href="student-dashboard.html" class="nav-link"><i class="ph-house"></i><span>Dashboard</span></a>
 						</li>
 						<li class="nav-item">
-							<a href="student-internships.html" class="nav-link">
-								<i class="ph-briefcase"></i>
-								<span>Browse Internships</span>
-							</a>
+							<a href="student-internships.html" class="nav-link"><i class="ph-briefcase"></i><span>Browse Internships</span></a>
 						</li>
 						<li class="nav-item">
-							<a href="student-applications.html" class="nav-link">
-								<i class="ph-file-text"></i>
-								<span>My Applications</span>
-							</a>
+							<a href="student-applications.html" class="nav-link"><i class="ph-file-text"></i><span>My Applications</span></a>
 						</li>
 						<li class="nav-item">
-							<a href="student-application-history.html" class="nav-link">
-								<i class="ph-clock-counter-clockwise"></i>
-								<span>Application History</span>
-							</a>
+							<a href="student-documents.html" class="nav-link"><i class="ph-file-doc"></i><span>Documents</span></a>
 						</li>
 						<li class="nav-item">
-							<a href="student-documents.html" class="nav-link">
-								<i class="ph-file-doc"></i>
-								<span>Documents</span>
-							</a>
-						</li>
-						<li class="nav-item">
-							<a href="student-evaluations.html" class="nav-link active">
-								<i class="ph-star"></i>
-								<span>Evaluations</span>
-							</a>
+							<a href="student-evaluations.html" class="nav-link active"><i class="ph-star"></i><span>Evaluations</span></a>
 						</li>
 
-						<!-- Profile -->
 						<li class="nav-item-header">
 							<div class="text-uppercase fs-sm lh-sm opacity-50 sidebar-resize-hide">Profile</div>
 							<i class="ph-dots-three sidebar-resize-show"></i>
 						</li>
 						<li class="nav-item">
-							<a href="student-profile.html" class="nav-link">
-								<i class="ph-user-circle"></i>
-								<span>My Profile</span>
-							</a>
+							<a href="student-profile.html" class="nav-link"><i class="ph-user-circle"></i><span>My Profile</span></a>
 						</li>
 						<li class="nav-item">
-							<a href="../index.html" class="nav-link logout-link">
-								<i class="ph-sign-out"></i>
-								<span>Logout</span>
-							</a>
+							<a href="../index.html" class="nav-link logout-link"><i class="ph-sign-out"></i><span>Logout</span></a>
 						</li>
 					</ul>
 				</div>
-				<!-- /main navigation -->
-
 			</div>
-			<!-- /sidebar content -->
-			
 		</div>
-		<!-- /main sidebar -->
-
 
 		<!-- Main content -->
 		<div class="content-wrapper" style="overflow-y: auto;">
@@ -299,11 +183,9 @@
 						<h4 class="page-title mb-0">Internship Evaluations</h4>
 						<span class="text-muted fs-sm">Provide feedback about your internship experience</span>
 					</div>
-					
 					<div>
 						<button type="button" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#evaluation_form">
-							<i class="ph-plus me-2"></i>
-							Submit New Evaluation
+							<i class="ph-plus me-2"></i>Submit New Evaluation
 						</button>
 					</div>
 				</div>
@@ -314,23 +196,9 @@
 							<a href="student-dashboard.html" class="breadcrumb-item"><i class="ph-house"></i></a>
 							<span class="breadcrumb-item active">Evaluations</span>
 						</div>
-
-						<div class="dropdown ms-auto">
-							<button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown">
-								<i class="ph-funnel me-2"></i>
-								Filter
-							</button>
-
-							<div class="dropdown-menu dropdown-menu-end">
-								<a href="#" class="dropdown-item" data-filter="all">All evaluations</a>
-								<a href="#" class="dropdown-item" data-filter="submitted">Submitted evaluations</a>
-								<a href="#" class="dropdown-item" data-filter="pending">Pending evaluations</a>
-							</div>
-						</div>
 					</div>
 				</div>
 			</div>
-			<!-- /page header -->
 
 			<!-- Content area -->
 			<div class="content">
@@ -346,27 +214,29 @@
 						</div>
 
 						<div class="card-body">
-							<form action="#" class="evaluation-form">
-							<!-- Application Selection -->
-							<div class="alert alert-info border-0 alert-dismissible fade show mb-4">
-								<span class="fw-semibold">Before you start:</span> Please select the internship application you want to evaluate.
-							</div>
-							
-							<div class="mb-4">
-								<label class="form-label fw-bold">Select Internship to Evaluate *</label>
-								<select class="form-select" id="application-selector" required>
-									<option value="">-- Select an application --</option>
-								</select>
-								<div class="form-text">Choose from your completed internship applications</div>
-							</div>
-							
-							<hr class="mb-4">
-							
-								<!-- Rating questions section -->
+							<form id="evaluationForm">
+								<!-- Application Selection -->
+								<div class="alert alert-info border-0 mb-4">
+									<i class="ph-info me-2"></i>
+									<span class="fw-semibold">Before you start:</span> Select the internship you want to evaluate. Only confirmed internships can be evaluated.
+								</div>
+								
 								<div class="mb-4">
-									<h6 class="fw-bold mb-3">Program Experience Rating</h6>
-									<div class="mb-3">
-										<label class="form-label">I was satisfied with the First Step to the Business World Program.*</label>
+									<label class="form-label fw-bold">Select Internship to Evaluate *</label>
+									<select class="form-select" id="application-selector" required>
+										<option value="">-- Select an application --</option>
+									</select>
+									<div class="form-text">Choose from your confirmed internship applications</div>
+								</div>
+								
+								<hr class="mb-4">
+								
+								<!-- Rating questions section -->
+								<h6 class="fw-bold mb-4">Program Experience Rating</h6>
+								
+								<div class="question-block">
+									<label class="question-label">I was satisfied with the First Step to the Business World Program. *</label>
+									<div class="rating-box">
 										<div class="form-check form-check-inline">
 											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction1" value="1" required>
 											<label class="form-check-label" for="satisfaction1">1</label>
@@ -388,9 +258,11 @@
 											<label class="form-check-label" for="satisfaction5">5</label>
 										</div>
 									</div>
+								</div>
 
-									<div class="mb-3">
-										<label class="form-label">The institution/company generally left a positive impression on me.*</label>
+								<div class="question-block">
+									<label class="question-label">The institution/company generally left a positive impression on me. *</label>
+									<div class="rating-box">
 										<div class="form-check form-check-inline">
 											<input type="radio" class="form-check-input" name="company_impression" id="impression1" value="1" required>
 											<label class="form-check-label" for="impression1">1</label>
@@ -412,9 +284,11 @@
 											<label class="form-check-label" for="impression5">5</label>
 										</div>
 									</div>
+								</div>
 
-									<div class="mb-3">
-										<label class="form-label">Did a consultant regularly take care of you at the institution?*</label>
+								<div class="question-block">
+									<label class="question-label">Did a consultant regularly take care of you at the institution? *</label>
+									<div class="rating-box">
 										<div class="form-check form-check-inline">
 											<input type="radio" class="form-check-input" name="consultant_care" id="consultant_yes" value="yes" required>
 											<label class="form-check-label" for="consultant_yes">Yes</label>
@@ -424,119 +298,121 @@
 											<label class="form-check-label" for="consultant_no">No</label>
 										</div>
 									</div>
+								</div>
 
-									<div class="mb-3 consultant-satisfaction" style="display: none;">
-										<label class="form-label">(If your answer is yes) I was satisfied with the guidance of my institution consultant.*</label>
+								<div class="question-block consultant-satisfaction" style="display: none;">
+									<label class="question-label">(If yes) I was satisfied with the guidance of my institution consultant. *</label>
+									<div class="rating-box">
 										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction1" value="1">
-											<label class="form-check-label" for="consultant_satisfaction1">1</label>
+											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_sat1" value="1">
+											<label class="form-check-label" for="consultant_sat1">1</label>
 										</div>
 										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction2" value="2">
-											<label class="form-check-label" for="consultant_satisfaction2">2</label>
+											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_sat2" value="2">
+											<label class="form-check-label" for="consultant_sat2">2</label>
 										</div>
 										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction3" value="3">
-											<label class="form-check-label" for="consultant_satisfaction3">3</label>
+											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_sat3" value="3">
+											<label class="form-check-label" for="consultant_sat3">3</label>
 										</div>
 										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction4" value="4">
-											<label class="form-check-label" for="consultant_satisfaction4">4</label>
+											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_sat4" value="4">
+											<label class="form-check-label" for="consultant_sat4">4</label>
 										</div>
 										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_satisfaction5" value="5">
-											<label class="form-check-label" for="consultant_satisfaction5">5</label>
+											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_sat5" value="5">
+											<label class="form-check-label" for="consultant_sat5">5</label>
 										</div>
 									</div>
+								</div>
 
-									<div class="mb-3">
-										<label class="form-label">I would recommend the First Step to the Business World Program to other students.*</label>
+								<div class="question-block">
+									<label class="question-label">I would recommend the First Step to the Business World Program to other students. *</label>
+									<div class="rating-box">
 										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program1" value="1" required>
-											<label class="form-check-label" for="recommend_program1">1</label>
+											<input type="radio" class="form-check-input" name="recommend_program" id="rec_prog1" value="1" required>
+											<label class="form-check-label" for="rec_prog1">1</label>
 										</div>
 										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program2" value="2">
-											<label class="form-check-label" for="recommend_program2">2</label>
+											<input type="radio" class="form-check-input" name="recommend_program" id="rec_prog2" value="2">
+											<label class="form-check-label" for="rec_prog2">2</label>
 										</div>
 										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program3" value="3">
-											<label class="form-check-label" for="recommend_program3">3</label>
+											<input type="radio" class="form-check-input" name="recommend_program" id="rec_prog3" value="3">
+											<label class="form-check-label" for="rec_prog3">3</label>
 										</div>
 										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program4" value="4">
-											<label class="form-check-label" for="recommend_program4">4</label>
+											<input type="radio" class="form-check-input" name="recommend_program" id="rec_prog4" value="4">
+											<label class="form-check-label" for="rec_prog4">4</label>
 										</div>
 										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_program" id="recommend_program5" value="5">
-											<label class="form-check-label" for="recommend_program5">5</label>
+											<input type="radio" class="form-check-input" name="recommend_program" id="rec_prog5" value="5">
+											<label class="form-check-label" for="rec_prog5">5</label>
 										</div>
 									</div>
+								</div>
 
-									<div class="mb-3">
-										<label class="form-label">I would recommend the institution/company to other students.*</label>
+								<div class="question-block">
+									<label class="question-label">I would recommend the institution/company to other students. *</label>
+									<div class="rating-box">
 										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company1" value="1" required>
-											<label class="form-check-label" for="recommend_company1">1</label>
+											<input type="radio" class="form-check-input" name="recommend_company" id="rec_comp1" value="1" required>
+											<label class="form-check-label" for="rec_comp1">1</label>
 										</div>
 										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company2" value="2">
-											<label class="form-check-label" for="recommend_company2">2</label>
+											<input type="radio" class="form-check-input" name="recommend_company" id="rec_comp2" value="2">
+											<label class="form-check-label" for="rec_comp2">2</label>
 										</div>
 										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company3" value="3">
-											<label class="form-check-label" for="recommend_company3">3</label>
+											<input type="radio" class="form-check-input" name="recommend_company" id="rec_comp3" value="3">
+											<label class="form-check-label" for="rec_comp3">3</label>
 										</div>
 										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company4" value="4">
-											<label class="form-check-label" for="recommend_company4">4</label>
+											<input type="radio" class="form-check-input" name="recommend_company" id="rec_comp4" value="4">
+											<label class="form-check-label" for="rec_comp4">4</label>
 										</div>
 										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_company" id="recommend_company5" value="5">
-											<label class="form-check-label" for="recommend_company5">5</label>
+											<input type="radio" class="form-check-input" name="recommend_company" id="rec_comp5" value="5">
+											<label class="form-check-label" for="rec_comp5">5</label>
 										</div>
 									</div>
 								</div>
 
 								<!-- Multiple choice section -->
+								<h6 class="fw-bold mb-3 mt-4">Program Benefits</h6>
 								<div class="mb-4">
-									<h6 class="fw-bold mb-3">Program Benefits</h6>
-									<div class="mb-3">
-										<label class="form-label">In which of the following areas do you think the First Step to the Business Program benefited you? (You can mark more than one option.)*</label>
-										<div class="form-check">
-											<input type="checkbox" class="form-check-input" id="benefit1" name="benefits[]" value="business_environment">
-											<label class="form-check-label" for="benefit1">I discovered the business environment and different departments.</label>
-										</div>
-										<div class="form-check">
-											<input type="checkbox" class="form-check-input" id="benefit2" name="benefits[]" value="career_interests">
-											<label class="form-check-label" for="benefit2">I discovered my career interests.</label>
-										</div>
-										<div class="form-check">
-											<input type="checkbox" class="form-check-input" id="benefit3" name="benefits[]" value="personal_awareness">
-											<label class="form-check-label" for="benefit3">I gained personal awareness.</label>
-										</div>
-										<div class="form-check">
-											<input type="checkbox" class="form-check-input" id="benefit4" name="benefits[]" value="academic_choice">
-											<label class="form-check-label" for="benefit4">It helped me choose an academic program.</label>
-										</div>
-										<div class="form-check">
-											<input type="checkbox" class="form-check-input" id="benefit5" name="benefits[]" value="network">
-											<label class="form-check-label" for="benefit5">I developed a network.</label>
-										</div>
+									<label class="form-label">In which of the following areas do you think the program benefited you? (Select all that apply) *</label>
+									<div class="form-check">
+										<input type="checkbox" class="form-check-input" id="benefit1" name="benefits[]" value="business_environment">
+										<label class="form-check-label" for="benefit1">I discovered the business environment and different departments.</label>
+									</div>
+									<div class="form-check">
+										<input type="checkbox" class="form-check-input" id="benefit2" name="benefits[]" value="career_interests">
+										<label class="form-check-label" for="benefit2">I discovered my career interests.</label>
+									</div>
+									<div class="form-check">
+										<input type="checkbox" class="form-check-input" id="benefit3" name="benefits[]" value="personal_awareness">
+										<label class="form-check-label" for="benefit3">I gained personal awareness.</label>
+									</div>
+									<div class="form-check">
+										<input type="checkbox" class="form-check-input" id="benefit4" name="benefits[]" value="academic_choice">
+										<label class="form-check-label" for="benefit4">It helped me choose an academic program.</label>
+									</div>
+									<div class="form-check">
+										<input type="checkbox" class="form-check-input" id="benefit5" name="benefits[]" value="network">
+										<label class="form-check-label" for="benefit5">I developed a network.</label>
 									</div>
 								</div>
 
 								<!-- Open-ended questions section -->
+								<h6 class="fw-bold mb-3">Additional Feedback</h6>
+								<div class="mb-3">
+									<label class="form-label">In which department did you attend the program? If rotational, please specify. *</label>
+									<textarea class="form-control" name="department" rows="2" required></textarea>
+								</div>
 								<div class="mb-4">
-									<h6 class="fw-bold mb-3">Additional Feedback</h6>
-									<div class="mb-3">
-										<label class="form-label">In which department did you attend the program? If it was rotational, please specify.*</label>
-										<textarea class="form-control" name="department" rows="2" required></textarea>
-									</div>
-									<div class="mb-3">
-										<label class="form-label">Did you encounter any significant problems during your internship? If so, please specify.</label>
-										<textarea class="form-control" name="problems" rows="3"></textarea>
-									</div>
+									<label class="form-label">Did you encounter any significant problems during your internship? If so, please specify.</label>
+									<textarea class="form-control" name="problems" rows="3"></textarea>
 								</div>
 
 								<div class="d-flex justify-content-end">
@@ -547,7 +423,6 @@
 						</div>
 					</div>
 				</div>
-				<!-- /evaluation form collapse -->
 
 				<!-- Previous evaluations -->
 				<div class="card">
@@ -575,42 +450,18 @@
 						</table>
 					</div>
 				</div>
-				<!-- /previous evaluations -->
 
 			</div>
-			<!-- /content area -->
 
 			<!-- Footer -->
 			<div class="navbar navbar-sm navbar-footer border-top">
 				<div class="container-fluid">
-					<span>&copy; 2023 <a href="#">Sabancı University Internship Portal</a></span>
-
-					<ul class="nav">
-						<li class="nav-item">
-							<a href="#" class="navbar-nav-link">
-								Support
-							</a>
-						</li>
-						<li class="nav-item">
-							<a href="#" class="navbar-nav-link">
-								Help
-							</a>
-						</li>
-						<li class="nav-item">
-							<a href="#" class="navbar-nav-link">
-								Contact
-							</a>
-						</li>
-					</ul>
+					<span>&copy; 2025 <a href="#">Sabancı University Internship Portal</a></span>
 				</div>
 			</div>
-			<!-- /footer -->
 
 		</div>
-		<!-- /main content -->
-
 	</div>
-	<!-- /page content -->
 
 	<!-- View evaluation modal -->
 	<div id="view_evaluation" class="modal fade" tabindex="-1">
@@ -620,468 +471,237 @@
 					<h5 class="modal-title">Evaluation Details</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 				</div>
-
-				<div class="modal-body">
-					<div class="mb-3">
-						<h6 class="fw-bold">XYZ Corporation - Marketing Intern</h6>
-						<p class="text-muted">Submitted on August 30, 2023</p>
-					</div>
-
-					<div class="mb-3">
-						<h6 class="fw-semibold">Program Experience Rating</h6>
-						<div class="table-responsive">
-							<table class="table table-bordered">
-								<tbody>
-									<tr>
-										<th width="70%">I was satisfied with the First Step to the Business World Program.</th>
-										<td><div class="text-center">4/5</div></td>
-									</tr>
-									<tr>
-										<th>The institution/company generally left a positive impression on me.</th>
-										<td><div class="text-center">5/5</div></td>
-									</tr>
-									<tr>
-										<th>Did a consultant regularly take care of you at the institution?</th>
-										<td><div class="text-center">Yes</div></td>
-									</tr>
-									<tr>
-										<th>I was satisfied with the guidance of my institution consultant.</th>
-										<td><div class="text-center">4/5</div></td>
-									</tr>
-									<tr>
-										<th>I would recommend the First Step to the Business World Program to other students.</th>
-										<td><div class="text-center">5/5</div></td>
-									</tr>
-									<tr>
-										<th>I would recommend the institution/company to other students.</th>
-										<td><div class="text-center">5/5</div></td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
-
-					<div class="mb-3">
-						<h6 class="fw-semibold">Program Benefits</h6>
-						<ul class="mb-0">
-							<li>I discovered the business environment and different departments.</li>
-							<li>I discovered my career interests.</li>
-							<li>I developed a network.</li>
-						</ul>
-					</div>
-
-					<div class="mb-3">
-						<h6 class="fw-semibold">Department</h6>
-						<p>Marketing Department</p>
-					</div>
-
-					<div class="mb-3">
-						<h6 class="fw-semibold">Problems Encountered</h6>
-						<p>No significant problems encountered during the internship.</p>
-					</div>
+				<div class="modal-body" id="evaluationModalBody">
+					<!-- Content will be loaded dynamically -->
 				</div>
-
 				<div class="modal-footer">
 					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
 				</div>
 			</div>
 		</div>
 	</div>
-	<!-- /view evaluation modal -->
 
-	<!-- Add script to toggle consultant satisfaction question -->
 	<script>
-		document.addEventListener('DOMContentLoaded', function() {
-			// Show/hide consultant satisfaction question based on "Yes" response
-			const consultantYes = document.getElementById('consultant_yes');
-			const consultantNo = document.getElementById('consultant_no');
-			const consultantSatisfactionDiv = document.querySelector('.consultant-satisfaction');
-			
-			if (consultantYes && consultantNo && consultantSatisfactionDiv) {
-				consultantYes.addEventListener('change', function() {
-					if (this.checked) {
-						consultantSatisfactionDiv.style.display = 'block';
-						document.querySelectorAll('[name="consultant_satisfaction"]').forEach(radio => {
-							radio.setAttribute('required', 'required');
-						});
-					}
-				});
-				
-				consultantNo.addEventListener('change', function() {
-					if (this.checked) {
-						consultantSatisfactionDiv.style.display = 'none';
-						document.querySelectorAll('[name="consultant_satisfaction"]').forEach(radio => {
-							radio.removeAttribute('required');
-						});
-					}
-				});
-			}
-		});
-	</script>
-
-	<!-- Load applications for evaluation dropdown -->
-	<script>
-		async function loadApplicationsForEvaluation() {
-			const studentId = localStorage.getItem('userId') || sessionStorage.getItem('impersonatedUser');
-			console.log('Loading applications for student ID:', studentId);
-			console.log('localStorage.userId:', localStorage.getItem('userId'));
-			console.log('sessionStorage.impersonatedUser:', sessionStorage.getItem('impersonatedUser'));
-			
-			if (!studentId) {
-				console.error('No student ID found - cannot load applications');
-				return;
-			}
-			
-		try {
-			console.log('Calling api.getApplications...');
-			const response = await api.getApplications(studentId);
-			console.log('Applications response:', response);
-			// Response is already an array, not wrapped in { data: [...] }
-			const applications = Array.isArray(response) ? response : (response.data || []);
-				
-				const selector = document.getElementById('application-selector');
-				if (!selector) return;
-				
-				// Clear existing options (except the first one)
-				selector.innerHTML = '<option value="">-- Select an application --</option>';
-				
-				// Filter applications that can be evaluated
-				// Include: Finalized (mapped from Approved_By_Company), Confirmed, Accepted
-				const completedApps = applications.filter(app => 
-					app.status === 'Finalized' || 
-					app.status === 'Confirmed' || 
-					app.status === 'Accepted'
-				);
-				
-				if (completedApps.length === 0) {
-					selector.innerHTML = '<option value="">No completed internships to evaluate</option>';
-					selector.disabled = true;
-					return;
-				}
-				
-			// Add applications to dropdown
-			completedApps.forEach(app => {
-				const option = document.createElement('option');
-				option.value = app.application_id;
-				option.textContent = `${app.company_name} - ${app.internship_position || 'Internship'} (${app.status})`;
-				selector.appendChild(option);
-			});
-				
-				// Check if URL has application_id parameter
-				const urlParams = new URLSearchParams(window.location.search);
-				const urlAppId = urlParams.get('application_id');
-				if (urlAppId) {
-					selector.value = urlAppId;
-				}
-				
-			} catch (error) {
-				console.error('Failed to load applications for evaluation:', error);
-			}
-		}
-	</script>
-
-	<!-- Handle evaluation form submission -->
-	<script>
-		document.addEventListener('DOMContentLoaded', function() {
-			// Connect evaluation form to backend
-			const evaluationForm = document.querySelector('.evaluation-form');
-			if (evaluationForm) {
-				evaluationForm.addEventListener('submit', async function(e) {
-					e.preventDefault();
-					
-					// Check if at least one benefit is selected
-					const benefits = document.querySelectorAll('[name="benefits[]"]:checked');
-					if (benefits.length === 0) {
-						alert('Please select at least one benefit.');
-						return;
-					}
-					
-					// Get application ID from dropdown
-					const selector = document.getElementById('application-selector');
-					const applicationId = selector ? selector.value : null;
-					
-					if (!applicationId) {
-						alert('Please select an internship application to evaluate.');
-						selector.focus();
-						return;
-					}
-					
-					// Collect form data
-					const formData = new FormData(evaluationForm);
-					const benefitsArray = Array.from(benefits).map(b => b.value);
-					
-					const evaluationData = {
-						application_id: applicationId,
-						program_satisfaction: parseInt(formData.get('program_satisfaction')) || 0,
-						future_participation: parseInt(formData.get('future_participation')) || 0,
-						consultant_care: formData.get('consultant_care') || 'no',
-						consultant_satisfaction: parseInt(formData.get('consultant_satisfaction')) || 0,
-						institution_selection: parseInt(formData.get('institution_selection')) || 0,
-						institution_recommendation: parseInt(formData.get('institution_recommendation')) || 0,
-						benefits: benefitsArray.join(', '),
-						department: formData.get('department') || '',
-						problems: formData.get('problems') || '',
-						additional_feedback: formData.get('additional_feedback') || ''
-					};
-					
-					try {
-						// Submit to backend
-						const response = await fetch(`${API_BASE_URL}/index.php?entity=student_evaluations&action=submit`, {
-							method: 'POST',
-							headers: { 'Content-Type': 'application/json' },
-							credentials: 'include',
-							body: JSON.stringify(evaluationData)
-						});
-						
-						const result = await response.json();
-						
-						if (result.status === 'success') {
-					alert('Evaluation submitted successfully!');
-							document.querySelector('[data-bs-target="#evaluation_form"]').click(); // Collapse form
-							evaluationForm.reset(); // Reset form
-							// Reload page to show new evaluation in list
-							location.reload();
-						} else {
-							alert('Error: ' + (result.error || 'Failed to submit evaluation'));
-						}
-					} catch (error) {
-						console.error('Evaluation submission failed:', error);
-						alert('Failed to submit evaluation. Please try again.');
-					}
-				});
-			}
-		});
-	</script>
-
-	<!-- Load and display evaluations -->
-	<script>
-	async function loadStudentEvaluations() {
-		const studentId = localStorage.getItem('userId') || sessionStorage.getItem('impersonatedUser');
-		if (!studentId) {
-			console.error('No student ID found');
+	document.addEventListener('DOMContentLoaded', function() {
+		// Auth check
+		const userRole = localStorage.getItem('userRole');
+		const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'student';
+		
+		if (userRole !== 'student' && !isBeingImpersonated) {
+			alert('Access denied. Redirecting to login page.');
+			window.location.href = '../index.html';
 			return;
 		}
 		
-		try {
-			const result = await api.request(`/index.php?entity=student_evaluations&action=list&student_id=${studentId}`);
-				
-				const tbody = document.getElementById('evaluationsTableBody');
-				if (!tbody) return;
-				
-				if (result.status === 'success' && result.data && result.data.length > 0) {
-					tbody.innerHTML = '';
-					result.data.forEach(evaluation => {
-						const row = document.createElement('tr');
-						row.innerHTML = `
-							<td>
-								<div class="d-flex align-items-center">
-									<div>${evaluation.company_name || evaluation.company_full_name || 'Unknown'}</div>
-								</div>
-							</td>
-							<td>${evaluation.position || 'N/A'}</td>
-							<td>
-								<div class="d-flex align-items-center">
-									<span class="me-2">${parseFloat(evaluation.overall_rating || 0).toFixed(1)}</span>
-									<i class="ph-star-fill text-warning"></i>
-								</div>
-							</td>
-							<td>${evaluation.submitted_date || 'N/A'}</td>
-							<td><span class="badge bg-success">Submitted</span></td>
-							<td class="text-center">
-								<button type="button" class="btn btn-light btn-sm" onclick="viewEvaluationDetails('${evaluation.evaluation_id}')">
-									<i class="ph-eye me-1"></i> View
-								</button>
-							</td>
-						`;
-						tbody.appendChild(row);
-					});
-				} else {
-					tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No evaluations submitted yet.</td></tr>';
-				}
-			} catch (error) {
-				console.error('Failed to load evaluations:', error);
-				const tbody = document.getElementById('evaluationsTableBody');
-				if (tbody) {
-					tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Failed to load evaluations.</td></tr>';
-				}
-			}
-		}
+		// Get student ID
+		const studentId = sessionStorage.getItem('impersonatedUser') || localStorage.getItem('userId');
 		
-	async function viewEvaluationDetails(evaluationId) {
-		try {
-			// Fetch evaluation details from backend
-			const response = await api.getStudentEvaluationDetails(evaluationId);
+		// Load applications and evaluations
+		loadApplicationsForEvaluation(studentId);
+		loadStudentEvaluations(studentId);
+		
+		// Show/hide consultant satisfaction based on Yes/No
+		document.querySelectorAll('[name="consultant_care"]').forEach(radio => {
+			radio.addEventListener('change', function() {
+				const consultantDiv = document.querySelector('.consultant-satisfaction');
+				if (this.value === 'yes') {
+					consultantDiv.style.display = 'block';
+					consultantDiv.querySelector('input').setAttribute('required', 'required');
+				} else {
+					consultantDiv.style.display = 'none';
+					consultantDiv.querySelectorAll('input').forEach(i => i.removeAttribute('required'));
+				}
+			});
+		});
+		
+		// Form submission
+		document.getElementById('evaluationForm').addEventListener('submit', async function(e) {
+			e.preventDefault();
 			
-			if (!response || response.error) {
-				alert('Failed to load evaluation details: ' + (response?.error || 'Unknown error'));
+			const benefits = document.querySelectorAll('[name="benefits[]"]:checked');
+			if (benefits.length === 0) {
+				alert('Please select at least one benefit.');
 				return;
 			}
 			
-			const evaluation = response.data || response;
+			const applicationId = document.getElementById('application-selector').value;
+			if (!applicationId) {
+				alert('Please select an internship to evaluate.');
+				return;
+			}
 			
-			// Populate modal with evaluation data
-			const modal = document.getElementById('view_evaluation');
-			const modalBody = modal.querySelector('.modal-body');
+			const formData = new FormData(this);
+			const benefitsArray = Array.from(benefits).map(b => b.value);
+			
+			const evaluationData = {
+				application_id: applicationId,
+				program_satisfaction: parseInt(formData.get('program_satisfaction')) || 0,
+				company_impression: parseInt(formData.get('company_impression')) || 0,
+				consultant_care: formData.get('consultant_care') || 'no',
+				consultant_satisfaction: parseInt(formData.get('consultant_satisfaction')) || 0,
+				recommend_program: parseInt(formData.get('recommend_program')) || 0,
+				recommend_company: parseInt(formData.get('recommend_company')) || 0,
+				benefits: benefitsArray.join(', '),
+				department: formData.get('department') || '',
+				problems: formData.get('problems') || ''
+			};
+			
+			try {
+				const response = await api.submitStudentEvaluation(applicationId, evaluationData);
+				
+				if (response.status === 'success') {
+					alert('Evaluation submitted successfully!');
+					location.reload();
+				} else {
+					alert('Error: ' + (response.error || 'Failed to submit evaluation'));
+				}
+			} catch (error) {
+				console.error('Evaluation submission failed:', error);
+				alert('Failed to submit evaluation: ' + error.message);
+			}
+		});
+		
+		// Logout
+		document.querySelectorAll('.logout-link').forEach(link => {
+			link.addEventListener('click', () => {
+				localStorage.removeItem('userRole');
+				localStorage.removeItem('userId');
+			});
+		});
+	});
+	
+	async function loadApplicationsForEvaluation(studentId) {
+		if (!studentId) return;
+		
+		try {
+			const response = await api.getApplications(studentId);
+			const applications = Array.isArray(response) ? response : (response.data || []);
+			
+			const selector = document.getElementById('application-selector');
+			selector.innerHTML = '<option value="">-- Select an application --</option>';
+			
+			// Only show CONFIRMED applications
+			const confirmedApps = applications.filter(app => app.status === 'Confirmed');
+			
+			if (confirmedApps.length === 0) {
+				selector.innerHTML = '<option value="">No confirmed internships to evaluate</option>';
+				selector.disabled = true;
+				return;
+			}
+			
+			confirmedApps.forEach(app => {
+				const option = document.createElement('option');
+				option.value = app.id || app.application_id;
+				option.textContent = `${app.company_name || 'Company'} - ${app.internship_position || app.position || 'Internship'}`;
+				selector.appendChild(option);
+			});
+		} catch (error) {
+			console.error('Failed to load applications:', error);
+		}
+	}
+	
+	async function loadStudentEvaluations(studentId) {
+		if (!studentId) return;
+		
+		try {
+			const result = await api.getStudentEvaluations(studentId);
+			const tbody = document.getElementById('evaluationsTableBody');
+			
+			if (result.status === 'success' && result.data && result.data.length > 0) {
+				tbody.innerHTML = '';
+				result.data.forEach(evaluation => {
+					const row = document.createElement('tr');
+					row.innerHTML = `
+						<td><strong>${evaluation.company_name || evaluation.company_full_name || 'Unknown'}</strong></td>
+						<td>${evaluation.position || 'N/A'}</td>
+						<td>
+							<div class="d-flex align-items-center">
+								<span class="me-2">${parseFloat(evaluation.overall_rating || 0).toFixed(1)}/5</span>
+								<i class="ph-star-fill text-warning"></i>
+							</div>
+						</td>
+						<td>${evaluation.submitted_date || 'N/A'}</td>
+						<td><span class="badge bg-success">Submitted</span></td>
+						<td class="text-center">
+							<button type="button" class="btn btn-light btn-sm" onclick="viewEvaluationDetails('${evaluation.evaluation_id}', '${studentId}')">
+								<i class="ph-eye me-1"></i> View
+							</button>
+						</td>
+					`;
+					tbody.appendChild(row);
+				});
+			} else {
+				tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No evaluations submitted yet.</td></tr>';
+			}
+		} catch (error) {
+			console.error('Failed to load evaluations:', error);
+			document.getElementById('evaluationsTableBody').innerHTML = '<tr><td colspan="6" class="text-center text-danger">Failed to load evaluations.</td></tr>';
+		}
+	}
+	
+	async function viewEvaluationDetails(evaluationId, studentId) {
+		try {
+			const response = await api.getStudentEvaluationDetails(evaluationId, studentId);
+			
+			if (!response || response.error) {
+				alert('Failed to load evaluation details');
+				return;
+			}
+			
+			const e = response.data || response;
+			const modalBody = document.getElementById('evaluationModalBody');
 			
 			modalBody.innerHTML = `
 				<div class="mb-3">
-					<h6 class="fw-bold">${evaluation.company_name || 'Company'} - ${evaluation.internship_position || 'Internship'}</h6>
-					<p class="text-muted">Submitted on ${new Date(evaluation.created_at).toLocaleDateString()}</p>
+					<h6 class="fw-bold">${e.company_name || e.company_full_name || 'Company'} - ${e.position || 'Internship'}</h6>
+					<p class="text-muted mb-0">Submitted on ${e.submitted_date || new Date(e.created_at).toLocaleDateString()}</p>
+					<p class="mb-0"><strong>Overall Rating:</strong> ${parseFloat(e.overall_rating || 0).toFixed(1)}/5 ⭐</p>
 				</div>
-
-				<div class="mb-3">
-					<h6 class="fw-semibold">Program Experience Rating</h6>
-					<div class="table-responsive">
-						<table class="table table-bordered">
-							<tbody>
-								<tr>
-									<th width="70%">I was satisfied with the First Step to the Business World Program.</th>
-									<td><div class="text-center">${evaluation.program_satisfaction || 0}/5</div></td>
-								</tr>
-								<tr>
-									<th>The institution/company generally left a positive impression on me.</th>
-									<td><div class="text-center">${evaluation.institution_selection || 0}/5</div></td>
-								</tr>
-								<tr>
-									<th>Did a consultant regularly take care of you at the institution?</th>
-									<td><div class="text-center">${evaluation.consultant_care === 'yes' ? 'Yes' : 'No'}</div></td>
-								</tr>
-								${evaluation.consultant_care === 'yes' ? `
-								<tr>
-									<th>I was satisfied with the guidance of my institution consultant.</th>
-									<td><div class="text-center">${evaluation.consultant_satisfaction || 0}/5</div></td>
-								</tr>
-								` : ''}
-								<tr>
-									<th>I would recommend the First Step to the Business World Program to other students.</th>
-									<td><div class="text-center">${evaluation.future_participation || 0}/5</div></td>
-								</tr>
-								<tr>
-									<th>I would recommend the institution/company to other students.</th>
-									<td><div class="text-center">${evaluation.institution_recommendation || 0}/5</div></td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-
-				${evaluation.benefits ? `
-				<div class="mb-3">
-					<h6 class="fw-semibold">Program Benefits</h6>
-					<ul class="mb-0">
-						${evaluation.benefits.split(',').map(b => `<li>${b.trim()}</li>`).join('')}
-					</ul>
-				</div>
-				` : ''}
-
-				${evaluation.department ? `
-				<div class="mb-3">
-					<h6 class="fw-semibold">Department</h6>
-					<p>${evaluation.department}</p>
-				</div>
-				` : ''}
-
-				${evaluation.problems ? `
-				<div class="mb-3">
-					<h6 class="fw-semibold">Problems Encountered</h6>
-					<p>${evaluation.problems}</p>
-				</div>
-				` : ''}
-
-				${evaluation.additional_feedback ? `
-				<div class="mb-3">
-					<h6 class="fw-semibold">Additional Feedback</h6>
-					<p>${evaluation.additional_feedback}</p>
-				</div>
-				` : ''}
+				<hr>
+				<h6 class="fw-semibold mb-3">Program Experience Rating</h6>
+				<table class="table table-bordered">
+					<tbody>
+						<tr>
+							<th width="70%">Program Satisfaction</th>
+							<td class="text-center">${e.program_satisfaction || 0}/5</td>
+						</tr>
+						<tr>
+							<th>Company Impression</th>
+							<td class="text-center">${e.institution_selection || 0}/5</td>
+						</tr>
+						<tr>
+							<th>Consultant Care</th>
+							<td class="text-center">${e.consultant_care === 'yes' ? 'Yes' : 'No'}</td>
+						</tr>
+						${e.consultant_care === 'yes' ? `
+						<tr>
+							<th>Consultant Satisfaction</th>
+							<td class="text-center">${e.consultant_satisfaction || 0}/5</td>
+						</tr>` : ''}
+						<tr>
+							<th>Recommend Program</th>
+							<td class="text-center">${e.future_participation || 0}/5</td>
+						</tr>
+						<tr>
+							<th>Recommend Company</th>
+							<td class="text-center">${e.institution_recommendation || 0}/5</td>
+						</tr>
+					</tbody>
+				</table>
+				${e.benefits ? `<p><strong>Benefits:</strong> ${e.benefits}</p>` : ''}
+				${e.department ? `<p><strong>Department:</strong> ${e.department}</p>` : ''}
+				${e.problems_encountered ? `<p><strong>Problems:</strong> ${e.problems_encountered}</p>` : ''}
 			`;
 			
-			// Show the modal using Bootstrap's Modal API
-			const bsModal = new bootstrap.Modal(modal);
-			bsModal.show();
-			
+			new bootstrap.Modal(document.getElementById('view_evaluation')).show();
 		} catch (error) {
 			console.error('Failed to load evaluation details:', error);
-			alert('Failed to load evaluation details. Please try again.');
+			alert('Failed to load evaluation details');
 		}
 	}
 	</script>
 
-	<!-- Add logout script -->
-	<script>
-		document.addEventListener('DOMContentLoaded', () => {
-			console.log('Student evaluations script loaded.');
-			
-			// Logout functionality
-			const logoutLinks = document.querySelectorAll('.logout-link');
-			logoutLinks.forEach(link => {
-				link.addEventListener('click', () => {
-					localStorage.removeItem('userRole');
-				});
-			});
-
-			// Auth check
-			const userRole = localStorage.getItem('userRole');
-			const isBeingImpersonated = sessionStorage.getItem('impersonatedUserType') === 'student';
-			
-			if (userRole !== 'student' && !isBeingImpersonated) {
-				alert('Access denied. Redirecting to login page.');
-				window.location.href = '../index.html';
-		} else {
-			// Load evaluations and applications if authenticated
-			loadStudentEvaluations();
-			loadApplicationsForEvaluation();
-			}
-		});
-	</script>
-
-	<!-- Impersonation detection script -->
-	<script>
-		document.addEventListener('DOMContentLoaded', function() {
-			// Check if an admin is impersonating this user
-			const impersonatedUser = sessionStorage.getItem('impersonatedUser');
-			const impersonatedUserEmail = sessionStorage.getItem('impersonatedUserEmail');
-			const impersonatedUserType = sessionStorage.getItem('impersonatedUserType');
-			const impersonatedUserName = sessionStorage.getItem('impersonatedUserName');
-			
-			if (impersonatedUser && impersonatedUserEmail && impersonatedUserType === 'student') {
-				// Show impersonation banner
-				const impersonationBanner = document.getElementById('impersonation-banner');
-				const impersonatedUserBanner = document.getElementById('impersonated-user-banner');
-				
-				if (impersonationBanner && impersonatedUserBanner) {
-					impersonatedUserBanner.textContent = impersonatedUserEmail;
-					impersonationBanner.classList.remove('d-none');
-				}
-				
-				// Update profile info in the header
-				if (impersonatedUserName) {
-					const userNameElement = document.querySelector('.navbar-nav-link .d-none.d-lg-inline-block.mx-lg-2');
-					if (userNameElement) {
-						userNameElement.textContent = impersonatedUserName;
-					}
-				}
-				
-				// Add event listener to end impersonation button
-				const endImpersonationButton = document.getElementById('end-impersonation-banner');
-				if (endImpersonationButton) {
-					endImpersonationButton.addEventListener('click', function() {
-						// Clear impersonation data
-						sessionStorage.removeItem('impersonatedUser');
-						sessionStorage.removeItem('impersonatedUserEmail');
-						sessionStorage.removeItem('impersonatedUserType');
-						sessionStorage.removeItem('impersonatedUserName');
-						
-						// Redirect back to admin dashboard
-						window.location.href = '../admin/admin-dashboard.html';
-					});
-				}
-			}
-		});
-	</script>
-
-
 	<!-- Standardized Impersonation Banner -->
 	<script src="../js/impersonation-banner.js"></script>
 </body>
-</html> 
+</html>

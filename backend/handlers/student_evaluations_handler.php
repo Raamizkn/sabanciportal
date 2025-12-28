@@ -27,6 +27,7 @@ function generate_student_eval_id() {
 /**
  * Submit student evaluation
  * Student evaluates their internship experience
+ * Only CONFIRMED applications can be evaluated
  */
 function submit_student_evaluation($student_id, $application_id, $evaluation_data) {
     try {
@@ -34,18 +35,25 @@ function submit_student_evaluation($student_id, $application_id, $evaluation_dat
         $db->beginTransaction();
         
         // Get application and verify it belongs to the student
+        // Try matching by application_id (string) or id (numeric)
         $stmt = $db->prepare("
             SELECT a.*, i.company_id, i.company_name, i.position
             FROM applications a
             JOIN internships i ON a.internship_id = i.id
-            WHERE a.application_id = ? AND a.student_id = ?
+            WHERE (a.application_id = ? OR a.id = ?) AND a.student_id = ?
         ");
-        $stmt->execute([$application_id, $student_id]);
+        $stmt->execute([$application_id, $application_id, $student_id]);
         $application = $stmt->fetch();
         
         if (!$application) {
             $db->rollBack();
             return ['error' => 'Application not found or access denied'];
+        }
+        
+        // Check status - only CONFIRMED applications can be evaluated
+        if ($application['status'] !== 'Confirmed') {
+            $db->rollBack();
+            return ['error' => 'Can only evaluate confirmed internships. Current status: ' . $application['status']];
         }
         
         // Check if evaluation already exists
@@ -59,15 +67,30 @@ function submit_student_evaluation($student_id, $application_id, $evaluation_dat
         // Generate evaluation ID
         $eval_id = generate_student_eval_id();
         
-        // Calculate overall rating
+        // Calculate overall rating from numeric fields (1-5 scale)
+        // Map frontend field names to backend field names
+        $program_satisfaction = intval($evaluation_data['program_satisfaction'] ?? 0);
+        $company_impression = intval($evaluation_data['company_impression'] ?? $evaluation_data['institution_selection'] ?? 0);
+        $recommend_program = intval($evaluation_data['recommend_program'] ?? $evaluation_data['future_participation'] ?? 0);
+        $recommend_company = intval($evaluation_data['recommend_company'] ?? $evaluation_data['institution_recommendation'] ?? 0);
+        $consultant_satisfaction = intval($evaluation_data['consultant_satisfaction'] ?? 0);
+        $consultant_care = $evaluation_data['consultant_care'] ?? 'no';
+        
         $ratings = [
-            $evaluation_data['program_satisfaction'] ?? 0,
-            $evaluation_data['future_participation'] ?? 0,
-            $evaluation_data['consultant_satisfaction'] ?? 0,
-            $evaluation_data['institution_selection'] ?? 0,
-            $evaluation_data['institution_recommendation'] ?? 0
+            $program_satisfaction,
+            $company_impression,
+            $recommend_program,
+            $recommend_company
         ];
-        $overall_rating = array_sum(array_filter($ratings)) / max(count(array_filter($ratings)), 1);
+        
+        // Only include consultant satisfaction if they had a consultant
+        if ($consultant_care === 'yes' && $consultant_satisfaction > 0) {
+            $ratings[] = $consultant_satisfaction;
+        }
+        
+        // Filter out zero values and calculate average
+        $valid_ratings = array_filter($ratings, function($r) { return $r > 0; });
+        $overall_rating = count($valid_ratings) > 0 ? array_sum($valid_ratings) / count($valid_ratings) : 0;
         
         // Insert evaluation
         $stmt = $db->prepare("
@@ -85,17 +108,17 @@ function submit_student_evaluation($student_id, $application_id, $evaluation_dat
             $application['id'],
             $student_id,
             $application['company_id'],
-            $evaluation_data['program_satisfaction'] ?? 0,
-            $evaluation_data['future_participation'] ?? 0,
-            $evaluation_data['consultant_care'] ?? 'no',
-            $evaluation_data['consultant_satisfaction'] ?? 0,
-            $evaluation_data['institution_selection'] ?? 0,
-            $evaluation_data['institution_recommendation'] ?? 0,
+            $program_satisfaction,
+            $recommend_program,  // Maps to future_participation
+            $consultant_care,
+            $consultant_satisfaction,
+            $company_impression,  // Maps to institution_selection
+            $recommend_company,   // Maps to institution_recommendation
             $evaluation_data['benefits'] ?? '',
             $evaluation_data['department'] ?? '',
             $evaluation_data['problems'] ?? '',
             $evaluation_data['additional_feedback'] ?? '',
-            $overall_rating
+            round($overall_rating, 2)
         ]);
         
         $db->commit();
@@ -218,21 +241,21 @@ function get_all_student_evaluations_admin() {
 
 /**
  * Get pending evaluations for a student
- * Returns applications that student completed but hasn't evaluated yet
+ * Returns CONFIRMED applications that student hasn't evaluated yet
  */
 function get_pending_student_evaluations($student_id) {
     try {
         $db = getDB();
         
-        // Get applications where student was confirmed but hasn't submitted evaluation
+        // Get applications where student has confirmed but hasn't submitted evaluation
         $stmt = $db->prepare("
-            SELECT a.application_id, a.status,
+            SELECT a.id, a.application_id, a.status,
                    i.company_name, i.position, i.location, i.dates,
                    (SELECT COUNT(*) FROM student_evaluations se WHERE se.application_id = a.id) as has_evaluation
             FROM applications a
             JOIN internships i ON a.internship_id = i.id
             WHERE a.student_id = ?
-            AND a.status = 'Confirmed_By_Student'
+            AND a.status = 'Confirmed'
             HAVING has_evaluation = 0
             ORDER BY a.status_updated_date DESC
         ");

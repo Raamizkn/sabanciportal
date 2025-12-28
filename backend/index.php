@@ -135,6 +135,49 @@ elseif ($entity === 'student_evaluations') {
 elseif ($entity === 'companies') {
     require_once __DIR__ . '/handlers/company_handler.php';
 }
+elseif ($entity === 'company_evaluations') {
+    // Company evaluations (company → student)
+    require_once __DIR__ . '/handlers/company_evaluations_handler.php';
+    
+    $company_id = $_GET['company_id'] ?? getCurrentUserId();
+    $response = null;
+    
+    if ($method === 'GET') {
+        if ($action === 'evaluable_students') {
+            // Get students that can be evaluated
+            $response = get_evaluable_students($company_id);
+        } elseif ($action === 'list') {
+            // Get all evaluations by this company
+            $response = get_company_evaluations($company_id);
+        } elseif ($action === 'details' && $id) {
+            // Get specific evaluation details
+            $response = get_company_evaluation_details($id, $company_id);
+        }
+    } elseif ($method === 'POST') {
+        if ($action === 'submit') {
+            // Submit new evaluation
+            requireRole(ROLE_COMPANY);
+            $application_id = $input['application_id'] ?? null;
+            if (!$application_id) {
+                http_response_code(400);
+                echo json_encode(['error' => 'application_id required']);
+                exit;
+            }
+            $response = submit_company_evaluation($company_id, $application_id, $input);
+        }
+    }
+    
+    if ($response !== null) {
+        if (isset($response['error'])) {
+            http_response_code(400);
+        }
+        echo json_encode($response);
+    } else {
+        http_response_code(400);
+        echo json_encode(['error' => 'Invalid company evaluation action']);
+    }
+    exit;
+}
 elseif ($entity === 'rounds') {
     require_once __DIR__ . '/handlers/rounds_handler.php';
 }

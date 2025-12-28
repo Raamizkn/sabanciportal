@@ -551,6 +551,42 @@ class APIService {
         });
     }
 
+    // ==================== COMPANY EVALUATION APIs ====================
+
+    /**
+     * Get students that a company can evaluate (confirmed internships)
+     */
+    async getEvaluableStudents(companyId) {
+        return this.request(`/index.php?entity=company_evaluations&action=evaluable_students&company_id=${companyId}`);
+    }
+
+    /**
+     * Get all evaluations submitted by a company
+     */
+    async getCompanySubmittedEvaluations(companyId) {
+        return this.request(`/index.php?entity=company_evaluations&action=list&company_id=${companyId}`);
+    }
+
+    /**
+     * Get details of a specific company evaluation
+     */
+    async getCompanyEvaluationDetails(evaluationId, companyId) {
+        return this.request(`/index.php?entity=company_evaluations&action=details&id=${evaluationId}&company_id=${companyId}`);
+    }
+
+    /**
+     * Submit company evaluation of a student
+     */
+    async submitCompanyEvaluation(applicationId, evaluationData) {
+        return this.request('/index.php?entity=company_evaluations&action=submit', {
+            method: 'POST',
+            body: JSON.stringify({
+                application_id: applicationId,
+                ...evaluationData
+            })
+        });
+    }
+
     // ==================== TERMS & ROUNDS APIs ====================
 
     /**
