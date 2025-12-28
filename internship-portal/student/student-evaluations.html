@@ -774,8 +774,8 @@
 				selector.innerHTML = '<option value="">-- Select an application --</option>';
 				
 				// IMPORTANT: Only allow evaluation of COMPLETED internships
-				// Statuses that indicate completion: Complete, Completed, Finalized
-				const completedStatuses = ['Complete', 'Completed', 'Finalized'];
+				// Statuses that indicate completion/finalization
+				const completedStatuses = ['Complete', 'Completed', 'Finalized', 'Approved_By_Company', 'Confirmed_By_Student'];
 				const completedApps = applications.filter(app => 
 					completedStatuses.includes(app.status)
 				);

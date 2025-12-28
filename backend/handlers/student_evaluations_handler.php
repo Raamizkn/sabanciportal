@@ -49,11 +49,12 @@ function submit_student_evaluation($student_id, $application_id, $evaluation_dat
             return ['error' => 'Application not found or access denied'];
         }
         
-        // IMPORTANT: Only allow evaluation of COMPLETED internships
-        $allowed_statuses = ['Complete', 'Completed', 'Finalized'];
+        // IMPORTANT: Only allow evaluation of COMPLETED/FINALIZED internships
+        // Include statuses that indicate the internship process is complete
+        $allowed_statuses = ['Complete', 'Completed', 'Finalized', 'Approved_By_Company', 'Confirmed_By_Student'];
         if (!in_array($application['status'], $allowed_statuses)) {
             $db->rollBack();
-            return ['error' => 'Can only evaluate completed internships. Current status: ' . $application['status'] . '. The internship must be marked as Complete before evaluation.'];
+            return ['error' => 'Can only evaluate completed internships. Current status: ' . $application['status'] . '. The internship must be approved/finalized before evaluation.'];
         }
         
         // Check if evaluation already exists

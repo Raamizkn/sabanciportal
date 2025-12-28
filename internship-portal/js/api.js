@@ -497,20 +497,41 @@ class APIService {
     // ==================== EVALUATION APIs ====================
 
     /**
-     * Get company evaluations
+     * Get company evaluations (company → student)
      */
     async getCompanyEvaluations(companyId) {
-        return this.request(`/index.php?entity=companies&action=get_evaluations&company_id=${companyId}`);
+        return this.request(`/index.php?entity=company_evaluations&action=list&company_id=${companyId}`);
     }
 
     /**
-     * Create evaluation
+     * Get students eligible for evaluation by a company
+     */
+    async getEvaluableStudents(companyId) {
+        return this.request(`/index.php?entity=company_evaluations&action=evaluable_students&company_id=${companyId}`);
+    }
+
+    /**
+     * Submit company evaluation of a student
+     */
+    async submitCompanyEvaluation(applicationId, evaluationData) {
+        return this.request(`/index.php?entity=company_evaluations&action=submit`, {
+            method: 'POST',
+            body: JSON.stringify({ ...evaluationData, application_id: applicationId })
+        });
+    }
+
+    /**
+     * Get company evaluation details
+     */
+    async getCompanyEvaluationDetails(evaluationId, companyId) {
+        return this.request(`/index.php?entity=company_evaluations&action=details&id=${evaluationId}&company_id=${companyId}`);
+    }
+
+    /**
+     * Create evaluation (legacy - for compatibility)
      */
     async createEvaluation(applicationId, evaluationData) {
-        return this.request(`/index.php?entity=companies&action=create_evaluation&application_id=${applicationId}`, {
-            method: 'POST',
-            body: JSON.stringify(evaluationData)
-        });
+        return this.submitCompanyEvaluation(applicationId, evaluationData);
     }
 
     /**
