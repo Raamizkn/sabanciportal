@@ -199,11 +199,9 @@ INSERT INTO companies (name, email, industry, website, phone, address, descripti
 ('Global Innovations', 'innovate@example.com', 'Research & Development', 'http://globalinnovations.example.com', '876-543-2109', '789 Innovation Hub, Remote', 'Innovative R&D company focusing on cutting-edge technologies'),
 ('Tech Solutions Inc.', 'techsolutions@example.com', 'Software Development', 'http://techsolutions.example.com', '765-432-1098', '321 Silicon Valley, Istanbul', 'Software development company specializing in web applications');
 
--- Insert Internships
-INSERT INTO internships (company_id, company_name, title, position, description, location, dates, requirements, type, status, application_deadline, posted_date) VALUES
-(1, 'ABC Technologies', 'Software Engineer Intern', 'Software Engineer Intern', 'Work on exciting projects in the web development team. Required skills: PHP, JavaScript, HTML, CSS.', 'Istanbul, Turkey', 'June 2024 - August 2024', 'PHP, JavaScript, HTML, CSS experience preferred', 'Full-time', 'Active', '2024-12-31', '2024-05-01'),
-(2, 'Global Innovations', 'Data Analyst Intern', 'Data Analyst Intern', 'Analyze large datasets and generate reports. Required skills: Python, SQL, Tableau.', 'Remote', 'July 2024 - September 2024', 'Python, SQL, Tableau knowledge required', 'Full-time', 'Active', '2024-12-31', '2024-05-05'),
-(3, 'Tech Solutions Inc.', 'Frontend Developer Intern', 'Frontend Developer Intern', 'Build responsive web interfaces using modern frameworks.', 'Istanbul, Turkey', 'August 2024 - October 2024', 'React, Vue.js, or Angular experience preferred', 'Full-time', 'Active', '2024-12-31', '2024-05-10');
+-- Insert Internships - REMOVED seed internships to prevent them appearing for companies that didn't create them
+-- Companies should create their own internships through the portal
+-- If you need test data, create internships manually through the UI for specific test companies
 
 -- Insert Applications
 INSERT INTO applications (application_id, student_id, internship_id, status, cover_letter, applied_date) VALUES

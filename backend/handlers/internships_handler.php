@@ -119,6 +119,15 @@ if ($entity === 'internships') {
                 $active_term = get_active_term();
                 $term_id_param = $_GET['term_id'] ?? null;
                 
+                // Auto-filter by company_id for company users (unless admin or explicitly requesting different company)
+                $userRole = getCurrentUserRole();
+                $currentUserId = getCurrentUserId();
+                
+                // If company user and no explicit company_id param, filter by their own company_id
+                if ($userRole === ROLE_COMPANY && $company_id_param === null) {
+                    $company_id_param = $currentUserId;
+                }
+                
                 $query = "SELECT i.*, c.name AS live_company_name, c.industry AS company_industry, c.website AS company_website,
                             c.phone AS company_phone, c.address AS company_address, c.description AS company_description,
                             c.logo AS company_logo
@@ -139,6 +148,7 @@ if ($entity === 'internships') {
                 }
                 // If no active term and no term_id param, show all (for admin/backward compatibility)
                 
+                // Filter by company_id - companies can only see their own internships
                 if ($company_id_param !== null) {
                     $query .= " AND i.company_id = ?";
                     $params[] = $company_id_param;
