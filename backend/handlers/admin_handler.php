@@ -9,58 +9,150 @@ $db = getDB();
 
 // --- Term Management --- //
 function get_all_terms() {
-    global $terms;
-    return $terms;
+    global $db;
+    try {
+        $stmt = $db->query("SELECT * FROM terms ORDER BY start_date DESC");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        return ['error' => 'Failed to fetch terms: ' . $e->getMessage()];
+    }
 }
+
 function add_term($data) {
-    global $terms;
+    global $db;
     
     // Require admin role
     requireRole(ROLE_ADMIN);
     
     // Basic validation
     if (empty($data['name']) || empty($data['start_date']) || empty($data['end_date'])) {
-        return ['error' => 'Missing required term data.'];
+        return ['error' => 'Missing required term data: name, start_date, end_date'];
+    }
+    
+    // Validate term name format (Fall/Spring/Summer YYYY)
+    $name = trim($data['name']);
+    if (!preg_match('/^(Fall|Spring|Summer) \d{4}$/i', $name)) {
+        return ['error' => 'Term name must be in format: Fall YYYY, Spring YYYY, or Summer YYYY'];
     }
 
-    $new_term = [
-        'id' => count($terms) + 1, // Simple unique ID
-        'name' => $data['name'],
-        'start_date' => $data['start_date'],
-        'end_date' => $data['end_date']
-    ];
-
-    // In a real app, you would insert this into the database.
-    return ['status' => 'success', 'message' => 'Term added successfully.', 'data' => $new_term];
+    try {
+        $stmt = $db->prepare("
+            INSERT INTO terms (name, start_date, end_date, is_active, max_applications_per_student)
+            VALUES (?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $name,
+            $data['start_date'],
+            $data['end_date'],
+            $data['is_active'] ?? true,
+            $data['max_applications_per_student'] ?? 3
+        ]);
+        
+        $term_id = $db->lastInsertId();
+        $stmt = $db->prepare("SELECT * FROM terms WHERE id = ?");
+        $stmt->execute([$term_id]);
+        $new_term = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return ['status' => 'success', 'message' => 'Term added successfully.', 'data' => $new_term];
+    } catch (PDOException $e) {
+        return ['error' => 'Failed to add term: ' . $e->getMessage()];
+    }
 }
+
 function update_term($term_id, $data) {
-    global $terms;
+    global $db;
     
     // Require admin role
     requireRole(ROLE_ADMIN);
     
-    foreach ($terms as &$term) {
-        if ($term['id'] == $term_id) {
-            $term = array_merge($term, $data);
-            return ['status' => 'success', 'message' => 'Term updated successfully.', 'data' => $term];
+    try {
+        // Build update query dynamically
+        $updates = [];
+        $values = [];
+        
+        if (isset($data['name'])) {
+            $name = trim($data['name']);
+            if (!preg_match('/^(Fall|Spring|Summer) \d{4}$/i', $name)) {
+                return ['error' => 'Term name must be in format: Fall YYYY, Spring YYYY, or Summer YYYY'];
+            }
+            $updates[] = "name = ?";
+            $values[] = $name;
         }
+        
+        if (isset($data['start_date'])) {
+            $updates[] = "start_date = ?";
+            $values[] = $data['start_date'];
+        }
+        
+        if (isset($data['end_date'])) {
+            $updates[] = "end_date = ?";
+            $values[] = $data['end_date'];
+        }
+        
+        if (isset($data['is_active'])) {
+            $updates[] = "is_active = ?";
+            $values[] = $data['is_active'] ? 1 : 0;
+        }
+        
+        if (isset($data['max_applications_per_student'])) {
+            $updates[] = "max_applications_per_student = ?";
+            $values[] = (int)$data['max_applications_per_student'];
+        }
+        
+        if (empty($updates)) {
+            return ['error' => 'No fields to update'];
+        }
+        
+        $values[] = $term_id;
+        $sql = "UPDATE terms SET " . implode(', ', $updates) . " WHERE id = ?";
+        $stmt = $db->prepare($sql);
+        $stmt->execute($values);
+        
+        $stmt = $db->prepare("SELECT * FROM terms WHERE id = ?");
+        $stmt->execute([$term_id]);
+        $term = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$term) {
+            return ['error' => 'Term not found'];
+        }
+        
+        return ['status' => 'success', 'message' => 'Term updated successfully.', 'data' => $term];
+    } catch (PDOException $e) {
+        return ['error' => 'Failed to update term: ' . $e->getMessage()];
     }
-    return ['error' => 'Term not found.'];
 }
+
 function delete_term($term_id) {
-    global $terms;
+    global $db;
     
     // Require admin role
     requireRole(ROLE_ADMIN);
     
-    foreach ($terms as $key => $term) {
-        if ($term['id'] == $term_id) {
-            // In a real app, you would delete from the database.
-            // unset($terms[$key]);
-            return ['status' => 'success', 'message' => 'Term deleted successfully.'];
+    try {
+        // Check if term has applications or internships
+        $stmt = $db->prepare("SELECT COUNT(*) FROM applications WHERE term_id = ?");
+        $stmt->execute([$term_id]);
+        $appCount = $stmt->fetchColumn();
+        
+        $stmt = $db->prepare("SELECT COUNT(*) FROM internships WHERE term_id = ?");
+        $stmt->execute([$term_id]);
+        $intCount = $stmt->fetchColumn();
+        
+        if ($appCount > 0 || $intCount > 0) {
+            return ['error' => 'Cannot delete term with existing applications or internships'];
         }
+        
+        $stmt = $db->prepare("DELETE FROM terms WHERE id = ?");
+        $stmt->execute([$term_id]);
+        
+        if ($stmt->rowCount() === 0) {
+            return ['error' => 'Term not found'];
+        }
+        
+        return ['status' => 'success', 'message' => 'Term deleted successfully.'];
+    } catch (PDOException $e) {
+        return ['error' => 'Failed to delete term: ' . $e->getMessage()];
     }
-    return ['error' => 'Term not found.'];
 }
 
 // --- Student Management --- //

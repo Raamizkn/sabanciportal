@@ -1,5 +1,5 @@
-// Finalized statuses - include database value since we can't ALTER ENUM
-const FINALIZED_STATUS_SET = new Set(['Finalized', 'Approved_By_Company']);
+// Confirmed statuses - Confirmed is the final status (no Finalized anymore)
+const CONFIRMED_STATUS_SET = new Set(['Confirmed', 'Confirmed_By_Student']);
 
 let currentCompanyId = null;
 let finalizedApplications = [];
@@ -25,7 +25,7 @@ function formatStatusLabel(status) {
     }
     // Map database values to clean display names
     const map = {
-        'Approved_By_Company': 'Finalized',
+        // Approved_By_Company removed - Confirmed is final
         'Confirmed_By_Student': 'Confirmed'
     };
     return map[status] || status;
@@ -34,7 +34,7 @@ function formatStatusLabel(status) {
 function renderStatusBadge(status) {
     let badgeClass = 'badge bg-secondary bg-opacity-20 text-secondary';
     // Check both display and database values
-    if (status === 'Finalized' || status === 'Approved_By_Company') {
+    if (status === 'Confirmed' || status === 'Confirmed_By_Student') {
         badgeClass = 'badge bg-success bg-opacity-20 text-success';
     } else if (status === 'Confirmed' || status === 'Confirmed_By_Student') {
         badgeClass = 'badge bg-info bg-opacity-20 text-info';
@@ -53,17 +53,17 @@ function splitTimeline(range) {
     };
 }
 
-async function loadFinalizedApplications(companyId) {
+async function loadConfirmedApplications(companyId) {
     try {
         const applications = await api.getCompanyApplications(companyId);
-        // Filter for finalized applications - include database value
+        // Filter for confirmed applications (final status)
         finalizedApplications = applications.filter(app => {
             const status = app.status || '';
-            return status === 'Finalized' || status === 'Approved_By_Company';
+            return status === 'Confirmed' || status === 'Confirmed_By_Student';
         });
         populateFinalizedTable(finalizedApplications);
     } catch (error) {
-        console.error('Failed to load finalized applications:', error);
+        console.error('Failed to load confirmed applications:', error);
         const tbody = document.getElementById('finalizedApplicationsBody');
         if (tbody) {
             tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Unable to load applications.</td></tr>';
@@ -77,7 +77,7 @@ function populateFinalizedTable(applications) {
     tbody.innerHTML = '';
 
     if (!applications.length) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No finalized internships yet.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No confirmed internships yet.</td></tr>';
         return;
     }
 
@@ -240,7 +240,7 @@ function renderModal(app) {
                             <dd class="col-sm-7">${app.application_id || 'N/A'}</dd>
                             <dt class="col-sm-5">Applied On:</dt>
                             <dd class="col-sm-7">${app.applied_date ? new Date(app.applied_date).toLocaleDateString() : 'N/A'}</dd>
-                            <dt class="col-sm-5">Finalized On:</dt>
+                            <dt class="col-sm-5">Confirmed On:</dt>
                             <dd class="col-sm-7">${app.status_updated_date ? new Date(app.status_updated_date).toLocaleDateString() : 'N/A'}</dd>
                         </dl>
                         ${app.offer_details ? `
@@ -311,5 +311,5 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    loadFinalizedApplications(currentCompanyId);
+    loadConfirmedApplications(currentCompanyId);
 });

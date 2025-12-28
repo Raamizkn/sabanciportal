@@ -561,75 +561,15 @@ class APIService {
     }
 
     /**
-     * Get all application rounds (optionally filtered by term_id)
+     * Update company quota (per term, stored in companies table)
      */
-    async getRounds(termId = null) {
-        const termParam = termId ? `&term_id=${termId}` : '';
-        return this.request(`/index.php?entity=rounds${termParam}`);
-    }
-
-    /**
-     * Get specific round
-     */
-    async getRound(roundId) {
-        return this.request(`/index.php?entity=rounds&id=${roundId}`);
-    }
-
-    /**
-     * Create application round (admin only)
-     */
-    async createRound(roundData) {
-        return this.request('/index.php?entity=rounds&action=create', {
-            method: 'POST',
-            body: JSON.stringify(roundData)
-        });
-    }
-
-    /**
-     * Update application round (admin only)
-     */
-    async updateRound(roundId, roundData) {
-        return this.request(`/index.php?entity=rounds&id=${roundId}&action=update`, {
-            method: 'POST',
-            body: JSON.stringify(roundData)
-        });
-    }
-
-    /**
-     * Toggle round active status (admin only)
-     */
-    async toggleRoundActive(roundId) {
-        return this.request(`/index.php?entity=rounds&id=${roundId}&action=toggle_active`, {
-            method: 'POST'
-        });
-    }
-
-    /**
-     * Get company quota for a round
-     */
-    async getCompanyQuota(companyId, roundId) {
-        return this.request(`/index.php?entity=quotas&company_id=${companyId}&round_id=${roundId}`);
-    }
-
-    /**
-     * Set company quota for a round
-     */
-    async setCompanyQuota(companyId, roundId, quota) {
-        return this.request('/index.php?entity=quotas&action=set', {
+    async updateCompanyQuota(companyId, quota) {
+        return this.request(`/index.php?entity=companies&id=${companyId}&action=update`, {
             method: 'POST',
             body: JSON.stringify({
-                company_id: companyId,
-                round_id: roundId,
-                quota: quota
+                company_quota: quota
             })
         });
-    }
-
-    /**
-     * Get all quotas for a company
-     */
-    async getCompanyQuotas(companyId) {
-        return this.request(`/index.php?entity=quotas&company_id=${companyId}`);
     }
 
     // ==================== IMPERSONATION APIs ====================

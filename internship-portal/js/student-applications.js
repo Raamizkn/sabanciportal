@@ -317,7 +317,7 @@ function getStatusBadge(status) {
         case 'Confirmed':
             badgeClass = 'bg-info';
             break;
-        case 'Finalized':
+        // Finalized status removed - Confirmed is final
             badgeClass = 'bg-success';
             break;
         case 'Rejected':
@@ -340,13 +340,13 @@ function getActionButtons(application) {
     const viewBtn = `<a href="student-application-detail.html?id=${appId}" class="btn btn-sm btn-icon btn-light view-button" data-bs-popup="tooltip" title="View Details"><i class="ph-eye"></i></a>`;
 
     // Confirm button should only be enabled for 'Accepted' status
-    // Disabled for: Finalized, Confirmed, Rejected, Withdrawn, and any other status
-    const finalStatuses = ['Finalized', 'Approved_By_Company', 'Confirmed', 'Confirmed_By_Student', 'Rejected', 'Withdrawn'];
+    // Disabled for: Confirmed, Rejected, Withdrawn (Confirmed is final, no Finalized status)
+    const finalStatuses = ['Confirmed', 'Confirmed_By_Student', 'Rejected', 'Withdrawn'];
     const confirmEnabled = status === 'Accepted' && !finalStatuses.includes(status);
     const confirmTitle = confirmEnabled 
         ? 'Confirm Acceptance' 
-        : (status === 'Finalized' || status === 'Approved_By_Company' 
-            ? 'Cannot confirm: Application already finalized' 
+        : (status === 'Confirmed' || status === 'Confirmed_By_Student'
+            ? 'Cannot confirm: Application already confirmed' 
             : status === 'Confirmed' || status === 'Confirmed_By_Student'
             ? 'Already confirmed'
             : 'Confirm disabled');
@@ -379,7 +379,7 @@ function normalizeStatusForStudent(status) {
     // Since we can't ALTER ENUM, map database values for display
     const map = {
         'Confirmed_By_Student': 'Confirmed',
-        'Approved_By_Company': 'Finalized'
+        // Approved_By_Company removed - Confirmed is final
     };
     return map[status] || status;
 }
@@ -462,7 +462,7 @@ function updateStatusCards(applications) {
         pending: 0,
         accepted: 0,
         confirmed: 0,
-        finalized: 0,
+        // finalized removed - confirmed is final
         rejected: 0
     };
 
@@ -476,8 +476,7 @@ function updateStatusCards(applications) {
             statusCounts.accepted++;
         } else if (status === 'Confirmed') {
             statusCounts.confirmed++;
-        } else if (status === 'Finalized') {
-            statusCounts.finalized++;
+        // Finalized status removed
         } else if (status === 'Rejected') {
             statusCounts.rejected++;
         }
@@ -488,7 +487,7 @@ function updateStatusCards(applications) {
     setCount('studentPendingApplicationsCount', statusCounts.pending);
     setCount('studentAcceptedApplicationsCount', statusCounts.accepted);
     setCount('studentConfirmedApplicationsCount', statusCounts.confirmed);
-    setCount('studentFinalizedApplicationsCount', statusCounts.finalized);
+    // Finalized count removed - use confirmed count instead
     setCount('studentRejectedApplicationsCount', statusCounts.rejected);
 }
 

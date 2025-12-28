@@ -9,7 +9,7 @@
 
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../auth/auth.php';
-require_once __DIR__ . '/rounds_handler.php';
+require_once __DIR__ . '/terms_helper.php';
 
 /**
  * Shared database connection for this handler.
@@ -754,13 +754,14 @@ if (isset($entity) && $entity === 'students') {
             try {
                 $db = student_db();
                 
-                // Get active round
-                $active_round = get_active_round();
+                // Get active term
+                require_once __DIR__ . '/terms_helper.php';
+                $active_term = get_active_term();
                 
-                if (!$active_round) {
-                    // No active round - return null
+                if (!$active_term) {
+                    // No active term - return null
                     echo json_encode([
-                        'active_round' => null,
+                        'active_term' => null,
                         'active_count' => 0,
                         'remaining' => 0,
                         'limit_reached' => false
@@ -768,26 +769,26 @@ if (isset($entity) && $entity === 'students') {
                     exit;
                 }
                 
-                // Count active applications for this student in this round
+                // Count active applications for this student in this term
+                $maxApps = get_max_applications_for_term($active_term['id']);
                 $stmt = $db->prepare("
                     SELECT COUNT(*) AS active_count
                     FROM applications
                     WHERE student_id = ?
-                      AND round_id = ?
-                      AND status NOT IN ('Rejected', 'Withdrawn', 'Approved_By_Company', 'Finalized')
+                      AND term_id = ?
+                      AND status NOT IN ('Rejected', 'Withdrawn', 'Confirmed_By_Student')
                 ");
-                $stmt->execute([$target_student_id, $active_round['id']]);
+                $stmt->execute([$target_student_id, $active_term['id']]);
                 $active_count = (int) $stmt->fetchColumn();
                 
-                $max_applications = (int) $active_round['max_applications_per_student'];
-                $remaining = max(0, $max_applications - $active_count);
-                $limit_reached = $active_count >= $max_applications;
+                $remaining = max(0, $maxApps - $active_count);
+                $limit_reached = $active_count >= $maxApps;
                 
                 echo json_encode([
-                    'active_round' => [
-                        'id' => $active_round['id'],
-                        'name' => $active_round['name'],
-                        'max_applications' => $max_applications
+                    'active_term' => [
+                        'id' => $active_term['id'],
+                        'name' => $active_term['name'],
+                        'max_applications' => $maxApps
                     ],
                     'active_count' => $active_count,
                     'remaining' => $remaining,

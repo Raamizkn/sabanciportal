@@ -1,4 +1,4 @@
-const FINALIZED_STATUSES = ['Finalized', 'Approved_By_Company']; // Finalized applications (database value included)
+const CONFIRMED_STATUSES = ['Confirmed', 'Confirmed_By_Student']; // Confirmed applications (final status)
 const PENDING_STATUSES = ['Pending']; // Pending applications
 const CONFIRMED_STATUSES = ['Confirmed', 'Confirmed_By_Student']; // Student confirmed (database value included)
 
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function populateCompanyInfo(internships, applications) {
     const activeInternships = internships.filter(internship => internship.status === 'Active').length;
     const totalApplications = applications.length;
-    const positionsFilled = applications.filter(app => FINALIZED_STATUSES.includes(app.status)).length;
+    const positionsFilled = applications.filter(app => CONFIRMED_STATUSES.includes(app.status)).length;
 
     setDashboardMetric('dashboardActiveCount', activeInternships);
     setDashboardMetric('dashboardApplicationsCount', totalApplications);
@@ -180,7 +180,7 @@ function populatePendingTasks(applications) {
 
     const pendingCount = applications.filter(app => PENDING_STATUSES.includes(app.status)).length;
     const confirmedCount = applications.filter(app => CONFIRMED_STATUSES.includes(app.status)).length;
-    const finalizedCount = applications.filter(app => FINALIZED_STATUSES.includes(app.status)).length;
+    const confirmedCount = applications.filter(app => CONFIRMED_STATUSES.includes(app.status)).length;
 
     if (pendingCount) {
         pendingTasksList.appendChild(createTaskItem('ph-users', `Review ${pendingCount} pending application${pendingCount === 1 ? '' : 's'}`, 'company-applications.html'));
@@ -191,8 +191,8 @@ function populatePendingTasks(applications) {
         pendingTasksList.appendChild(createTaskItem('ph-check-square', `Finalize ${confirmedCount} confirmed application${confirmedCount === 1 ? '' : 's'}`, 'company-applications.html'));
     }
 
-    if (finalizedCount) {
-        pendingTasksList.appendChild(createTaskItem('ph-check-circle', `Finalize paperwork for ${finalizedCount} placement${finalizedCount === 1 ? '' : 's'}`, 'company-finalized.html'));
+    if (confirmedCount) {
+        pendingTasksList.appendChild(createTaskItem('ph-check-circle', `View ${confirmedCount} confirmed placement${confirmedCount === 1 ? '' : 's'}`, 'company-finalized.html'));
     }
 
     if (!pendingTasksList.children.length) {
@@ -226,7 +226,7 @@ function createTaskItem(icon, text, href) {
 function renderStatusBadge(status) {
     let badgeClass = 'badge bg-secondary bg-opacity-20 text-secondary';
     const label = formatStatusLabel(status);
-    if (FINALIZED_STATUSES.includes(status)) {
+    if (CONFIRMED_STATUSES.includes(status)) {
         badgeClass = 'badge bg-success bg-opacity-20 text-success';
     } else if (PENDING_STATUSES.includes(status)) {
         badgeClass = 'badge bg-warning bg-opacity-20 text-warning';

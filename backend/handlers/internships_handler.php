@@ -7,8 +7,7 @@ global $internships, $method, $entity, $id, $action, $input;
 // Get database connection
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../auth/auth.php';
-require_once __DIR__ . '/quotas_handler.php';
-require_once __DIR__ . '/rounds_handler.php';
+require_once __DIR__ . '/terms_helper.php';
 $db = getDB();
 
 // Helper function to generate a new internship ID (mock)
@@ -46,21 +45,35 @@ function mapInternshipWithCompany($row) {
     $row['company_name'] = $company['name'];
     $row['company'] = $company;
     
-    // Add seats left information
+    // Add seats left information - ONLY for companies (not students)
+    // Check if current user is a company viewing their own internships
     try {
-        $active_round = get_active_round();
-        if ($active_round) {
-            $company_id = $row['company_id'];
-            $round_id = $active_round['id'];
-            $effective_quota = get_effective_quota($company_id, $round_id);
-            $used_quota = get_used_quota($company_id, $round_id);
-            $seats_left = max(0, $effective_quota - $used_quota);
-            
-            $row['seats_left'] = $seats_left;
-            $row['quota_total'] = $effective_quota;
-            $row['quota_used'] = $used_quota;
-            $row['is_full'] = ($seats_left === 0);
+        $userRole = getCurrentUserRole();
+        $currentUserId = getCurrentUserId();
+        $company_id = $row['company_id'];
+        
+        // Only show seats to companies viewing their own internships
+        if ($userRole === 'company' && (int)$currentUserId === (int)$company_id) {
+            // Get active term
+            $active_term = get_active_term();
+            if ($active_term) {
+                $term_id = $active_term['id'];
+                $effective_quota = get_effective_quota_for_term($company_id, $term_id);
+                $used_quota = get_used_quota_for_term($company_id, $term_id);
+                $seats_left = max(0, $effective_quota - $used_quota);
+                
+                $row['seats_left'] = $seats_left;
+                $row['quota_total'] = $effective_quota;
+                $row['quota_used'] = $used_quota;
+                $row['is_full'] = ($seats_left === 0);
+            } else {
+                $row['seats_left'] = null;
+                $row['quota_total'] = null;
+                $row['quota_used'] = null;
+                $row['is_full'] = false;
+            }
         } else {
+            // Students and other users don't see seats
             $row['seats_left'] = null;
             $row['quota_total'] = null;
             $row['quota_used'] = null;
@@ -102,6 +115,10 @@ if ($entity === 'internships') {
             }
         } else {
             try {
+                // Get active term for filtering (terms are supreme layer)
+                $active_term = get_active_term();
+                $term_id_param = $_GET['term_id'] ?? null;
+                
                 $query = "SELECT i.*, c.name AS live_company_name, c.industry AS company_industry, c.website AS company_website,
                             c.phone AS company_phone, c.address AS company_address, c.description AS company_description,
                             c.logo AS company_logo
@@ -109,6 +126,19 @@ if ($entity === 'internships') {
                         JOIN companies c ON i.company_id = c.id
                         WHERE i.status != 'Deleted'";
                 $params = [];
+                
+                // Filter by term - terms are the supreme layer
+                if ($term_id_param !== null) {
+                    // Explicit term filter from query param
+                    $query .= " AND i.term_id = ?";
+                    $params[] = $term_id_param;
+                } elseif ($active_term) {
+                    // Default to active term if no explicit term specified
+                    $query .= " AND i.term_id = ?";
+                    $params[] = $active_term['id'];
+                }
+                // If no active term and no term_id param, show all (for admin/backward compatibility)
+                
                 if ($company_id_param !== null) {
                     $query .= " AND i.company_id = ?";
                     $params[] = $company_id_param;
@@ -152,8 +182,16 @@ if ($entity === 'internships') {
                     exit;
                 }
                 
-                // Insert into database
-                $stmt = $db->prepare("INSERT INTO internships (company_id, company_name, title, position, description, location, dates, requirements, type, status, application_deadline, posted_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', ?, CURDATE())");
+                // Get active term for new internship (terms are supreme layer)
+                $active_term = get_active_term();
+                if (!$active_term) {
+                    http_response_code(403);
+                    echo json_encode(['error' => 'No active term found. Cannot create internship.']);
+                    exit;
+                }
+                
+                // Insert into database with term_id
+                $stmt = $db->prepare("INSERT INTO internships (company_id, company_name, title, position, description, location, dates, requirements, type, status, application_deadline, posted_date, term_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', ?, CURDATE(), ?)");
                 $stmt->execute([
                     $company_id,
                     $company['name'],
@@ -164,7 +202,8 @@ if ($entity === 'internships') {
                     $input['dates'] ?? 'TBD',
                     $input['requirements'] ?? '',
                     $input['type'] ?? 'Full-time',
-                    $input['application_deadline'] ?? null
+                    $input['application_deadline'] ?? null,
+                    $active_term['id']
                 ]);
                 
                 $newId = $db->lastInsertId();

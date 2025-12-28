@@ -8,8 +8,7 @@ global $applications, $internships, $method, $entity, $id, $action, $student_id_
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../auth/auth.php';
 require_once __DIR__ . '/../config/security.php';
-require_once __DIR__ . '/rounds_handler.php';
-require_once __DIR__ . '/quotas_handler.php';
+require_once __DIR__ . '/terms_helper.php';
 $db = getDB();
 
 function format_document_download_url($path, $document_id = null) {
@@ -61,10 +60,10 @@ function normalize_status($status) {
         return 'Pending';
     }
     // Map database values to clean display names
-    // Since we can't ALTER the ENUM, we keep database values but map for display
+    // Confirmed_By_Student maps to Confirmed (which is the final status)
+    // No Finalized status exists anymore
     $map = array(
-        'Confirmed_By_Student' => 'Confirmed',
-        'Approved_By_Company' => 'Finalized'
+        'Confirmed_By_Student' => 'Confirmed'
     );
     return isset($map[$status]) ? $map[$status] : $status;
 }
@@ -272,9 +271,7 @@ if ($entity === 'applications') {
                         a.applied_date as created_at, 
                         a.cover_letter,
                         a.term_id,
-                        a.round_id,
                         t.name as term_name,
-                        r.name as round_name,
                         i.position as internship_position, 
                         i.location as internship_location,
                         i.dates as internship_dates,
@@ -283,7 +280,6 @@ if ($entity === 'applications') {
                     JOIN internships i ON a.internship_id = i.id
                     JOIN companies c ON i.company_id = c.id
                     LEFT JOIN terms t ON a.term_id = t.id
-                    LEFT JOIN application_rounds r ON a.round_id = r.id
                     WHERE a.student_id = ?{$term_condition}
                     ORDER BY a.applied_date DESC
                 ");
@@ -433,29 +429,20 @@ if ($entity === 'applications') {
             try {
                 $db->beginTransaction();
 
-                // Check for active round
-                $active_round = get_active_round();
-                if (!$active_round) {
-                    // Fallback: Check if any rounds exist at all
-                    $roundsCheck = $db->query("SELECT COUNT(*) FROM application_rounds")->fetchColumn();
-                    if ($roundsCheck > 0) {
-                        // Rounds exist but none are active - applications are closed
-                        $db->rollBack();
-                        http_response_code(403);
-                        echo json_encode(['error' => 'No active application round. Applications are currently closed. Please contact an administrator to activate an application round.']);
-                        exit;
-                    }
-                    // No rounds exist yet - allow applications without round (backward compatibility)
-                    // This allows the system to work before rounds are set up
-                    $active_round = null;
-                }
-
-                // Get term for today
-                $current_term = get_term_for_date();
+                // Get active term for today - terms are now the supreme layer
+                $current_term = get_active_term();
                 if (!$current_term) {
                     $db->rollBack();
                     http_response_code(403);
-                    echo json_encode(['error' => 'No active term found.']);
+                    echo json_encode(['error' => 'No active term found. Applications are currently closed. Please contact an administrator to activate a term.']);
+                    exit;
+                }
+                
+                // Check if term allows interactions (is_active)
+                if (!$current_term['is_active']) {
+                    $db->rollBack();
+                    http_response_code(403);
+                    echo json_encode(['error' => 'The current term is inactive. Applications are currently closed.']);
                     exit;
                 }
 
@@ -479,28 +466,26 @@ if ($entity === 'applications') {
                     exit;
                 }
 
-                // Enforce max applications per student from active round (if round exists)
-                if ($active_round) {
-                    $activeStmt = $db->prepare("
-                        SELECT COUNT(*) AS active_count
-                        FROM applications
-                        WHERE student_id = ?
-                          AND round_id = ?
-                          AND status NOT IN ('Rejected', 'Withdrawn', 'Approved_By_Company', 'Finalized')
-                    ");
-                    $activeStmt->execute([$student_id, $active_round['id']]);
-                    $activeCount = (int) $activeStmt->fetchColumn();
-                    $maxApps = (int) $active_round['max_applications_per_student'];
-                    if ($activeCount >= $maxApps) {
-                        $db->rollBack();
-                        http_response_code(400);
-                        echo json_encode([
-                            'error' => "You have reached the limit of {$maxApps} applications for this round. Withdraw or wait for decisions to free slots.",
-                            'max_applications' => $maxApps,
-                            'current_count' => $activeCount
-                        ]);
-                        exit;
-                    }
+                // Enforce max applications per student from term
+                $maxApps = get_max_applications_for_term($current_term['id']);
+                $activeStmt = $db->prepare("
+                    SELECT COUNT(*) AS active_count
+                    FROM applications
+                    WHERE student_id = ?
+                      AND term_id = ?
+                      AND status NOT IN ('Rejected', 'Withdrawn', 'Confirmed_By_Student')
+                ");
+                $activeStmt->execute([$student_id, $current_term['id']]);
+                $activeCount = (int) $activeStmt->fetchColumn();
+                if ($activeCount >= $maxApps) {
+                    $db->rollBack();
+                    http_response_code(400);
+                    echo json_encode([
+                        'error' => "You have reached the limit of {$maxApps} applications for {$current_term['name']}. Withdraw or wait for decisions to free slots.",
+                        'max_applications' => $maxApps,
+                        'current_count' => $activeCount
+                    ]);
+                    exit;
                 }
 
                 $new_app_id = generate_application_code($db);
@@ -508,13 +493,12 @@ if ($entity === 'applications') {
                 // Sanitize cover letter HTML to prevent XSS
                 $cover_letter = isset($input['cover_letter']) ? sanitize_cover_letter_html($input['cover_letter']) : '';
 
-                $stmt = $db->prepare("INSERT INTO applications (application_id, student_id, internship_id, term_id, round_id, status, cover_letter, applied_date) VALUES (?, ?, ?, ?, ?, 'Pending', ?, CURDATE())");
+                $stmt = $db->prepare("INSERT INTO applications (application_id, student_id, internship_id, term_id, status, cover_letter, applied_date) VALUES (?, ?, ?, ?, 'Pending', ?, CURDATE())");
                 $stmt->execute([
                     $new_app_id, 
                     $student_id, 
                     $input['internship_id'], 
-                    $current_term ? $current_term['id'] : null,
-                    $active_round ? $active_round['id'] : null,
+                    $current_term['id'],
                     $cover_letter
                 ]);
                 $newPrimaryId = $db->lastInsertId();
@@ -577,8 +561,8 @@ if ($entity === 'applications') {
                 
                 $rawStatus = $application['status'];
                 $normalizedStatus = normalize_status($rawStatus);
-                // Block withdraw only after finalization or rejection
-                $blockedWithdrawStatuses = array('Finalized', 'Approved_By_Company', 'Rejected');
+                // Block withdraw only after confirmation or rejection (confirmed is final, no finalized status)
+                $blockedWithdrawStatuses = array('Confirmed_By_Student', 'Rejected');
 
                 if (!in_array($rawStatus, $blockedWithdrawStatuses, true) && !in_array($normalizedStatus, $blockedWithdrawStatuses, true) && $normalizedStatus !== 'Withdrawn') {
                     // Update status to Withdrawn
@@ -621,33 +605,51 @@ if ($entity === 'applications') {
                 
                 // Student can confirm if status is 'Accepted'
                 if ($rawStatus === 'Accepted' || $currentStatus === 'Accepted') {
-                    // Ensure student has no other confirmed/finalized placement
+                    // Ensure student has no other confirmed placement
                     $limitStmt = $db->prepare("
                         SELECT COUNT(*) FROM applications 
                         WHERE student_id = ? 
                           AND application_id <> ? 
-                          AND status IN ('Confirmed_By_Student', 'Approved_By_Company', 'Finalized')
+                          AND status = 'Confirmed_By_Student'
                     ");
                     $limitStmt->execute([getCurrentUserId(), $id]);
                     $alreadyConfirmed = (int) $limitStmt->fetchColumn();
                     if ($alreadyConfirmed > 0) {
                         http_response_code(400);
-                        echo json_encode(['error' => 'You already have a confirmed or finalized internship. Withdraw or wait for rejection before confirming another.']);
+                        echo json_encode(['error' => 'You already have a confirmed internship. Withdraw it before confirming another.']);
                         exit;
                     }
 
-                    // Use database value since we can't ALTER ENUM
+                    // Update this application to confirmed
                     $stmt = $db->prepare("UPDATE applications SET status = 'Confirmed_By_Student', status_updated_date = NOW() WHERE application_id = ?");
                     $stmt->execute([$id]);
+                    
+                    // AUTO-WITHDRAW: Withdraw all other pending/accepted applications for this student
+                    $withdrawStmt = $db->prepare("
+                        UPDATE applications 
+                        SET status = 'Withdrawn', status_updated_date = NOW() 
+                        WHERE student_id = ? 
+                          AND application_id <> ? 
+                          AND status IN ('Pending', 'Accepted')
+                    ");
+                    $withdrawStmt->execute([getCurrentUserId(), $id]);
+                    $withdrawnCount = $withdrawStmt->rowCount();
                     
                     $stmt = $db->prepare("SELECT * FROM applications WHERE application_id = ?");
                     $stmt->execute([$id]);
                     $updated_application = $stmt->fetch(PDO::FETCH_ASSOC);
                     $updated_application['status'] = normalize_status($updated_application['status']);
+                    
+                    $message = "Application confirmed successfully.";
+                    if ($withdrawnCount > 0) {
+                        $message .= " {$withdrawnCount} other application(s) have been automatically withdrawn.";
+                    }
+                    
                     echo json_encode([
                         'status' => 'success', 
-                        'message' => "Application confirmed successfully. Company can now finalize.",
-                        'application' => $updated_application
+                        'message' => $message,
+                        'application' => $updated_application,
+                        'withdrawn_count' => $withdrawnCount
                     ]);
                 } else {
                     http_response_code(400);
@@ -690,14 +692,13 @@ if ($entity === 'applications') {
                 $currentStatus = normalize_status($application['status']);
                 $newStatus = $input['status'];
                 
-                // Define valid status transitions for company (using clean status names)
+                // Define valid status transitions for company
+                // Confirmed_By_Student is the final status - no finalized status exists
                 $validTransitions = array(
                     'Pending' => array('Accepted', 'Rejected'),
                     'Accepted' => array(), // Company cannot change Accepted - student must confirm
-                    'Confirmed' => array('Finalized'), // Company can finalize after student confirms
-                    'Confirmed_By_Student' => array('Finalized'), // Database value - company can finalize
-                    'Finalized' => array(), // Finalized is final
-                    'Approved_By_Company' => array(), // Database value - finalized is final
+                    'Confirmed' => array(), // Confirmed is final - no finalized status
+                    'Confirmed_By_Student' => array(), // Confirmed is final - no finalized status
                     'Rejected' => array(), // Rejected is final
                     'Withdrawn' => array() // Withdrawn is final
                 );
@@ -718,28 +719,9 @@ if ($entity === 'applications') {
                 exit;
             }
             
-                // Check company quota when finalizing
-                if ($dbStatus === 'Approved_By_Company' || $dbStatus === 'Finalized') {
-                    if (!empty($application['round_id'])) {
-                        $effective_quota = get_effective_quota($application['company_id'], $application['round_id']);
-                        $used_quota = get_used_quota($application['company_id'], $application['round_id']);
-                        
-                        // If this application is already finalized, don't count it again
-                        if ($application['status'] === 'Approved_By_Company' || $application['status'] === 'Finalized') {
-                            $used_quota--; // Don't double-count
-                        }
-                        
-                        if ($used_quota >= $effective_quota) {
-                            http_response_code(403);
-                            echo json_encode([
-                                'error' => "Company quota reached. You have finalized {$used_quota} out of {$effective_quota} allowed placements for this round.",
-                                'quota' => $effective_quota,
-                                'used' => $used_quota
-                            ]);
-                            exit;
-                        }
-                    }
-                }
+                // Note: Quota checking is not needed for status updates
+                // Quotas are checked when students confirm (which is the final status)
+                // Companies don't "finalize" anymore - confirmed is final
                 
                 // Update in database using ENUM value
                 $stmt = $db->prepare("UPDATE applications SET status = ?, offer_details = ?, status_updated_date = NOW() WHERE application_id = ?");
@@ -850,73 +832,8 @@ if ($entity === 'applications') {
             }
         }
         // Company finalize action
-        elseif ($id !== null && $action === 'finalize') {
-            requireRole(ROLE_COMPANY);
-            
-            try {
-                $stmt = $db->prepare("SELECT a.*, i.company_id FROM applications a JOIN internships i ON a.internship_id = i.id WHERE a.application_id = ?");
-                $stmt->execute([$id]);
-                $application = $stmt->fetch(PDO::FETCH_ASSOC);
-                
-                if (!$application) {
-                    http_response_code(404);
-                    echo json_encode(['error' => "Application {$id} not found."]);
-                    exit;
-                }
-                
-                if ($application['company_id'] != getCurrentUserId()) {
-                    http_response_code(403);
-                    echo json_encode(['error' => "Access denied."]);
-                    exit;
-                }
-                
-                // Check status
-                $currentStatus = $application['status'];
-                
-                // Can finalize if status is 'Confirmed' (check both display and database values)
-                $rawStatus = $application['status'];
-                if ($currentStatus !== 'Confirmed' && $rawStatus !== 'Confirmed_By_Student') {
-                    http_response_code(400);
-                    echo json_encode(['error' => "Can only finalize applications with status 'Confirmed'. Current status: '{$currentStatus}'."]);
-                    exit;
-                }
-                
-                // Check company quota when finalizing
-                if (!empty($application['round_id'])) {
-                    $effective_quota = get_effective_quota($application['company_id'], $application['round_id']);
-                    $used_quota = get_used_quota($application['company_id'], $application['round_id']);
-                    
-                    // If this application is already finalized, don't count it again
-                    if ($application['status'] === 'Approved_By_Company' || $application['status'] === 'Finalized') {
-                        $used_quota--; // Don't double-count
-                    }
-                    
-                    if ($used_quota >= $effective_quota) {
-                        http_response_code(403);
-                        echo json_encode([
-                            'error' => "Company quota reached. You have finalized {$used_quota} out of {$effective_quota} allowed placements for this round.",
-                            'quota' => $effective_quota,
-                            'used' => $used_quota
-                        ]);
-                        exit;
-                    }
-                }
-                
-                // Use database value since we can't ALTER ENUM
-                $stmt = $db->prepare("UPDATE applications SET status = 'Approved_By_Company', status_updated_date = NOW() WHERE application_id = ?");
-                $stmt->execute([$id]);
-                
-                $stmt = $db->prepare("SELECT * FROM applications WHERE application_id = ?");
-                $stmt->execute([$id]);
-                $updated = $stmt->fetch(PDO::FETCH_ASSOC);
-                $updated['status'] = normalize_status($updated['status']);
-                
-                echo json_encode(['status' => 'success', 'message' => 'Application finalized successfully.', 'application' => $updated]);
-            } catch(PDOException $e) {
-                http_response_code(500);
-                echo json_encode(['error' => 'Failed to finalize application: ' . $e->getMessage()]);
-            }
-        }
+        // Finalize action removed - Confirmed_By_Student is the final status
+        // Companies cannot "finalize" anymore - when student confirms, that's it
         else {
             http_response_code(400);
             echo json_encode(['error' => "Unknown action for POST request to applications entity or missing ID."]);

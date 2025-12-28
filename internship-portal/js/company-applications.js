@@ -177,7 +177,7 @@ function formatStatusLabel(status) {
     // Map database values to clean display names
     const map = {
         'Confirmed_By_Student': 'Confirmed',
-        'Approved_By_Company': 'Finalized'
+        // Approved_By_Company removed - Confirmed is final
     };
     return map[status] || status;
 }

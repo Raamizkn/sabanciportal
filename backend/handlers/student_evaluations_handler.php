@@ -232,7 +232,7 @@ function get_pending_student_evaluations($student_id) {
             FROM applications a
             JOIN internships i ON a.internship_id = i.id
             WHERE a.student_id = ?
-            AND a.status IN ('Confirmed_By_Student', 'Approved_By_Company', 'Finalized')
+            AND a.status = 'Confirmed_By_Student'
             HAVING has_evaluation = 0
             ORDER BY a.status_updated_date DESC
         ");

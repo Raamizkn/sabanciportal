@@ -351,13 +351,7 @@
 								<div class="opacity-75 fs-sm">Confirmed</div>
 							</div>
 
-							<div class="col-xl-2 col-sm-4 col-6">
-								<div class="bg-white bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
-									<i class="ph-seal-check fs-2"></i>
-								</div>
-								<h4 class="mb-0 fw-bold" id="dashboardFinalizedApplications">0</h4>
-								<div class="opacity-75 fs-sm">Finalized</div>
-							</div>
+							<!-- Finalized status removed - Confirmed is final -->
 
 							<div class="col-xl-2 col-sm-4 col-6">
 								<div class="bg-white bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
@@ -445,13 +439,7 @@
 								<span class="text-muted fs-sm">Confirm the offer to notify the company. Status becomes <span class="badge bg-info">Confirmed</span>.</span>
 							</div>
 						</div>
-						<div class="list-group-item d-flex align-items-center">
-							<i class="ph-seal-check ph-xl me-3 text-success"></i>
-							<div>
-								<div class="fw-semibold">5. Internship Finalized</div>
-								<span class="text-muted fs-sm">The company finalizes your placement. Final Status: <span class="badge bg-success">Finalized</span>.</span>
-							</div>
-						</div>
+						<!-- Step 5 removed - Confirmed is the final status -->
 						<div class="list-group-item d-flex align-items-center">
 							<i class="ph-x-circle ph-xl me-3 text-danger"></i>
 							<div>
@@ -624,9 +612,7 @@
 				case 'Confirmed':
 					badgeClass = 'bg-info';
 					break;
-				case 'Finalized':
-					badgeClass = 'bg-success';
-					break;
+				// Finalized status removed - Confirmed is final
 				case 'Rejected':
 					badgeClass = 'bg-danger';
 					break;
@@ -650,7 +636,6 @@
 				pending: 0,
 				accepted: 0,
 				confirmed: 0,
-				finalized: 0,
 				rejected: 0
 			};
 
@@ -664,8 +649,6 @@
 					statusCounts.accepted++;
 				} else if (status === 'Confirmed') {
 					statusCounts.confirmed++;
-				} else if (status === 'Finalized') {
-					statusCounts.finalized++;
 				} else if (status === 'Rejected') {
 					statusCounts.rejected++;
 				}
@@ -675,7 +658,6 @@
 			setCount('dashboardPendingApplications', statusCounts.pending);
 			setCount('dashboardAcceptedApplications', statusCounts.accepted);
 			setCount('dashboardConfirmedApplications', statusCounts.confirmed);
-			setCount('dashboardFinalizedApplications', statusCounts.finalized);
 			setCount('dashboardRejectedApplications', statusCounts.rejected);
 		}
 

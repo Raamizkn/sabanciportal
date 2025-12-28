@@ -224,7 +224,6 @@
 										<th>Location</th>
 										<th>Applied Date</th>
 										<th>Term</th>
-										<th>Round</th>
 										<th>Status</th>
 										<th class="text-center">Actions</th>
 									</tr>
@@ -343,7 +342,7 @@
 				renderHistoryTable(filteredApplications);
 			} catch (error) {
 				console.error('Failed to load application history:', error);
-				tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Failed to load application history.</td></tr>';
+				tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Failed to load application history.</td></tr>';
 			}
 		}
 
@@ -352,7 +351,7 @@
 			tbody.innerHTML = '';
 
 			if (applications.length === 0) {
-				tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No application history found for selected term.</td></tr>';
+				tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No application history found for selected term.</td></tr>';
 				return;
 			}
 
@@ -360,7 +359,6 @@
 				const row = document.createElement('tr');
 				const statusBadge = getStatusBadge(app.status);
 				const termName = app.term_name || (app.term_id ? 'Term #' + app.term_id : 'No Term Assigned');
-				const roundName = app.round_name || (app.round_id ? 'Round #' + app.round_id : '—');
 				
 				row.innerHTML = `
 					<td>${app.company_name || 'N/A'}</td>
@@ -368,7 +366,6 @@
 					<td>${app.internship_location || 'N/A'}</td>
 					<td>${app.created_at ? new Date(app.created_at).toLocaleDateString() : 'N/A'}</td>
 					<td>${termName}</td>
-					<td>${roundName}</td>
 					<td>${statusBadge}</td>
 					<td class="text-center">
 						<a href="student-application-detail.html?id=${app.application_id}" class="btn btn-sm btn-light">
