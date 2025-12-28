@@ -23,7 +23,7 @@
 
 	<!-- Theme JS files -->
 	<script src="../bs5/template/html/layout_1/full/assets/js/app.js"></script>
-
+	
 	<style>
 		.content-wrapper {
 			display: flex;
@@ -40,33 +40,30 @@
 			display: flex;
 			overflow: hidden;
 		}
-		/* Rating options styling - box below question */
-		.rating-box {
+		/* Rating options styling */
+		.rating-group {
 			background: #f8f9fa;
 			border: 1px solid #dee2e6;
 			border-radius: 8px;
-			padding: 12px 16px;
+			padding: 15px 20px;
 			margin-top: 8px;
-			display: flex;
-			justify-content: center;
-			gap: 24px;
 		}
-		.rating-box .form-check {
-			margin: 0;
-			padding: 0;
-		}
-		.rating-box .form-check-input {
-			margin-right: 4px;
-		}
-		.rating-box .form-check-label {
+		.rating-group label.rating-label {
+			display: inline-block;
+			margin: 0 15px 0 5px;
 			font-weight: 500;
+			cursor: pointer;
+		}
+		.rating-group input[type="radio"] {
+			cursor: pointer;
 		}
 		.question-block {
-			margin-bottom: 20px;
+			margin-bottom: 24px;
 		}
-		.question-label {
+		.question-text {
 			font-weight: 500;
-			margin-bottom: 0;
+			margin-bottom: 8px;
+			display: block;
 		}
 	</style>
 </head>
@@ -220,7 +217,7 @@
 									<i class="ph-info me-2"></i>
 									<span class="fw-semibold">Before you start:</span> Select the student you want to evaluate. Only students with confirmed internships can be evaluated.
 								</div>
-								
+
 								<div class="mb-4">
 									<label class="form-label fw-bold">Select Student to Evaluate *</label>
 									<select class="form-select" id="student-selector" required>
@@ -228,328 +225,212 @@
 									</select>
 									<div class="form-text">Choose from students who completed their internship at your company</div>
 								</div>
-								
+
 								<hr class="mb-4">
 								
 								<!-- Rating questions section -->
 								<h6 class="fw-bold mb-4">Program & Student Evaluation</h6>
+								<p class="text-muted mb-4">Rate on a scale of 1-5 (1 = Strongly Disagree, 5 = Strongly Agree)</p>
 								
+								<!-- Q1: Program Satisfaction → overall_performance -->
 								<div class="question-block">
-									<label class="question-label">We were generally satisfied with the First Step to the Business World Program. *</label>
-									<div class="rating-box">
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction1" value="1" required>
-											<label class="form-check-label" for="satisfaction1">1</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction2" value="2">
-											<label class="form-check-label" for="satisfaction2">2</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction3" value="3">
-											<label class="form-check-label" for="satisfaction3">3</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction4" value="4">
-											<label class="form-check-label" for="satisfaction4">4</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction5" value="5">
-											<label class="form-check-label" for="satisfaction5">5</label>
-										</div>
+									<span class="question-text">We were generally satisfied with the First Step to the Business World Program. *</span>
+									<div class="rating-group">
+										<input type="radio" name="program_satisfaction" id="ps1" value="1" required>
+										<label class="rating-label" for="ps1">1</label>
+										<input type="radio" name="program_satisfaction" id="ps2" value="2">
+										<label class="rating-label" for="ps2">2</label>
+										<input type="radio" name="program_satisfaction" id="ps3" value="3">
+										<label class="rating-label" for="ps3">3</label>
+										<input type="radio" name="program_satisfaction" id="ps4" value="4">
+										<label class="rating-label" for="ps4">4</label>
+										<input type="radio" name="program_satisfaction" id="ps5" value="5">
+										<label class="rating-label" for="ps5">5</label>
 									</div>
 								</div>
 
+								<!-- Q2: Student Impact → technical_skills -->
 								<div class="question-block">
-									<label class="question-label">Students had a positive impact on our institution. *</label>
-									<div class="rating-box">
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="student_impact" id="impact1" value="1" required>
-											<label class="form-check-label" for="impact1">1</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="student_impact" id="impact2" value="2">
-											<label class="form-check-label" for="impact2">2</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="student_impact" id="impact3" value="3">
-											<label class="form-check-label" for="impact3">3</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="student_impact" id="impact4" value="4">
-											<label class="form-check-label" for="impact4">4</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="student_impact" id="impact5" value="5">
-											<label class="form-check-label" for="impact5">5</label>
-										</div>
+									<span class="question-text">Students had a positive impact on our institution. *</span>
+									<div class="rating-group">
+										<input type="radio" name="student_impact" id="si1" value="1" required>
+										<label class="rating-label" for="si1">1</label>
+										<input type="radio" name="student_impact" id="si2" value="2">
+										<label class="rating-label" for="si2">2</label>
+										<input type="radio" name="student_impact" id="si3" value="3">
+										<label class="rating-label" for="si3">3</label>
+										<input type="radio" name="student_impact" id="si4" value="4">
+										<label class="rating-label" for="si4">4</label>
+										<input type="radio" name="student_impact" id="si5" value="5">
+										<label class="rating-label" for="si5">5</label>
 									</div>
 								</div>
 
+								<!-- Q3: Motivation → problem_solving -->
 								<div class="question-block">
-									<label class="question-label">Students' motivation and desire to learn were strong. *</label>
-									<div class="rating-box">
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="motivation" id="motivation1" value="1" required>
-											<label class="form-check-label" for="motivation1">1</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="motivation" id="motivation2" value="2">
-											<label class="form-check-label" for="motivation2">2</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="motivation" id="motivation3" value="3">
-											<label class="form-check-label" for="motivation3">3</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="motivation" id="motivation4" value="4">
-											<label class="form-check-label" for="motivation4">4</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="motivation" id="motivation5" value="5">
-											<label class="form-check-label" for="motivation5">5</label>
-										</div>
+									<span class="question-text">Students' motivation and desire to learn were strong. *</span>
+									<div class="rating-group">
+										<input type="radio" name="motivation" id="mo1" value="1" required>
+										<label class="rating-label" for="mo1">1</label>
+										<input type="radio" name="motivation" id="mo2" value="2">
+										<label class="rating-label" for="mo2">2</label>
+										<input type="radio" name="motivation" id="mo3" value="3">
+										<label class="rating-label" for="mo3">3</label>
+										<input type="radio" name="motivation" id="mo4" value="4">
+										<label class="rating-label" for="mo4">4</label>
+										<input type="radio" name="motivation" id="mo5" value="5">
+										<label class="rating-label" for="mo5">5</label>
 									</div>
 								</div>
 
+								<!-- Q4: Communication → communication_skills -->
 								<div class="question-block">
-									<label class="question-label">Students' verbal and written communication was strong. *</label>
-									<div class="rating-box">
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="communication" id="comm1" value="1" required>
-											<label class="form-check-label" for="comm1">1</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="communication" id="comm2" value="2">
-											<label class="form-check-label" for="comm2">2</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="communication" id="comm3" value="3">
-											<label class="form-check-label" for="comm3">3</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="communication" id="comm4" value="4">
-											<label class="form-check-label" for="comm4">4</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="communication" id="comm5" value="5">
-											<label class="form-check-label" for="comm5">5</label>
-										</div>
+									<span class="question-text">Students' verbal and written communication was strong. *</span>
+									<div class="rating-group">
+										<input type="radio" name="communication" id="cm1" value="1" required>
+										<label class="rating-label" for="cm1">1</label>
+										<input type="radio" name="communication" id="cm2" value="2">
+										<label class="rating-label" for="cm2">2</label>
+										<input type="radio" name="communication" id="cm3" value="3">
+										<label class="rating-label" for="cm3">3</label>
+										<input type="radio" name="communication" id="cm4" value="4">
+										<label class="rating-label" for="cm4">4</label>
+										<input type="radio" name="communication" id="cm5" value="5">
+										<label class="rating-label" for="cm5">5</label>
 									</div>
 								</div>
 
+								<!-- Q5: Timeliness (stored in comments JSON) -->
 								<div class="question-block">
-									<label class="question-label">Students did the assigned work on time and completely. *</label>
-									<div class="rating-box">
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="timeliness" id="time1" value="1" required>
-											<label class="form-check-label" for="time1">1</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="timeliness" id="time2" value="2">
-											<label class="form-check-label" for="time2">2</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="timeliness" id="time3" value="3">
-											<label class="form-check-label" for="time3">3</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="timeliness" id="time4" value="4">
-											<label class="form-check-label" for="time4">4</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="timeliness" id="time5" value="5">
-											<label class="form-check-label" for="time5">5</label>
-										</div>
+									<span class="question-text">Students did the assigned work on time and completely. *</span>
+									<div class="rating-group">
+										<input type="radio" name="timeliness" id="tl1" value="1" required>
+										<label class="rating-label" for="tl1">1</label>
+										<input type="radio" name="timeliness" id="tl2" value="2">
+										<label class="rating-label" for="tl2">2</label>
+										<input type="radio" name="timeliness" id="tl3" value="3">
+										<label class="rating-label" for="tl3">3</label>
+										<input type="radio" name="timeliness" id="tl4" value="4">
+										<label class="rating-label" for="tl4">4</label>
+										<input type="radio" name="timeliness" id="tl5" value="5">
+										<label class="rating-label" for="tl5">5</label>
 									</div>
 								</div>
 
+								<!-- Q6: Positive Attitude (stored in comments JSON) -->
 								<div class="question-block">
-									<label class="question-label">Students' attitudes were positive in the difficulties they encountered. *</label>
-									<div class="rating-box">
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="positive_attitude" id="att1" value="1" required>
-											<label class="form-check-label" for="att1">1</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="positive_attitude" id="att2" value="2">
-											<label class="form-check-label" for="att2">2</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="positive_attitude" id="att3" value="3">
-											<label class="form-check-label" for="att3">3</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="positive_attitude" id="att4" value="4">
-											<label class="form-check-label" for="att4">4</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="positive_attitude" id="att5" value="5">
-											<label class="form-check-label" for="att5">5</label>
-										</div>
+									<span class="question-text">Students' attitudes were positive in the difficulties they encountered. *</span>
+									<div class="rating-group">
+										<input type="radio" name="positive_attitude" id="pa1" value="1" required>
+										<label class="rating-label" for="pa1">1</label>
+										<input type="radio" name="positive_attitude" id="pa2" value="2">
+										<label class="rating-label" for="pa2">2</label>
+										<input type="radio" name="positive_attitude" id="pa3" value="3">
+										<label class="rating-label" for="pa3">3</label>
+										<input type="radio" name="positive_attitude" id="pa4" value="4">
+										<label class="rating-label" for="pa4">4</label>
+										<input type="radio" name="positive_attitude" id="pa5" value="5">
+										<label class="rating-label" for="pa5">5</label>
 									</div>
 								</div>
 
+								<!-- Q7: Teamwork → teamwork -->
 								<div class="question-block">
-									<label class="question-label">Students were good team players. *</label>
-									<div class="rating-box">
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="teamwork" id="team1" value="1" required>
-											<label class="form-check-label" for="team1">1</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="teamwork" id="team2" value="2">
-											<label class="form-check-label" for="team2">2</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="teamwork" id="team3" value="3">
-											<label class="form-check-label" for="team3">3</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="teamwork" id="team4" value="4">
-											<label class="form-check-label" for="team4">4</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="teamwork" id="team5" value="5">
-											<label class="form-check-label" for="team5">5</label>
-										</div>
+									<span class="question-text">Students were good team players. *</span>
+									<div class="rating-group">
+										<input type="radio" name="teamwork" id="tw1" value="1" required>
+										<label class="rating-label" for="tw1">1</label>
+										<input type="radio" name="teamwork" id="tw2" value="2">
+										<label class="rating-label" for="tw2">2</label>
+										<input type="radio" name="teamwork" id="tw3" value="3">
+										<label class="rating-label" for="tw3">3</label>
+										<input type="radio" name="teamwork" id="tw4" value="4">
+										<label class="rating-label" for="tw4">4</label>
+										<input type="radio" name="teamwork" id="tw5" value="5">
+										<label class="rating-label" for="tw5">5</label>
 									</div>
 								</div>
 
+								<!-- Q8: Adaptation (stored in comments JSON) -->
 								<div class="question-block">
-									<label class="question-label">Students easily adapted to the work culture. *</label>
-									<div class="rating-box">
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="adaptation" id="adapt1" value="1" required>
-											<label class="form-check-label" for="adapt1">1</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="adaptation" id="adapt2" value="2">
-											<label class="form-check-label" for="adapt2">2</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="adaptation" id="adapt3" value="3">
-											<label class="form-check-label" for="adapt3">3</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="adaptation" id="adapt4" value="4">
-											<label class="form-check-label" for="adapt4">4</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="adaptation" id="adapt5" value="5">
-											<label class="form-check-label" for="adapt5">5</label>
-										</div>
+									<span class="question-text">Students easily adapted to the work culture. *</span>
+									<div class="rating-group">
+										<input type="radio" name="adaptation" id="ad1" value="1" required>
+										<label class="rating-label" for="ad1">1</label>
+										<input type="radio" name="adaptation" id="ad2" value="2">
+										<label class="rating-label" for="ad2">2</label>
+										<input type="radio" name="adaptation" id="ad3" value="3">
+										<label class="rating-label" for="ad3">3</label>
+										<input type="radio" name="adaptation" id="ad4" value="4">
+										<label class="rating-label" for="ad4">4</label>
+										<input type="radio" name="adaptation" id="ad5" value="5">
+										<label class="rating-label" for="ad5">5</label>
 									</div>
 								</div>
 
+								<!-- Q9: Digital Tools (stored in comments JSON) -->
 								<div class="question-block">
-									<label class="question-label">Students' ability to use digital tools was strong. *</label>
-									<div class="rating-box">
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="digital_tools" id="digital1" value="1" required>
-											<label class="form-check-label" for="digital1">1</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="digital_tools" id="digital2" value="2">
-											<label class="form-check-label" for="digital2">2</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="digital_tools" id="digital3" value="3">
-											<label class="form-check-label" for="digital3">3</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="digital_tools" id="digital4" value="4">
-											<label class="form-check-label" for="digital4">4</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="digital_tools" id="digital5" value="5">
-											<label class="form-check-label" for="digital5">5</label>
-										</div>
+									<span class="question-text">Students' ability to use digital tools was strong. *</span>
+									<div class="rating-group">
+										<input type="radio" name="digital_tools" id="dt1" value="1" required>
+										<label class="rating-label" for="dt1">1</label>
+										<input type="radio" name="digital_tools" id="dt2" value="2">
+										<label class="rating-label" for="dt2">2</label>
+										<input type="radio" name="digital_tools" id="dt3" value="3">
+										<label class="rating-label" for="dt3">3</label>
+										<input type="radio" name="digital_tools" id="dt4" value="4">
+										<label class="rating-label" for="dt4">4</label>
+										<input type="radio" name="digital_tools" id="dt5" value="5">
+										<label class="rating-label" for="dt5">5</label>
 									</div>
 								</div>
 
-								<!-- Yes/No questions -->
+								<!-- Yes/No Questions -->
 								<h6 class="fw-bold mb-4 mt-4">Additional Questions</h6>
 
 								<div class="question-block">
-									<label class="question-label">Would you like to participate in this program again? *</label>
-									<div class="rating-box">
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="participate_again" id="participate_yes" value="yes" required>
-											<label class="form-check-label" for="participate_yes">Yes</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="participate_again" id="participate_no" value="no">
-											<label class="form-check-label" for="participate_no">No</label>
-										</div>
+									<span class="question-text">Would you like to participate in this program again? *</span>
+									<div class="rating-group">
+										<input type="radio" name="participate_again" id="part_yes" value="yes" required>
+										<label class="rating-label" for="part_yes">Yes</label>
+										<input type="radio" name="participate_again" id="part_no" value="no">
+										<label class="rating-label" for="part_no">No</label>
 									</div>
 								</div>
 
 								<div class="question-block">
-									<label class="question-label">Would you recommend this program to other institutions? *</label>
-									<div class="rating-box">
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_program" id="recommend_yes" value="yes" required>
-											<label class="form-check-label" for="recommend_yes">Yes</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_program" id="recommend_no" value="no">
-											<label class="form-check-label" for="recommend_no">No</label>
-										</div>
+									<span class="question-text">Would you recommend this program to other institutions? *</span>
+									<div class="rating-group">
+										<input type="radio" name="recommend_program" id="rec_yes" value="yes" required>
+										<label class="rating-label" for="rec_yes">Yes</label>
+										<input type="radio" name="recommend_program" id="rec_no" value="no">
+										<label class="rating-label" for="rec_no">No</label>
 									</div>
 								</div>
 
 								<div class="question-block">
-									<label class="question-label">Would you consider the students for a long-term internship in the future? *</label>
-									<div class="rating-box">
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="future_internship" id="future_yes" value="yes" required>
-											<label class="form-check-label" for="future_yes">Yes</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="future_internship" id="future_no" value="no">
-											<label class="form-check-label" for="future_no">No</label>
-										</div>
+									<span class="question-text">Would you consider the students for a long-term internship in the future? *</span>
+									<div class="rating-group">
+										<input type="radio" name="future_internship" id="fut_yes" value="yes" required>
+										<label class="rating-label" for="fut_yes">Yes</label>
+										<input type="radio" name="future_internship" id="fut_no" value="no">
+										<label class="rating-label" for="fut_no">No</label>
 									</div>
 								</div>
 
 								<div class="question-block">
-									<label class="question-label">Would you like to participate in our short interview about the program?</label>
-									<div class="rating-box">
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="interview" id="interview_yes" value="yes">
-											<label class="form-check-label" for="interview_yes">Yes</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="interview" id="interview_no" value="no">
-											<label class="form-check-label" for="interview_no">No</label>
-										</div>
+									<span class="question-text">Would you like to participate in our short interview to be published in GazeteSU about the First Step to the Business World Program?</span>
+									<div class="rating-group">
+										<input type="radio" name="interview" id="int_yes" value="yes">
+										<label class="rating-label" for="int_yes">Yes</label>
+										<input type="radio" name="interview" id="int_no" value="no">
+										<label class="rating-label" for="int_no">No</label>
 									</div>
-								</div>
-
-								<div class="mb-3">
-									<label class="form-label">If you were to redesign this program, what would you do differently?</label>
-									<textarea rows="3" class="form-control" name="redesign" placeholder="Your suggestions..."></textarea>
 								</div>
 
 								<div class="mb-4">
-									<label class="form-label">Which of the following was the type of program? *</label>
-									<div class="form-check">
-										<input type="radio" class="form-check-input" name="program_type" id="type_rotation" value="rotation" required>
-										<label class="form-check-label" for="type_rotation">Rotation (student worked in multiple departments)</label>
-									</div>
-									<div class="form-check">
-										<input type="radio" class="form-check-input" name="program_type" id="type_project" value="project">
-										<label class="form-check-label" for="type_project">Project-based (student worked on specific projects)</label>
-									</div>
-									<div class="form-check">
-										<input type="radio" class="form-check-input" name="program_type" id="type_department" value="department">
-										<label class="form-check-label" for="type_department">Department-specific (student worked in a single department)</label>
-									</div>
-									<div class="form-check">
-										<input type="radio" class="form-check-input" name="program_type" id="type_hybrid" value="hybrid">
-										<label class="form-check-label" for="type_hybrid">Hybrid (combination of the above)</label>
-									</div>
+									<label class="form-label">If you were to redesign this program, what would you do differently?</label>
+									<textarea class="form-control" name="redesign" rows="3" placeholder="Your suggestions..."></textarea>
 								</div>
 
 								<div class="d-flex justify-content-end">
@@ -596,7 +477,7 @@
 					<span>&copy; 2025 <a href="#">Sabancı University Internship Portal</a></span>
 				</div>
 			</div>
-
+			
 		</div>
 	</div>
 
@@ -651,8 +532,10 @@
 			
 			const formData = new FormData(this);
 			
+			// Collect all evaluation data
 			const evaluationData = {
 				application_id: applicationId,
+				// Rating questions (1-5)
 				program_satisfaction: parseInt(formData.get('program_satisfaction')) || 0,
 				student_impact: parseInt(formData.get('student_impact')) || 0,
 				motivation: parseInt(formData.get('motivation')) || 0,
@@ -662,12 +545,13 @@
 				teamwork: parseInt(formData.get('teamwork')) || 0,
 				adaptation: parseInt(formData.get('adaptation')) || 0,
 				digital_tools: parseInt(formData.get('digital_tools')) || 0,
+				// Yes/No questions
 				participate_again: formData.get('participate_again') || 'no',
 				recommend_program: formData.get('recommend_program') || 'no',
 				future_internship: formData.get('future_internship') || 'no',
 				interview: formData.get('interview') || 'no',
-				redesign: formData.get('redesign') || '',
-				program_type: formData.get('program_type') || ''
+				// Text
+				redesign: formData.get('redesign') || ''
 			};
 			
 			try {
@@ -745,11 +629,11 @@
 						<td>${evaluation.internship_position || 'N/A'}</td>
 						<td>
 							<div class="d-flex align-items-center">
-								<span class="me-2">${parseFloat(evaluation.overall_rating || 0).toFixed(1)}/5</span>
+								<span class="me-2">${parseFloat(evaluation.rating || 0).toFixed(1)}/5</span>
 								<i class="ph-star-fill text-warning"></i>
 							</div>
 						</td>
-						<td>${evaluation.submitted_at ? new Date(evaluation.submitted_at).toLocaleDateString() : 'N/A'}</td>
+						<td>${evaluation.created_at ? new Date(evaluation.created_at).toLocaleDateString() : 'N/A'}</td>
 						<td><span class="badge bg-success">Submitted</span></td>
 						<td class="text-center">
 							<button type="button" class="btn btn-light btn-sm" onclick="viewEvaluationDetails('${evaluation.id}')">
@@ -780,32 +664,41 @@
 			const e = response.data || response;
 			const modalBody = document.getElementById('evaluationModalBody');
 			
+			// Parse extra data from comments if available
+			let extraData = {};
+			try {
+				if (e.comments && e.comments.startsWith('{')) {
+					extraData = JSON.parse(e.comments);
+				}
+			} catch (err) {}
+			
 			modalBody.innerHTML = `
 				<div class="mb-3">
 					<h6 class="fw-bold">${e.student_name || 'Student'} - ${e.internship_position || 'Intern'}</h6>
-					<p class="text-muted mb-0">Submitted on ${e.submitted_at ? new Date(e.submitted_at).toLocaleDateString() : 'N/A'}</p>
-					<p class="mb-0"><strong>Overall Rating:</strong> ${parseFloat(e.overall_rating || 0).toFixed(1)}/5 ⭐</p>
+					<p class="text-muted mb-0">Submitted on ${e.created_at ? new Date(e.created_at).toLocaleDateString() : 'N/A'}</p>
+					<p class="mb-0"><strong>Overall Rating:</strong> ${parseFloat(e.rating || 0).toFixed(1)}/5 ⭐</p>
 				</div>
 				<hr>
-				<h6 class="fw-semibold mb-3">Performance Ratings</h6>
-				<table class="table table-bordered">
+				<h6 class="fw-semibold mb-3">Program & Student Ratings</h6>
+				<table class="table table-bordered table-sm">
 					<tbody>
-						<tr><th width="70%">Program Satisfaction</th><td class="text-center">${e.program_satisfaction || 0}/5</td></tr>
-						<tr><th>Positive Impact</th><td class="text-center">${e.student_impact || 0}/5</td></tr>
-						<tr><th>Motivation</th><td class="text-center">${e.motivation || 0}/5</td></tr>
-						<tr><th>Communication</th><td class="text-center">${e.communication || 0}/5</td></tr>
-						<tr><th>Timeliness</th><td class="text-center">${e.timeliness || 0}/5</td></tr>
-						<tr><th>Positive Attitude</th><td class="text-center">${e.positive_attitude || 0}/5</td></tr>
+						<tr><th>Program Satisfaction</th><td class="text-center">${e.overall_performance || 0}/5</td></tr>
+						<tr><th>Student Impact</th><td class="text-center">${e.technical_skills || 0}/5</td></tr>
+						<tr><th>Motivation</th><td class="text-center">${e.problem_solving || 0}/5</td></tr>
+						<tr><th>Communication</th><td class="text-center">${e.communication_skills || 0}/5</td></tr>
+						<tr><th>Timeliness</th><td class="text-center">${extraData.timeliness || '-'}/5</td></tr>
+						<tr><th>Positive Attitude</th><td class="text-center">${extraData.positive_attitude || '-'}/5</td></tr>
 						<tr><th>Teamwork</th><td class="text-center">${e.teamwork || 0}/5</td></tr>
-						<tr><th>Adaptation</th><td class="text-center">${e.adaptation || 0}/5</td></tr>
-						<tr><th>Digital Tools</th><td class="text-center">${e.digital_tools || 0}/5</td></tr>
+						<tr><th>Adaptation</th><td class="text-center">${extraData.adaptation || '-'}/5</td></tr>
+						<tr><th>Digital Tools</th><td class="text-center">${extraData.digital_tools || '-'}/5</td></tr>
 					</tbody>
 				</table>
-				<p><strong>Participate Again:</strong> ${e.participate_again === 'yes' ? 'Yes' : 'No'}</p>
-				<p><strong>Recommend Program:</strong> ${e.recommend_program === 'yes' ? 'Yes' : 'No'}</p>
-				<p><strong>Future Internship:</strong> ${e.future_internship === 'yes' ? 'Yes' : 'No'}</p>
-				${e.program_type ? `<p><strong>Program Type:</strong> ${e.program_type}</p>` : ''}
-				${e.redesign_suggestions ? `<p><strong>Suggestions:</strong> ${e.redesign_suggestions}</p>` : ''}
+				<h6 class="fw-semibold mb-2 mt-3">Additional Responses</h6>
+				<p><strong>Participate Again:</strong> ${extraData.participate_again || e.recommendation?.includes('participate') ? 'Yes' : 'No'}</p>
+				<p><strong>Recommend Program:</strong> ${extraData.recommend_program || 'N/A'}</p>
+				<p><strong>Future Internship:</strong> ${extraData.future_internship || 'N/A'}</p>
+				<p><strong>Interview Interest:</strong> ${extraData.interview || 'N/A'}</p>
+				${extraData.redesign ? `<p><strong>Redesign Suggestions:</strong> ${extraData.redesign}</p>` : ''}
 			`;
 			
 			new bootstrap.Modal(document.getElementById('view_evaluation')).show();

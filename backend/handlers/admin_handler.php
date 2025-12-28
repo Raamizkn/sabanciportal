@@ -730,16 +730,17 @@ function get_all_evaluations_admin() {
             $stmt = $db->query("
                 SELECT 
                     e.id as evaluation_id,
+                    e.evaluation_id as eval_code,
                     e.student_id,
                     e.company_id,
-                    e.overall_rating,
-                    COALESCE(e.submitted_at, e.created_at) as date_submitted,
+                    e.rating as overall_rating,
+                    e.created_at as date_submitted,
                     s.name as student_name,
                     s.email as student_email,
                     s.profile_pic as student_profile_pic,
                     c.name as company_name,
                     c.logo as company_logo,
-                    i.position as internship_position,
+                    i.title as internship_position,
                     'Company' as submitted_by,
                     'company_evaluation' as evaluation_type
                 FROM evaluations e
@@ -747,7 +748,7 @@ function get_all_evaluations_admin() {
                 JOIN companies c ON e.company_id = c.id
                 JOIN applications a ON e.application_id = a.id
                 JOIN internships i ON a.internship_id = i.id
-                ORDER BY COALESCE(e.submitted_at, e.created_at) DESC
+                ORDER BY e.created_at DESC
             ");
             $companyEvals = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
@@ -783,7 +784,9 @@ function get_evaluation_details_admin($evaluation_id, $type = 'student') {
                     s.name as student_name,
                     s.email as student_email,
                     c.name as company_name,
-                    i.position as internship_position,
+                    c.name as company_full_name,
+                    i.title as internship_position,
+                    i.position as position,
                     a.application_id
                 FROM student_evaluations se
                 JOIN students s ON se.student_id = s.id
@@ -797,10 +800,15 @@ function get_evaluation_details_admin($evaluation_id, $type = 'student') {
             $stmt = $db->prepare("
                 SELECT 
                     e.*,
+                    e.rating as overall_rating,
+                    e.overall_performance as program_satisfaction,
+                    e.technical_skills as student_impact,
+                    e.problem_solving as motivation,
+                    e.communication_skills as communication,
                     s.name as student_name,
                     s.email as student_email,
                     c.name as company_name,
-                    i.position as internship_position,
+                    i.title as internship_position,
                     a.application_id
                 FROM evaluations e
                 JOIN students s ON e.student_id = s.id
@@ -816,6 +824,23 @@ function get_evaluation_details_admin($evaluation_id, $type = 'student') {
         
         if (!$evaluation) {
             return ['error' => 'Evaluation not found'];
+        }
+        
+        // For company evaluations, decode the JSON comments to get extra fields
+        if ($type !== 'student' && $type !== 'student_evaluation' && !empty($evaluation['comments'])) {
+            $extra = json_decode($evaluation['comments'], true);
+            if (is_array($extra)) {
+                // Merge extra fields into the evaluation
+                $evaluation['timeliness'] = $extra['timeliness'] ?? 0;
+                $evaluation['positive_attitude'] = $extra['positive_attitude'] ?? 0;
+                $evaluation['adaptation'] = $extra['adaptation'] ?? 0;
+                $evaluation['digital_tools'] = $extra['digital_tools'] ?? 0;
+                $evaluation['participate_again'] = $extra['participate_again'] ?? 'no';
+                $evaluation['recommend_program'] = $extra['recommend_program'] ?? 'no';
+                $evaluation['future_internship'] = $extra['future_internship'] ?? 'no';
+                $evaluation['interview'] = $extra['interview'] ?? 'no';
+                $evaluation['redesign_suggestions'] = $extra['redesign'] ?? '';
+            }
         }
         
         return ['status' => 'success', 'data' => $evaluation];

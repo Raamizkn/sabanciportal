@@ -1,51 +1,52 @@
 <?php
-
 /**
  * Company Evaluations Handler
- * Handles companies evaluating students after internship completion
+ * Handles company-side evaluation of students who completed internships
  * 
- * This handles company → student evaluations
- * Stored in the 'evaluations' table
+ * Field Mapping (Frontend → Database):
+ * - program_satisfaction → overall_performance
+ * - student_impact → technical_skills
+ * - motivation → problem_solving
+ * - communication → communication_skills
+ * - teamwork → teamwork
+ * - timeliness, positive_attitude, adaptation, digital_tools → stored in comments as JSON
+ * - yes/no questions → stored in recommendation field
  */
 
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../auth/auth.php';
 
 /**
- * Get students that a company can evaluate
- * Only students with CONFIRMED applications can be evaluated
+ * Get students eligible for evaluation
+ * Returns students with Confirmed applications at this company
  */
 function get_evaluable_students($company_id) {
     try {
         $db = getDB();
         
-        // Get confirmed applications where company hasn't submitted evaluation yet
-        $stmt = $db->prepare("
-            SELECT 
-                a.id as application_id,
-                a.application_id as application_code,
-                a.status,
-                a.created_at as application_date,
-                s.id as student_id,
-                s.name as student_name,
-                s.email as student_email,
-                s.student_id as student_number,
-                s.major as student_major,
-                s.profile_pic as student_profile_pic,
-                i.id as internship_id,
-                i.position as internship_position,
-                i.dates as internship_dates,
-                i.location as internship_location,
-                (SELECT COUNT(*) FROM evaluations e WHERE e.application_id = a.id AND e.company_id = ?) as has_evaluation
-            FROM applications a
-            JOIN students s ON a.student_id = s.id
-            JOIN internships i ON a.internship_id = i.id
-            WHERE i.company_id = ?
-            AND a.status = 'Confirmed'
-            HAVING has_evaluation = 0
-            ORDER BY a.created_at DESC
-        ");
-        $stmt->execute([$company_id, $company_id]);
+        // Get applications that are Confirmed and haven't been evaluated yet
+        $sql = "SELECT 
+                    a.id AS application_id,
+                    a.student_id,
+                    s.name AS student_name,
+                    s.email AS student_email,
+                    s.profile_pic AS student_profile_pic,
+                    i.title AS internship_position,
+                    i.id AS internship_id,
+                    a.status
+                FROM applications a
+                JOIN students s ON a.student_id = s.id
+                JOIN internships i ON a.internship_id = i.id
+                WHERE i.company_id = :company_id
+                AND a.status IN ('Confirmed', 'Confirmed_By_Student', 'confirmed')
+                AND NOT EXISTS (
+                    SELECT 1 FROM evaluations e 
+                    WHERE e.application_id = a.id
+                )
+                ORDER BY s.name";
+        
+        $stmt = $db->prepare($sql);
+        $stmt->execute([':company_id' => $company_id]);
         $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         return [
@@ -53,119 +54,167 @@ function get_evaluable_students($company_id) {
             'data' => $students
         ];
     } catch (PDOException $e) {
-        error_log("Failed to fetch evaluable students: " . $e->getMessage());
-        return ['error' => 'Failed to fetch evaluable students'];
+        error_log("Error getting evaluable students: " . $e->getMessage());
+        return [
+            'status' => 'error',
+            'error' => 'Failed to load students'
+        ];
     }
 }
 
 /**
- * Submit company evaluation of a student
+ * Submit a company evaluation for a student
  */
 function submit_company_evaluation($company_id, $application_id, $evaluation_data) {
     try {
         $db = getDB();
-        $db->beginTransaction();
         
-        // Get application and verify it belongs to this company
-        $stmt = $db->prepare("
-            SELECT a.*, i.company_id, i.position, s.id as student_id, s.name as student_name
-            FROM applications a
-            JOIN internships i ON a.internship_id = i.id
-            JOIN students s ON a.student_id = s.id
-            WHERE a.id = ? AND i.company_id = ?
-        ");
-        $stmt->execute([$application_id, $company_id]);
-        $application = $stmt->fetch();
+        // Verify the application belongs to this company and is confirmed
+        $sql = "SELECT a.*, i.company_id, a.student_id
+                FROM applications a
+                JOIN internships i ON a.internship_id = i.id
+                WHERE a.id = :application_id 
+                AND i.company_id = :company_id
+                AND a.status IN ('Confirmed', 'Confirmed_By_Student', 'confirmed')";
         
-        if (!$application) {
-            $db->rollBack();
-            return ['error' => 'Application not found or access denied'];
-        }
-        
-        // Check status - only CONFIRMED applications can be evaluated
-        if ($application['status'] !== 'Confirmed') {
-            $db->rollBack();
-            return ['error' => 'Can only evaluate students with confirmed internships. Current status: ' . $application['status']];
-        }
-        
-        // Check if evaluation already exists
-        $stmt = $db->prepare("SELECT id FROM evaluations WHERE application_id = ? AND company_id = ?");
-        $stmt->execute([$application_id, $company_id]);
-        if ($stmt->fetch()) {
-            $db->rollBack();
-            return ['error' => 'You have already submitted an evaluation for this student'];
-        }
-        
-        // Calculate overall rating from numeric fields (1-5 scale)
-        $ratings = [
-            intval($evaluation_data['program_satisfaction'] ?? 0),
-            intval($evaluation_data['student_impact'] ?? 0),
-            intval($evaluation_data['motivation'] ?? 0),
-            intval($evaluation_data['communication'] ?? 0),
-            intval($evaluation_data['timeliness'] ?? 0),
-            intval($evaluation_data['positive_attitude'] ?? 0),
-            intval($evaluation_data['teamwork'] ?? 0),
-            intval($evaluation_data['adaptation'] ?? 0),
-            intval($evaluation_data['digital_tools'] ?? 0)
-        ];
-        
-        // Filter out zero values and calculate average
-        $valid_ratings = array_filter($ratings, function($r) { return $r > 0; });
-        $overall_rating = count($valid_ratings) > 0 ? array_sum($valid_ratings) / count($valid_ratings) : 0;
-        
-        // Insert evaluation
-        $stmt = $db->prepare("
-            INSERT INTO evaluations (
-                application_id, student_id, company_id,
-                program_satisfaction, student_impact, motivation,
-                communication, timeliness, positive_attitude,
-                teamwork, adaptation, digital_tools,
-                participate_again, recommend_program, future_internship, interview,
-                redesign_suggestions, program_type,
-                overall_rating, submitted_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
-        ");
-        
+        $stmt = $db->prepare($sql);
         $stmt->execute([
-            $application_id,
-            $application['student_id'],
-            $company_id,
-            intval($evaluation_data['program_satisfaction'] ?? 0),
-            intval($evaluation_data['student_impact'] ?? 0),
-            intval($evaluation_data['motivation'] ?? 0),
-            intval($evaluation_data['communication'] ?? 0),
-            intval($evaluation_data['timeliness'] ?? 0),
-            intval($evaluation_data['positive_attitude'] ?? 0),
-            intval($evaluation_data['teamwork'] ?? 0),
-            intval($evaluation_data['adaptation'] ?? 0),
-            intval($evaluation_data['digital_tools'] ?? 0),
-            $evaluation_data['participate_again'] ?? 'no',
-            $evaluation_data['recommend_program'] ?? 'no',
-            $evaluation_data['future_internship'] ?? 'no',
-            $evaluation_data['interview'] ?? 'no',
-            $evaluation_data['redesign'] ?? '',
-            $evaluation_data['program_type'] ?? '',
-            round($overall_rating, 2)
+            ':application_id' => $application_id,
+            ':company_id' => $company_id
         ]);
         
-        $eval_id = $db->lastInsertId();
+        $application = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        $db->commit();
+        if (!$application) {
+            return [
+                'status' => 'error',
+                'error' => 'Invalid application or not confirmed for evaluation'
+            ];
+        }
+        
+        // Check if already evaluated
+        $checkSql = "SELECT id FROM evaluations WHERE application_id = :application_id";
+        $checkStmt = $db->prepare($checkSql);
+        $checkStmt->execute([':application_id' => $application_id]);
+        
+        if ($checkStmt->fetch()) {
+            return [
+                'status' => 'error', 
+                'error' => 'This student has already been evaluated'
+            ];
+        }
+        
+        // Map frontend fields to database columns
+        // Main rating fields (5 mapped to DB columns)
+        $program_satisfaction = intval($evaluation_data['program_satisfaction'] ?? 0);
+        $student_impact = intval($evaluation_data['student_impact'] ?? 0);
+        $motivation = intval($evaluation_data['motivation'] ?? 0);
+        $communication = intval($evaluation_data['communication'] ?? 0);
+        $teamwork_rating = intval($evaluation_data['teamwork'] ?? 0);
+        
+        // Additional ratings stored in comments JSON
+        $extra_ratings = [
+            'timeliness' => intval($evaluation_data['timeliness'] ?? 0),
+            'positive_attitude' => intval($evaluation_data['positive_attitude'] ?? 0),
+            'adaptation' => intval($evaluation_data['adaptation'] ?? 0),
+            'digital_tools' => intval($evaluation_data['digital_tools'] ?? 0),
+            'participate_again' => $evaluation_data['participate_again'] ?? 'no',
+            'recommend_program' => $evaluation_data['recommend_program'] ?? 'no',
+            'future_internship' => $evaluation_data['future_internship'] ?? 'no',
+            'interview' => $evaluation_data['interview'] ?? 'no',
+            'redesign' => $evaluation_data['redesign'] ?? ''
+        ];
+        
+        // Calculate overall rating from ALL 9 numeric ratings
+        $all_ratings = [
+            $program_satisfaction,
+            $student_impact,
+            $motivation,
+            $communication,
+            $teamwork_rating,
+            $extra_ratings['timeliness'],
+            $extra_ratings['positive_attitude'],
+            $extra_ratings['adaptation'],
+            $extra_ratings['digital_tools']
+        ];
+        
+        $valid_ratings = array_filter($all_ratings, function($r) { return $r > 0; });
+        $overall_rating = count($valid_ratings) > 0 ? array_sum($valid_ratings) / count($valid_ratings) : 0;
+        
+        // Build recommendation string from yes/no answers
+        $recommendations = [];
+        if ($extra_ratings['participate_again'] === 'yes') $recommendations[] = 'participate_again';
+        if ($extra_ratings['recommend_program'] === 'yes') $recommendations[] = 'recommend_program';
+        if ($extra_ratings['future_internship'] === 'yes') $recommendations[] = 'future_internship';
+        if ($extra_ratings['interview'] === 'yes') $recommendations[] = 'interview';
+        $recommendation_str = implode(',', $recommendations);
+        
+        // Store extra data as JSON in comments
+        $comments_json = json_encode($extra_ratings);
+        
+        // Generate unique evaluation ID
+        $eval_id = 'CEVAL' . date('Ymd') . rand(1000, 9999);
+        
+        // Insert using existing database columns
+        $insertSql = "INSERT INTO evaluations (
+                        evaluation_id,
+                        application_id,
+                        student_id,
+                        company_id,
+                        technical_skills,
+                        communication_skills,
+                        teamwork,
+                        problem_solving,
+                        overall_performance,
+                        rating,
+                        comments,
+                        recommendation,
+                        evaluator_name
+                      ) VALUES (
+                        :evaluation_id,
+                        :application_id,
+                        :student_id,
+                        :company_id,
+                        :technical_skills,
+                        :communication_skills,
+                        :teamwork,
+                        :problem_solving,
+                        :overall_performance,
+                        :rating,
+                        :comments,
+                        :recommendation,
+                        :evaluator_name
+                      )";
+        
+        $stmt = $db->prepare($insertSql);
+        $stmt->execute([
+            ':evaluation_id' => $eval_id,
+            ':application_id' => $application_id,
+            ':student_id' => $application['student_id'],
+            ':company_id' => $company_id,
+            ':technical_skills' => $student_impact,           // Student Impact → technical_skills
+            ':communication_skills' => $communication,        // Communication → communication_skills
+            ':teamwork' => $teamwork_rating,                  // Teamwork → teamwork
+            ':problem_solving' => $motivation,                // Motivation → problem_solving
+            ':overall_performance' => $program_satisfaction,  // Program Satisfaction → overall_performance
+            ':rating' => round($overall_rating, 2),
+            ':comments' => $comments_json,
+            ':recommendation' => $recommendation_str,
+            ':evaluator_name' => 'Company Evaluation'
+        ]);
         
         return [
             'status' => 'success',
             'message' => 'Evaluation submitted successfully',
-            'data' => [
-                'evaluation_id' => $eval_id,
-                'overall_rating' => round($overall_rating, 2),
-                'student_name' => $application['student_name'],
-                'position' => $application['position']
-            ]
+            'evaluation_id' => $eval_id
         ];
-    } catch (Exception $e) {
-        if ($db->inTransaction()) $db->rollBack();
-        error_log("Company evaluation submission failed: " . $e->getMessage());
-        return ['error' => 'Failed to submit evaluation: ' . $e->getMessage()];
+        
+    } catch (PDOException $e) {
+        error_log("Error submitting company evaluation: " . $e->getMessage());
+        return [
+            'status' => 'error',
+            'error' => 'Failed to submit evaluation: ' . $e->getMessage()
+        ];
     }
 }
 
@@ -176,23 +225,31 @@ function get_company_evaluations($company_id) {
     try {
         $db = getDB();
         
-        $stmt = $db->prepare("
-            SELECT e.*,
-                   s.name as student_name,
-                   s.email as student_email,
-                   s.profile_pic as student_profile_pic,
-                   s.major as student_major,
-                   i.position as internship_position,
-                   i.dates as internship_dates,
-                   a.application_id as application_code
-            FROM evaluations e
-            JOIN students s ON e.student_id = s.id
-            JOIN applications a ON e.application_id = a.id
-            JOIN internships i ON a.internship_id = i.id
-            WHERE e.company_id = ?
-            ORDER BY e.submitted_at DESC
-        ");
-        $stmt->execute([$company_id]);
+        $sql = "SELECT 
+                    e.id,
+                    e.application_id,
+                    e.rating,
+                    e.technical_skills,
+                    e.communication_skills,
+                    e.teamwork,
+                    e.problem_solving,
+                    e.overall_performance,
+                    e.comments,
+                    e.recommendation,
+                    e.created_at,
+                    s.name AS student_name,
+                    s.email AS student_email,
+                    s.profile_pic AS student_profile_pic,
+                    i.title AS internship_position
+                FROM evaluations e
+                JOIN applications a ON e.application_id = a.id
+                JOIN students s ON e.student_id = s.id
+                JOIN internships i ON a.internship_id = i.id
+                WHERE e.company_id = :company_id
+                ORDER BY e.created_at DESC";
+        
+        $stmt = $db->prepare($sql);
+        $stmt->execute([':company_id' => $company_id]);
         $evaluations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         return [
@@ -200,39 +257,46 @@ function get_company_evaluations($company_id) {
             'data' => $evaluations
         ];
     } catch (PDOException $e) {
-        error_log("Failed to fetch company evaluations: " . $e->getMessage());
-        return ['error' => 'Failed to fetch evaluations'];
+        error_log("Error getting company evaluations: " . $e->getMessage());
+        return [
+            'status' => 'error',
+            'error' => 'Failed to load evaluations'
+        ];
     }
 }
 
 /**
- * Get evaluation details by ID
+ * Get details of a specific evaluation
  */
 function get_company_evaluation_details($evaluation_id, $company_id) {
     try {
         $db = getDB();
         
-        $stmt = $db->prepare("
-            SELECT e.*,
-                   s.name as student_name,
-                   s.email as student_email,
-                   s.profile_pic as student_profile_pic,
-                   s.major as student_major,
-                   i.position as internship_position,
-                   i.dates as internship_dates,
-                   i.location as internship_location,
-                   a.application_id as application_code
-            FROM evaluations e
-            JOIN students s ON e.student_id = s.id
-            JOIN applications a ON e.application_id = a.id
-            JOIN internships i ON a.internship_id = i.id
-            WHERE e.id = ? AND e.company_id = ?
-        ");
-        $stmt->execute([$evaluation_id, $company_id]);
+        $sql = "SELECT 
+                    e.*,
+                    s.name AS student_name,
+                    s.email AS student_email,
+                    i.title AS internship_position
+                FROM evaluations e
+                JOIN applications a ON e.application_id = a.id
+                JOIN students s ON e.student_id = s.id
+                JOIN internships i ON a.internship_id = i.id
+                WHERE e.id = :evaluation_id
+                AND e.company_id = :company_id";
+        
+        $stmt = $db->prepare($sql);
+        $stmt->execute([
+            ':evaluation_id' => $evaluation_id,
+            ':company_id' => $company_id
+        ]);
+        
         $evaluation = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if (!$evaluation) {
-            return ['error' => 'Evaluation not found or access denied'];
+            return [
+                'status' => 'error',
+                'error' => 'Evaluation not found'
+            ];
         }
         
         return [
@@ -240,9 +304,10 @@ function get_company_evaluation_details($evaluation_id, $company_id) {
             'data' => $evaluation
         ];
     } catch (PDOException $e) {
-        error_log("Failed to fetch evaluation details: " . $e->getMessage());
-        return ['error' => 'Failed to fetch evaluation'];
+        error_log("Error getting evaluation details: " . $e->getMessage());
+        return [
+            'status' => 'error',
+            'error' => 'Failed to load evaluation details'
+        ];
     }
 }
-
-?>

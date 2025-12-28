@@ -51,7 +51,7 @@ function submit_student_evaluation($student_id, $application_id, $evaluation_dat
         }
         
         // Check status - only CONFIRMED applications can be evaluated
-        if ($application['status'] !== 'Confirmed') {
+        if (!in_array($application['status'], ['Confirmed', 'Confirmed_By_Student'])) {
             $db->rollBack();
             return ['error' => 'Can only evaluate confirmed internships. Current status: ' . $application['status']];
         }
@@ -255,7 +255,7 @@ function get_pending_student_evaluations($student_id) {
             FROM applications a
             JOIN internships i ON a.internship_id = i.id
             WHERE a.student_id = ?
-            AND a.status = 'Confirmed'
+            AND a.status IN ('Confirmed', 'Confirmed_By_Student')
             HAVING has_evaluation = 0
             ORDER BY a.status_updated_date DESC
         ");

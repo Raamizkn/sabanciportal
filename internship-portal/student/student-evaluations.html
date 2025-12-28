@@ -40,33 +40,30 @@
 			display: flex;
 			overflow: hidden;
 		}
-		/* Rating options styling - box below question */
-		.rating-box {
+		/* Rating options styling */
+		.rating-group {
 			background: #f8f9fa;
 			border: 1px solid #dee2e6;
 			border-radius: 8px;
-			padding: 12px 16px;
+			padding: 15px 20px;
 			margin-top: 8px;
-			display: flex;
-			justify-content: center;
-			gap: 24px;
 		}
-		.rating-box .form-check {
-			margin: 0;
-			padding: 0;
-		}
-		.rating-box .form-check-input {
-			margin-right: 4px;
-		}
-		.rating-box .form-check-label {
+		.rating-group label.rating-label {
+			display: inline-block;
+			margin: 0 15px 0 5px;
 			font-weight: 500;
+			cursor: pointer;
+		}
+		.rating-group input[type="radio"] {
+			cursor: pointer;
 		}
 		.question-block {
-			margin-bottom: 20px;
+			margin-bottom: 24px;
 		}
-		.question-label {
+		.question-text {
 			font-weight: 500;
-			margin-bottom: 0;
+			margin-bottom: 8px;
+			display: block;
 		}
 	</style>
 </head>
@@ -233,148 +230,95 @@
 								
 								<!-- Rating questions section -->
 								<h6 class="fw-bold mb-4">Program Experience Rating</h6>
+								<p class="text-muted mb-4">Rate on a scale of 1-5 (1 = Strongly Disagree, 5 = Strongly Agree)</p>
 								
 								<div class="question-block">
-									<label class="question-label">I was satisfied with the First Step to the Business World Program. *</label>
-									<div class="rating-box">
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction1" value="1" required>
-											<label class="form-check-label" for="satisfaction1">1</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction2" value="2">
-											<label class="form-check-label" for="satisfaction2">2</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction3" value="3">
-											<label class="form-check-label" for="satisfaction3">3</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction4" value="4">
-											<label class="form-check-label" for="satisfaction4">4</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="program_satisfaction" id="satisfaction5" value="5">
-											<label class="form-check-label" for="satisfaction5">5</label>
-										</div>
+									<span class="question-text">I was satisfied with the First Step to the Business World Program. *</span>
+									<div class="rating-group">
+										<input type="radio" name="program_satisfaction" id="satisfaction1" value="1" required>
+										<label class="rating-label" for="satisfaction1">1</label>
+										<input type="radio" name="program_satisfaction" id="satisfaction2" value="2">
+										<label class="rating-label" for="satisfaction2">2</label>
+										<input type="radio" name="program_satisfaction" id="satisfaction3" value="3">
+										<label class="rating-label" for="satisfaction3">3</label>
+										<input type="radio" name="program_satisfaction" id="satisfaction4" value="4">
+										<label class="rating-label" for="satisfaction4">4</label>
+										<input type="radio" name="program_satisfaction" id="satisfaction5" value="5">
+										<label class="rating-label" for="satisfaction5">5</label>
 									</div>
 								</div>
 
 								<div class="question-block">
-									<label class="question-label">The institution/company generally left a positive impression on me. *</label>
-									<div class="rating-box">
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="company_impression" id="impression1" value="1" required>
-											<label class="form-check-label" for="impression1">1</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="company_impression" id="impression2" value="2">
-											<label class="form-check-label" for="impression2">2</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="company_impression" id="impression3" value="3">
-											<label class="form-check-label" for="impression3">3</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="company_impression" id="impression4" value="4">
-											<label class="form-check-label" for="impression4">4</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="company_impression" id="impression5" value="5">
-											<label class="form-check-label" for="impression5">5</label>
-										</div>
+									<span class="question-text">The institution/company generally left a positive impression on me. *</span>
+									<div class="rating-group">
+										<input type="radio" name="company_impression" id="impression1" value="1" required>
+										<label class="rating-label" for="impression1">1</label>
+										<input type="radio" name="company_impression" id="impression2" value="2">
+										<label class="rating-label" for="impression2">2</label>
+										<input type="radio" name="company_impression" id="impression3" value="3">
+										<label class="rating-label" for="impression3">3</label>
+										<input type="radio" name="company_impression" id="impression4" value="4">
+										<label class="rating-label" for="impression4">4</label>
+										<input type="radio" name="company_impression" id="impression5" value="5">
+										<label class="rating-label" for="impression5">5</label>
 									</div>
 								</div>
 
 								<div class="question-block">
-									<label class="question-label">Did a consultant regularly take care of you at the institution? *</label>
-									<div class="rating-box">
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="consultant_care" id="consultant_yes" value="yes" required>
-											<label class="form-check-label" for="consultant_yes">Yes</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="consultant_care" id="consultant_no" value="no">
-											<label class="form-check-label" for="consultant_no">No</label>
-										</div>
+									<span class="question-text">Did a consultant regularly take care of you at the institution? *</span>
+									<div class="rating-group">
+										<input type="radio" name="consultant_care" id="consultant_yes" value="yes" required>
+										<label class="rating-label" for="consultant_yes">Yes</label>
+										<input type="radio" name="consultant_care" id="consultant_no" value="no">
+										<label class="rating-label" for="consultant_no">No</label>
 									</div>
 								</div>
 
 								<div class="question-block consultant-satisfaction" style="display: none;">
-									<label class="question-label">(If yes) I was satisfied with the guidance of my institution consultant. *</label>
-									<div class="rating-box">
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_sat1" value="1">
-											<label class="form-check-label" for="consultant_sat1">1</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_sat2" value="2">
-											<label class="form-check-label" for="consultant_sat2">2</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_sat3" value="3">
-											<label class="form-check-label" for="consultant_sat3">3</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_sat4" value="4">
-											<label class="form-check-label" for="consultant_sat4">4</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="consultant_satisfaction" id="consultant_sat5" value="5">
-											<label class="form-check-label" for="consultant_sat5">5</label>
-										</div>
+									<span class="question-text">(If yes) I was satisfied with the guidance of my institution consultant. *</span>
+									<div class="rating-group">
+										<input type="radio" name="consultant_satisfaction" id="consultant_sat1" value="1">
+										<label class="rating-label" for="consultant_sat1">1</label>
+										<input type="radio" name="consultant_satisfaction" id="consultant_sat2" value="2">
+										<label class="rating-label" for="consultant_sat2">2</label>
+										<input type="radio" name="consultant_satisfaction" id="consultant_sat3" value="3">
+										<label class="rating-label" for="consultant_sat3">3</label>
+										<input type="radio" name="consultant_satisfaction" id="consultant_sat4" value="4">
+										<label class="rating-label" for="consultant_sat4">4</label>
+										<input type="radio" name="consultant_satisfaction" id="consultant_sat5" value="5">
+										<label class="rating-label" for="consultant_sat5">5</label>
 									</div>
 								</div>
 
 								<div class="question-block">
-									<label class="question-label">I would recommend the First Step to the Business World Program to other students. *</label>
-									<div class="rating-box">
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_program" id="rec_prog1" value="1" required>
-											<label class="form-check-label" for="rec_prog1">1</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_program" id="rec_prog2" value="2">
-											<label class="form-check-label" for="rec_prog2">2</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_program" id="rec_prog3" value="3">
-											<label class="form-check-label" for="rec_prog3">3</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_program" id="rec_prog4" value="4">
-											<label class="form-check-label" for="rec_prog4">4</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_program" id="rec_prog5" value="5">
-											<label class="form-check-label" for="rec_prog5">5</label>
-										</div>
+									<span class="question-text">I would recommend the First Step to the Business World Program to other students. *</span>
+									<div class="rating-group">
+										<input type="radio" name="recommend_program" id="rec_prog1" value="1" required>
+										<label class="rating-label" for="rec_prog1">1</label>
+										<input type="radio" name="recommend_program" id="rec_prog2" value="2">
+										<label class="rating-label" for="rec_prog2">2</label>
+										<input type="radio" name="recommend_program" id="rec_prog3" value="3">
+										<label class="rating-label" for="rec_prog3">3</label>
+										<input type="radio" name="recommend_program" id="rec_prog4" value="4">
+										<label class="rating-label" for="rec_prog4">4</label>
+										<input type="radio" name="recommend_program" id="rec_prog5" value="5">
+										<label class="rating-label" for="rec_prog5">5</label>
 									</div>
 								</div>
 
 								<div class="question-block">
-									<label class="question-label">I would recommend the institution/company to other students. *</label>
-									<div class="rating-box">
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_company" id="rec_comp1" value="1" required>
-											<label class="form-check-label" for="rec_comp1">1</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_company" id="rec_comp2" value="2">
-											<label class="form-check-label" for="rec_comp2">2</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_company" id="rec_comp3" value="3">
-											<label class="form-check-label" for="rec_comp3">3</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_company" id="rec_comp4" value="4">
-											<label class="form-check-label" for="rec_comp4">4</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<input type="radio" class="form-check-input" name="recommend_company" id="rec_comp5" value="5">
-											<label class="form-check-label" for="rec_comp5">5</label>
-										</div>
+									<span class="question-text">I would recommend the institution/company to other students. *</span>
+									<div class="rating-group">
+										<input type="radio" name="recommend_company" id="rec_comp1" value="1" required>
+										<label class="rating-label" for="rec_comp1">1</label>
+										<input type="radio" name="recommend_company" id="rec_comp2" value="2">
+										<label class="rating-label" for="rec_comp2">2</label>
+										<input type="radio" name="recommend_company" id="rec_comp3" value="3">
+										<label class="rating-label" for="rec_comp3">3</label>
+										<input type="radio" name="recommend_company" id="rec_comp4" value="4">
+										<label class="rating-label" for="rec_comp4">4</label>
+										<input type="radio" name="recommend_company" id="rec_comp5" value="5">
+										<label class="rating-label" for="rec_comp5">5</label>
 									</div>
 								</div>
 
@@ -581,7 +525,7 @@
 			selector.innerHTML = '<option value="">-- Select an application --</option>';
 			
 			// Only show CONFIRMED applications
-			const confirmedApps = applications.filter(app => app.status === 'Confirmed');
+			const confirmedApps = applications.filter(app => ['Confirmed', 'Confirmed_By_Student'].includes(app.status));
 			
 			if (confirmedApps.length === 0) {
 				selector.innerHTML = '<option value="">No confirmed internships to evaluate</option>';
