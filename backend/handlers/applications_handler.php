@@ -309,6 +309,32 @@ if ($entity === 'applications') {
 
             try {
                 $status_param = $_GET['status'] ?? null;
+                $term_id_param = $_GET['term_id'] ?? null;
+                
+                // Get active term for filtering (terms are supreme layer)
+                $active_term = get_active_term();
+                
+                // Build query with term filtering
+                $term_condition = "";
+                $params = [$company_id_param];
+                
+                // Filter by term - terms are the supreme layer
+                if ($term_id_param !== null) {
+                    // Explicit term filter from query param
+                    $term_condition = " AND i.term_id = ?";
+                    $params[] = $term_id_param;
+                } elseif ($active_term && !hasRole(ROLE_ADMIN)) {
+                    // Default to active term for companies (admins see all)
+                    $term_condition = " AND i.term_id = ?";
+                    $params[] = $active_term['id'];
+                }
+                // If admin and no term_id param, show all (for admin view)
+                
+                if ($status_param) {
+                    $term_condition .= " AND a.status = ?";
+                    $params[] = $status_param;
+                }
+                
                 $stmt = $db->prepare("
                     SELECT 
                         a.id AS internal_id,
@@ -322,6 +348,7 @@ if ($entity === 'applications') {
                         i.location as internship_location,
                         i.dates as internship_dates,
                         i.description as internship_description,
+                        i.term_id,
                         s.name as student_name,
                         s.major as student_major,
                         s.email as student_email,
@@ -332,13 +359,9 @@ if ($entity === 'applications') {
                     FROM applications a
                     JOIN internships i ON a.internship_id = i.id
                     JOIN students s ON a.student_id = s.id
-                    WHERE i.company_id = ?" . ($status_param ? " AND a.status = ?" : "") . "
+                    WHERE i.company_id = ?{$term_condition}
                     ORDER BY a.applied_date DESC
                 ");
-                $params = [$company_id_param];
-                if ($status_param) {
-                    $params[] = $status_param;
-                }
                 $stmt->execute($params);
                 $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 foreach ($applications as &$application) {

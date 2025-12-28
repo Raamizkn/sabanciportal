@@ -8,7 +8,9 @@ global $db;
 
 /**
  * Get active term for a given date (or today)
- * Terms must be active (is_active = TRUE) and contain the date
+ * Terms must be active (is_active = TRUE)
+ * Priority: If is_active=1, term is active regardless of dates (admin can activate future terms)
+ * Fallback: If no active term found, check date range
  */
 function get_active_term($date = null) {
     global $db;
@@ -17,16 +19,32 @@ function get_active_term($date = null) {
     }
     
     try {
+        // First, try to get any active term (is_active=1 takes priority over dates)
         $stmt = $db->prepare("
             SELECT * FROM terms
-            WHERE is_active = 1 
-            AND start_date <= ? AND end_date >= ?
+            WHERE is_active = 1
+            ORDER BY start_date DESC
+            LIMIT 1
+        ");
+        $stmt->execute();
+        $active_term = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // If we found an active term, return it (regardless of dates)
+        if ($active_term) {
+            return $active_term;
+        }
+        
+        // Fallback: If no active term, try to find term containing the date
+        $stmt = $db->prepare("
+            SELECT * FROM terms
+            WHERE start_date <= ? AND end_date >= ?
             ORDER BY start_date DESC
             LIMIT 1
         ");
         $stmt->execute([$date, $date]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
+        error_log("Database error in get_active_term: " . $e->getMessage());
         return null;
     }
 }

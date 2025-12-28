@@ -207,7 +207,25 @@ async function loadStudentApplications(studentId) {
         hideApplicationLimitsDisplay();
     }
     try {
-        const applications = await api.getStudentApplications(studentId);
+        // Get active term to filter applications (terms are supreme layer)
+        let activeTermId = null;
+        try {
+            const terms = await api.getTerms();
+            if (Array.isArray(terms) && terms.length > 0) {
+                // Find active term - prioritize is_active=1 over dates
+                const activeTerm = terms.find(term => {
+                    return term.is_active === 1 || term.is_active === true;
+                });
+                if (activeTerm) {
+                    activeTermId = activeTerm.id;
+                }
+            }
+        } catch (e) {
+            console.warn('Could not load terms:', e);
+        }
+        
+        // Load applications filtered by active term
+        const applications = await api.getStudentApplications(studentId, activeTermId);
         allApplications = applications; // Store for filtering
         populateApplicationsTable(applications);
         updateStatusCards(applications);

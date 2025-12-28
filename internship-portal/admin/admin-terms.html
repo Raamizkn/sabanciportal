@@ -456,6 +456,11 @@
 						</div>
 
 						<div class="mb-3">
+							<label class="form-label">Max Applications Per Student:</label>
+							<input type="number" class="form-control" id="edit_term_max_applications" min="1" value="3">
+						</div>
+
+						<div class="mb-3">
 							<label class="form-label">Description (optional):</label>
 							<textarea class="form-control" id="edit_term_description" rows="3"></textarea>
 						</div>
@@ -625,7 +630,7 @@
 			});
 			
 			// Handle Edit Term Form Submission
-			document.getElementById('update_term').addEventListener('click', function() {
+			document.getElementById('update_term').addEventListener('click', async function() {
 				const termId = document.getElementById('edit_term_id').value;
 				const termName = document.getElementById('edit_term_name').value;
 				const startDate = document.getElementById('edit_term_start_date').value;
@@ -637,26 +642,36 @@
 					return;
 				}
 				
-				// In a real application, this would be an AJAX call to update the term
-				console.log('Updating term:', {
-					id: termId,
-					name: termName,
-					startDate: startDate,
-					endDate: endDate,
-					status: status,
-					description: document.getElementById('edit_term_description').value
-				});
+				// Map status to is_active boolean
+				const isActive = status === 'active';
 				
-				// Show success message
-				alert('Term updated successfully!');
-				
-				// Close modal and refresh page
-				const modal = bootstrap.Modal.getInstance(document.getElementById('edit_term_modal'));
-				modal.hide();
-				
-				// In a real application, you would update the table with the updated term
-				// For demo purposes, let's refresh the page
-				location.reload();
+				try {
+					const result = await api.updateTerm(termId, {
+						name: termName,
+						start_date: startDate,
+						end_date: endDate,
+						is_active: isActive,
+						max_applications_per_student: parseInt(document.getElementById('edit_term_max_applications')?.value) || 3
+					});
+					
+					if (result.error) {
+						alert('Error: ' + result.error);
+						return;
+					}
+					
+					// Show success message
+					alert('Term updated successfully!');
+					
+					// Close modal and refresh page
+					const modal = bootstrap.Modal.getInstance(document.getElementById('edit_term_modal'));
+					modal.hide();
+					
+					// Reload terms table
+					await loadTerms();
+				} catch (error) {
+					alert('An error occurred while updating the term.');
+					console.error(error);
+				}
 			});
 			
 			// Populate Delete Term Modal
@@ -808,7 +823,32 @@
 					document.getElementById('edit_term_name').value = term.name || '';
 					document.getElementById('edit_term_start_date').value = term.start_date || '';
 					document.getElementById('edit_term_end_date').value = term.end_date || '';
-					document.getElementById('edit_term_status').value = term.status || 'Active';
+					
+					// Map is_active to status dropdown
+					const isActive = term.is_active === 1 || term.is_active === true;
+					const statusSelect = document.getElementById('edit_term_status');
+					if (isActive) {
+						statusSelect.value = 'active';
+					} else {
+						// Check dates to determine if upcoming or completed
+						const today = new Date();
+						const startDate = new Date(term.start_date);
+						const endDate = new Date(term.end_date);
+						if (today < startDate) {
+							statusSelect.value = 'upcoming';
+						} else if (today > endDate) {
+							statusSelect.value = 'completed';
+						} else {
+							statusSelect.value = 'upcoming';
+						}
+					}
+					
+					// Set max_applications_per_student
+					const maxAppsField = document.getElementById('edit_term_max_applications');
+					if (maxAppsField) {
+						maxAppsField.value = term.max_applications_per_student || 3;
+					}
+					
 					document.getElementById('edit_term_description').value = term.description || '';
 				}
 			} catch (error) {
